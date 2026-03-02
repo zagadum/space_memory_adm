@@ -1,4 +1,4 @@
-import type { AxiosAdapter, AxiosRequestConfig, AxiosResponse } from "axios";
+import type { AxiosAdapter, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes } from "./mockDb";
 
 type Json = any;
@@ -7,27 +7,27 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-function ok<T>(config: AxiosRequestConfig, data: T, status = 200): AxiosResponse<T> {
+function ok<T>(config: InternalAxiosRequestConfig, data: T, status = 200): AxiosResponse<T> {
   return {
     data,
     status,
     statusText: "OK",
-    headers: { "content-type": "application/json" },
-    config,
+    headers: { "content-type": "application/json" } as any,
+    config: config as any,
   };
 }
 
-function err(config: AxiosRequestConfig, status: number, message: string): AxiosResponse<Json> {
+function err(config: InternalAxiosRequestConfig, status: number, message: string): AxiosResponse<Json> {
   return {
     data: { message },
     status,
     statusText: "Error",
-    headers: { "content-type": "application/json" },
-    config,
+    headers: { "content-type": "application/json" } as any,
+    config: config as any,
   };
 }
 
-function readBody(config: AxiosRequestConfig): any {
+function readBody(config: InternalAxiosRequestConfig): any {
   const d: any = (config as any).data;
   if (!d) return null;
   if (typeof d === "string") {
