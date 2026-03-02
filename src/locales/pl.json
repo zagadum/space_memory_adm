@@ -1,0 +1,338 @@
+{
+  "app": {
+    "title": "GLS · Płatności",
+    "logout": "Wyloguj"
+  },
+  "auth": {
+    "title": "Logowanie",
+    "email": "Email",
+    "password": "Hasło",
+    "submit": "Zaloguj"
+  },
+  "tabs": {
+    "payments": "Płatności",
+    "groups": "Grupy",
+    "info": "Informacje",
+    "attendance": "Obecność",
+    "progress": "Postęp",
+    "notes": "Notatki"
+  },
+  "payments": {
+    "balance": "Saldo",
+    "overall": "Saldo ogólne",
+    "nextPay": "Następna płatność",
+    "activePrograms": "Aktywne programy",
+    "actions": "Akcje",
+    "tx": {
+      "title": "Transakcje",
+      "count": "transakcji",
+      "loading": "Ładowanie transakcji…",
+      "paid": "paid",
+      "pending": "pending"
+    },
+    "legend": {
+      "title": "Legenda:",
+      "paid": "Opłacone",
+      "pending": "Oczekuje",
+      "overdue": "Zaległe",
+      "pause": "Pauza",
+      "summer": "Wakacje",
+      "extra": "Zaj. dodatkowe"
+    },
+    "year": "Rok:",
+    "view": {
+      "grid": "⬛ Siatka",
+      "table": "☰ Tabela"
+    },
+    "month": {
+      "status": "Status",
+      "amount": "Kwota",
+      "lessons": "Zajęcia"
+    },
+    "btn": {
+      "invoice": "Faktura",
+      "refund": "Zwrot",
+      "korekta": "Korekta",
+      "tariff": "Taryfa",
+      "discount": "Zniżka",
+      "pause": "Pauza",
+      "extra": "Dodatkowe",
+      "unlock": "Unlock",
+      "archive": "Archiwum",
+      "split": "Podziel",
+      "resume": "Wznów"
+    },
+    "extras": {
+      "title": "Pozycje",
+      "count": "pozycje"
+    },
+    "status": {
+      "paid": "Opłacono",
+      "pending": "Oczekuje",
+      "overdue": "Zaległe",
+      "pause": "Pauza",
+      "summer": "Lato",
+      "partial": "Częściowo",
+      "extra": "Dodatkowe"
+    },
+    "table": {
+      "month": "Miesiąc",
+      "status": "Status",
+      "amount": "Kwota",
+      "ksef": "KSeF",
+      "lessons": "Lekcje"
+    },
+    "labels": {
+      "until": "do",
+      "discountShort": "zniżka"
+    },
+    "ksef": {
+      "title": "Faktury KSeF",
+      "loading": "Ładowanie KSeF…"
+    },
+    "korekta": {
+      "forInvoice": "Korekta do faktury"
+    },
+    "refund": {
+      "forInvoice": "Zwrot dla faktury"
+    }
+  },
+  "common": {
+    "cancel": "Anuluj",
+    "save": "Zapisz",
+    "ok": "OK",
+    "close": "Zamknij",
+    "loading": "Ładowanie…",
+    "monthsShort": [
+      "STY",
+      "LUT",
+      "MAR",
+      "KWI",
+      "MAJ",
+      "CZE",
+      "LIP",
+      "SIE",
+      "WRZ",
+      "PAŹ",
+      "LIS",
+      "GRU"
+    ],
+    "submit": "Wyślij",
+    "apply": "Zastosuj",
+    "add": "Dodaj",
+    "create": "Utwórz",
+    "sending": "Sending…",
+    "saving": "Zapisywanie…",
+    "active": "Aktywna",
+    "expand": "Rozwiń",
+    "collapse": "Zwiń"
+  },
+  "modals": {
+    "pause": {
+      "title": "⏸ Pauza / wakacje",
+      "subtitle": "Zamrożenie abonamentu na wybrany okres.",
+      "from": "Od",
+      "to": "Do",
+      "return": "Data powrotu"
+    },
+    "discount": {
+      "title": "Zniżka",
+      "subtitle": "Przykładowe okno. Style/klasy jak w prototypie.",
+      "type": "Typ zniżki",
+      "amount": "Kwota (zł)",
+      "comment": "Komentarz",
+      "kind": "Typ",
+      "apply": "Zastosuj",
+      "kinds": {
+        "family": "Rodzina",
+        "referral": "Polecenie",
+        "promo": "Promo",
+        "loyalty": "Lojalność"
+      }
+    },
+    "tariff": {
+      "title": "Taryfa",
+      "subtitle": "Przykład REST: wysyłamy zmianę i odświeżamy store.",
+      "value": "Nowa taryfa (zł/mies.)",
+      "fromMonth": "Od miesiąca (indeks 0-11)",
+      "titleFull": "💸 Taryfa / cena",
+      "program": "Program"
+    },
+    "extra": {
+      "title": "Zajęcie/usługa dodatkowa",
+      "subtitle": "Szablon (bez backendu) — pola jak w projekcie.",
+      "name": "Nazwa",
+      "amount": "Kwota (zł)",
+      "date": "Data",
+      "titleField": "Tytuł",
+      "titlePlaceholder": "np. konsultacja / materiały"
+    },
+    "unlock": {
+      "action": "Odblokuj",
+      "subtitle": "Potwierdź działanie.",
+      "month": "Miesiąc",
+      "title": "🔓 Odblokuj płatności"
+    },
+    "archive": {
+      "title": "Archiwizacja",
+      "subtitle": "Przenieś program do archiwum (przykład).",
+      "reason": "Powód",
+      "action": "Archiwizuj",
+      "reasons": {
+        "left": "Odszedł/a",
+        "pause": "Pauza",
+        "other": "Inne"
+      }
+    },
+    "invoice": {
+      "title": "Edytuj fakturę",
+      "fv": "Numer FV",
+      "date": "Data",
+      "amount": "Kwota",
+      "ksef": "KSeF",
+      "subtitle": "Edytuj dane faktury dla wybranego miesiąca.",
+      "fvnum": "Numer FV",
+      "fvPlaceholder": "FV/2026/03/001",
+      "ksefPlaceholder": "Status / id KSeF",
+      "comment": "Komentarz",
+      "commentPlaceholder": "Notatka (opcjonalnie)",
+      "issueDate": "Data wystawienia",
+      "payDate": "Data opłaty"
+    },
+    "korekta": {
+      "title": "Korekta",
+      "subtitle": "Okno korekty kwoty (przykład).",
+      "comment": "Komentarz",
+      "amount": "Kwota (zł)",
+      "create": "Utwórz korektę",
+      "reason": "Powód",
+      "reasonPlaceholder": "np. przeliczenie",
+      "date": "Data korekty"
+    },
+    "refund": {
+      "title": "↩️ Zwrot",
+      "subtitle": "Przykład REST: wysyłamy żądanie i pokazujemy OK.",
+      "fv": "Numer FV",
+      "amount": "Kwota (zł)",
+      "reason": "Powód",
+      "date": "Data zwrotu",
+      "submit": "Zrób zwrot"
+    },
+    "refundOk": {
+      "title": "✅ Zgłoszenie przyjęte",
+      "created": "Utworzono:",
+      "status": "Status:"
+    },
+    "resume": {
+      "action": "Wznów",
+      "subtitle": "Zdejmij pauzę i kontynuuj naukę.",
+      "date": "Data",
+      "title": "Wznów"
+    },
+    "groupSplit": {
+      "title": "Podział grupy",
+      "subtitle": "Szablon: przenieś 1 lekcję/tydz. do innej grupy.",
+      "desc": "Opis",
+      "from": "Z grupy",
+      "to": "Do grupy",
+      "date": "Data obowiązywania"
+    },
+    "placeholders": {
+      "ddmm": "dd.mm",
+      "ddmmyyyy": "dd.mm.rrrr"
+    },
+    "changeGroup": {
+      "title": "🔄 Zmień grupę",
+      "subtitle": "Przykładowe okno. Zapis wywołuje mock API.",
+      "program": "Program",
+      "from": "Z",
+      "to": "Do",
+      "reason": "Powód",
+      "reasonPh": "Opcjonalny komentarz"
+    },
+    "trainerPresence": {
+      "title": "Obecność",
+      "subtitle": "Przykładowe okno połączone z mock API.",
+      "trainer": "Trener",
+      "status": "Status"
+    },
+    "editInfo": {
+      "title": "✏️ Edytuj dane",
+      "subtitle": "Przykładowe okno połączone z mock API."
+    },
+    "attendance": {
+      "title": "Obecność",
+      "status": "Status",
+      "note": "Notatka",
+      "notePh": "Opcjonalny komentarz",
+      "empty": "Brak"
+    }
+  },
+  "groups": {
+    "title": "Grupy",
+    "group": "Grupa",
+    "changeGroup": "Zmień grupę",
+    "trainers": "Trenerzy",
+    "statTotal": "Łącznie",
+    "statPresent": "Obecny",
+    "statAbsent": "Nieobecny",
+    "statRate": "Frekwencja"
+  },
+  "info": {
+    "title": "Informacje",
+    "edit": "Edytuj",
+    "studentData": "Dane ucznia",
+    "parentData": "Rodzic / opiekun",
+    "billing": "Faktury",
+    "rodo": "Zgody RODO",
+    "source": "Źródło",
+    "fullName": "Imię i nazwisko",
+    "birthDate": "Data urodzenia",
+    "years": "lat",
+    "school": "Szkoła",
+    "class": "Klasa",
+    "phone": "Telefon",
+    "email": "Email",
+    "address": "Adres",
+    "clientType": "Typ klienta",
+    "person": "Osoba fizyczna",
+    "company": "Firma",
+    "signed": "Podpisano",
+    "notSigned": "Brak zgody"
+  },
+  "attendance": {
+    "title": "Obecność",
+    "total": "Wszystkie zajęcia",
+    "present": "Obecny",
+    "absent": "Nieobecny",
+    "late": "Spóźniony",
+    "makeup": "Odrabianie",
+    "rate": "Frekwencja",
+    "date": "Data",
+    "topic": "Temat",
+    "trainer": "Trener",
+    "status": "Status",
+    "note": "Notatka",
+    "change": "Kliknij aby zmienić"
+  },
+  "progress": {
+    "title": "Postępy",
+    "achievements": "Osiągnięcia"
+  },
+  "notes": {
+    "title": "Notatki",
+    "new": "Nowa notatka",
+    "open": "Otwarte",
+    "done": "Zamknięte",
+    "payment": "Płatność",
+    "complaint": "Skarga",
+    "pause": "Pauza",
+    "general": "Ogólne",
+    "typeCall": "Telefon",
+    "typeEmail": "Email",
+    "typeMeet": "Spotkanie",
+    "typeNote": "Notatka",
+    "placeholder": "Napisz notatkę…",
+    "tags": "Tagi (po przecinku)"
+  }
+}

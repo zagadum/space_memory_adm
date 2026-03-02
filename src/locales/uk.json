@@ -1,0 +1,338 @@
+{
+  "app": {
+    "title": "GLS · Платежі",
+    "logout": "Вийти"
+  },
+  "auth": {
+    "title": "Вхід",
+    "email": "Email",
+    "password": "Пароль",
+    "submit": "Увійти"
+  },
+  "tabs": {
+    "payments": "Платежі",
+    "groups": "Групи",
+    "info": "Інформація",
+    "attendance": "Відвідуваність",
+    "progress": "Прогрес",
+    "notes": "Нотатки"
+  },
+  "payments": {
+    "balance": "Баланс",
+    "overall": "Загальний баланс",
+    "nextPay": "Наступний платіж",
+    "activePrograms": "Активні програми",
+    "actions": "Дії",
+    "tx": {
+      "title": "Транзакції",
+      "count": "транзакцій",
+      "loading": "Завантаження транзакцій…",
+      "paid": "paid",
+      "pending": "pending"
+    },
+    "legend": {
+      "title": "Легенда:",
+      "paid": "Оплачено",
+      "pending": "Очікує",
+      "overdue": "Прострочено",
+      "pause": "Пауза",
+      "summer": "Канікули",
+      "extra": "Дод. заняття"
+    },
+    "year": "Рік:",
+    "view": {
+      "grid": "⬛ Сітка",
+      "table": "☰ Таблиця"
+    },
+    "month": {
+      "status": "Статус",
+      "amount": "Сума",
+      "lessons": "Заняття"
+    },
+    "btn": {
+      "invoice": "Рахунок",
+      "refund": "Повернення",
+      "korekta": "Корекція",
+      "tariff": "Тариф",
+      "discount": "Знижка",
+      "pause": "Пауза",
+      "extra": "Додаткові",
+      "unlock": "Unlock",
+      "archive": "Архів",
+      "split": "Split",
+      "resume": "Відновити"
+    },
+    "extras": {
+      "title": "Позиції",
+      "count": "позиції"
+    },
+    "status": {
+      "paid": "Оплачено",
+      "pending": "Очікує",
+      "overdue": "Прострочено",
+      "pause": "Пауза",
+      "summer": "Літо",
+      "partial": "Частково",
+      "extra": "Додатково"
+    },
+    "table": {
+      "month": "Місяць",
+      "status": "Статус",
+      "amount": "Сума",
+      "ksef": "KSeF",
+      "lessons": "Заняття"
+    },
+    "labels": {
+      "until": "до",
+      "discountShort": "знижка"
+    },
+    "ksef": {
+      "title": "Рахунки KSeF",
+      "loading": "Завантаження KSeF…"
+    },
+    "korekta": {
+      "forInvoice": "Коректура до рахунку"
+    },
+    "refund": {
+      "forInvoice": "Повернення по рахунку"
+    }
+  },
+  "common": {
+    "cancel": "Скасувати",
+    "save": "Зберегти",
+    "ok": "OK",
+    "close": "Закрити",
+    "loading": "Завантаження…",
+    "monthsShort": [
+      "СІЧ",
+      "ЛЮТ",
+      "БЕР",
+      "КВІ",
+      "ТРА",
+      "ЧЕР",
+      "ЛИП",
+      "СЕР",
+      "ВЕР",
+      "ЖОВ",
+      "ЛИС",
+      "ГРУ"
+    ],
+    "submit": "Надіслати",
+    "apply": "Застосувати",
+    "add": "Додати",
+    "create": "Створити",
+    "sending": "Sending…",
+    "saving": "Збереження…",
+    "active": "Активна",
+    "expand": "Розгорнути",
+    "collapse": "Згорнути"
+  },
+  "modals": {
+    "pause": {
+      "title": "⏸ Пауза / канікули",
+      "subtitle": "Замороження абонемента на вибраний період.",
+      "from": "З",
+      "to": "До",
+      "return": "Дата повернення"
+    },
+    "discount": {
+      "title": "Знижка",
+      "subtitle": "Приклад діалогу. Стилі/класи як у прототипі.",
+      "type": "Тип знижки",
+      "amount": "Сума (zł)",
+      "comment": "Коментар",
+      "kind": "Тип",
+      "apply": "Застосувати",
+      "kinds": {
+        "family": "Сім'я",
+        "referral": "Рекомендація",
+        "promo": "Промо",
+        "loyalty": "Лояльність"
+      }
+    },
+    "tariff": {
+      "title": "Тариф",
+      "subtitle": "REST приклад: надсилаємо зміну і оновлюємо store.",
+      "value": "Новий тариф (zł/міс)",
+      "fromMonth": "З місяця (індекс 0-11)",
+      "titleFull": "💸 Тариф / ціна",
+      "program": "Програма"
+    },
+    "extra": {
+      "title": "Дод. заняття / послуга",
+      "subtitle": "Шаблон (без бекенда) — поля як у дизайні.",
+      "name": "Назва",
+      "amount": "Сума (zł)",
+      "date": "Дата",
+      "titleField": "Назва",
+      "titlePlaceholder": "напр.: консультація / матеріали"
+    },
+    "unlock": {
+      "action": "Розблокувати",
+      "subtitle": "Підтвердження дії.",
+      "month": "Місяць",
+      "title": "🔓 Розблокувати оплату"
+    },
+    "archive": {
+      "title": "Архівація",
+      "subtitle": "Перевести програму в архів (приклад діалогу).",
+      "reason": "Причина",
+      "action": "Архівувати",
+      "reasons": {
+        "left": "Пішов/пішла",
+        "pause": "Пауза",
+        "other": "Інше"
+      }
+    },
+    "invoice": {
+      "title": "Редагувати рахунок",
+      "fv": "Номер FV",
+      "date": "Дата",
+      "amount": "Сума",
+      "ksef": "KSeF",
+      "subtitle": "Редагування рахунку для обраного місяця.",
+      "fvnum": "Номер FV",
+      "fvPlaceholder": "FV/2026/03/001",
+      "ksefPlaceholder": "Статус / id KSeF",
+      "comment": "Коментар",
+      "commentPlaceholder": "Примітка (необов'язково)",
+      "issueDate": "Дата виставлення",
+      "payDate": "Дата оплати"
+    },
+    "korekta": {
+      "title": "Корекція (Korekta)",
+      "subtitle": "Приклад вікна для коригування суми.",
+      "comment": "Коментар",
+      "amount": "Сума (zł)",
+      "create": "Створити корекцію",
+      "reason": "Причина",
+      "reasonPlaceholder": "напр.: перерахунок",
+      "date": "Дата коректури"
+    },
+    "refund": {
+      "title": "↩️ Повернення",
+      "subtitle": "REST приклад: надсилаємо запит і показуємо OK-вікно.",
+      "fv": "Номер FV",
+      "amount": "Сума (zł)",
+      "reason": "Причина",
+      "date": "Дата повернення",
+      "submit": "Зробити повернення"
+    },
+    "refundOk": {
+      "title": "✅ Запит прийнято",
+      "created": "Створено:",
+      "status": "Статус:"
+    },
+    "resume": {
+      "action": "Відновити",
+      "subtitle": "Зняти паузу і продовжити навчання.",
+      "date": "Дата",
+      "title": "Відновити"
+    },
+    "groupSplit": {
+      "title": "Поділ групи",
+      "subtitle": "Шаблон: перенести 1 заняття/тиждень в іншу групу.",
+      "desc": "Опис",
+      "from": "З групи",
+      "to": "В групу",
+      "date": "Дата набуття чинності"
+    },
+    "placeholders": {
+      "ddmm": "дд.мм",
+      "ddmmyyyy": "дд.мм.рррр"
+    },
+    "changeGroup": {
+      "title": "🔄 Змінити групу",
+      "subtitle": "Демо-вікно. Зберегти викликає mock API.",
+      "program": "Програма",
+      "from": "З",
+      "to": "До",
+      "reason": "Причина",
+      "reasonPh": "Необовʼязковий коментар"
+    },
+    "trainerPresence": {
+      "title": "Присутність",
+      "subtitle": "Демо-вікно привʼязане до mock API.",
+      "trainer": "Тренер",
+      "status": "Статус"
+    },
+    "editInfo": {
+      "title": "✏️ Редагувати дані",
+      "subtitle": "Демо-вікно привʼязане до mock API."
+    },
+    "attendance": {
+      "title": "Відвідуваність",
+      "status": "Статус",
+      "note": "Нотатка",
+      "notePh": "Необовʼязковий коментар",
+      "empty": "Без позначки"
+    }
+  },
+  "groups": {
+    "title": "Групи",
+    "group": "Група",
+    "changeGroup": "Змінити групу",
+    "trainers": "Тренери",
+    "statTotal": "Всього",
+    "statPresent": "Присутній",
+    "statAbsent": "Відсутній",
+    "statRate": "Відвідуваність"
+  },
+  "info": {
+    "title": "Інформація",
+    "edit": "Редагувати",
+    "studentData": "Дані учня",
+    "parentData": "Батьки / опікун",
+    "billing": "Фактури",
+    "rodo": "Згоди RODO",
+    "source": "Звідки прийшов",
+    "fullName": "Імʼя та прізвище",
+    "birthDate": "Дата народження",
+    "years": "років",
+    "school": "Школа",
+    "class": "Клас",
+    "phone": "Телефон",
+    "email": "Email",
+    "address": "Адреса",
+    "clientType": "Тип клієнта",
+    "person": "Фізична особа",
+    "company": "Компанія",
+    "signed": "Підписано",
+    "notSigned": "Не підписано"
+  },
+  "attendance": {
+    "title": "Obecność",
+    "total": "Всього занять",
+    "present": "Присутній",
+    "absent": "Відсутній",
+    "late": "Запізнився",
+    "makeup": "Відпрацювання",
+    "rate": "Відвідуваність",
+    "date": "Дата",
+    "topic": "Тема",
+    "trainer": "Тренер",
+    "status": "Статус",
+    "note": "Нотатка",
+    "change": "Клікніть щоб змінити"
+  },
+  "progress": {
+    "title": "Успішність",
+    "achievements": "Досягнення"
+  },
+  "notes": {
+    "title": "Нотатки",
+    "new": "Нова нотатка",
+    "open": "Відкрито",
+    "done": "Закрито",
+    "payment": "Оплата",
+    "complaint": "Скарга",
+    "pause": "Пауза",
+    "general": "Загальне",
+    "typeCall": "Дзвінок",
+    "typeEmail": "Email",
+    "typeMeet": "Зустріч",
+    "typeNote": "Нотатка",
+    "placeholder": "Напишіть нотатку…",
+    "tags": "Теги (через кому)"
+  }
+}
