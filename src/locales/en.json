@@ -274,9 +274,24 @@
     "changeGroup": "Change group",
     "trainers": "Trainers",
     "statTotal": "Total",
-    "statPresent": "Present",
-    "statAbsent": "Absent",
-    "statRate": "Attendance"
+    "statPresent": "Attended",
+    "statAbsent": "Missed",
+    "statRate": "Attendance",
+    "lessons": {
+      "date": "DATE",
+      "block": "TOPIC BLOCK",
+      "element": "ELEMENT",
+      "trainer": "TRAINER",
+      "attendance": "ATTENDANCE",
+      "status": "STATUS",
+      "history": "GROUP HISTORY",
+      "current": "Current group",
+      "selectBlock": "— block —",
+      "selectElement": "— element —",
+      "statusPending": "🕐 Pending",
+      "statusDone": "✓ Completed",
+      "statusMakeup": "↩ Made up"
+    }
   },
   "info": {
     "title": "Information",

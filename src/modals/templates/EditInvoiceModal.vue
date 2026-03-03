@@ -1,38 +1,89 @@
 <template>
   <BaseModal popupClass="popup-edit-invoice">
     <div class="popup-title">🧾 {{ t("modals.invoice.title") }}</div>
-    <div class="popup-sub">{{ payload?.headerText || t("modals.invoice.subtitle") }}</div>
+    <div class="popup-sub">{{ t("modals.invoice.subtitle") }}</div>
 
     <div class="popup-2col">
       <div>
         <div class="popup-label">{{ t("modals.invoice.fvnum") }}</div>
-        <input class="popup-input" v-model="fv" :placeholder="t('modals.invoice.fvPlaceholder')" />
+        <input class="popup-input" v-model="fv" placeholder="FV/2026/03/..." />
       </div>
       <div>
-        <div class="popup-label">{{ t("modals.invoice.ksef") }}</div>
-        <input class="popup-input" v-model="ksef" :placeholder="t('modals.invoice.ksefPlaceholder')" />
+        <div class="popup-label">Дата выставления</div>
+        <input class="popup-input" type="date" v-model="issueDate" />
       </div>
     </div>
 
-    <div class="popup-2col" style="margin-top:10px">
+    <div class="popup-2col">
       <div>
-        <div class="popup-label">{{ t("modals.invoice.issueDate") }}</div>
-        <input class="popup-input" type="date" v-model="issueDate" />
+        <div class="popup-label">Тип наименования</div>
+        <select class="popup-input" v-model="serviceType" @change="onTypeChange">
+          <option value="lang_course">Курс иностранных языков</option>
+          <option value="bonus">Бонусные занятия</option>
+          <option value="custom">Произвольное наименование...</option>
+        </select>
       </div>
       <div>
-        <div class="popup-label">{{ t("modals.invoice.payDate") }}</div>
+        <div class="popup-label">Срок оплаты</div>
         <input class="popup-input" type="date" v-model="payDate" />
       </div>
     </div>
 
     <div>
-      <div class="popup-label">{{ t("modals.invoice.comment") }}</div>
-      <input class="popup-input" v-model="comment" :placeholder="t('modals.invoice.commentPlaceholder')" />
+      <div class="popup-label">Текст в счёте</div>
+      <input 
+        class="popup-input" 
+        v-model="serviceName" 
+        :disabled="serviceType !== 'custom'"
+        :style="{ opacity: serviceType !== 'custom' ? 0.6 : 1 }"
+        placeholder="Укажите название услуги..."
+      />
+    </div>
+
+    <div class="popup-2col">
+      <div>
+        <div class="popup-label">Период обучения</div>
+        <div style="display:flex; gap:5px">
+          <select class="popup-input" style="flex:2" v-model="targetMonth">
+            <option v-for="(m, i) in MONTHS" :key="i" :value="i">{{ m }}</option>
+          </select>
+          <input class="popup-input" style="flex:1" v-model="targetYear" placeholder="2026" />
+        </div>
+      </div>
+      <div>
+        <div class="popup-label">Итоговая сумма (PLN)</div>
+        <input class="popup-input amt-input" v-model="amount" />
+      </div>
+    </div>
+
+    <div class="client-card">
+      <div class="client-card-title">Данные плательщика (Buyer)</div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+        <div>
+          <div class="popup-label">Имя / Название</div>
+          <input class="popup-input input-sm" v-model="buyerName" />
+        </div>
+        <div>
+          <div class="popup-label">NIP (если есть)</div>
+          <input class="popup-input input-sm" v-model="buyerNip" placeholder="—" />
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <div class="popup-label">Адрес</div>
+        <input class="popup-input input-sm" v-model="buyerAddress" />
+      </div>
+    </div>
+
+    <div class="info-box info-amber">
+      <span>⚠️</span>
+      <div>Редактирование номера или даты может повлиять на статус в <strong>KSeF</strong>. Если счёт уже отправлен, может потребоваться корректировка.</div>
     </div>
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close">{{ t("common.cancel") }}</button>
-      <button class="btn btn-amber" :disabled="saving" @click="save">{{ t("common.save") }}</button>
+      <button class="btn btn-primary" :disabled="saving" @click="save">
+        {{ saving ? t("common.saving") : 'Сохранить изменения' }}
+      </button>
     </div>
   </BaseModal>
 </template>
@@ -47,19 +98,37 @@ import { paymentsApi } from "../../api/paymentsApi";
 const { t } = useI18n();
 const modal = useModalStore();
 
+const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
 const payload = modal.payload as any;
-const programId = payload?.programId as string | undefined;
-const year = payload?.year as string | undefined;
-const monthIndex = (payload?.monthIndex ?? 0) as number;
-const tx = payload?.tx || null;
+const programId = payload?.programId;
+const tx = payload?.tx || {};
 
-const issueDate = ref(payload?.issueDate || "2026-03-02");
-const payDate = ref(payload?.payDate || "2026-03-02");
+// Поля формы
+const fv = ref(tx.fvnum || "");
+const issueDate = ref(payload?.issueDate || new Date().toISOString().split('T')[0]);
+const payDate = ref(payload?.payDate || new Date().toISOString().split('T')[0]);
+const amount = ref(tx.amount || "0.00");
 
-const fv = ref(tx?.fvnum ?? "");
-const ksef = ref(tx?.ksef ?? "");
-const comment = ref("");
+// Логика типа услуги
+const serviceType = ref("lang_course");
+const serviceName = ref("Курс иностранных языков");
+
+// Период
+const targetMonth = ref(payload?.monthIndex ?? new Date().getMonth());
+const targetYear = ref(payload?.year ?? "2026");
+
+// Данные клиента
+const buyerName = ref(payload?.clientName || "Jan Kowalski");
+const buyerAddress = ref(payload?.clientAddress || "ul. Marszałkowska 1, 00-001 Warszawa");
+const buyerNip = ref(payload?.clientNip || "");
+
 const saving = ref(false);
+
+function onTypeChange() {
+  if (serviceType.value === 'lang_course') serviceName.value = "Курс иностранных языков";
+  else if (serviceType.value === 'bonus') serviceName.value = "Дополнительные / Бонусные занятия";
+}
 
 function close(){ modal.close(); }
 
@@ -67,10 +136,69 @@ async function save(){
   if (!programId) return close();
   saving.value = true;
   try{
-    await paymentsApi.editInvoice({ programId, year: year || "", monthIndex, fvnum: fv.value, ksef: ksef.value || undefined, issueDate: issueDate.value, payDate: payDate.value });
+    // Отправляем расширенный набор данных в твой API
+    await paymentsApi.editInvoice({ 
+      programId, 
+      year: targetYear.value, 
+      monthIndex: targetMonth.value, 
+      fvnum: fv.value, 
+      issueDate: issueDate.value, 
+      payDate: payDate.value,
+      amount: amount.value,
+      serviceName: serviceName.value,
+      buyerName: buyerName.value,
+      buyerAddress: buyerAddress.value,
+      buyerNip: buyerNip.value
+    });
     modal.close();
+  } catch(e) {
+    console.error(e);
   } finally {
     saving.value = false;
   }
 }
 </script>
+
+<style scoped>
+.popup-edit-invoice { max-width: 520px; }
+.popup-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.popup-sub { font-size: 12px; color: var(--dim); margin-bottom: 16px; }
+
+.popup-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+
+.popup-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--dim); margin-bottom: 5px; }
+
+.popup-input { 
+  background: rgba(255,255,255,.04); 
+  border: 1px solid var(--b); 
+  border-radius: 8px; 
+  padding: 9px 12px; 
+  color: var(--white); 
+  font-family: inherit; 
+  width: 100%; 
+  outline: none; 
+  font-size: 13px;
+}
+.popup-input:focus { border-color: var(--blue); background: rgba(255,255,255,.07); }
+
+.amt-input { color: var(--green); font-family: 'Space Mono', monospace; font-weight: 700; font-size: 15px; }
+
+.client-card { 
+  background: rgba(255,255,255,.02); 
+  border: 1px solid var(--b); 
+  border-radius: 10px; 
+  padding: 12px; 
+  margin: 15px 0;
+}
+.client-card-title { font-size: 11px; font-weight: 800; color: var(--blue); text-transform: uppercase; margin-bottom: 10px; }
+.input-sm { padding: 6px 10px; font-size: 12px; }
+
+.info-box { border-radius: 8px; padding: 10px 12px; font-size: 11px; display: flex; gap: 10px; line-height: 1.4; margin-bottom: 15px; }
+.info-amber { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); color: #d4a017; }
+
+.popup-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn { flex: 1; padding: 11px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: .2s; }
+.btn-ghost { background: rgba(255,255,255,.05); color: var(--dim); }
+.btn-primary { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; }
+.btn:hover { filter: brightness(1.2); }
+</style>

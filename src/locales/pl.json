@@ -273,10 +273,25 @@
     "group": "Grupa",
     "changeGroup": "Zmień grupę",
     "trainers": "Trenerzy",
-    "statTotal": "Łącznie",
-    "statPresent": "Obecny",
-    "statAbsent": "Nieobecny",
-    "statRate": "Frekwencja"
+    "statTotal": "Wszystkie",
+    "statPresent": "Obecność",
+    "statAbsent": "Nieobecność",
+    "statRate": "Frekwencja",
+    "lessons": {
+      "date": "DATA",
+      "block": "BLOK TEMATU",
+      "element": "ELEMENT",
+      "trainer": "TRENER",
+      "attendance": "FREKWENCJA",
+      "status": "STATUS",
+      "history": "HISTORIA GRUP",
+      "current": "Obecna grupa",
+      "selectBlock": "— blok —",
+      "selectElement": "— element —",
+      "statusPending": "🕐 Oczekuje",
+      "statusDone": "✓ Przeprowadzone",
+      "statusMakeup": "↩ Odrobione"
+    }
   },
   "info": {
     "title": "Informacje",

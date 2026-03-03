@@ -276,7 +276,22 @@
     "statTotal": "Всього",
     "statPresent": "Присутній",
     "statAbsent": "Відсутній",
-    "statRate": "Відвідуваність"
+    "statRate": "Відвідуваність",
+    "lessons": {
+      "date": "ДАТА",
+      "block": "БЛОК ТЕМИ",
+      "element": "ЕЛЕМЕНТ",
+      "trainer": "ТРЕНЕР",
+      "attendance": "ЯВКА",
+      "status": "СТАТУС",
+      "history": "ІСТОРІЯ ГРУП",
+      "current": "Поточна група",
+      "selectBlock": "— блок —",
+      "selectElement": "— елемент —",
+      "statusPending": "🕐 Очікує",
+      "statusDone": "✓ Проведено",
+      "statusMakeup": "↩ Відпрацьовано"
+    }
   },
   "info": {
     "title": "Інформація",
@@ -301,7 +316,7 @@
     "notSigned": "Не підписано"
   },
   "attendance": {
-    "title": "Obecność",
+    "title": "Відвідуваність",
     "total": "Всього занять",
     "present": "Присутній",
     "absent": "Відсутній",
