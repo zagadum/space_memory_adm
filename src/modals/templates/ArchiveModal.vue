@@ -76,7 +76,7 @@ async function confirm(){
   saving.value = true;
   try{
     // Отправляем расширенные данные согласно DevGuide (раздел 12.1)
-    await paymentsApi.archiveProgram({ 
+    await paymentsApi.archive({ 
       programId, 
       endDate: endDate.value,
       reason: reason.value,

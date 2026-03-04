@@ -33,12 +33,12 @@ export const paymentsApi = {
     return data.items;
   },
 
-  async submitRefund(payload: { fvnum: string; amount?: number; reason?: string }) {
+  async submitRefund(payload: { fvnum: string; amount?: number; reason?: string; type?: string; description?: string; method?: string; iban?: string }) {
     const { data } = await http.post<{ id: string; status: string; createdAt: string }>("api/payments/refund", payload);
     return data;
   },
 
-  async editInvoice(payload: { programId: string; monthIndex?: number; year?: string; fvnum: string; ksef?: string; issueDate?: string; payDate?: string }) {
+  async editInvoice(payload: { programId: string; monthIndex?: number; year?: string; fvnum: string; ksef?: string; issueDate?: string; payDate?: string; amount?: number; serviceName?: string; buyerName?: string; buyerAddress?: string; buyerNip?: string }) {
     const { data } = await http.post<{ ok: boolean; fvnum: string }>("api/payments/invoice", payload);
     return data;
   },
@@ -53,7 +53,7 @@ export const paymentsApi = {
     return data as { ok: boolean; programId: string; value: number };
   },
 
-  async setPause(payload: { programId: string; from: string; to: string; reason?: string }) {
+  async setPause(payload: { programId: string; from: string; to: string; reason?: string; comment?: string }) {
     const { data } = await http.post<{ ok: boolean }>("api/payments/pause", payload);
     return data;
   },
@@ -73,7 +73,7 @@ export const paymentsApi = {
     return data;
   },
 
-  async archive(payload: { programId: string; reason: string }) {
+  async archive(payload: { programId: string; reason?: string; endDate?: string; comment?: string }) {
     const { data } = await http.post<{ ok: boolean }>("api/payments/archive", payload);
     return data;
   },

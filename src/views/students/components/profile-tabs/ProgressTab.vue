@@ -27,16 +27,20 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
-import { useStudentTabsStore } from "../stores/studentTabs.store";
+import { useStudentTabsStore } from "../../../../stores/studentTabs.store";
 
-const studentId = "s_1";
+const route = useRoute();
 const { t } = useI18n();
 const st = useStudentTabsStore();
 const { progress, loading } = storeToRefs(st);
 
-onMounted(() => st.loadProgress(studentId));
+onMounted(() => {
+  const studentId = route.params.id as string;
+  if (studentId) st.loadProgress(studentId);
+});
 </script>
 
 <style scoped>

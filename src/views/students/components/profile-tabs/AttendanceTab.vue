@@ -52,12 +52,13 @@
 
 <script setup lang="ts">
 import { onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
-import { useStudentTabsStore } from "../stores/studentTabs.store";
-import { useModalStore } from "../stores/modal.store";
+import { useStudentTabsStore } from "../../../../stores/studentTabs.store";
+import { useModalStore } from "../../../../stores/modal.store";
 
-const studentId = "s_1";
+const route = useRoute();
 const { t } = useI18n();
 const st = useStudentTabsStore();
 const modal = useModalStore();
@@ -75,7 +76,10 @@ function markClass(mark: string) {
   return ({ present: "mark-present", absent: "mark-absent", late: "mark-late", makeup: "mark-makeup", empty: "mark-empty" } as any)[mark] ?? "mark-empty";
 }
 
-onMounted(() => st.loadAttendance(studentId));
+onMounted(() => {
+  const studentId = route.params.id as string;
+  if (studentId) st.loadAttendance(studentId);
+});
 </script>
 
 <style scoped>

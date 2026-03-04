@@ -64,8 +64,9 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // --- PAYMENTS ---
   if (method === "get" && url.startsWith("api/payments/student/")) {
     const studentId = url.split("/").pop();
-    if (studentId !== mockDb.student.id) return err(config, 404, "Student not found");
-    return ok(config, { student: mockDb.student, programs: mockDb.programs });
+    const data = studentId ? mockDb.students[studentId] : null;
+    if (!data) return err(config, 404, "Student not found");
+    return ok(config, { student: data.profile, programs: data.programs });
   }
 
   // Example mutation endpoints (no real persistence, but realistic response shape)

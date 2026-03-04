@@ -10,11 +10,12 @@
   <RefundModal v-else-if="openId==='refund'" />
   <RefundOkModal v-else-if="openId==='refund-ok'" />
   <ResumeModal v-else-if="openId==='resume'" />
-  <GroupSplitModal v-else-if="openId==='group-split'" />
+  <GroupSplitModal v-else-if="openId==='groupSplit'" />
   <ChangeGroupModal v-else-if="openId==='change-group'" />
   <TrainerPresenceModal v-else-if="openId==='trainer-presence'" />
   <EditInfoModal v-else-if="openId==='edit-info'" />
   <AttendanceStatusModal v-else-if="openId==='attendance-status'" />
+  <AttendanceModal v-else-if="openId==='attendance'" />
 </template>
 
 <script setup lang="ts">
@@ -36,6 +37,7 @@ import ChangeGroupModal from "./templates/ChangeGroupModal.vue";
 import TrainerPresenceModal from "./templates/TrainerPresenceModal.vue";
 import EditInfoModal from "./templates/EditInfoModal.vue";
 import AttendanceStatusModal from "./templates/AttendanceStatusModal.vue";
+import AttendanceModal from "./templates/AttendanceModal.vue";
 
 const modal = useModalStore();
 const { openId } = storeToRefs(modal);

@@ -1,13 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import AppLayout from "../layouts/AppLayout.vue";
 import AuthLayout from "../layouts/AuthLayout.vue";
-import PaymentsTab from "../tabs/PaymentsTab.vue";
-import GroupsTab from "../tabs/GroupsTab.vue";
-import InfoTab from "../tabs/InfoTab.vue";
-import AttendanceTab from "../tabs/AttendanceTab.vue";
-import ProgressTab from "../tabs/ProgressTab.vue";
-import NotesTab from "../tabs/NotesTab.vue";
-import SignInPage from "../tabs/SignInPage.vue";
+import SignInPage from "../views/auth/SignInPage.vue";
+import StudentListPage from "../views/students/StudentListPage.vue";
+import StudentProfilePage from "../views/students/StudentProfilePage.vue";
+
+import PaymentsTab from "../views/students/components/profile-tabs/PaymentsTab.vue";
+import GroupsTab from "../views/students/components/profile-tabs/GroupsTab.vue";
+import InfoTab from "../views/students/components/profile-tabs/InfoTab.vue";
+import AttendanceTab from "../views/students/components/profile-tabs/AttendanceTab.vue";
+import ProgressTab from "../views/students/components/profile-tabs/ProgressTab.vue";
+import NotesTab from "../views/students/components/profile-tabs/NotesTab.vue";
+
 import { useAuthStore } from "../stores/auth.store";
 
 export const router = createRouter({
@@ -23,16 +27,24 @@ export const router = createRouter({
       path: "/",
       component: AppLayout,
       children: [
-        { path: "", redirect: "/payments" },
-        { path: "payments", name: "payments", component: PaymentsTab },
-        { path: "groups", name: "groups", component: GroupsTab },
-        { path: "info", name: "info", component: InfoTab },
-        { path: "attendance", name: "attendance", component: AttendanceTab },
-        { path: "progress", name: "progress", component: ProgressTab },
-        { path: "notes", name: "notes", component: NotesTab },
+        { path: "", redirect: "/students" },
+        { path: "students", name: "students-list", component: StudentListPage },
+        {
+          path: "students/:id",
+          component: StudentProfilePage,
+          children: [
+            { path: "", redirect: { name: "student-payments" } },
+            { path: "payments", name: "student-payments", component: PaymentsTab },
+            { path: "groups", name: "student-groups", component: GroupsTab },
+            { path: "info", name: "student-info", component: InfoTab },
+            { path: "attendance", name: "student-attendance", component: AttendanceTab },
+            { path: "progress", name: "student-progress", component: ProgressTab },
+            { path: "notes", name: "student-notes", component: NotesTab },
+          ],
+        },
       ],
     },
-    { path: "/:pathMatch(.*)*", redirect: "/payments" },
+    { path: "/:pathMatch(.*)*", redirect: "/students" },
   ],
 });
 

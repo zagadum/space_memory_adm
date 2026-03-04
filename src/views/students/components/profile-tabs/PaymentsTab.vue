@@ -22,7 +22,7 @@
 
       <div class="bc">
         <div class="bc-label">{{ t("payments.activePrograms") }}</div>
-        <div class="bc-val">{{ payments.programs.length }}</div>
+        <div class="bc-val">{{ currentStudent?.enrollments?.length || 0 }}</div>
         <div class="bc-sub">Space · INDIGO · Extras</div>
       </div>
     </div>
@@ -37,55 +37,56 @@
       <div class="li"><div class="ld" style="background:rgba(236,72,153,.5);border:1px dashed rgba(236,72,153,.5)"></div>{{ t("payments.legend.extra") }}</div>
     </div>
 
-    <div v-for="p in payments.programs" :key="p.id" class="prog" :class="{ open: p.id === activeProgramId }">
-      
-      <div class="prog-head" @click="toggleProgram(p.id)">
-        <div class="prog-bar" :style="{ background: p.id === 'space' ? 'linear-gradient(180deg,var(--blue),var(--purple))' : p.id === 'indigo' ? 'linear-gradient(180deg,var(--purple),var(--pink))' : 'linear-gradient(180deg,var(--amber),var(--orange))' }"></div>
+    <!-- Iterate over enrollments -->
+    <div v-for="(enr, idx) in currentStudent?.enrollments" :key="idx" class="prog" :class="{ open: getProgramId(enr) === activeProgramId }">
+      <div class="prog-head" @click="toggleProgram(getProgramId(enr))">
+        <div class="prog-bar" :style="{ background: enr.school.includes('Indigo') ? 'linear-gradient(180deg,var(--purple),var(--pink))' : 'linear-gradient(180deg,var(--blue),var(--purple))' }"></div>
         <div class="prog-info">
-          <div class="prog-name">{{ p.name }}</div>
+          <div class="prog-name">{{ enr.school }}</div>
           <div class="prog-sub">
-            <span v-if="p.sub">{{ p.sub }}</span>
-            <span v-if="p.tariff"> · {{ p.tariff }} зл/мес</span>
-            <span v-if="p.id === 'indigo'" class="badge badge-child2" style="font-size:9.5px;margin-left:6px">👧 2-й ребёнок · <strong>−10% семья</strong></span>
+            <span>{{ enr.group }} · {{ enr.teacher }}</span>
+            <span> · {{ getSchedule(enr.teacher) }}</span>
+            <span v-if="enr.school.includes('Indigo')" class="badge badge-child2" style="font-size:9.5px;margin-left:6px">👧 2-й ребёнок · <strong>−10% семья</strong></span>
           </div>
         </div>
 
-        <div class="prog-bal">
-          <div class="prog-bal-val" :style="{ color: p.balance>0 ? 'var(--green)' : p.balance<0 ? 'var(--red)' : 'var(--white)' }">
-            {{ p.balance>0 ? "+" : "" }}{{ p.balance }} zł
+        <div class="prog-bal" v-if="getProgramForEnrollment(enr)">
+          <div class="prog-bal-val" :style="{ color: (getProgramForEnrollment(enr)?.balance || 0) > 0 ? 'var(--green)' : (getProgramForEnrollment(enr)?.balance || 0) < 0 ? 'var(--red)' : 'var(--white)' }">
+            {{ (getProgramForEnrollment(enr)?.balance || 0) > 0 ? "+" : "" }}{{ getProgramForEnrollment(enr)?.balance }} zł
           </div>
-          <div class="prog-bal-sub">{{ p.balanceLabel || 'баланс' }}</div>
+          <div class="prog-bal-sub">{{ getProgramForEnrollment(enr)?.balanceLabel || 'баланс' }}</div>
         </div>
         <div class="prog-arrow">›</div>
       </div>
 
-      <div class="prog-body">
+      <div class="prog-body" v-if="getProgramForEnrollment(enr)" v-show="getProgramId(enr) === activeProgramId">
         <div class="prog-inner">
           <div class="year-row">
             <span class="yr-label">{{ t("payments.year") }}</span>
             <button
-              v-for="y in yearsOf(p)"
+              v-for="y in yearsOf(getProgramForEnrollment(enr)!)"
               :key="y"
               class="yr-btn"
-              :class="{ active: yearByProgram[p.id] === y }"
-              @click="yearByProgram[p.id] = y"
+              :class="{ active: yearByProgram[getProgramId(enr)] === y }"
+              @click="yearByProgram[getProgramId(enr)] = y"
             >
               {{ y }}
             </button>
 
             <div class="view-toggle">
-              <button class="vt-btn" :class="{ active: viewMode[p.id] !== 'table' }" @click.stop="viewMode[p.id]='grid'">⬛ {{ t("payments.view.grid") }}</button>
-              <button class="vt-btn" :class="{ active: viewMode[p.id] === 'table' }" @click.stop="viewMode[p.id]='table'">☰ {{ t("payments.view.table") }}</button>
+              <button class="vt-btn" :class="{ active: viewMode[getProgramId(enr)] !== 'table' }" @click.stop="viewMode[getProgramId(enr)]='grid'">⬛ {{ t("payments.view.grid") }}</button>
+              <button class="vt-btn" :class="{ active: viewMode[getProgramId(enr)] === 'table' }" @click.stop="viewMode[getProgramId(enr)]='table'">☰ {{ t("payments.view.table") }}</button>
             </div>
           </div>
 
-          <div v-if="viewMode[p.id] !== 'table'" class="month-grid">
+          <!-- GRID VIEW -->
+          <div v-if="viewMode[getProgramId(enr)] !== 'table'" class="month-grid">
             <button
-              v-for="(m, idx) in monthsFor(p)"
-              :key="idx"
+              v-for="(m, midx) in monthsFor(getProgramForEnrollment(enr)!)"
+              :key="midx"
               class="mcell"
-              :class="[statusClass(m), { sel: selected[p.id] === idx }]"
-              @click="selected[p.id] = idx"
+              :class="[statusClass(m), { sel: selected[getProgramId(enr)] === midx }]"
+              @click="selected[getProgramId(enr)] = midx"
               type="button"
             >
               <div v-if="m.split" class="cbadge" style="background:var(--cyan);color:#000">⇄</div>
@@ -93,21 +94,18 @@
               <div v-if="m.ksef === 'conflict'" class="cbadge" style="background:var(--orange);color:#000;right:8px">!</div>
               <div v-if="m.ksef === 'error'" class="cbadge" style="background:var(--red);color:#fff;right:8px">✕</div>
 
-              <div class="mc-name">{{ monthNames[idx] }}</div>
+              <div class="mc-name">{{ monthNames[midx] }}</div>
               <div class="mc-icon">{{ iconFor(m) }}</div>
               <div class="mc-amt">{{ m.amount ? m.amount + ' zł' : '—' }}</div>
               <div class="mc-pay" :style="{ color: payColor(m) }" v-if="m.status.startsWith('extra')">{{ payLabel(m) }}</div>
-              
-              <div class="mc-sub" v-if="m.status === 'partial' && m.returnDate">↩ {{ m.returnDate }}</div>
-              <div class="mc-sub" v-if="m.status === 'pause' && m.pauseUntil">do {{ m.pauseUntil }}</div>
             </button>
-
-            <button class="mcell mcell-add" @click="modal.open('extra', { programId: p.id })" v-if="p.id !== 'extras'">
+            <button class="mcell mcell-add" @click="modal.open('extra', { programId: getProgramId(enr) })">
               <div style="font-size:17px;color:var(--pink)">＋</div>
               <div style="font-size:9px;color:var(--pink);font-weight:700;margin-top:1px">Доп. зан.</div>
             </button>
           </div>
 
+          <!-- TABLE VIEW -->
           <div v-else class="month-table-wrap">
             <table class="exp-table">
               <thead>
@@ -123,8 +121,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(m, idx) in monthsFor(p)" :key="idx" :class="[statusClass(m), { selrow: selected[p.id]===idx }]" @click="selected[p.id]=idx">
-                  <td style="font-family:'Space Mono',monospace;font-size:10.5px">{{ monthNames[idx] }}</td>
+                <tr v-for="(m, midx) in monthsFor(getProgramForEnrollment(enr)!)" :key="midx" :class="[statusClass(m), { selrow: selected[getProgramId(enr)]===midx }]" @click="selected[getProgramId(enr)]=midx">
+                  <td style="font-family:'Space Mono',monospace;font-size:10.5px">{{ monthNames[midx] }}</td>
                   <td><span class="st" :class="'st-' + m.status">{{ iconFor(m) }} {{ payLabelT(m) }}</span></td>
                   <td><span style="font-size:11px;font-weight:700" :style="{ color: payColor(m) }">{{ payLabel(m) }}</span></td>
                   <td style="font-family:'Space Mono',monospace;font-weight:700;font-size:11.5px" :style="{ color: payColor(m) }">{{ m.amount ? (m.amount + ' zł') : '—' }}</td>
@@ -137,196 +135,118 @@
             </table>
           </div>
 
-          <div v-if="currentMonth(p)" class="month-detail">
+          <!-- MONTH DETAIL -->
+          <div v-if="currentMonth(getProgramForEnrollment(enr)!)" class="month-detail">
             <div class="md-head">
-              <div class="md-title">{{ monthNames[selected[p.id] ?? 0] }} · {{ yearByProgram[p.id] }}</div>
-              <span style="padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(0,0,0,.2);border:1px solid" :style="{ color: payColor(currentMonth(p)), borderColor: payColor(currentMonth(p)) + '40' }">
-                {{ iconFor(currentMonth(p)) }} {{ payLabelT(currentMonth(p)) }}
+              <div class="md-title">{{ monthNames[selected[getProgramId(enr)] ?? 0] }} · {{ yearByProgram[getProgramId(enr)] }}</div>
+              <span style="padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(0,0,0,.2);border:1px solid" :style="{ color: payColor(currentMonth(getProgramForEnrollment(enr)!)), borderColor: payColor(currentMonth(getProgramForEnrollment(enr)!)) + '40' }">
+                {{ iconFor(currentMonth(getProgramForEnrollment(enr)!)) }} {{ payLabelT(currentMonth(getProgramForEnrollment(enr)!)) }}
               </span>
             </div>
-
             <div class="md-rows">
-              <div v-if="currentMonth(p).payStatus" class="md-row" :style="{ border: `1px solid ${payColor(currentMonth(p))}30`, background: `${payColor(currentMonth(p))}10` }">
+              <div v-if="currentMonth(getProgramForEnrollment(enr)!).payStatus" class="md-row" :style="{ border: `1px solid ${payColor(currentMonth(getProgramForEnrollment(enr)!))}30`, background: `${payColor(currentMonth(getProgramForEnrollment(enr)!))}10` }">
                 <span class="md-lbl">💰 Статус оплаты</span>
                 <div style="display:flex;align-items:center;gap:10px;margin-left:auto">
-                  <span v-if="currentMonth(p).txDate" style="font-size:10.5px;color:var(--dim)">📅 {{ currentMonth(p).txDate }}</span>
-                  <span style="font-weight:700" :style="{ color: payColor(currentMonth(p)) }">{{ payLabel(currentMonth(p)) }}</span>
+                  <span v-if="currentMonth(getProgramForEnrollment(enr)!).txDate" style="font-size:10.5px;color:var(--dim)">📅 {{ currentMonth(getProgramForEnrollment(enr)!).txDate }}</span>
+                  <span style="font-weight:700" :style="{ color: payColor(currentMonth(getProgramForEnrollment(enr)!)) }">{{ payLabel(currentMonth(getProgramForEnrollment(enr)!)) }}</span>
                 </div>
               </div>
-
               <div class="md-row">
                 <span class="md-lbl">{{ t("payments.month.amount") }}</span>
-                <span class="md-val" :style="{ color: payColor(currentMonth(p)) }">{{ currentMonth(p)?.amount ? currentMonth(p).amount + ' zł' : '0 zł' }}</span>
-              </div>
-
-              <div v-if="currentMonth(p).status === 'partial'" class="md-row" style="background:rgba(6,182,212,.05);border:1px solid rgba(6,182,212,.15)">
-                <span class="md-lbl">◐ Частичная пауза</span>
-                <div style="display:flex;flex-direction:column;gap:2px;align-items:flex-end">
-                  <span style="font-size:11.5px;color:var(--cyan);font-weight:600">{{ currentMonth(p).lessons }} занятий</span>
-                </div>
-              </div>
-
-              <div v-if="currentMonth(p).discAmt" class="md-row">
-                <span class="md-lbl">🏷️ Скидка</span>
-                <span class="md-val" style="color:var(--red);margin-left:auto">−{{ currentMonth(p).discAmt }} зл</span>
-              </div>
-
-              <div v-if="currentMonth(p).teacher" class="md-row">
-                <span class="md-lbl">👩‍🏫 Учитель</span>
-                <span style="font-size:12px;font-weight:600">{{ currentMonth(p).teacher }}</span>
-              </div>
-
-              <div v-if="currentMonth(p).bonus" class="md-row" style="background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.22)">
-                <span class="md-lbl">⭐ Бонусное занятие</span>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
-                  <span style="color:var(--gold);font-weight:700;font-size:11.5px">5-е занятие · бесплатно</span>
-                  <span v-if="currentMonth(p).bonusDate" style="font-size:10px;color:var(--dim)">Дата: <strong style="color:var(--white)">{{ currentMonth(p).bonusDate }}</strong></span>
-                </div>
-              </div>
-              
-              <div v-if="currentMonth(p).ksef" class="md-row">
-                <span class="md-lbl">📄 KSeF</span>
-                <span class="kb" :class="'kb-' + currentMonth(p).ksef">{{ currentMonth(p).ksef }}</span>
+                <span class="md-val" :style="{ color: payColor(currentMonth(getProgramForEnrollment(enr)!)) }">{{ currentMonth(getProgramForEnrollment(enr)!)?.amount ? currentMonth(getProgramForEnrollment(enr)!).amount + ' zł' : '0 zł' }}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="action-section" v-if="p.id !== 'extras'">
+        <div class="action-section">
           <div class="action-label">{{ t("payments.actions") }}</div>
           <div class="action-row">
-            <button class="btn btn-amber btn-sm" @click="modal.open('pause', { programId: p.id })">🌙 {{ t("payments.btn.pause") }}</button>
-            <button class="btn btn-ghost btn-sm" @click="modal.open('discount', { programId: p.id, year: yearByProgram[p.id], monthIndex: selected[p.id] ?? 0 })">🏷️ {{ t("payments.btn.discount") }}</button>
-            <button class="btn btn-ghost btn-sm" @click="modal.open('tariff', { programId: p.id, year: yearByProgram[p.id], monthIndex: selected[p.id] ?? 0 })">💱 {{ t("payments.btn.tariff") }}</button>
-            <button class="btn btn-pink btn-sm" @click="modal.open('extra', { programId: p.id })">➕ {{ t("payments.btn.extra") }}</button>
+            <button class="btn btn-amber btn-sm" @click="modal.open('pause', { programId: getProgramId(enr) })">🌙 {{ t("payments.btn.pause") }}</button>
+            <button class="btn btn-ghost btn-sm" @click="modal.open('discount', { programId: getProgramId(enr), year: yearByProgram[getProgramId(enr)], monthIndex: selected[getProgramId(enr)] ?? 0 })">🏷️ {{ t("payments.btn.discount") }}</button>
+            <button class="btn btn-ghost btn-sm" @click="modal.open('tariff', { programId: getProgramId(enr), year: yearByProgram[getProgramId(enr)], monthIndex: selected[getProgramId(enr)] ?? 0 })">💱 {{ t("payments.btn.tariff") }}</button>
+            <button class="btn btn-pink btn-sm" @click="modal.open('extra', { programId: getProgramId(enr) })">➕ {{ t("payments.btn.extra") }}</button>
           </div>
           <div class="action-row">
-            <button class="btn btn-unlock btn-sm" @click="modal.open('unlock', { programId: p.id })">🔓 {{ t("payments.btn.unlock") }}</button>
+            <button class="btn btn-unlock btn-sm" @click="modal.open('unlock', { programId: getProgramId(enr) })">🔓 {{ t("payments.btn.unlock") }}</button>
             <div class="action-divider"></div>
-            <button class="btn btn-ghost btn-sm" @click="modal.open('group-split', { programId: p.id })">🔄 {{ t("payments.btn.split") }}</button>
-            <button class="btn btn-archive btn-sm" @click="modal.open('archive', { programId: p.id })">📦 {{ t("payments.btn.archive") }}</button>
-            <button class="btn btn-green btn-sm" @click="modal.open('resume', { programId: p.id })">▶ {{ t("payments.btn.resume") }}</button>
+            <button class="btn btn-ghost btn-sm" @click="modal.open('groupSplit', { programId: getProgramId(enr) })">🔄 {{ t("payments.btn.split") }}</button>
+            <button class="btn btn-archive btn-sm" @click="modal.open('archive', { programId: getProgramId(enr) })">📦 {{ t("payments.btn.archive") }}</button>
+            <button class="btn btn-green btn-sm" @click="modal.open('resume', { programId: getProgramId(enr) })">▶ {{ t("payments.btn.resume") }}</button>
           </div>
-          <div class="action-hint">💡 Возврат и корректура счёта — у каждой транзакции ниже ✏️ 📋 ↩️</div>
         </div>
 
-        <div class="tx-section" :class="{ open: openTx[p.id] }" v-if="p.id !== 'extras'">
-          <div class="tx-toggle" @click="toggleTx(p.id)">
+        <div class="tx-section" :class="{ open: openTx[getProgramId(enr)] }">
+          <div class="tx-toggle" @click="toggleTx(getProgramId(enr))">
             <div class="tx-toggle-left">💳 {{ t("payments.tx.title") }} и счета KSeF</div>
             <div style="display:flex;align-items:center;gap:7px">
-              <span class="tx-cnt">{{ txsFor(p).length }} {{ t("payments.tx.count") }}</span>
-              <div class="tx-arrow" :style="{ transform: openTx[p.id] ? 'rotate(90deg)' : 'rotate(0deg)' }">›</div>
+              <span class="tx-cnt">{{ txsFor(getProgramForEnrollment(enr)!)?.length || 0 }} {{ t("payments.tx.count") }}</span>
+              <div class="tx-arrow" :style="{ transform: openTx[getProgramId(enr)] ? 'rotate(90deg)' : 'rotate(0deg)' }">›</div>
             </div>
           </div>
-
-          <div class="tx-body" v-show="openTx[p.id]">
-            <div v-if="payments.txLoading[p.id]" class="note">{{ t("payments.tx.loading") }}</div>
-            <div v-else-if="payments.txError[p.id]" class="note" style="border-color:rgba(239,68,68,.35); background:rgba(239,68,68,.08)">{{ payments.txError[p.id] }}</div>
-            
-            <div v-else>
-              <div v-for="(tx, i) in txsFor(p)" :key="tx.id || i">
-                <div v-if="tx.ksef === 'conflict'" class="tx-conflict-wrap" style="background:rgba(249,115,22,.04);border:1px solid rgba(249,115,22,.3);border-radius:10px;margin-bottom:4px;overflow:hidden;">
-                  <div class="tx-conflict-bar" style="background:rgba(249,115,22,.1);padding:6px 12px;font-size:11px;font-weight:700;color:var(--orange);display:flex;align-items:center;gap:6px;">
-                    ⚠ Конфликт KSeF — требует ручного разрешения
-                  </div>
-                  <div class="tx-row" style="border:none; margin-bottom:0; background:transparent">
-                    <div class="tx-date">{{ tx.date }}</div>
-                    <div class="tx-desc">
-                      <div class="tx-title">{{ tx.title }}</div>
-                      <div class="tx-sub">{{ tx.sub || `#TXN-${tx.id}` }}</div>
-                    </div>
-
-                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;margin-right:10px">
-                      <div class="tx-amt" :style="{ color: tx.paid ? 'var(--green)' : 'var(--blue)' }">{{ tx.amount }} zł</div>
-                      <span style="font-size:9.5px;font-weight:700" :style="{ color: tx.paid ? 'var(--green)' : 'var(--blue)' }">
-                        {{ tx.paid ? '✓ Оплачен' : '🕐 Ожидает' }}
-                      </span>
-                    </div>
-                    
-                    <span class="kb" :class="tx.ksef === 'ok' ? 'kb-ok' : 'kb-pending'">{{ tx.ksef === 'ok' ? '✓ KSeF' : '🕐 KSeF' }}</span>
-                    
-                    <div class="tx-btns" style="margin-left:10px">
-                      <button class="tx-btn" :style="{ opacity: !tx.paid ? '0.3' : '1', cursor: !tx.paid ? 'not-allowed' : 'pointer' }" :disabled="!tx.paid" title="Редактировать" @click.stop="openTxEditInvoice(p, tx)">✏️</button>
-                      <button class="tx-btn" :style="{ opacity: !tx.paid ? '0.3' : '1', cursor: !tx.paid ? 'not-allowed' : 'pointer' }" :disabled="!tx.paid" title="Корректура" @click.stop="openTxKorekta(p, tx)">📋</button>
-                      <button class="tx-btn" :style="{ opacity: !tx.paid ? '0.3' : '1', cursor: !tx.paid ? 'not-allowed' : 'pointer' }" :disabled="!tx.paid" title="Возврат" @click.stop="openTxRefund(p, tx)">↩️</button>
-                    </div>
-                  </div>
+          <div class="tx-body" v-show="openTx[getProgramId(enr)]">
+             <div v-for="(tx, i) in txsFor(getProgramForEnrollment(enr)!)" :key="i" class="tx-row">
+                <div class="tx-date">{{ tx.date }}</div>
+                <div class="tx-desc">
+                  <div class="tx-title">{{ tx.title }}</div>
+                  <div class="tx-sub">{{ tx.sub || '#TXN' }}</div>
                 </div>
-
-                <div v-else class="tx-row">
-                  <div class="tx-date">{{ tx.date }}</div>
-                  <div class="tx-desc">
-                    <div class="tx-title">{{ tx.title }}</div>
-                    <div class="tx-sub">{{ tx.sub || `#TXN-${tx.id}` }}</div>
-                  </div>
-
-                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;margin-right:10px">
-                    <div class="tx-amt" :style="{ color: tx.paid ? 'var(--green)' : 'var(--blue)' }">{{ tx.amount }} zł</div>
-                    <span style="font-size:9.5px;font-weight:700" :style="{ color: tx.paid ? 'var(--green)' : 'var(--blue)' }">
-                      {{ tx.paid ? '✓ Оплачен' : '🕐 Ожидает' }}
-                    </span>
-                  </div>
-                  
-                  <span class="kb" :class="tx.ksef === 'ok' ? 'kb-ok' : 'kb-pending'">{{ tx.ksef === 'ok' ? '✓ KSeF' : '🕐 KSeF' }}</span>
-                  
-                  <div class="tx-btns" style="margin-left:10px">
-                    <button class="tx-btn" :style="{ opacity: !tx.paid ? '0.3' : '1', cursor: !tx.paid ? 'not-allowed' : 'pointer' }" :disabled="!tx.paid" title="Редактировать" @click.stop="openTxEditInvoice(p, tx)">✏️</button>
-                    <button class="tx-btn" :style="{ opacity: !tx.paid ? '0.3' : '1', cursor: !tx.paid ? 'not-allowed' : 'pointer' }" :disabled="!tx.paid" title="Корректура" @click.stop="openTxKorekta(p, tx)">📋</button>
-                    <button class="tx-btn" :style="{ opacity: !tx.paid ? '0.3' : '1', cursor: !tx.paid ? 'not-allowed' : 'pointer' }" :disabled="!tx.paid" title="Возврат" @click.stop="openTxRefund(p, tx)">↩️</button>
-                  </div>
+                <div class="tx-amt" :style="{ color: tx.paid ? 'var(--green)' : 'var(--blue)' }">{{ tx.amount }} zł</div>
+                <div class="tx-btns">
+                  <button class="tx-btn" @click.stop="openTxEditInvoice(getProgramForEnrollment(enr)!, tx)">✏️</button>
+                  <button class="tx-btn" @click.stop="openTxKorekta(getProgramForEnrollment(enr)!, tx)">📋</button>
+                  <button class="tx-btn" @click.stop="openTxRefund(getProgramForEnrollment(enr)!, tx)">↩️</button>
                 </div>
-              </div>
-            </div>
+             </div>
           </div>
         </div>
+      </div>
+    </div>
 
-        <div v-if="p.id === 'extras' && p.extras?.length" class="tx-section open">
-          <div class="tx-toggle" @click="openExtras[p.id] = !openExtras[p.id]">
-            <div class="tx-toggle-left">📚 {{ t("payments.extras.title") }}</div>
-            <div style="display:flex;align-items:center;gap:7px">
-              <span class="tx-cnt">{{ p.extras.length }} {{ t("payments.extras.count") }}</span>
-              <div class="tx-arrow" :style="{ transform: openExtras[p.id] ? 'rotate(90deg)' : 'rotate(0deg)' }">›</div>
-            </div>
-          </div>
-
-          <div class="prog-body" v-show="openExtras[p.id]" style="display:block; border-top:none; padding: 0 16px 12px;">
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <div v-for="(e, i) in p.extras" :key="i" style="display:flex;align-items:center;gap:11px;padding:11px 13px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:10px">
-                <span style="font-size:20px;flex-shrink:0">{{ e.icon || '🏆' }}</span>
-                <div style="flex:1;min-width:0">
-                  <div style="font-size:13px;font-weight:700">{{ e.title }}</div>
-                  <div style="font-size:11px;color:var(--dim);margin-top:1px">{{ e.meta || e.amount + ' zł' }}</div>
-                </div>
-                <span style="font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--green);flex-shrink:0">{{ e.amount }} zł</span>
-                <div class="tx-btns" style="flex-shrink:0">
-                  <div class="tx-btn" title="Редактировать" @click.stop="openExtraEditInvoice(p, e)">✏️</div>
-                  <div class="tx-btn" title="Корректура" @click.stop="openExtraKorekta(p, e)">📋</div>
-                  <div class="tx-btn" title="Возврат" @click.stop="openExtraRefund(p, e)">↩️</div>
-                </div>
-              </div>
-            </div>
-            <div class="info-box info-blue" style="margin-top:8px;font-size:11px">
-              <span>ℹ️</span><div>Разовые услуги — нет абонемента, пауз и изменения тарифа.</div>
-            </div>
-          </div>
+    <!-- Extras card -->
+    <div v-if="payments.programs.find(p => p.id === 'extras')" class="prog" :class="{ open: activeProgramId === 'extras' }">
+      <div class="prog-head" @click="toggleProgram('extras')">
+        <div class="prog-bar" style="background:linear-gradient(180deg,var(--amber),var(--orange))"></div>
+        <div class="prog-info">
+          <div class="prog-name">Extras</div>
+          <div class="prog-sub">Разовые услуги и товары</div>
         </div>
-
+        <div class="prog-arrow">›</div>
+      </div>
+      <div class="prog-body" v-show="activeProgramId === 'extras'">
+        <div class="prog-inner">
+           <div v-for="(e, i) in (payments.programs.find(p => p.id === 'extras')?.extras || [])" :key="i" class="tx-row">
+              <span style="font-size:18px">{{ e.icon || '🏆' }}</span>
+              <div style="flex:1">
+                <div style="font-weight:600">{{ e.title }}</div>
+                <div style="font-size:10px; color:var(--dim)">{{ e.meta }}</div>
+              </div>
+              <div class="tx-amt">{{ e.amount }} zł</div>
+              <div class="tx-btns">
+                <button class="tx-btn" @click.stop="openExtraEditInvoice(payments.programs.find(p => p.id === 'extras')!, e)">✏️</button>
+                <button class="tx-btn" @click.stop="openExtraKorekta(payments.programs.find(p => p.id === 'extras')!, e)">📋</button>
+                <button class="tx-btn" @click.stop="openExtraRefund(payments.programs.find(p => p.id === 'extras')!, e)">↩️</button>
+              </div>
+           </div>
+        </div>
       </div>
     </div>
   </template>
 </template>
 
 <script setup lang="ts">
-// --- ЛОГИКА ОСТАЛАСЬ БЕЗ ИЗМЕНЕНИЙ 100% ---
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { usePaymentsStore } from "../stores/payments.store";
-import { useModalStore } from "../stores/modal.store";
-import type { MonthItem, Program } from "../api/mockDb";
+import { storeToRefs } from "pinia";
+import { usePaymentsStore } from "../../../../stores/payments.store";
+import { useModalStore } from "../../../../stores/modal.store";
+import { TEACHERS_DB } from "../../../../api/mockDb";
+import type { MonthItem, Program, Enrollment } from "../../../../api/mockDb";
 
 const { t, tm } = useI18n();
 const payments = usePaymentsStore();
 const modal = useModalStore();
+const { student: currentStudent } = storeToRefs(payments);
 
 const monthNames = (tm("common.monthsShort") as string[]) || ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
 
@@ -336,11 +256,22 @@ const selected = reactive<Record<string, number>>({});
 const openTx = reactive<Record<string, boolean>>({});
 const viewMode = reactive<Record<string, "grid" | "table">>({});
 const openExtras = reactive<Record<string, boolean>>({});
-const txItemOpen = reactive<Record<string, string | null>>({});
 
-onMounted(() => {
-  if (!payments.student) payments.loadStudent("s_1");
-});
+function getProgramId(enr: Enrollment) {
+  if (enr.school.includes('Indigo')) return 'indigo';
+  return 'space';
+}
+
+function getProgramForEnrollment(enr: Enrollment) {
+  const pid = getProgramId(enr);
+  return payments.programs.find(p => p.id === pid) || null;
+}
+
+function getSchedule(teacherName?: string) {
+  if (!teacherName) return "—";
+  const teach = TEACHERS_DB.find(x => x.name === teacherName);
+  return teach ? teach.schedule : "—";
+}
 
 function toggleProgram(id: string) {
   activeProgramId.value = activeProgramId.value === id ? "" : id;
@@ -364,9 +295,9 @@ function monthsFor(p: Program): MonthItem[] {
   return out;
 }
 
-function currentMonth(p: Program): MonthItem | null {
+function currentMonth(p: Program): MonthItem {
   const idx = selected[p.id] ?? 0;
-  return monthsFor(p)[idx] || null;
+  return monthsFor(p)[idx] || { status: "future", amount: 0, ksef: null, g1: 0, g2: 0 } as unknown as MonthItem;
 }
 
 function statusClass(m: MonthItem) {

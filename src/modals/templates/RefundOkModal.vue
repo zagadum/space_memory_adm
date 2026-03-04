@@ -18,6 +18,7 @@ import { useI18n } from "vue-i18n";
 import { computed } from "vue";
 import BaseModal from "../BaseModal.vue";
 import { useModalStore } from "../../stores/modal.store";
+const { t } = useI18n();
 const modal = useModalStore();
 const payload = computed(() => modal.payload);
 function close(){ modal.close(); }

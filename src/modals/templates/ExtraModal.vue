@@ -55,7 +55,7 @@
       <label class="popup-label">ДОПОЛНИТЕЛЬНАЯ СКИДКА <span style="font-size:10px;font-weight:400;color:var(--dim)">(НЕОБЯЗАТЕЛЬНО)</span></label>
       <input type="number" class="popup-input" v-model.number="extraDisc" placeholder="0 зл — оставить пустым если нет">
       
-      <div v-if="extraDisc > 0" class="fade-in">
+      <div v-if="Number(extraDisc) > 0" class="fade-in">
         <div class="info-box info-amber" style="margin-bottom:8px">
           <span>⚠️</span>
           <div>Дополнительная скидка требует <strong style="color:var(--white)">подтверждения руководителя</strong>.</div>

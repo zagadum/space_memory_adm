@@ -61,12 +61,13 @@
 
 <script setup lang="ts">
 import { reactive, ref, onMounted } from "vue";
+import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
-import { useStudentTabsStore } from "../stores/studentTabs.store";
-import { createStudentNote } from "../api/studentApi";
+import { useStudentTabsStore } from "../../../../stores/studentTabs.store";
+import { createStudentNote } from "../../../../api/studentApi";
 
-const studentId = "s_1";
+const route = useRoute();
 const { t } = useI18n();
 const st = useStudentTabsStore();
 const { notes, loading } = storeToRefs(st);
@@ -89,6 +90,8 @@ function typeClass(type: string) {
 }
 
 async function save() {
+  const studentId = route.params.id as string;
+  if (!studentId) return;
   saving.value = true;
   try {
     const parsedTags = tags.value
@@ -112,7 +115,10 @@ async function save() {
   }
 }
 
-onMounted(() => st.loadNotes(studentId));
+onMounted(() => {
+  const studentId = route.params.id as string;
+  if (studentId) st.loadNotes(studentId);
+});
 </script>
 
 <style scoped>

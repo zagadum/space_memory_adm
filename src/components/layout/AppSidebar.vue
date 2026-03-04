@@ -111,6 +111,9 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Управление состоянием открытых папок
 const openSections = ref<Record<string, boolean>>({
@@ -129,6 +132,9 @@ const toggleSection = (section: string) => {
 // Функция выделения активного пункта
 const setActive = (item: string) => {
   activeItem.value = item
+  if (item === 'students') {
+    router.push('/students')
+  }
 }
 </script>
 
