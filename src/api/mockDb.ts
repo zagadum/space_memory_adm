@@ -26,6 +26,7 @@ export interface MonthItem {
   pauseFrom?: string;
   returnDate?: string;
   teacher?: string;
+  lessons?: number;
   split?: boolean;
   bonus?: boolean;
   bonusDate?: string;
@@ -49,138 +50,254 @@ export interface StudentProfile {
   id: string;
   initials: string;
   name: string;
-  age: string;
-  parent: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  birthDate: string;
+  country: string;
+  city: string;
+  street: string;
+  apartment: string;
+  postalCode: string;
+  age: number;
+  parentName: string;
+  parentFirstName: string;
+  parentLastName: string;
+  parentPhone: string;
+  parentRole: string;
+  parentPassport: string;
   phone: string;
-  statusLabel: string;
+  status: string;
   statusColor: string;
+  photoConsent: boolean;
+  regComment: string;
   totalBalance: { value: string; label: string; color: string };
   nextPay: { date: string; approx: string };
+  enrollments: Enrollment[];
 }
 
-export const mockDb: { me: any; student: StudentProfile; programs: Program[] } = {
-  me: { id: "u_1", email: "admin@demo.local", name: "Demo Admin" },
-  student: {
-    id: "s_1",
-    initials: "АК",
-    name: "Anna Kowalska",
-    age: "11 лет",
-    parent: "Ewa Kowalska (мама)",
-    phone: "+48 601 234 567",
-    statusLabel: "● Активна",
-    statusColor: "var(--green)",
-    totalBalance: { value: "+220 zł", label: "переплата", color: "var(--green)" },
-    nextPay: { date: "01.03.2026", approx: "~837 зл · с учётом скидок" },
-  },
-  programs: [
-    {
-      id: "space",
-      name: "🌌 Space Memory",
-      sub: "Гр. A · Пн 16:00 · Anna Kowalska · 490 зл/мес · 👦 1-й ребёнок · без скидки",
-      tariff: 490,
-      balance: 120,
-      balanceLabel: "переплата",
-      barGradient: "linear-gradient(180deg,var(--blue),var(--purple))",
-      years: {
-        "2025": [
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "conflict", g1: 4, g2: 0, disc: "referral", discAmt: 99, txDate: "01.01.2025" },
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "manual", g1: 4, g2: 0, txDate: "01.02.2025" },
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, bonus: true, bonusDate: "30.03.2025", txDate: "01.03.2025" },
-          { status: "paid", payStatus: "paid", amount: 396, ksef: "ok", g1: 2, g2: 2, split: true, disc: "family", discAmt: 44, txDate: "01.04.2025" },
-          { status: "partial", payStatus: "paid", amount: 122, ksef: "ok", g1: 1, g2: 0, pauseFrom: "10.05", returnDate: "15.06", txDate: "01.05.2025" },
-          { status: "pause", amount: 0, ksef: null, g1: 0, g2: 0, pauseUntil: "15.06" },
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.07.2025" },
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.08.2025" },
-          { status: "extra-paid", payStatus: "paid", amount: 110, ksef: "ok", g1: 1, g2: 0, teacher: "Отдел Качества", txDate: "15.09.2025" },
-          { status: "overdue", payStatus: "overdue", amount: 441, ksef: "pending", g1: 4, g2: 0 },
-          { status: "pending", payStatus: "pending", amount: 441, ksef: "pending", g1: 4, g2: 0 },
-          { status: "pending", payStatus: "pending", amount: 441, ksef: null, g1: 4, g2: 0 },
-        ],
-        "2026": [
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "conflict", g1: 4, g2: 0, txDate: "01.01.2026" },
-          { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "08.02.2026" },
-          { status: "pending", payStatus: "pending", amount: 441, ksef: null, g1: 4, g2: 0 },
-          { status: "extra-pending", payStatus: "pending", amount: 110, ksef: null, g1: 1, g2: 0, teacher: "Anna K." },
-          { status: "pause", amount: 0, ksef: null, g1: 0, g2: 0, pauseUntil: "10.05" },
-          { status: "partial", payStatus: "pending", amount: 122, ksef: null, g1: 1, g2: 0, pauseFrom: "01.05", returnDate: "10.05" },
-          { status: "summer", amount: 0, ksef: null, g1: 0, g2: 0 },
-          { status: "summer", amount: 0, ksef: null, g1: 0, g2: 0 },
-          { status: "future", amount: 441, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 441, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 441, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 441, ksef: null, g1: 4, g2: 0 },
-        ],
-      },
-      transactions: [
-        { date: "08.02.2026", title: "Абонемент февраль 2026 ✓", sub: "Space Memory · Imoje · #TXN-2026-0847", amount: "+441 зл", paid: true, ksef: "ok", fvnum: "FV/2026/02/091", type: "month" },
-        { date: "01.01.2026", title: "Абонемент январь 2026 ✓", sub: "Space Memory · Imoje · #TXN-2026-0201", amount: "+441 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/045", type: "month" },
-        { date: "01.12.2025", title: "Абонемент декабрь 2025 ✓", sub: "Space Memory · Imoje · #TXN-2025-2341", amount: "+441 зл", paid: true, ksef: "ok", fvnum: "FV/2025/12/089", type: "month" },
-        { date: "15.01.2026", title: "➕ Доп. занятие · январь 2026", sub: "Учитель: Отдел Качества · #TXN-2026-0312", amount: "+110 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/312", type: "extra" },
-        { date: "—", title: "➕ Доп. занятие · март 2026", sub: "Учитель: Anna K. · ожидает оплаты", amount: "110 зл", paid: false, ksef: "pending", fvnum: null, type: "extra" },
-      ],
-    },
-    {
-      id: "indigo",
-      name: "⚡ Speedy Mind INDIGO",
-      sub: "Гр. C · Пт 15:00 · Ewa Lewandowska · 420 зл/мес · 👧 2-й ребёнок · −10% семья",
-      tariff: 420,
-      balance: 0,
-      balanceLabel: "баланс",
-      barGradient: "linear-gradient(180deg,var(--purple),var(--pink))",
-      years: {
-        "2025": [
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2025" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.02.2025" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.03.2025" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.04.2025" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.05.2025" },
-          { status: "summer", amount: 0, ksef: null, g1: 0, g2: 0 },
-          { status: "summer", amount: 0, ksef: null, g1: 0, g2: 0 },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.08.2025" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.09.2025" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.10.2025" },
-          { status: "pending", payStatus: "pending", amount: 420, ksef: "pending", g1: 4, g2: 0 },
-          { status: "pending", payStatus: "pending", amount: 420, ksef: null, g1: 4, g2: 0 },
-        ],
-        "2026": [
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2026" },
-          { status: "paid", payStatus: "paid", amount: 420, ksef: "ok", g1: 4, g2: 0, txDate: "08.02.2026" },
-          { status: "pending", payStatus: "pending", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "summer", amount: 0, ksef: null, g1: 0, g2: 0 },
-          { status: "summer", amount: 0, ksef: null, g1: 0, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-          { status: "future", amount: 420, ksef: null, g1: 4, g2: 0 },
-        ],
-      },
-      transactions: [
-        { date: "08.02.2026", title: "Абонемент февраль 2026 ✓", sub: "INDIGO · Imoje · #TXN-2026-0848", amount: "+420 зл", paid: true, ksef: "ok", fvnum: "FV/2026/02/092", type: "month" },
-        { date: "01.01.2026", title: "Абонемент январь 2026 ✓", sub: "INDIGO · Imoje · #TXN-2026-0202", amount: "+420 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/046", type: "month" },
-      ],
-    },
-    {
-      id: "extras",
-      name: "📚 Доп. материалы и программы",
-      sub: "Разовые услуги и товары · 3 позиции",
-      tariff: 0,
-      balance: 450,
-      balanceLabel: "оплачено",
-      barGradient: "linear-gradient(180deg,var(--amber),var(--orange))",
-      years: { "2026": [] },
-      transactions: [],
-      extras: [
-        { icon: "🏆", title: "Олимпиада онлайн 2026", meta: "150 зл · 15.01.2026 · #TXN-2026-0312 · ✓ KSeF", amount: "150 зл", paid: true, fvnum: "FV/2026/01/312" },
-        { icon: "🧮", title: "Счёты детские", meta: "180 зл · 10.02.2026 · #TXN-2026-0445 · ✓ KSeF", amount: "180 зл", paid: true, fvnum: "FV/2026/02/445" },
-        { icon: "👩‍💼", title: "1-месячный курс для родителей", meta: "120 зл · ожидает оплаты · 🕐 KSeF после оплаты", amount: "120 зл", paid: false, fvnum: null },
-      ],
-    },
-  ],
-};
+export interface Enrollment {
+  school: string;
+  group: string;
+  teacher: string;
+  lessons: Array<{
+    id: string;
+    date: string;
+    block: string;
+    theme: string;
+    element: string;
+    teacher: string;
+    attendance: string;
+    status: string;
+  }>;
+}
 
+export const TEACHERS_DB = [
+  { id: 't1', name: 'Клара Левит', group: 'Вт 17 Младшая', schedule: 'Вт 17:00', dow: 2 },
+  { id: 't2', name: 'Пиотр Ивановски', group: 'Ср 15 Младшая', schedule: 'Ср 15:00', dow: 3 },
+  { id: 't3', name: 'Анна Новак', group: 'Пт 19 Старшая', schedule: 'Пт 19:00', dow: 5 },
+  { id: 't4', name: 'Мария Ковальска', group: 'Чт 16 Средняя', schedule: 'Чт 16:00', dow: 4 },
+  { id: 't5', name: 'Ханна Боян', group: 'Ср 15 Младшая', schedule: 'Ср 15:00', dow: 3 }
+];
+
+export const mockDb: { me: any; students: Record<string, { profile: StudentProfile; programs: Program[] }> } = {
+  me: { id: "u_1", email: "admin@demo.local", name: "Demo Admin" },
+  students: {
+    s_1: {
+      profile: {
+        id: "s_1",
+        initials: "ИИ",
+        name: "Иван Иванов",
+        firstName: "Иван",
+        lastName: "Иванов",
+        email: "ivan.ivanov@gmail.com",
+        birthDate: "2012-05-15",
+        country: "Польша",
+        city: "Варшава",
+        street: "Aleje Jerozolimskie 100",
+        apartment: "12",
+        postalCode: "00-001",
+        age: 12,
+        parentName: "Марина Иванова",
+        parentFirstName: "Марина",
+        parentLastName: "Иванова",
+        parentPhone: "+48 777 000 222",
+        parentRole: "мама",
+        parentPassport: "AB 1234567",
+        phone: "+48 777 000 111",
+        status: "Активна",
+        statusColor: "var(--green)",
+        photoConsent: true,
+        regComment: "Хочет заниматься по выходным",
+        totalBalance: { value: "+220 zł", label: "переплата", color: "var(--green)" },
+        nextPay: { date: "01.03.2026", approx: "~837 зл · с учётом скидок" },
+        enrollments: [
+          {
+            school: 'Space Memory',
+            group: 'Вт 17 Младшая',
+            teacher: 'Клара Левит',
+            lessons: [
+              { id: 'm1', date: '10.03.2026', block: 'Память', theme: 'Ассоциации', element: 'Слова', teacher: 'Клара Левит', attendance: 'Присутствовал', status: 'Оплачено' },
+              { id: 'm2', date: '17.03.2026', block: 'Техники', theme: 'Дворец памяти', element: 'Локации', teacher: 'Клара Левит', attendance: 'Присутствовал', status: 'Оплачено' }
+            ]
+          },
+          {
+            school: 'Speedy Mind Indigo',
+            group: 'Ср 15 Младшая',
+            teacher: 'Ханна Боян',
+            lessons: [
+              { id: 'l1', date: '12.03.2026', block: 'Сложение', theme: 'Просто друзья', element: '1', teacher: 'Ханна Боян', attendance: 'Присутствовал', status: 'Оплачено' },
+              { id: 'l2', date: '14.03.2026', block: 'Сложение', theme: 'Маленькие друзья', element: '10', teacher: 'Ханна Боян', attendance: 'Присутствовал', status: 'Оплачено' },
+              { id: 'l3', date: '19.03.2026', block: 'Вычитание', theme: 'Большие друзья', element: '100', teacher: 'Ханна Боян', attendance: 'Отсутствовал', status: 'Отработка' },
+              { id: 'l4', date: '21.03.2026', block: 'Умножение', theme: 'Семья', element: '1000', teacher: 'Ханна Боян', attendance: 'Будет', status: 'Ожидает' },
+              { id: 'l5', date: '26.03.2026', block: 'Ментально', theme: 'Анзан', element: '1-100', teacher: 'Ханна Боян', attendance: 'Будет', status: 'Ожидает' }
+            ]
+          }
+        ]
+      },
+      programs: [
+        {
+          id: "space",
+          name: "🌌 Space Memory",
+          sub: "Вт 17 Младшая · Вт 17:00 · Клара Левит · 490 зл/мес · 👦 1-й ребёнок · без скидки",
+          tariff: 490,
+          balance: 120,
+          balanceLabel: "переплата",
+          barGradient: "linear-gradient(180deg,var(--blue),var(--purple))",
+          years: {
+            "2026": [
+              { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2026" },
+              { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "08.02.2026" },
+              { status: "pending", payStatus: "pending", amount: 441, ksef: null, g1: 4, g2: 0 },
+            ],
+          },
+          transactions: [
+            { date: "08.02.2026", title: "Абонемент февраль 2026 ✓", sub: "Space Memory · Imoje", amount: "+441 зл", paid: true, ksef: "ok", fvnum: "FV/2026/02/091" },
+          ],
+        },
+        {
+          id: "indigo",
+          name: "⚡ Speedy Mind Indigo",
+          sub: "Ср 15 Младшая · Ср 15:00 · Ханна Боян · 450 зл/мес · 👦 1-й ребёнок · без скидки",
+          tariff: 450,
+          balance: 100,
+          balanceLabel: "переплата",
+          barGradient: "linear-gradient(180deg,var(--purple),var(--pink))",
+          years: {
+            "2026": [
+              { status: "paid", payStatus: "paid", amount: 405, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2026" },
+              { status: "pending", payStatus: "pending", amount: 405, ksef: null, g1: 4, g2: 0 },
+            ],
+          },
+          transactions: [
+            { date: "15.01.2026", title: "Абонемент январь 2026 ✓", sub: "Indigo · Imoje", amount: "+405 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/055" },
+          ],
+        },
+      ],
+    },
+    s_2: {
+      profile: {
+        id: "s_2",
+        initials: "МС",
+        name: "Мария Смирнова",
+        firstName: "Мария",
+        lastName: "Смирнова",
+        email: "mariya.sm@gmail.com",
+        birthDate: "2014-08-20",
+        country: "Польша",
+        city: "Варшава",
+        street: "Marszałkowska 10",
+        apartment: "5",
+        postalCode: "00-202",
+        age: 10,
+        parentName: "Елена Смирнова",
+        parentFirstName: "Елена",
+        parentLastName: "Смирнова",
+        parentPhone: "+48 987 654 321",
+        parentRole: "мама",
+        parentPassport: "CD 7654321",
+        phone: "+48 987 654 321",
+        status: "Активна",
+        statusColor: "var(--green)",
+        photoConsent: true,
+        regComment: "Очень талантливая девочка",
+        totalBalance: { value: "+150 zł", label: "переплата", color: "var(--green)" },
+        nextPay: { date: "05.03.2026", approx: "~420 зл" },
+        enrollments: [
+          { school: 'Speedy Mind Indigo', group: 'Ср 15 Младшая', teacher: 'Пиотр Ивановски', lessons: [] }
+        ]
+      },
+      programs: [
+        {
+          id: "indigo",
+          name: "⚡ Speedy Mind Indigo",
+          sub: "Ср 15 Младшая · Ср 15:00 · Пиотр Ивановски · 450 зл/мес · 👦 1-й ребёнок · без скидки",
+          tariff: 450,
+          balance: 150,
+          balanceLabel: "переплата",
+          barGradient: "linear-gradient(180deg,var(--purple),var(--pink))",
+          years: {
+            "2026": [
+              { status: "paid", payStatus: "paid", amount: 450, ksef: "ok", g1: 4, g2: 0, txDate: "10.01.2026" },
+              { status: "pending", payStatus: "pending", amount: 450, ksef: null, g1: 4, g2: 0 },
+            ],
+          },
+          transactions: [],
+        },
+      ],
+    },
+    s_3: {
+      profile: {
+        id: "s_3",
+        initials: "КК",
+        name: "Кирилл Козлов",
+        firstName: "Кирилл",
+        lastName: "Козлов",
+        email: "kirill.kozlov@mail.ru",
+        birthDate: "2013-03-10",
+        country: "Польша",
+        city: "Варшава",
+        street: "Nowy Świat 40",
+        apartment: "7",
+        postalCode: "00-303",
+        age: 11,
+        parentName: "Олег Козлов",
+        parentFirstName: "Олег",
+        parentLastName: "Козлов",
+        parentPhone: "+48 111 222 333",
+        parentRole: "папа",
+        parentPassport: "EF 9876543",
+        phone: "+48 111 222 333",
+        status: "Должник",
+        statusColor: "var(--red)",
+        photoConsent: false,
+        regComment: "Нужно напоминать об оплате",
+        totalBalance: { value: "-490 zł", label: "задолженность", color: "var(--red)" },
+        nextPay: { date: "10.02.2026", approx: "СРОЧНО: 490 зл" },
+        enrollments: [
+          { school: 'Space Memory', group: 'Пт 19 Старшая', teacher: 'Анна Новак', lessons: [] }
+        ]
+      },
+      programs: [
+        {
+          id: "space",
+          name: "🌌 Space Memory",
+          sub: "Пт 19 Старшая · Пт 19:00 · Анна Новак · 490 зл/мес · 👦 1-й ребёнок · без скидки",
+          tariff: 490,
+          balance: -490,
+          balanceLabel: "задолженность",
+          barGradient: "linear-gradient(180deg,var(--blue),var(--purple))",
+          years: {
+            "2026": [
+              { status: "overdue", payStatus: "overdue", amount: 490, ksef: "error", g1: 0, g2: 0 },
+            ],
+          },
+          transactions: [],
+        },
+      ],
+    },
+  },
+};
 
 export const mockTransactions: Record<string, any[]> = {
   space: [

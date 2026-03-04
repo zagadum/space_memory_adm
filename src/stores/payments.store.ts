@@ -28,8 +28,8 @@ export const usePaymentsStore = defineStore("payments", {
       this.error = "";
       try {
         const res = await paymentsApi.getStudentPayments(studentId);
-        this.student = res.student;
-        this.programs = res.programs;
+        this.student = res.student || null;
+        this.programs = res.programs || [];
       } catch (e: any) {
         this.error = e?.response?.data?.message || "Failed to load payments";
       } finally {
@@ -71,5 +71,15 @@ export const usePaymentsStore = defineStore("payments", {
       // keep sub string readable
       p.sub = p.sub.replace(/\d+\s*зл\/мес/, `${value} зл/мес`);
     },
+    reset() {
+      this.student = null;
+      this.programs = [];
+      this.transactionsByProgram = {};
+      this.txLoading = {};
+      this.txError = {};
+      this.ksefInvoicesByProgram = {};
+      this.ksefLoading = {};
+      this.ksefError = {};
+    }
   },
 });

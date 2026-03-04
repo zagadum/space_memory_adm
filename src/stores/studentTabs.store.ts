@@ -6,6 +6,8 @@ import {
   getStudentProgress,
   getStudentNotes,
 } from "../api/studentApi";
+import { paymentsApi } from "../api/paymentsApi";
+import type { StudentProfile } from "../api/mockDb";
 
 export const useStudentTabsStore = defineStore("studentTabs", {
   state: () => ({
@@ -21,13 +23,14 @@ export const useStudentTabsStore = defineStore("studentTabs", {
     attendance: null as any,
     progress: null as any,
     notes: [] as any[],
+    student: null as StudentProfile | null,
   }),
   actions: {
     async loadGroups(studentId: string) {
       this.loading.groups = true;
       try {
         const res = await getStudentGroups(studentId);
-        this.groups = res.items;
+        this.groups = res.items || [];
       } finally {
         this.loading.groups = false;
       }
@@ -63,10 +66,25 @@ export const useStudentTabsStore = defineStore("studentTabs", {
       this.loading.notes = true;
       try {
         const res = await getStudentNotes(studentId);
-        this.notes = res.items;
+        this.notes = res.items || [];
       } finally {
         this.loading.notes = false;
       }
     },
+    async loadStudent(studentId: string) {
+      try {
+        const res = await paymentsApi.getStudentPayments(studentId);
+        this.student = res.student || null;
+      } catch (e) {
+        console.error("Failed to load student in studentTabsStore", e);
+      }
+    },
+    resetAll() {
+      this.groups = [];
+      this.info = null;
+      this.attendance = null;
+      this.progress = null;
+      this.notes = [];
+    }
   },
 });

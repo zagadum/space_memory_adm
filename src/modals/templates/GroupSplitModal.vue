@@ -17,8 +17,8 @@
           <div :style="{ background: getRowColor(i).accent }" style="width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:800; color:#000; flex-shrink:0">
             {{ i + 1 }}
           </div>
-          <select class="popup-input" style="flex:1; margin-bottom:0; font-size:11.5px" v-model="row.teacherId" @change="onTeacherChange(row)">
-            <option v-for="t in TEACHERS" :key="t.id" :value="t.id">
+            <select class="popup-input" style="flex:1; margin-bottom:0; font-size:11.5px" v-model="row.teacherId" @change="onTeacherChange(row)">
+            <option v-for="t in TEACHERS_DB" :key="t.id" :value="t.id">
               {{ t.group }} · {{ t.schedule }} · {{ t.name }}
             </option>
           </select>
@@ -129,6 +129,7 @@ import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue"; // ИСПРАВЛЕННЫЙ ПУТЬ
 import { useModalStore } from "../../stores/modal.store";
 import { paymentsApi } from "../../api/paymentsApi";
+import { TEACHERS_DB } from "../../api/mockDb";
 
 const { t } = useI18n();
 const modal = useModalStore();
@@ -142,14 +143,6 @@ const maxLessons = ref(4);
 const MONTHS_F = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 const DOW_RU = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
 const monthTitle = computed(() => `${MONTHS_F[monthIndex]} ${year}`);
-
-const TEACHERS = [
-  { id: 'ak', name: 'Anna Kowalska',   group: 'Гр. A', schedule: 'Пн 16:00', dow: 1 },
-  { id: 'mw', name: 'Marek Wójcik',    group: 'Гр. B', schedule: 'Ср 17:00', dow: 3 },
-  { id: 'el', name: 'Ewa Lewandowska', group: 'Гр. C', schedule: 'Пт 15:00', dow: 5 },
-  { id: 'pn', name: 'Piotr Nowak',     group: 'Гр. D', schedule: 'Вт 16:30', dow: 2 },
-  { id: 'jk', name: 'Julia Kowalczyk', group: 'Гр. E', schedule: 'Чт 18:00', dow: 4 },
-];
 
 const ROW_COLORS = [
   { bg: 'rgba(79,110,247,.08)',  border: 'rgba(79,110,247,.35)',  accent: 'var(--blue)' },
@@ -195,7 +188,7 @@ function getAvailableDates(teacherId: string) {
 }
 
 function getTeacherObj(teacherId: string) {
-  return TEACHERS.find(t => t.id === teacherId) || TEACHERS[0];
+  return TEACHERS_DB.find(t => t.id === teacherId) || TEACHERS_DB[0];
 }
 
 function getRowColor(index: number) {
@@ -204,7 +197,7 @@ function getRowColor(index: number) {
 
 function addRow() {
   if (usedLessons.value >= maxLessons.value) return;
-  const t = TEACHERS[0];
+  const t = TEACHERS_DB[0];
   const dates = getAvailableDates(t.id).slice(0, 1).map(d => d.date);
   rows.value.push({
     id: rowIdCounter++, teacherId: t.id, lessons: 1, 
@@ -278,7 +271,7 @@ async function save() {
 
 onMounted(() => {
   if (rows.value.length === 0) {
-    const t = TEACHERS[0];
+    const t = TEACHERS_DB[0];
     const dates = getAvailableDates(t.id).slice(0, maxLessons.value).map(d => d.date);
     rows.value.push({
       id: rowIdCounter++,
