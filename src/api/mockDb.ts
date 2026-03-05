@@ -260,7 +260,7 @@ export const mockDb: { me: AdminUser; students: Record<string, { profile: Studen
             "2026": [
               { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "05.01.2026", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
               { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "08.02.2026", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
-              { s: "pending", payStatus: "pending", a: 441, ksef: null, g1: 4, g2: 0, lessons: 2, totalLessons: 4 },
+              { s: "pending", payStatus: "pending", a: 441, ksef: null, g1: 4, g2: 0, lessons: 2, totalLessons: 5, bonus: true, bonusDate: "31.03.2026" },
               { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
               { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
               { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },

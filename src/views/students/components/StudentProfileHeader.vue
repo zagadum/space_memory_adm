@@ -6,7 +6,7 @@
       <div style="flex:1">
         <div class="s-name">{{ student?.name || "—" }}</div>
         <div class="s-meta">
-          <span v-if="student">{{ student.age }} лет</span><div class="sep" v-if="student"></div>
+          <span v-if="student">{{ t('common.age', student.age) }}</span><div class="sep" v-if="student"></div>
           <span v-if="student">{{ student.parentName }} ({{ student.parentRole }})</span><div class="sep" v-if="student"></div>
           <span v-if="student" style="font-family:'Space Mono',monospace">{{ student.phone }}</span><div class="sep" v-if="student"></div>
           <span v-if="student" :style="{ color: student.statusColor || 'var(--green)' }">{{ student.status }}</span>

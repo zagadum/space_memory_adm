@@ -9,40 +9,40 @@
         <input class="popup-input" v-model="fv" placeholder="FV/2026/03/..." />
       </div>
       <div>
-        <div class="popup-label">Дата выставления</div>
+        <div class="popup-label">{{ t("modals.invoice.issueDate") }}</div>
         <input class="popup-input" type="date" v-model="issueDate" />
       </div>
     </div>
 
     <div class="popup-2col">
       <div>
-        <div class="popup-label">Тип наименования</div>
+        <div class="popup-label">{{ t("modals.invoice.serviceTypeLabel") }}</div>
         <select class="popup-input" v-model="serviceType" @change="onTypeChange">
-          <option value="lang_course">Курс иностранных языков</option>
-          <option value="bonus">Бонусные занятия</option>
-          <option value="custom">Произвольное наименование...</option>
+          <option value="lang_course">{{ t("modals.invoice.serviceTypes.langCourse") }}</option>
+          <option value="bonus">{{ t("modals.invoice.serviceTypes.bonus") }}</option>
+          <option value="custom">{{ t("modals.invoice.serviceTypes.custom") }}</option>
         </select>
       </div>
       <div>
-        <div class="popup-label">Срок оплаты</div>
+        <div class="popup-label">{{ t("modals.invoice.payDueLabel") }}</div>
         <input class="popup-input" type="date" v-model="payDate" />
       </div>
     </div>
 
     <div>
-      <div class="popup-label">Текст в счёте</div>
+      <div class="popup-label">{{ t("modals.invoice.serviceTextLabel") }}</div>
       <input 
         class="popup-input" 
         v-model="serviceName" 
         :disabled="serviceType !== 'custom'"
         :style="{ opacity: serviceType !== 'custom' ? 0.6 : 1 }"
-        placeholder="Укажите название услуги..."
+        :placeholder="t('modals.invoice.serviceTextPlaceholder')"
       />
     </div>
 
     <div class="popup-2col">
       <div>
-        <div class="popup-label">Период обучения</div>
+        <div class="popup-label">{{ t("modals.invoice.periodLabel") }}</div>
         <div style="display:flex; gap:5px">
           <select class="popup-input" style="flex:2" v-model="targetMonth">
             <option v-for="(m, i) in MONTHS" :key="i" :value="i">{{ m }}</option>
@@ -51,39 +51,39 @@
         </div>
       </div>
       <div>
-        <div class="popup-label">Итоговая сумма (PLN)</div>
+        <div class="popup-label">{{ t("modals.invoice.totalAmountLabel") }}</div>
         <input class="popup-input amt-input" v-model="amount" />
       </div>
     </div>
 
     <div class="client-card">
-      <div class="client-card-title">Данные плательщика (Buyer)</div>
+      <div class="client-card-title">{{ t("modals.invoice.buyerTitle") }}</div>
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
         <div>
-          <div class="popup-label">Имя / Название</div>
+          <div class="popup-label">{{ t("modals.invoice.buyerName") }}</div>
           <input class="popup-input input-sm" v-model="buyerName" />
         </div>
         <div>
-          <div class="popup-label">NIP (если есть)</div>
+          <div class="popup-label">{{ t("modals.invoice.buyerNip") }}</div>
           <input class="popup-input input-sm" v-model="buyerNip" placeholder="—" />
         </div>
       </div>
       <div style="margin-top:8px">
-        <div class="popup-label">Адрес</div>
+        <div class="popup-label">{{ t("modals.invoice.buyerAddress") }}</div>
         <input class="popup-input input-sm" v-model="buyerAddress" />
       </div>
     </div>
 
     <div class="info-box info-amber">
       <span>⚠️</span>
-      <div>Редактирование номера или даты может повлиять на статус в <strong>KSeF</strong>. Если счёт уже отправлен, может потребоваться корректировка.</div>
+      <div>{{ t("modals.invoice.ksefWarning") }}</div>
     </div>
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close">{{ t("common.cancel") }}</button>
       <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button class="btn btn-primary" :disabled="saving" @click="save">
-        {{ saving ? t("common.saving") : 'Сохранить изменения' }}
+        {{ saving ? t("common.saving") : t('modals.invoice.saveChanges') }}
       </button>
     </div>
   </BaseModal>
@@ -91,7 +91,7 @@
 
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import BaseModal from "../BaseModal.vue";
 import { usePaymentsStore } from "../../stores/payments.store";
 import { useModalStore } from "../../stores/modal.store";
@@ -101,7 +101,7 @@ const { t } = useI18n();
 const paymentsStore = usePaymentsStore();
 const modal = useModalStore();
 
-const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+const MONTHS = computed(() => (t('payments.monthsFull') as unknown as string[]));
 
 const payload = modal.payload as any;
 const programId = payload?.programId;

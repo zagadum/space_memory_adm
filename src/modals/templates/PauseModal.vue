@@ -23,7 +23,7 @@
           <div class="pmr-name">{{ m.label }}</div>
           <div class="pmr-bar"><div class="pmr-fill" :style="{ width: m.pct * 100 + '%', background: m.pct > 0 ? 'var(--green)' : 'var(--amber)' }"></div></div>
           <div class="pmr-amt" :style="{ color: m.pct > 0 ? 'var(--green)' : 'var(--amber)' }">{{ m.amt > 0 ? m.amt + ' zł' : '0 zł' }}</div>
-          <div class="pmr-note">{{ m.active }}/{{ m.total }} {{ t("modals.pause.lessons") }} · {{ m.status }}</div>
+          <div class="pmr-note">{{ m.active }}/{{ m.total }} {{ t("modals.pause.lessons") }}<template v-if="m.bonusCount > 0"> ({{ m.bonusCount }} {{ t("modals.pause.bonusLesson") }})</template> · {{ m.status }}</div>
         </div>
       </div>
 
@@ -105,6 +105,7 @@ interface MonthCalcRow {
   amt: number;
   pct: number;
   status: string;
+  bonusCount: number;
 }
 
 const monthRows = ref<MonthCalcRow[]>([]);
@@ -115,12 +116,13 @@ const isValid = computed(() => {
 });
 
 /**
- * Schedule-based pause calculation.
- * Matches the prototype's calcPause() logic exactly:
- * 1. Iterate months from `from` to `to`
- * 2. For each month, count all occurrences of schedule day (e.g., Monday)
- * 3. Split into: beforePause, afterPause, inPause
- * 4. Calculate: (active/total) * tariff
+ * Schedule-based pause calculation with BONUS logic.
+ * If a month has 5 occurrences of the schedule day:
+ *   - The 5th lesson is ALWAYS free (bonus).
+ *   - perLesson = tariff / 4 (not 5).
+ * Active (non-paused) lessons are priced accordingly:
+ *   - If the bonus lesson is active → it costs 0 zł.
+ *   - Other active lessons → tariff / 4 each.
  */
 function calcPause() {
   if (!from.value || !to.value) {
@@ -158,37 +160,68 @@ function calcPause() {
     }
 
     const total = scheduleDays.length;
-    const beforePause = scheduleDays.filter(sd => sd < fDate).length;
-    const afterPause = scheduleDays.filter(sd => sd >= tDate).length;
+    const hasBonus = total === 5;
+    // Per-lesson cost: always tariff / 4 (bonus 5th is free)
+    const perLesson = hasBonus ? tariff / 4 : (total > 0 ? tariff / total : 0);
 
-    let active = 0;
-    let status = '';
+    // Determine which lessons are active (not on pause)
     const pad = (n: number) => String(n).padStart(2, '0');
+    const activeLessons: boolean[] = scheduleDays.map(sd => {
+      if (yr === fDate.getFullYear() && mo === fDate.getMonth() &&
+          yr === tDate.getFullYear() && mo === tDate.getMonth()) {
+        // Same month — active if before pause start OR after pause end
+        return sd < fDate || sd >= tDate;
+      } else if (yr === fDate.getFullYear() && mo === fDate.getMonth()) {
+        return sd < fDate; // first month – active only before pause
+      } else if (yr === tDate.getFullYear() && mo === tDate.getMonth()) {
+        return sd >= tDate; // last month – active from return date
+      } else {
+        return false; // full pause month
+      }
+    });
 
+    const active = activeLessons.filter(Boolean).length;
+
+    // Calculate amount: sum cost of active lessons, bonus (5th, index 4) = 0
+    let amt = 0;
+    let bonusCount = 0;
+    activeLessons.forEach((isActive, idx) => {
+      if (isActive) {
+        if (hasBonus && idx === 4) {
+          // 5th lesson is bonus → 0 zł
+          bonusCount++;
+        } else {
+          amt += perLesson;
+        }
+      }
+    });
+    amt = Math.round(amt);
+
+    // Count bonus lessons in pause (for info)
+    if (hasBonus) {
+      activeLessons.forEach((isActive, idx) => {
+        if (!isActive && idx === 4) {
+          bonusCount++; // bonus fell into pause
+        }
+      });
+    }
+
+    let status = '';
     if (yr === fDate.getFullYear() && mo === fDate.getMonth() &&
         yr === tDate.getFullYear() && mo === tDate.getMonth()) {
-      // Same month — partial pause
-      active = beforePause + afterPause;
       status = `частичная · пауза ${fDate.getDate()}.${pad(mo + 1)}–${tDate.getDate()}.${pad(mo + 1)}`;
     } else if (yr === fDate.getFullYear() && mo === fDate.getMonth()) {
-      // First month of pause
-      active = beforePause;
       status = `пауза с ${fDate.getDate()}.${pad(mo + 1)} · возврат: ${tDate.getDate()}.${pad(tDate.getMonth() + 1)}`;
     } else if (yr === tDate.getFullYear() && mo === tDate.getMonth()) {
-      // Last month (return month)
-      active = afterPause;
       status = `↩ возврат ${tDate.getDate()}.${pad(mo + 1)}`;
     } else {
-      // Full pause month
-      active = 0;
       status = 'полная пауза';
     }
 
-    const amt = total > 0 ? Math.round(active / total * tariff) : 0;
     const pct = total > 0 ? active / total : 0;
     const label = mNames[mo] + ' ' + yr;
 
-    result.push({ label, total, active, amt, pct, status });
+    result.push({ label, total, active, amt, pct, status, bonusCount });
     d.setMonth(d.getMonth() + 1);
   }
 

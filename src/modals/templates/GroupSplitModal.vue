@@ -271,6 +271,11 @@ async function save() {
 }
 
 onMounted(() => {
+  // Dynamic maxLessons: count occurrences of the teacher's day-of-week in the month
+  const firstTeacher = TEACHERS_DB[0];
+  const datesInMonth = getDatesForDow(year, monthIndex, firstTeacher.dow);
+  maxLessons.value = datesInMonth.length; // 4 or 5
+
   if (rows.value.length === 0) {
     const t = TEACHERS_DB[0];
     const dates = getAvailableDates(t.id).slice(0, maxLessons.value).map(d => d.date);

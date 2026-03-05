@@ -1,18 +1,18 @@
 <template>
   <BaseModal popupClass="popup-korekta">
-    <div class="popup-title">📋 Корректура счёта</div>
-    <div class="popup-sub">Создание корректировочного счёта (Faktura Korekta)</div>
+    <div class="popup-title">📋 {{ t("modals.korekta.title") }}</div>
+    <div class="popup-sub">{{ t("modals.korekta.subtitle") }}</div>
 
     <!-- ── Исходный документ ── -->
     <div class="tx-info-card">
-      <div class="tx-info-title">Исходный документ</div>
+      <div class="tx-info-title">{{ t("modals.korekta.sourceDoc") }}</div>
       <div class="tx-info-grid">
         <div class="tx-info-item">
-          <span class="tx-info-label">№ СФ</span>
+          <span class="tx-info-label">{{ t("modals.refund.fvLabel") }}</span>
           <span class="tx-info-val">{{ fvnum }}</span>
         </div>
         <div class="tx-info-item">
-          <span class="tx-info-label">Сумма</span>
+          <span class="tx-info-label">{{ t("modals.korekta.sumLabel") }}</span>
           <span class="tx-info-val" style="color:var(--cyan)">{{ origAmount }} zł</span>
         </div>
         <div class="tx-info-item">
@@ -23,20 +23,20 @@
     </div>
 
     <!-- ── Тип корректуры ── -->
-    <div class="popup-label">Тип корректуры</div>
+    <div class="popup-label">{{ t("modals.korekta.typeLabel") }}</div>
     <div class="radio-grid">
       <div class="radio-card" :class="{ active: corrType === 'full' }" @click="corrType = 'full'">
         <div class="radio-dot"></div>
         <div>
-          <div class="radio-title">Полная корректура</div>
-          <div class="radio-desc">Обнуление всей суммы</div>
+          <div class="radio-title">{{ t("modals.korekta.typeFull") }}</div>
+          <div class="radio-desc">{{ t("modals.korekta.typeFullDesc") }}</div>
         </div>
       </div>
       <div class="radio-card" :class="{ active: corrType === 'partial' }" @click="corrType = 'partial'">
         <div class="radio-dot"></div>
         <div>
-          <div class="radio-title">Частичная корректура</div>
-          <div class="radio-desc">Изменение суммы</div>
+          <div class="radio-title">{{ t("modals.korekta.typePartial") }}</div>
+          <div class="radio-desc">{{ t("modals.korekta.typePartialDesc") }}</div>
         </div>
       </div>
     </div>
@@ -45,11 +45,11 @@
     <div v-if="corrType === 'partial'" class="fade-in" style="margin-top:14px">
       <div class="popup-2col">
         <div>
-          <div class="popup-label">Новая сумма (PLN) <span style="color:var(--red)">*</span></div>
+          <div class="popup-label">{{ t("modals.korekta.amount") }} <span style="color:var(--red)">*</span></div>
           <input class="popup-input amt-input" v-model.number="newAmount" type="number" min="0" />
         </div>
         <div>
-          <div class="popup-label">Дата коррекции</div>
+          <div class="popup-label">{{ t("modals.korekta.corrDateLabel") }}</div>
           <input class="popup-input" type="date" v-model="corrDate" />
         </div>
       </div>
@@ -57,16 +57,16 @@
       <!-- diff preview -->
       <div class="diff-preview" v-if="newAmount >= 0">
         <div class="dp-row">
-          <span class="dp-lbl">Было</span>
+          <span class="dp-lbl">{{ t("modals.korekta.wasLabel") }}</span>
           <span class="dp-val">{{ origAmount }} zł</span>
         </div>
         <div class="dp-row">
-          <span class="dp-lbl">Станет</span>
+          <span class="dp-lbl">{{ t("modals.korekta.willBeLabel") }}</span>
           <span class="dp-val" style="color:var(--blue)">{{ newAmount }} zł</span>
         </div>
         <div class="dp-divider"></div>
         <div class="dp-row">
-          <span class="dp-lbl">Разница</span>
+          <span class="dp-lbl">{{ t("modals.korekta.diffLabel") }}</span>
           <span class="dp-val" :style="{ color: diffAmount < 0 ? 'var(--green)' : 'var(--red)' }">
             {{ diffAmount > 0 ? '+' : '' }}{{ diffAmount }} zł
           </span>
@@ -76,45 +76,45 @@
 
     <!-- Дата коррекции (для полной) -->
     <div v-if="corrType === 'full'" style="margin-top:14px">
-      <div class="popup-label">Дата коррекции</div>
+      <div class="popup-label">{{ t("modals.korekta.corrDateLabel") }}</div>
       <input class="popup-input" type="date" v-model="corrDate" />
     </div>
 
     <!-- ── Причина ── -->
     <div style="margin-top:16px">
-      <div class="popup-label">Причина корректировки <span style="color:var(--red)">*</span></div>
+      <div class="popup-label">{{ t("modals.korekta.reasonLabel") }} <span style="color:var(--red)">*</span></div>
       <select class="popup-input" v-model="reasonId">
-        <option value="" disabled>— выберите причину —</option>
-        <option value="price_error">💲 Ошибка в цене</option>
-        <option value="discount">🏷️ Предоставление скидки</option>
-        <option value="return">↩️ Частичный возврат услуг</option>
-        <option value="data_error">📝 Ошибка в реквизитах</option>
-        <option value="other">❓ Другая причина</option>
+        <option value="" disabled>{{ t("modals.korekta.selectReasonPlaceholder") }}</option>
+        <option value="price_error">{{ t("modals.korekta.reasons.priceError") }}</option>
+        <option value="discount">{{ t("modals.korekta.reasons.discount") }}</option>
+        <option value="return">{{ t("modals.korekta.reasons.return") }}</option>
+        <option value="data_error">{{ t("modals.korekta.reasons.dataError") }}</option>
+        <option value="other">{{ t("modals.korekta.reasons.other") }}</option>
       </select>
     </div>
 
     <!-- ── Комментарий ── -->
     <div style="margin-top:14px">
-      <div class="popup-label">Комментарий (печать в счёте)</div>
+      <div class="popup-label">{{ t("modals.korekta.commentLabel") }}</div>
       <textarea
         class="popup-input popup-textarea"
         v-model="comment"
-        placeholder="Обоснование для бухгалтерии и KSeF..."
+        :placeholder="t('modals.korekta.commentPlaceholder')"
       ></textarea>
     </div>
 
     <!-- ── Warning ── -->
     <div class="info-box info-amber" style="margin-top:16px">
       <span>⚠️</span>
-      <div>Корректура создаст новый документ <strong>FK/...</strong> в KSeF. Оригинальный счёт <strong>{{ fvnum }}</strong> будет помечен как скорректированный.</div>
+      <div>{{ t("modals.korekta.ksefWarning", { fvnum }) }}</div>
     </div>
 
     <!-- ── Actions ── -->
     <div class="popup-actions">
-      <button class="btn btn-ghost" @click="close">Отмена</button>
+      <button class="btn btn-ghost" @click="close">{{ t("modals.korekta.cancel") }}</button>
       <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button class="btn btn-primary-grad" :disabled="saving || !isValid" @click="save">
-        {{ saving ? 'Отправка...' : '📋 Создать корректуру' }}
+        {{ saving ? t('common.sending') : t('modals.korekta.submit') }}
       </button>
     </div>
   </BaseModal>
@@ -122,11 +122,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
 import { usePaymentsStore } from "../../stores/payments.store";
 import { useModalStore } from "../../stores/modal.store";
 import { paymentsApi } from "../../api/paymentsApi";
 
+const { t } = useI18n();
 const paymentsStore = usePaymentsStore();
 const modal = useModalStore();
 const payload = modal.payload as any;

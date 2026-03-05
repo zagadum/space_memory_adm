@@ -1,4 +1,5 @@
 import type { AxiosAdapter, InternalAxiosRequestConfig, AxiosResponse } from "axios";
+import { mockNewGroups, mockGroupStudents, mockMasterStudents, mockTeachers, mockManagers } from "./mockNewGroupsDb";
 import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes } from "./mockDb";
 
 type Json = any;
@@ -250,6 +251,94 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     };
     notes.unshift(note);
     return ok(config, { ok: true, note });
+  }
+
+  // --- NEW GROUPS ---
+  const ng: any[] = (globalThis as any).__mock_new_groups ?? ((globalThis as any).__mock_new_groups = JSON.parse(JSON.stringify(mockNewGroups)));
+  const ngStudents: any = (globalThis as any).__mock_ng_students ?? ((globalThis as any).__mock_ng_students = JSON.parse(JSON.stringify(mockGroupStudents)));
+
+  if (method === "get" && url === "api/new-groups") {
+    return ok(config, { items: ng });
+  }
+
+  if (method === "get" && url === "api/new-groups/students") {
+    const groupId = Number((config.params as any)?.groupId);
+    if (!groupId) return err(config, 400, "groupId is required");
+    return ok(config, { items: ngStudents[groupId] ?? [] });
+  }
+
+  if (method === "get" && url === "api/new-groups/master-students") {
+    return ok(config, { items: mockMasterStudents });
+  }
+
+  if (method === "get" && url === "api/new-groups/teachers") {
+    return ok(config, { items: mockTeachers });
+  }
+
+  if (method === "post" && url === "api/new-groups/create") {
+    const body = readBody(config);
+    if (!body?.name || !body?.day) return err(config, 400, "name/day required");
+    const today = new Date().toISOString().slice(0, 10);
+    const newGroup = {
+      id: Date.now(),
+      name: body.name,
+      type: body.type ?? "group",
+      startDate: body.startDate || (() => { const d = new Date(); d.setDate(d.getDate() + 14); return d.toISOString().slice(0, 10); })(),
+      createdDate: today,
+      totalSlots: body.type === "individual" ? 1 : 10,
+      paid: 0,
+      manager: mockManagers[0],
+      teacher: body.teacherId ? mockTeachers.find(t => t.id === body.teacherId) ?? null : null,
+      day: body.day,
+      time: body.time ?? "16:00",
+      age: body.age ?? null,
+      students: body.studentIds ?? [],
+    };
+    ng.unshift(newGroup);
+    ngStudents[newGroup.id] = [];
+    return ok(config, { ok: true, group: newGroup });
+  }
+
+  if (method === "post" && url === "api/new-groups/start") {
+    const body = readBody(config);
+    if (!body?.groupId) return err(config, 400, "groupId required");
+    const idx = ng.findIndex(x => x.id === body.groupId);
+    if (idx !== -1) ng.splice(idx, 1);
+    return ok(config, { ok: true });
+  }
+
+  if (method === "post" && url === "api/new-groups/delete") {
+    const body = readBody(config);
+    if (!body?.groupId) return err(config, 400, "groupId required");
+    const idx = ng.findIndex(x => x.id === body.groupId);
+    if (idx !== -1) ng.splice(idx, 1);
+    return ok(config, { ok: true });
+  }
+
+  if (method === "post" && url === "api/new-groups/add-students") {
+    const body = readBody(config);
+    if (!body?.groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
+    const today = new Date().toISOString().slice(0, 10);
+    if (!ngStudents[body.groupId]) ngStudents[body.groupId] = [];
+    const existing = new Set(ngStudents[body.groupId].map((s: any) => s.name));
+    let added = 0;
+    for (const sid of body.studentIds) {
+      const ms = mockMasterStudents.find(s => s.id === sid);
+      if (ms && !existing.has(ms.name)) {
+        ngStudents[body.groupId].push({ id: Date.now() + Math.random(), name: ms.name, age: ms.age, contract: "pending", paymentStr: "0 zł", createdDate: today, manager: null });
+        added++;
+      }
+    }
+    return ok(config, { ok: true, added });
+  }
+
+  if (method === "post" && url === "api/new-groups/remove-student") {
+    const body = readBody(config);
+    if (!body?.groupId || !body?.studentName) return err(config, 400, "groupId/studentName required");
+    if (ngStudents[body.groupId]) {
+      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.name !== body.studentName);
+    }
+    return ok(config, { ok: true });
   }
 
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);

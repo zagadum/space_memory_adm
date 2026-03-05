@@ -1,45 +1,45 @@
 <template>
   <BaseModal popupClass="popup-refund">
     <div class="popup-title">↪️ {{ t("modals.refund.title") }}</div>
-    <div class="popup-sub">Возврат по счёту {{ fvnum }} · {{ payload?.desc || 'Абонемент' }}</div>
+    <div class="popup-sub">{{ t("modals.refund.subtitle") }} {{ fvnum }} · {{ payload?.desc || t('modals.refund.subscription') }}</div>
 
     <div class="tx-info-card">
-      <div class="tx-info-title">Данные транзакции</div>
+      <div class="tx-info-title">{{ t("modals.refund.txInfo") }}</div>
       <div class="tx-info-grid">
         <div class="tx-info-item">
-          <span class="tx-info-label">№ СФ</span>
+          <span class="tx-info-label">{{ t("modals.refund.fvLabel") }}</span>
           <span class="tx-info-val">{{ fvnum }}</span>
         </div>
         <div class="tx-info-item">
-          <span class="tx-info-label">Сумма</span>
-          <span class="tx-info-val" style="color:var(--cyan)">{{ payload?.amount || 0 }} зл</span>
+          <span class="tx-info-label">{{ t("modals.refund.sumLabel") }}</span>
+          <span class="tx-info-val" style="color:var(--cyan)">{{ payload?.amount || 0 }} zł</span>
         </div>
         <div class="tx-info-item">
           <span class="tx-info-label">KSeF</span>
-          <span class="kb kb-ok">✓ Отправлен</span>
+          <span class="kb kb-ok">{{ t("modals.refund.ksefSent") }}</span>
         </div>
       </div>
     </div>
 
-    <div class="popup-label">Тип возврата</div>
+    <div class="popup-label">{{ t("modals.refund.typeLabel") }}</div>
     <div class="radio-grid">
       <div class="radio-card" :class="{ active: refundType === 'full' }" @click="refundType = 'full'">
         <div class="radio-dot"></div>
         <div>
-          <div class="radio-title">Полный возврат</div>
-          <div class="radio-desc">Вся сумма</div>
+          <div class="radio-title">{{ t("modals.refund.typeFull") }}</div>
+          <div class="radio-desc">{{ t("modals.refund.typeFullDesc") }}</div>
         </div>
       </div>
       <div class="radio-card" :class="{ active: refundType === 'partial' }" @click="refundType = 'partial'">
         <div class="radio-dot"></div>
         <div>
-          <div class="radio-title">Частичный возврат</div>
-          <div class="radio-desc">Часть суммы</div>
+          <div class="radio-title">{{ t("modals.refund.typePartial") }}</div>
+          <div class="radio-desc">{{ t("modals.refund.typePartialDesc") }}</div>
         </div>
       </div>
     </div>
 
-    <div class="popup-label" style="margin-top:16px">Причина возврата</div>
+    <div class="popup-label" style="margin-top:16px">{{ t("modals.refund.reasonLabel") }}</div>
     <div class="radio-grid grid-2col">
       <div v-for="r in reasons" :key="r.id" 
            class="radio-card card-sm" 
@@ -51,47 +51,47 @@
     </div>
 
     <div style="margin-top:16px">
-      <div class="popup-label">Подробное описание <span style="color:var(--red)">*</span></div>
+      <div class="popup-label">{{ t("modals.refund.descriptionLabel") }} <span style="color:var(--red)">*</span></div>
       <textarea 
         class="popup-input popup-textarea" 
         v-model="description" 
-        placeholder="Опишите причину возврата подробно — будет видно администратору и в истории клиента..."
+        :placeholder="t('modals.refund.descriptionPlaceholder')"
       ></textarea>
     </div>
 
-    <div class="popup-label" style="margin-top:16px">Метод возврата</div>
+    <div class="popup-label" style="margin-top:16px">{{ t("modals.refund.methodLabel") }}</div>
     <div class="radio-grid">
       <div class="radio-card" :class="{ active: method === 'imoje' }" @click="method = 'imoje'">
         <div class="radio-dot"></div>
         <div>
-          <div class="radio-title">💳 Imoje</div>
-          <div class="radio-desc">Автовозврат на карту клиента</div>
+          <div class="radio-title">{{ t("modals.refund.methodImoje") }}</div>
+          <div class="radio-desc">{{ t("modals.refund.methodImojeDesc") }}</div>
         </div>
       </div>
       <div class="radio-card" :class="{ active: method === 'bank' }" @click="method = 'bank'">
         <div class="radio-dot"></div>
         <div>
-          <div class="radio-title">🏦 Банковский перевод</div>
-          <div class="radio-desc">Перевод на счёт клиента</div>
+          <div class="radio-title">{{ t("modals.refund.methodBank") }}</div>
+          <div class="radio-desc">{{ t("modals.refund.methodBankDesc") }}</div>
         </div>
       </div>
     </div>
 
     <div v-if="method === 'bank'" style="margin-top:12px" class="animate-fade">
-      <div class="popup-label">Номер счета (IBAN) <span style="color:var(--red)">*</span></div>
-      <input class="popup-input" v-model="iban" placeholder="PL 00 0000 0000..." />
+      <div class="popup-label">{{ t("modals.refund.ibanLabel") }} <span style="color:var(--red)">*</span></div>
+      <input class="popup-input" v-model="iban" :placeholder="t('modals.refund.ibanPlaceholder')" />
     </div>
 
     <div class="info-box info-amber" style="margin-top:20px">
       <span>⚠️</span>
-      <div>Заявка попадёт в закладку <strong>«Возвраты»</strong> и будет рассмотрена администратором. Faktura Korekta будет создана автоматически.</div>
+      <div>{{ t("modals.refund.warning") }}</div>
     </div>
 
     <div class="popup-actions">
-      <button class="btn btn-ghost" @click="close">{{ t("common.cancel") }}</button>
+      <button class="btn btn-ghost" @click="close">{{ t("modals.refund.cancel") }}</button>
       <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button class="btn btn-primary-grad" :disabled="saving || !isValid" @click="submit">
-        {{ saving ? t("common.sending") : 'Отправить заявку на возврат' }}
+        {{ saving ? t("common.sending") : t('modals.refund.submitBtn') }}
       </button>
     </div>
   </BaseModal>
@@ -119,12 +119,12 @@ const iban = ref("");
 const saving = ref(false);
 const errorMessage = ref('');
 
-const reasons = [
-  { id: 'cancel', label: 'Отказ от занятий', icon: '🚪' },
-  { id: 'quality', label: 'Проблема качества', icon: '⭐' },
-  { id: 'overpaid', label: 'Переплата', icon: '💰' },
-  { id: 'other', label: 'Другая причина', icon: '📝' }
-];
+const reasons = computed(() => [
+  { id: 'cancel', label: t('modals.refund.reasons.cancel'), icon: '🚪' },
+  { id: 'quality', label: t('modals.refund.reasons.quality'), icon: '⭐' },
+  { id: 'overpaid', label: t('modals.refund.reasons.overpaid'), icon: '💰' },
+  { id: 'other', label: t('modals.refund.reasons.other'), icon: '📝' }
+]);
 
 const isValid = computed(() => {
   if (description.value.length < 5) return false;

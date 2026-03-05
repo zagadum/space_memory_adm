@@ -4,6 +4,7 @@ import AuthLayout from "../layouts/AuthLayout.vue";
 import SignInPage from "../views/auth/SignInPage.vue";
 import StudentListPage from "../views/students/StudentListPage.vue";
 import StudentProfilePage from "../views/students/StudentProfilePage.vue";
+import NewGroupsPage from "../views/groups/NewGroupsPage.vue";
 
 import PaymentsTab from "../views/students/components/profile-tabs/PaymentsTab.vue";
 import GroupsTab from "../views/students/components/profile-tabs/GroupsTab.vue";
@@ -29,6 +30,7 @@ export const router = createRouter({
       children: [
         { path: "", redirect: "/students" },
         { path: "students", name: "students-list", component: StudentListPage },
+        { path: "recruitment/new-groups", name: "new-groups", component: NewGroupsPage },
         {
           path: "students/:id",
           component: StudentProfilePage,

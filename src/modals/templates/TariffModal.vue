@@ -1,10 +1,10 @@
 <template>
   <BaseModal popupClass="popup-tariff">
-    <div class="popup-title">💱 Изменение тарифа</div>
-    <div class="popup-sub">{{ programName }} · текущий тариф {{ currentTariff }} zł/мес</div>
+    <div class="popup-title">{{ t("modals.tariff.titleFull") }}</div>
+    <div class="popup-sub">{{ programName }} · {{ t("modals.tariff.currentTariffSub") }} {{ currentTariff }} {{ t("modals.tariff.perMonth") }}</div>
 
     <!-- ── С какого месяца ── -->
-    <label class="popup-label">С КАКОГО МЕСЯЦА</label>
+    <label class="popup-label">{{ t("modals.tariff.fromMonthLabel") }}</label>
     <div class="month-selector">
       <button
         v-for="(m, i) in months"
@@ -18,75 +18,75 @@
     <!-- ── Новый тариф ── -->
     <div class="popup-2col">
       <div>
-        <label class="popup-label">НОВЫЙ ТАРИФ (ZŁ/МЕС)</label>
+        <label class="popup-label">{{ t("modals.tariff.newTariffLabel") }}</label>
         <div class="input-with-icon">
           <span class="icon">💰</span>
           <input class="popup-input" type="number" min="0" v-model.number="newTariff" />
         </div>
       </div>
       <div>
-        <label class="popup-label">ПРИЧИНА ИЗМЕНЕНИЯ</label>
+        <label class="popup-label">{{ t("modals.tariff.reasonLabel") }}</label>
         <select class="popup-input" v-model="reason">
-          <option value="index">📈 Индексация тарифа</option>
-          <option value="promo">🎁 Промо-акция</option>
-          <option value="group-change">🔄 Смена группы / уровня</option>
-          <option value="individual">🎯 Индивидуальные условия</option>
-          <option value="other">❓ Другое</option>
+          <option value="index">{{ t("modals.tariff.reasons.index") }}</option>
+          <option value="promo">{{ t("modals.tariff.reasons.promo") }}</option>
+          <option value="group-change">{{ t("modals.tariff.reasons.groupChange") }}</option>
+          <option value="individual">{{ t("modals.tariff.reasons.individual") }}</option>
+          <option value="other">{{ t("modals.tariff.reasons.other") }}</option>
         </select>
       </div>
     </div>
 
     <!-- ── Calc Preview ── -->
     <div class="tariff-preview" v-if="newTariff > 0">
-      <div class="tp-title">📊 Предварительный расчёт</div>
+      <div class="tp-title">{{ t("modals.tariff.calcTitle") }}</div>
       <div class="tp-grid">
         <div class="tp-card">
-          <div class="tp-lbl">Текущий тариф</div>
+          <div class="tp-lbl">{{ t("modals.tariff.currentLabel") }}</div>
           <div class="tp-val">{{ currentTariff }} zł</div>
         </div>
         <div class="tp-card">
-          <div class="tp-lbl">Разница</div>
+          <div class="tp-lbl">{{ t("modals.tariff.diffLabel") }}</div>
           <div class="tp-val" :style="{ color: diffColor }">
             {{ diff > 0 ? '+' : '' }}{{ diff }} zł
           </div>
         </div>
         <div class="tp-card tp-card-hl" :style="{ borderColor: diffColor + '40' }">
-          <div class="tp-lbl">Новый тариф</div>
+          <div class="tp-lbl">{{ t("modals.tariff.newLabel") }}</div>
           <div class="tp-val" :style="{ color: diffColor }">{{ newTariff }} zł</div>
         </div>
       </div>
 
       <!-- per-lesson breakdown -->
       <div class="tp-sub">
-        Стоимость занятия: {{ currentTariff }} ÷ 4 = <strong>{{ perLesson }} zł</strong> →
+        {{ t("modals.tariff.perLessonText") }} {{ currentTariff }} ÷ 4 = <strong>{{ perLesson }} zł</strong> →
         {{ newTariff }} ÷ 4 = <strong :style="{ color: diffColor }">{{ newPerLesson }} zł</strong>
       </div>
     </div>
 
     <!-- ── Комментарий ── -->
     <div style="margin-top:12px">
-      <label class="popup-label">КОММЕНТАРИЙ (НЕОБЯЗАТЕЛЬНО)</label>
+      <label class="popup-label">{{ t("modals.tariff.commentLabel") }}</label>
       <div class="input-with-icon">
         <span class="icon">💬</span>
-        <input class="popup-input" v-model="comment" placeholder="Заметка для бухгалтерии..." />
+        <input class="popup-input" v-model="comment" :placeholder="t('modals.tariff.commentPlaceholder')" />
       </div>
     </div>
 
     <!-- ── Warning ── -->
     <div class="info-box info-amber" v-if="diff !== 0">
-      ⚠️ Тариф будет изменён с {{ MONTHS_F[selectedMonth] }} {{ activeYear }}. Все последующие месяцы будут пересчитаны.
+      {{ t("modals.tariff.warning", { month: MONTHS_F[selectedMonth], year: activeYear }) }}
     </div>
 
     <!-- ── Actions ── -->
     <div class="popup-actions">
-      <button class="btn btn-ghost" @click="close" :disabled="saving">Отмена</button>
+      <button class="btn btn-ghost" @click="close" :disabled="saving">{{ t("modals.tariff.cancel") }}</button>
       <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button
         class="btn btn-amber-grad"
         :disabled="saving || newTariff <= 0 || diff === 0"
         @click="save"
       >
-        {{ saving ? 'Сохранение...' : '💱 Изменить тариф' }}
+        {{ saving ? t('modals.tariff.saving') : t('modals.tariff.submit') }}
       </button>
     </div>
   </BaseModal>
@@ -94,11 +94,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
 import { useModalStore } from "../../stores/modal.store";
 import { usePaymentsStore } from "../../stores/payments.store";
 import { paymentsApi } from "../../api/paymentsApi";
 
+const { t } = useI18n();
 const modal = useModalStore();
 const payments = usePaymentsStore();
 
@@ -117,8 +119,8 @@ const currentTariff = computed(() => {
 const activeYear = computed(() => payments.activeYear[programId] || 2026);
 
 // ── Form state ──
-const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
-const MONTHS_F = ["Января","Февраля","Марта","Апреля","Мая","Июня","Июля","Августа","Сентября","Октября","Ноября","Декабря"];
+const months = computed(() => (t('common.monthsShort') as unknown as string[]));
+const MONTHS_F = computed(() => (t('payments.monthsFull') as unknown as string[]) || months.value);
 
 const selectedMonth = ref((modal.payload?.monthIndex as number) ?? new Date().getMonth());
 const newTariff = ref(currentTariff.value);

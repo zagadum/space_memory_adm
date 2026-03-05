@@ -1,15 +1,15 @@
 <template>
   <BaseModal popupClass="popup-archive">
     <div class="popup-title">📦 {{ t("modals.archive.title") }}</div>
-    <div class="popup-sub">Завершение программы и перенос в архив</div>
+    <div class="popup-sub">{{ t("modals.archive.subtitle") }}</div>
 
     <div class="info-box info-red">
       <span>⚠️</span>
-      <div><strong>Внимание:</strong> Это действие остановит все будущие начисления. Место в группе будет освобождено для других учеников.</div>
+      <div><strong>{{ t("modals.archive.warningTitle") }}</strong> {{ t("modals.archive.warning") }}</div>
     </div>
 
     <div style="margin-bottom: 16px;">
-      <div class="popup-label">Дата последнего занятия <span style="color:var(--red)">*</span></div>
+      <div class="popup-label">{{ t("modals.archive.endDateLabel") }} <span style="color:var(--red)">*</span></div>
       <div class="input-with-icon">
         <span class="icon">📅</span>
         <input class="popup-input" type="date" v-model="endDate" />
@@ -17,31 +17,31 @@
     </div>
 
     <div style="margin-bottom: 16px;">
-      <div class="popup-label">Причина завершения <span style="color:var(--red)">*</span></div>
+      <div class="popup-label">{{ t("modals.archive.reasonLabel") }} <span style="color:var(--red)">*</span></div>
       <select class="popup-input" v-model="reason">
-        <option value="" disabled>— Выберите из списка —</option>
-        <option value="finished">🎓 Успешное окончание курса</option>
-        <option value="relocation">✈️ Переезд / Смена жительства</option>
-        <option value="schedule">⏰ Не подходит расписание</option>
-        <option value="financial">💸 Финансовые причины</option>
-        <option value="quality">👎 Недовольство качеством</option>
-        <option value="other">📝 Другое (укажите ниже)</option>
+        <option value="" disabled>{{ t("modals.archive.selectPlaceholder") }}</option>
+        <option value="finished">{{ t("modals.archive.archiveReasons.finished") }}</option>
+        <option value="relocation">{{ t("modals.archive.archiveReasons.relocation") }}</option>
+        <option value="schedule">{{ t("modals.archive.archiveReasons.schedule") }}</option>
+        <option value="financial">{{ t("modals.archive.archiveReasons.financial") }}</option>
+        <option value="quality">{{ t("modals.archive.archiveReasons.quality") }}</option>
+        <option value="other">{{ t("modals.archive.archiveReasons.other") }}</option>
       </select>
     </div>
 
     <div style="margin-bottom: 20px;">
-      <div class="popup-label">Подробный комментарий</div>
+      <div class="popup-label">{{ t("modals.archive.commentLabel") }}</div>
       <textarea 
         class="popup-input popup-textarea" 
         v-model="comment" 
-        placeholder="Напишите подробнее, почему ученик уходит. Эта информация поможет нам стать лучше..."
+        :placeholder="t('modals.archive.commentPlaceholder')"
       ></textarea>
     </div>
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close" :disabled="saving">{{ t("common.cancel") }}</button>
       <button class="btn btn-red-grad" :disabled="saving || !isValid" @click="confirm">
-        {{ saving ? t("common.saving") : 'Завершить и архивировать' }}
+        {{ saving ? t("common.saving") : t('modals.archive.submit') }}
       </button>
     </div>
   </BaseModal>

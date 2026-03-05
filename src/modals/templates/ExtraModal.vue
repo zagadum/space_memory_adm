@@ -1,10 +1,10 @@
 <template>
   <BaseModal popupClass="popup-extra">
-    <div class="popup-title">➕ Доп. занятие</div>
+    <div class="popup-title">{{ t("modals.extra.title") }}</div>
     <div class="popup-sub">{{ programName }} · {{ currentTeacher }}</div>
 
     <!-- ── Месяц ── -->
-    <label class="popup-label">МЕСЯЦ ЗАНЯТИЯ</label>
+    <label class="popup-label">{{ t("modals.extra.monthLabel") }}</label>
     <div class="month-selector">
       <button
         v-for="(m, i) in months"
@@ -16,82 +16,82 @@
     </div>
 
     <!-- ── Учитель ── -->
-    <label class="popup-label">УЧИТЕЛЬ ЗАНЯТИЯ</label>
+    <label class="popup-label">{{ t("modals.extra.teacherLabel") }}</label>
     <select class="popup-input" v-model="selectedTeacher">
-      <option value="ak">{{ currentTeacher }} (основной тренер)</option>
+      <option value="ak">{{ currentTeacher }} ({{ t("modals.extra.mainTrainer") }})</option>
       <option value="mw">Marek Wójcik</option>
-      <option value="qa">Отдел Качества — проверка мотивации</option>
-      <option value="other">Другой учитель</option>
+      <option value="qa">{{ t("modals.extra.qualityDept") }}</option>
+      <option value="other">{{ t("modals.extra.otherTeacher") }}</option>
     </select>
 
     <!-- ── Info box (price breakdown) ── -->
     <div class="info-box info-blue">
       <span>💡</span>
       <div>
-        Цена 1 занятия = тариф ÷ 4 = <strong style="color:var(--white)">{{ basePrice }} zł</strong><br>
-        После авто-скидок (<span class="dc dc-auto">−20% авто</span>): <strong style="color:var(--green)">≈ {{ afterAutoDisc }} zł</strong><br>
-        <span style="font-size:10.5px">Отдельная транзакция и отдельный счёт KSeF. Карточка ➕ появится в сетке.</span>
+        {{ t("modals.extra.priceInfo") }} <strong style="color:var(--white)">{{ basePrice }} zł</strong><br>
+        {{ t("modals.extra.afterAutoDisc") }} (<span class="dc dc-auto">{{ t("modals.extra.autoDiscLabel") }}</span>): <strong style="color:var(--green)">≈ {{ afterAutoDisc }} zł</strong><br>
+        <span style="font-size:10.5px">{{ t("modals.extra.separateTx") }}</span>
       </div>
     </div>
 
     <!-- ── Calc Preview ── -->
     <div class="calc-preview">
       <div class="cp">
-        <div class="cp-label">БАЗОВАЯ ЦЕНА</div>
+        <div class="cp-label">{{ t("modals.extra.basePrice") }}</div>
         <div class="cp-val">{{ basePrice }} zł</div>
       </div>
       <div class="cp" style="border-color:rgba(239,68,68,.2)">
-        <div class="cp-label">АВТО-СКИДКА</div>
+        <div class="cp-label">{{ t("modals.extra.autoDiscount") }}</div>
         <div class="cp-val" style="color:var(--red)">−{{ autoDiscount }} zł</div>
       </div>
       <div class="cp" style="border-color:rgba(236,72,153,.3)">
-        <div class="cp-label">К ОПЛАТЕ</div>
+        <div class="cp-label">{{ t("modals.extra.toPay") }}</div>
         <div class="cp-val" style="color:var(--pink)">{{ finalPrice }} zł</div>
       </div>
     </div>
 
     <!-- ── Тема ── -->
-    <label class="popup-label">ТЕМА ЗАНЯТИЯ <span style="font-size:10px;font-weight:400;color:var(--dim)">(ЗАПОЛНЯЕТСЯ УЧИТЕЛЕМ — НЕОБЯЗАТЕЛЬНО)</span></label>
-    <input class="popup-input" v-model="topic" placeholder="напр. Повторение перед олимпиадой, проверка мотивации..." />
+    <label class="popup-label">{{ t("modals.extra.topicLabel") }} <span style="font-size:10px;font-weight:400;color:var(--dim)">({{ t("modals.extra.topicHint") }})</span></label>
+    <input class="popup-input" v-model="topic" :placeholder="t('modals.extra.topicPlaceholder')" />
 
     <!-- ── Доп. скидка ── -->
     <div class="extra-disc-section">
-      <label class="popup-label">ДОПОЛНИТЕЛЬНАЯ СКИДКА <span style="font-size:10px;font-weight:400;color:var(--dim)">(НЕОБЯЗАТЕЛЬНО)</span></label>
-      <input type="number" class="popup-input" v-model.number="extraDisc" min="0" placeholder="0 зл — оставить пустым если нет" />
+      <label class="popup-label">{{ t("modals.extra.extraDiscLabel") }} <span style="font-size:10px;font-weight:400;color:var(--dim)">({{ t("modals.extra.extraDiscHint") }})</span></label>
+      <input type="number" class="popup-input" v-model.number="extraDisc" min="0" :placeholder="t('modals.extra.extraDiscPlaceholder')" />
 
       <div v-if="Number(extraDisc) > 0" class="fade-in">
         <div class="info-box info-amber" style="margin-bottom:8px">
           <span>⚠️</span>
-          <div>Дополнительная скидка требует <strong style="color:var(--white)">подтверждения руководителя</strong>.</div>
+          <div>{{ t("modals.extra.extraDiscWarning") }} <strong style="color:var(--white)">{{ t("modals.extra.approvalRequired") }}</strong>.</div>
         </div>
 
-        <label class="popup-label">ОБОСНОВАНИЕ СКИДКИ <span style="color:var(--red)">★</span></label>
-        <input class="popup-input" v-model="discReason" placeholder="Опишите причину дополнительной скидки..." />
+        <label class="popup-label">{{ t("modals.extra.discReasonLabel") }} <span style="color:var(--red)">★</span></label>
+        <input class="popup-input" v-model="discReason" :placeholder="t('modals.extra.discReasonPlaceholder')" />
 
-        <label class="popup-label">ПОДТВЕРЖДАЕТ <span style="color:var(--red)">★</span></label>
+        <label class="popup-label">{{ t("modals.extra.approverLabel") }} <span style="color:var(--red)">★</span></label>
         <div class="approver-grid">
           <div class="reason-opt" :class="{ active: approver === 'account' }" @click="approver = 'account'">
             <input type="radio" :checked="approver === 'account'" style="accent-color:var(--blue); pointer-events: none;" />
-            <div><div style="font-weight:700;font-size:11.5px">📊 Бухгалтер</div></div>
+            <div><div style="font-weight:700;font-size:11.5px">{{ t("modals.extra.approverAccount") }}</div></div>
           </div>
           <div class="reason-opt" :class="{ active: approver === 'dir' }" @click="approver = 'dir'">
             <input type="radio" :checked="approver === 'dir'" style="accent-color:var(--blue); pointer-events: none;" />
-            <div><div style="font-weight:700;font-size:11.5px">🎯 Директор ОК</div></div>
+            <div><div style="font-weight:700;font-size:11.5px">{{ t("modals.extra.approverDirector") }}</div></div>
           </div>
         </div>
 
         <!-- Updated calc with extra discount -->
         <div class="calc-preview" style="margin-top:10px">
           <div class="cp">
-            <div class="cp-label">ПОСЛЕ АВТО</div>
+            <div class="cp-label">{{ t("modals.extra.afterAuto") }}</div>
             <div class="cp-val">{{ afterAutoDisc }} zł</div>
           </div>
           <div class="cp" style="border-color:rgba(168,85,247,.2)">
-            <div class="cp-label">ДОП. СКИДКА</div>
+            <div class="cp-label">{{ t("modals.extra.extraDiscCalc") }}</div>
             <div class="cp-val" style="color:var(--purple)">−{{ extraDisc }} zł</div>
           </div>
           <div class="cp" style="border-color:rgba(16,185,129,.3)">
-            <div class="cp-label">ИТОГО</div>
+            <div class="cp-label">{{ t("modals.extra.totalCalc") }}</div>
             <div class="cp-val" style="color:var(--green)">{{ finalPrice }} zł</div>
           </div>
         </div>
@@ -100,10 +100,10 @@
 
     <!-- ── Actions ── -->
     <div class="popup-actions">
-      <button class="btn btn-ghost" @click="close" :disabled="saving">Отмена</button>
+      <button class="btn btn-ghost" @click="close" :disabled="saving">{{ t("modals.extra.cancel") }}</button>
       <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button class="btn btn-pink" @click="save" :disabled="saving">
-        {{ saving ? 'Сохранение...' : '➕ Добавить занятие' }}
+        {{ saving ? t('modals.extra.saving') : t('modals.extra.submit') }}
       </button>
     </div>
   </BaseModal>
@@ -139,7 +139,7 @@ const currentTeacher = computed(() => {
 });
 
 // ── Form state ──
-const months = ["Янв","Фев","Мар","Апр","Май","Июн","Июл","Авг","Сен","Окт","Ноя","Дек"];
+const months = computed(() => (t('common.monthsShort') as unknown as string[]));
 const selectedMonth = ref(new Date().getMonth());
 const selectedTeacher = ref("ak");
 const topic = ref("");

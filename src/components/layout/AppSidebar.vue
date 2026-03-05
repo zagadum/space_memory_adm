@@ -95,6 +95,49 @@
           <span class="nav-badge cyan">2</span>
         </div>
       </div>
+
+      <div 
+        class="nav-section" 
+        :class="{ open: openSections.recruitment }" 
+        @click="toggleSection('recruitment')"
+      >
+        <span class="nav-section-icon">🚀</span>
+        <span class="nav-section-label">Рекрутация</span>
+        <span class="nav-section-badge nb-green">8</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.recruitment }">
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'new-students' }" 
+          @click="setActive('new-students')"
+        >
+          <span class="nav-icon">🌟</span> Новые ученики
+          <span class="nav-badge green">8</span>
+        </div>
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'new-groups' }" 
+          @click="navigateTo('new-groups', '/recruitment/new-groups')"
+        >
+          <span class="nav-icon">🎓</span> Новые группы
+        </div>
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'expelled' }" 
+          @click="setActive('expelled')"
+        >
+          <span class="nav-icon">📤</span> Выписанные ученики
+        </div>
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'recruit-archive' }" 
+          @click="setActive('recruit-archive')"
+        >
+          <span class="nav-icon">🗃️</span> Архив
+        </div>
+      </div>
+
     </nav>
 
     <div class="sidebar-bottom">
@@ -110,36 +153,47 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
 
-// Управление состоянием открытых папок
 const openSections = ref<Record<string, boolean>>({
-  secretariat: true, // По умолчанию открыт Секретариат
-  finance: false
+  secretariat: true,
+  finance: false,
+  recruitment: false,
 })
 
-// Управление активным пунктом меню
 const activeItem = ref('students')
 
-// Функция открытия/закрытия секций
+watch(() => route.path, (path) => {
+  if (path.startsWith('/recruitment/new-groups')) {
+    activeItem.value = 'new-groups'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/students')) {
+    activeItem.value = 'students'
+  }
+}, { immediate: true })
+
 const toggleSection = (section: string) => {
   openSections.value[section] = !openSections.value[section]
 }
 
-// Функция выделения активного пункта
 const setActive = (item: string) => {
   activeItem.value = item
   if (item === 'students') {
     router.push('/students')
   }
 }
+
+const navigateTo = (item: string, path: string) => {
+  activeItem.value = item
+  router.push(path)
+}
 </script>
 
 <style scoped>
-/* ── СТИЛИ ИЗ ТВОЕГО HTML ── */
 .sidebar { 
   position: fixed; left: 0; top: 0; bottom: 0; width: 240px; 
   background: rgba(7,7,32,0.97); border-right: 1px solid var(--space-border, rgba(100,120,255,0.15)); 
@@ -188,6 +242,7 @@ const setActive = (item: string) => {
 .nav-badge.cyan { background: #06b6d4; }
 .nav-section-badge { font-size: 9.5px; font-weight: 700; padding: 1px 5px; border-radius: 8px; margin-right: 5px; }
 .nb-red { background: #ef4444; color: #fff; }
+.nb-green { background: #10b981; color: #fff; }
 
 .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--space-border, rgba(100,120,255,0.15)); flex-shrink: 0; }
 .user-card { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }

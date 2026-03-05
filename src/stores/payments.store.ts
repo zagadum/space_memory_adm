@@ -32,6 +32,13 @@ export const usePaymentsStore = defineStore("payments", {
     activeYear: {} as Record<string, number>,
     activeMonth: {} as Record<string, number | null>,
     activeView: {} as Record<string, "grid" | "table">,
+
+    // НОВОЕ: Справочники для выпадающих списков
+    dictionaries: {
+      pauseReasons: [] as Array<{ id: string; labelKey: string }>,
+      paymentMethods: [] as Array<{ id: string; labelKey: string }>,
+      discountTypes: [] as Array<{ id: string; labelKey: string }>
+    }
   }),
 
   getters: {
@@ -70,6 +77,28 @@ export const usePaymentsStore = defineStore("payments", {
   },
 
   actions: {
+    // НОВОЕ: Экшен для загрузки справочников
+    async fetchDictionaries() {
+      // В будущем здесь будет реальный запрос через axios/fetch к API_ENDPOINTS.DICTIONARIES
+      // Сейчас просто имитируем ответ сервера, чтобы UI уже работал:
+      this.dictionaries = {
+        pauseReasons: [
+          { id: 'vacation', labelKey: 'modals.reasons.vacation' },
+          { id: 'illness', labelKey: 'modals.reasons.illness' },
+          { id: 'family', labelKey: 'modals.reasons.family' }
+        ],
+        paymentMethods: [
+          { id: 'card', labelKey: 'modals.methods.card' },
+          { id: 'cash', labelKey: 'modals.methods.cash' },
+          { id: 'transfer', labelKey: 'modals.methods.transfer' }
+        ],
+        discountTypes: [
+          { id: 'family', labelKey: 'modals.discounts.family' },
+          { id: 'marketing', labelKey: 'modals.discounts.marketing' }
+        ]
+      };
+    },
+
     // ── Data loading ──
     async loadStudent(studentId = "s_1") {
       this.loading = true;
@@ -159,6 +188,8 @@ export const usePaymentsStore = defineStore("payments", {
       this.activeYear = {};
       this.activeMonth = {};
       this.activeView = {};
+      // Очищаем справочники при сбросе
+      this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [] };
     },
   },
 });
