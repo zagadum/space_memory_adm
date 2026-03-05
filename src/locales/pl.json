@@ -24,11 +24,12 @@
     "activePrograms": "Aktywne programy",
     "actions": "Akcje",
     "tx": {
-      "title": "Transakcje",
+      "title": "Transakcje i e-Faktury KSeF",
       "count": "transakcji",
       "loading": "Ładowanie transakcji…",
-      "paid": "paid",
-      "pending": "pending"
+      "paid": "✓ Opłacono",
+      "pending": "🕐 Oczekuje",
+      "empty": "Brak transakcji dla tego programu"
     },
     "legend": {
       "title": "Legenda:",
@@ -37,7 +38,8 @@
       "overdue": "Zaległe",
       "pause": "Pauza",
       "summer": "Wakacje",
-      "extra": "Zaj. dodatkowe"
+      "extra": "Zaj. dodatkowe",
+      "partial": "Częściowa pauza"
     },
     "year": "Rok:",
     "view": {
@@ -54,17 +56,24 @@
       "refund": "Zwrot",
       "korekta": "Korekta",
       "tariff": "Taryfa",
-      "discount": "Zniżka",
+      "discount": "Rabat",
       "pause": "Pauza",
-      "extra": "Dodatkowe",
-      "unlock": "Unlock",
+      "extra": "Dodatkowo",
+      "unlock": "Odblokuj",
       "archive": "Archiwum",
       "split": "Podziel",
-      "resume": "Wznów"
+      "resume": "Wznów",
+      "changeGroup": "Zmień grupę",
+      "addExtra": "Zaj. dod."
     },
     "extras": {
-      "title": "Pozycje",
-      "count": "pozycje"
+      "title": "Dod. materiały i programy",
+      "subtitle": "Usługi jednorazowe i towary",
+      "items": "pozycje",
+      "paid": "opłacono",
+      "awaitingPayment": "oczekuje na płatność",
+      "afterPayment": "po płatności",
+      "infoText": "Usługi jednorazowe — brak abonamentu, przerw i zmian taryfy."
     },
     "status": {
       "paid": "Opłacono",
@@ -73,29 +82,82 @@
       "pause": "Pauza",
       "summer": "Lato",
       "partial": "Częściowo",
-      "extra": "Dodatkowe"
+      "extra": "Dodatkowe",
+      "future": "Przyszłe",
+      "pendingFull": "Oczekuje na płatność",
+      "partialPause": "Częściowa pauza",
+      "extraPaid": "Dod. opłacone",
+      "extraPending": "Dod. oczekuje"
     },
     "table": {
       "month": "Miesiąc",
       "status": "Status",
       "amount": "Kwota",
       "ksef": "KSeF",
-      "lessons": "Lekcje"
+      "lessons": "Lekcje",
+      "payment": "Płatność",
+      "discount": "Rabat",
+      "txDate": "Data Tx"
     },
     "labels": {
       "until": "do",
-      "discountShort": "zniżka"
+      "from": "od",
+      "return": "powrót",
+      "discountShort": "zniżka",
+      "free": "Bezpłatnie",
+      "lessonsCount": "zajęć",
+      "lessonsSuffix": "zaj."
     },
     "ksef": {
       "title": "Faktury KSeF",
-      "loading": "Ładowanie KSeF…"
+      "loading": "Ładowanie KSeF…",
+      "ok": "✓ Wysłane",
+      "manual": "✎ Ręczne",
+      "pending": "⏳ Oczekuje",
+      "error": "✕ Błąd",
+      "conflict": "! Konflikt"
     },
     "korekta": {
       "forInvoice": "Korekta do faktury"
     },
     "refund": {
       "forInvoice": "Zwrot dla faktury"
-    }
+    },
+    "detail": {
+      "payStatus": "💰 Status płatności",
+      "amount": "💵 Kwota do zapłaty",
+      "lessons": "📊 Zajęcia",
+      "partialPause": "◐ Częściowa pauza",
+      "activePause": "🌙 Aktywna pauza",
+      "distribution": "🔄 Rozkład",
+      "discount": "🏷️ Rabat",
+      "teacher": "👩‍🏫 Nauczyciel",
+      "bonus": "⭐ Lekcja bonusowa",
+      "ksefLabel": "📄 KSeF",
+      "txHint": "💡 Transakcje i faktury — poniżej w sekcji Transakcje"
+    },
+    "disc": {
+      "family": "Rodzinna",
+      "referral": "Polecenie",
+      "loyalty": "Lojalność",
+      "complaint": "Rekompensata",
+      "promo": "Promo"
+    },
+    "monthsFull": [
+      "Styczeń",
+      "Luty",
+      "Marzec",
+      "Kwiecień",
+      "Maj",
+      "Czerwiec",
+      "Lipiec",
+      "Sierpień",
+      "Wrzesień",
+      "Październik",
+      "Listopad",
+      "Grudzień"
+    ],
+    "child2badge": "👧 2. dziecko · −10% rodzina"
   },
   "common": {
     "cancel": "Anuluj",
@@ -129,26 +191,87 @@
   },
   "modals": {
     "pause": {
-      "title": "⏸ Pauza / wakacje",
-      "subtitle": "Zamrożenie abonamentu na wybrany okres.",
-      "from": "Od",
-      "to": "Do",
-      "return": "Data powrotu"
+      "title": "Pauza",
+      "scheduleHint1": "System liczy zajęcia wg",
+      "scheduleHint2": "planu grupy",
+      "scheduleHint3": "(konkretne dni), nie wg kalendarza. Pauza i powrót widoczne w siatce z datami.",
+      "from": "Pauza od",
+      "to": "Powrót od",
+      "datesHint": "Daty powrotu widoczne na karcie i w szczegółach miesiąca",
+      "calcTitle": "Obliczenie wg planu",
+      "lessons": "zaj",
+      "invoicesTitle": "Faktury:",
+      "invoicesText": "nie zmieniamy. Nieprzeprowadzone zajęcia przenosimy na 1. miesiąc po powrocie. Korekta tylko na prośbę klienta o zwrot.",
+      "qualityText1": "Po powrocie z pauzy —",
+      "qualityText2": "Dział Jakości dzwoni",
+      "qualityText3": "i przydziela do grupy. Nadpłata przeliczana po faktycznym powrocie.",
+      "reason": "Powód",
+      "selectReason": "wybierz powód",
+      "reasons": {
+        "illness": "Choroba / wypadek",
+        "trip": "Wyjazd / urlop",
+        "exams": "Egzaminy / nauka",
+        "family": "Okoliczności rodzinne",
+        "other": "Inny powód"
+      },
+      "comment": "Komentarz",
+      "optional": "opcjonalnie",
+      "commentPlaceholder": "Dodatkowe informacje...",
+      "apply": "Zastosuj pauzę"
     },
     "discount": {
-      "title": "Zniżka",
-      "subtitle": "Przykładowe okno. Style/klasy jak w prototypie.",
-      "type": "Typ zniżki",
-      "amount": "Kwota (zł)",
-      "comment": "Komentarz",
-      "kind": "Typ",
-      "apply": "Zastosuj",
-      "kinds": {
-        "family": "Rodzina",
-        "referral": "Polecenie",
-        "promo": "Promo",
-        "loyalty": "Lojalność"
-      }
+      "title": "🏷️ Rabat jednorazowy",
+      "selectMonth": "WYBIERZ MIESIĄC",
+      "type": "RODZAJ RABATU",
+      "fixedSum": "Kwota stała (zł)",
+      "percent": "Procent (%)",
+      "value": "WARTOŚĆ",
+      "valuePlaceholder": "np. 50",
+      "activeAuto": "Aktywne auto-rabaty:",
+      "orderInfo": "Kolejność: kwoty stałe → procenty. Rabat jednorazowy stosowany dodatkowo.",
+      "baseTariff": "TARYFA BAZOWA",
+      "totalDiscounts": "RABATY ŁĄCZNIE",
+      "toPay": "DO ZAPŁATY",
+      "reason": "POWÓD RABATU",
+      "reasons": {
+        "loyalty": "🤝 Lojalność",
+        "loyaltyDesc": "Stały klient",
+        "referral": "👥 Polecenie",
+        "referralDesc": "Kto poleca / kto jest polecony",
+        "complaint": "💬 Reklamacja",
+        "complaintDesc": "Rekompensata jakości",
+        "promo": "🎫️ Promocja",
+        "promoDesc": "Kod / akcja"
+      },
+      "referralInfo": "Polecający otrzymuje −10%",
+      "referredGets": "−10%",
+      "referredNewGets": "−5%",
+      "referralAutoInfo": "Przy przyznaniu rabatu jednemu — system automatycznie nalicza rabat drugiemu.",
+      "referrer": "Polecający (kto poleca)",
+      "searchClient": "Szukaj w bazie klientów...",
+      "willReceive": "Otrzyma:",
+      "nextMonth": "na następny miesiąc",
+      "referred": "Polecony (nowy klient)",
+      "thisMonth": "na ten miesiąc",
+      "complaintDescLabel": "Opis przyczyny reklamacji",
+      "complaintPlaceholder": "Opisz szczegółowo przyczynę rekompensaty (widoczne w historii i dla księgowości)...",
+      "requiresApproval": "⏳ Wymaga zatwierdzenia",
+      "approver": "Zatwierdza",
+      "approvalInfo": "Ten sam menedżer, który zatwierdza zwroty. Rabat aktywny po zatwierdzeniu.",
+      "promoCode": "Kod promocyjny",
+      "promoPlaceholder": "np. LATO2026",
+      "department": "DZIAŁ WYDAJĄCY RABAT",
+      "depts": {
+        "quality": "🎯 Dział Jakości",
+        "admin": "🏛️ Administracja",
+        "accounting": "📊 Księgowość",
+        "director": "👔 Dyrektor"
+      },
+      "comment": "KOMENTARZ / UZASADNIENIE",
+      "commentPlaceholder": "np. Klient od 3 lat, rabat za lojalność — opisz przyczynę",
+      "apply": "💾 Zastosuj rabat",
+      "saving": "Zapisywanie...",
+      "deptIssuing": "Dział wydający rabat"
     },
     "tariff": {
       "title": "Taryfa",
@@ -230,12 +353,35 @@
       "title": "Wznów"
     },
     "groupSplit": {
-      "title": "Podział grupy",
-      "subtitle": "Szablon: przenieś 1 lekcję/tydz. do innej grupy.",
-      "desc": "Opis",
-      "from": "Z grupy",
-      "to": "Do grupy",
-      "date": "Data obowiązywania"
+      "title": "🔄 Zmień grupę / rozkład zajęć",
+      "month": "Miesiąc",
+      "totalLessons": "łącznie",
+      "lessonsWord": "zajęcia",
+      "lessonsCount": "Zajęć",
+      "specificDates": "Konkretne daty zajęć",
+      "lessonN": "Zaj.",
+      "noDates": "Brak dat w rozkładzie",
+      "enterManually": "Wpisz ręcznie...",
+      "changeReason": "Przyczyna zmiany",
+      "selectReason": "— wybierz przyczynę —",
+      "describeReason": "Opisz przyczynę...",
+      "reasons": {
+        "teacherAbsent": "Zastępstwo nauczyciela (choroba/nieobecność)",
+        "groupChange": "Zmiana grupy na życzenie klienta",
+        "scheduleConflict": "Konflikt harmonogramu",
+        "trial": "Zajęcia próbne w innej grupie",
+        "makeup": "Odrabianie pominiętych zajęć",
+        "other": "Inna przyczyna (wpisz ręcznie)"
+      },
+      "addGroup": "Dodaj kolejną grupę / nauczyciela",
+      "totalCount": "Łącznie zajęć",
+      "ready": "Gotowe",
+      "exceeded": "Przekroczono",
+      "remaining": "pozostało",
+      "infoText1": "Przy zmianie grupy dziecko jest",
+      "infoTextBold": "automatycznie wypisywane",
+      "infoText2": "z poprzedniej. Do historii klienta dodawany jest wpis.",
+      "saveSplit": "Zapisz rozkład"
     },
     "placeholders": {
       "ddmm": "dd.mm",

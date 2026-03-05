@@ -1,21 +1,12 @@
 import { http } from "./http";
-import type { Program, StudentProfile } from "./mockDb";
+import type { Program, StudentProfile, Transaction, KsefInvoice } from "./mockDb";
+
+export type { Transaction };
 
 export interface StudentPaymentsResponse {
   student: StudentProfile;
   programs: Program[];
 }
-
-export type Transaction = {
-  id: string;
-  date: string;
-  title: string;
-  sub?: string;
-  amount: string;      // formatted
-  paid: boolean;
-  ksef?: string | null;
-  fvnum?: string | null;
-};
 
 export const paymentsApi = {
   async getStudentPayments(studentId: string) {
@@ -29,7 +20,7 @@ export const paymentsApi = {
   },
 
   async getKsefInvoices(programId: string) {
-    const { data } = await http.get<{ items: any[] }>("api/payments/ksef-invoices", { params: { programId } });
+    const { data } = await http.get<{ items: KsefInvoice[] }>("api/payments/ksef-invoices", { params: { programId } });
     return data.items;
   },
 

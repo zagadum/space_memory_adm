@@ -13,7 +13,6 @@ export type ModalId =
   | "refund-ok"
   | "resume"
   | "groupSplit"
-  | "change-group"
   | "trainer-presence"
   | "edit-info"
   | "attendance-status"

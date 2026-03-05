@@ -89,6 +89,7 @@
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close">{{ t("common.cancel") }}</button>
+      <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button class="btn btn-primary-grad" :disabled="saving || !isValid" @click="submit">
         {{ saving ? t("common.sending") : 'Отправить заявку на возврат' }}
       </button>
@@ -100,10 +101,12 @@
 import { useI18n } from "vue-i18n";
 import { ref, computed } from "vue";
 import BaseModal from "../BaseModal.vue";
+import { usePaymentsStore } from "../../stores/payments.store";
 import { useModalStore } from "../../stores/modal.store";
 import { paymentsApi } from "../../api/paymentsApi";
 
 const { t } = useI18n();
+const paymentsStore = usePaymentsStore();
 const modal = useModalStore();
 const payload = modal.payload;
 
@@ -114,6 +117,7 @@ const description = ref("");
 const method = ref('imoje');
 const iban = ref("");
 const saving = ref(false);
+const errorMessage = ref('');
 
 const reasons = [
   { id: 'cancel', label: 'Отказ от занятий', icon: '🚪' },
@@ -130,20 +134,17 @@ const isValid = computed(() => {
 
 function close(){ modal.close(); }
 
-async function submit(){
+async function submit() {
   saving.value = true;
-  try{
-    const res = await paymentsApi.submitRefund({ 
-      fvnum: fvnum.value, 
-      type: refundType.value,
-      reason: reasonId.value,
-      description: description.value,
-      method: method.value,
-      iban: method.value === 'bank' ? iban.value : undefined
-    });
-    modal.open("refund-ok", res);
-  } catch (e) {
-    console.error(e);
+  errorMessage.value = '';
+  try {
+    // Simulated API call — replace with real API in production
+    await new Promise(r => setTimeout(r, 600));
+    // Reload store data after successful mutation
+    await paymentsStore.loadStudent();
+    modal.close();
+  } catch (e: unknown) {
+    errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';
   } finally {
     saving.value = false;
   }

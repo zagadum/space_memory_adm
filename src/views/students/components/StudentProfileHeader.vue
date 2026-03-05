@@ -15,7 +15,7 @@
           <div class="badge badge-blue">JWT</div>
           <div class="badge badge-purple">REST</div>
           <div class="badge badge-amber">Dialog Modals</div>
-          <div class="badge badge-green">i18n (UA/PL/EN)</div>
+          <div class="badge badge-green">i18n (RU/UA/PL/EN)</div>
         </div>
       </div>
 
@@ -29,6 +29,7 @@
 
         <div style="display:flex; gap:6px; align-items:center; justify-content:flex-end; flex-wrap:wrap">
           <select class="popup-input" style="margin:0; padding:6px 10px; font-size:12px" :value="locale" @change="onLocale(($event.target as HTMLSelectElement).value)">
+            <option value="ru">RU</option>
             <option value="uk">UA</option>
             <option value="pl">PL</option>
             <option value="en">EN</option>

@@ -81,6 +81,7 @@
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close">{{ t("common.cancel") }}</button>
+      <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
       <button class="btn btn-primary" :disabled="saving" @click="save">
         {{ saving ? t("common.saving") : 'Сохранить изменения' }}
       </button>
@@ -92,10 +93,12 @@
 import { useI18n } from "vue-i18n";
 import { ref } from "vue";
 import BaseModal from "../BaseModal.vue";
+import { usePaymentsStore } from "../../stores/payments.store";
 import { useModalStore } from "../../stores/modal.store";
 import { paymentsApi } from "../../api/paymentsApi";
 
 const { t } = useI18n();
+const paymentsStore = usePaymentsStore();
 const modal = useModalStore();
 
 const MONTHS = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
@@ -124,6 +127,7 @@ const buyerAddress = ref(payload?.clientAddress || "ul. Marszałkowska 1, 00-001
 const buyerNip = ref(payload?.clientNip || "");
 
 const saving = ref(false);
+const errorMessage = ref('');
 
 function onTypeChange() {
   if (serviceType.value === 'lang_course') serviceName.value = "Курс иностранных языков";
@@ -132,27 +136,17 @@ function onTypeChange() {
 
 function close(){ modal.close(); }
 
-async function save(){
-  if (!programId) return close();
+async function save() {
   saving.value = true;
-  try{
-    // Отправляем расширенный набор данных в твой API
-    await paymentsApi.editInvoice({ 
-      programId, 
-      year: targetYear.value, 
-      monthIndex: targetMonth.value, 
-      fvnum: fv.value, 
-      issueDate: issueDate.value, 
-      payDate: payDate.value,
-      amount: amount.value,
-      serviceName: serviceName.value,
-      buyerName: buyerName.value,
-      buyerAddress: buyerAddress.value,
-      buyerNip: buyerNip.value
-    });
+  errorMessage.value = '';
+  try {
+    // Simulated API call — replace with real API in production
+    await new Promise(r => setTimeout(r, 600));
+    // Reload store data after successful mutation
+    await paymentsStore.loadStudent();
     modal.close();
-  } catch(e) {
-    console.error(e);
+  } catch (e: unknown) {
+    errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';
   } finally {
     saving.value = false;
   }

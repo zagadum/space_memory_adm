@@ -1,3 +1,6 @@
+// ─────────────────────────────────────────────────────────────
+// Type aliases
+// ─────────────────────────────────────────────────────────────
 export type PayStatus = "paid" | "pending" | "overdue";
 export type MonthStatus =
   | "paid"
@@ -12,40 +15,109 @@ export type MonthStatus =
 
 export type KsefStatus = "ok" | "manual" | "pending" | "error" | "conflict" | null;
 
-export interface MonthItem {
-  status: MonthStatus;
-  payStatus?: PayStatus;
-  amount: number; // zł
-  ksef: KsefStatus;
-  g1: number;
-  g2: number;
-  txDate?: string;
-  disc?: "family" | "referral" | "loyalty" | "complaint" | "promo";
-  discAmt?: number;
-  pauseUntil?: string;
-  pauseFrom?: string;
-  returnDate?: string;
-  teacher?: string;
-  lessons?: number;
-  split?: boolean;
-  bonus?: boolean;
-  bonusDate?: string;
-  groupSplit?: any[];
+// ─────────────────────────────────────────────────────────────
+// MonthObj — главная единица помесячной сетки
+// ─────────────────────────────────────────────────────────────
+export interface MonthObj {
+  s: MonthStatus;               // статус месяца
+  payStatus?: PayStatus | null; // статус оплаты
+  a: number;                    // сумма (zł)
+  ksef: KsefStatus;             // статус KSeF
+  g1: number;                   // кол-во занятий группа 1
+  g2: number;                   // кол-во занятий группа 2
+  split?: boolean;              // разделение групп
+  groupSplit?: GroupSplitDetail[];  // детализация разделения
+  disc?: string;                // тип скидки (family, referral, loyalty, complaint, promo)
+  discAmt?: number;             // размер скидки (zł)
+  txDate?: string;              // дата транзакции
+  bonus?: boolean;              // бонусный месяц
+  bonusDate?: string;           // дата бонуса
+  teacher?: string;             // преподаватель
+  pauseUntil?: string;          // пауза до
+  pauseFrom?: string;           // пауза с
+  returnDate?: string;          // дата возврата
+  lessons?: number;             // занятий проведено
+  totalLessons?: number;        // занятий всего
+}
+
+// Обратная совместимость — алиас
+export type MonthItem = MonthObj;
+
+// ─────────────────────────────────────────────────────────────
+// Program
+// ─────────────────────────────────────────────────────────────
+export interface ExtraPurchase {
+  id: string;
+  icon: string;
+  title: string;
+  price: number;
+  date: string | null;
+  txId: string | null;
+  ksef: 'ok' | 'pending' | 'none';
+  status: 'paid' | 'pending';
+}
+
+export interface GroupSplitDetail {
+  group: string;
+  teacher: string;
+  lessons: number;
+  amount?: number;
+  dates?: string[];
+  reason?: string;
+}
+
+export interface KsefInvoice {
+  fvnum: string;
+  title: string;
+  status: string;
+  statusClass: string;
+}
+
+export interface ProgramTransaction {
+  date: string;
+  title: string;
+  sub: string;
+  amount: string;
+  paid: boolean;
+  ksef: string | null;
+  fvnum: string | null;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export interface Transaction {
+  id: string;
+  date: string;
+  title: string;
+  sub?: string;
+  amount: number;
+  amountFmt?: string;
+  status: "paid" | "pending";
+  type: "month" | "extra";
+  ksef?: "ok" | "pending" | "conflict" | "error" | null;
+  fvnum?: string | null;
 }
 
 export interface Program {
-  id: "space" | "indigo" | "extras";
+  id: string;
   name: string;
   sub: string;
   tariff: number;
   balance: number;
   balanceLabel: string;
   barGradient: string;
-  years: Record<string, MonthItem[]>;
-  transactions: any[];
-  extras?: any[];
+  years: Record<string, MonthObj[]>;
+  transactions: ProgramTransaction[];
+  extras?: ExtraPurchase[];
 }
 
+// ─────────────────────────────────────────────────────────────
+// Student & Enrollment
+// ─────────────────────────────────────────────────────────────
 export interface StudentProfile {
   id: string;
   initials: string;
@@ -92,6 +164,9 @@ export interface Enrollment {
   }>;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Teachers DB
+// ─────────────────────────────────────────────────────────────
 export const TEACHERS_DB = [
   { id: 't1', name: 'Клара Левит', group: 'Вт 17 Младшая', schedule: 'Вт 17:00', dow: 2 },
   { id: 't2', name: 'Пиотр Ивановски', group: 'Ср 15 Младшая', schedule: 'Ср 15:00', dow: 3 },
@@ -100,7 +175,10 @@ export const TEACHERS_DB = [
   { id: 't5', name: 'Ханна Боян', group: 'Ср 15 Младшая', schedule: 'Ср 15:00', dow: 3 }
 ];
 
-export const mockDb: { me: any; students: Record<string, { profile: StudentProfile; programs: Program[] }> } = {
+// ─────────────────────────────────────────────────────────────
+// Mock DB
+// ─────────────────────────────────────────────────────────────
+export const mockDb: { me: AdminUser; students: Record<string, { profile: StudentProfile; programs: Program[] }> } = {
   me: { id: "u_1", email: "admin@demo.local", name: "Demo Admin" },
   students: {
     s_1: {
@@ -165,32 +243,97 @@ export const mockDb: { me: any; students: Record<string, { profile: StudentProfi
           balanceLabel: "переплата",
           barGradient: "linear-gradient(180deg,var(--blue),var(--purple))",
           years: {
+            "2025": [
+              { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "03.01.2025", lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "02.02.2025", lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "01.03.2025", lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "01.04.2025", lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "05.05.2025", lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "02.06.2025", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.09.2025", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.10.2025", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "03.11.2025", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.12.2025", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+            ],
             "2026": [
-              { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2026" },
-              { status: "paid", payStatus: "paid", amount: 441, ksef: "ok", g1: 4, g2: 0, txDate: "08.02.2026" },
-              { status: "pending", payStatus: "pending", amount: 441, ksef: null, g1: 4, g2: 0 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "05.01.2026", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 441, ksef: "ok", g1: 4, g2: 0, txDate: "08.02.2026", disc: "family", discAmt: 49, lessons: 4, totalLessons: 4 },
+              { s: "pending", payStatus: "pending", a: 441, ksef: null, g1: 4, g2: 0, lessons: 2, totalLessons: 4 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 441, ksef: null, g1: 0, g2: 0 },
             ],
           },
           transactions: [
             { date: "08.02.2026", title: "Абонемент февраль 2026 ✓", sub: "Space Memory · Imoje", amount: "+441 зл", paid: true, ksef: "ok", fvnum: "FV/2026/02/091" },
+            { date: "05.01.2026", title: "Абонемент январь 2026 ✓", sub: "Space Memory · Imoje", amount: "+441 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/045" },
           ],
         },
         {
           id: "indigo",
           name: "⚡ Speedy Mind Indigo",
-          sub: "Ср 15 Младшая · Ср 15:00 · Ханна Боян · 450 зл/мес · 👦 1-й ребёнок · без скидки",
+          sub: "Ср 15 Младшая · Ср 15:00 · Ханна Боян · 450 зл/мес · 👧 2-й ребёнок · −10% семья",
           tariff: 450,
           balance: 100,
           balanceLabel: "переплата",
           barGradient: "linear-gradient(180deg,var(--purple),var(--pink))",
           years: {
+            "2025": [
+              { s: "future", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "paid", payStatus: "paid", a: 405, ksef: "ok", g1: 4, g2: 0, txDate: "01.09.2025", disc: "family", discAmt: 45, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 405, ksef: "ok", g1: 4, g2: 0, txDate: "02.10.2025", disc: "family", discAmt: 45, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 405, ksef: "ok", g1: 4, g2: 0, txDate: "03.11.2025", disc: "family", discAmt: 45, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 405, ksef: "ok", g1: 4, g2: 0, txDate: "01.12.2025", disc: "family", discAmt: 45, lessons: 4, totalLessons: 4 },
+            ],
             "2026": [
-              { status: "paid", payStatus: "paid", amount: 405, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2026" },
-              { status: "pending", payStatus: "pending", amount: 405, ksef: null, g1: 4, g2: 0 },
+              { s: "paid", payStatus: "paid", a: 405, ksef: "ok", g1: 4, g2: 0, txDate: "05.01.2026", disc: "family", discAmt: 45, lessons: 4, totalLessons: 4 },
+              { s: "paid", payStatus: "paid", a: 405, ksef: "ok", g1: 4, g2: 0, txDate: "06.02.2026", disc: "family", discAmt: 45, lessons: 4, totalLessons: 4 },
+              { s: "overdue", payStatus: "overdue", a: 405, ksef: "error", g1: 4, g2: 0, lessons: 3, totalLessons: 4 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 405, ksef: null, g1: 0, g2: 0 },
             ],
           },
           transactions: [
-            { date: "15.01.2026", title: "Абонемент январь 2026 ✓", sub: "Indigo · Imoje", amount: "+405 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/055" },
+            { date: "06.02.2026", title: "Абонемент февраль 2026 ✓", sub: "Indigo · Imoje", amount: "+405 зл", paid: true, ksef: "ok", fvnum: "FV/2026/02/092" },
+            { date: "05.01.2026", title: "Абонемент январь 2026 ✓", sub: "Indigo · Imoje", amount: "+405 зл", paid: true, ksef: "ok", fvnum: "FV/2026/01/055" },
+          ],
+        },
+        {
+          id: "extras" as const,
+          name: "📚 Доп. материалы и программы",
+          sub: "Разовые услуги и товары",
+          tariff: 0,
+          balance: 450,
+          balanceLabel: "оплачено",
+          barGradient: "linear-gradient(180deg,var(--amber),var(--orange))",
+          years: {},
+          transactions: [],
+          extras: [
+            { id: "ext_1", icon: "🏆", title: "Олимпиада онлайн 2026", price: 150, date: "15.01.2026", txId: "#TXN-2026-0312", ksef: "ok", status: "paid" },
+            { id: "ext_2", icon: "🧮", title: "Счёты детские", price: 180, date: "10.02.2026", txId: "#TXN-2026-0445", ksef: "ok", status: "paid" },
+            { id: "ext_3", icon: "👩‍💼", title: "1-месячный курс для родителей", price: 120, date: null, txId: null, ksef: "pending", status: "pending" },
           ],
         },
       ],
@@ -238,8 +381,18 @@ export const mockDb: { me: any; students: Record<string, { profile: StudentProfi
           barGradient: "linear-gradient(180deg,var(--purple),var(--pink))",
           years: {
             "2026": [
-              { status: "paid", payStatus: "paid", amount: 450, ksef: "ok", g1: 4, g2: 0, txDate: "10.01.2026" },
-              { status: "pending", payStatus: "pending", amount: 450, ksef: null, g1: 4, g2: 0 },
+              { s: "paid", payStatus: "paid", a: 450, ksef: "ok", g1: 4, g2: 0, txDate: "10.01.2026", lessons: 4, totalLessons: 4 },
+              { s: "pending", payStatus: "pending", a: 450, ksef: null, g1: 4, g2: 0, lessons: 2, totalLessons: 4 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 450, ksef: null, g1: 0, g2: 0 },
             ],
           },
           transactions: [],
@@ -289,7 +442,18 @@ export const mockDb: { me: any; students: Record<string, { profile: StudentProfi
           barGradient: "linear-gradient(180deg,var(--blue),var(--purple))",
           years: {
             "2026": [
-              { status: "overdue", payStatus: "overdue", amount: 490, ksef: "error", g1: 0, g2: 0 },
+              { s: "overdue", payStatus: "overdue", a: 490, ksef: "error", g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "summer", a: 0, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
+              { s: "future", a: 490, ksef: null, g1: 0, g2: 0 },
             ],
           },
           transactions: [],
@@ -299,23 +463,28 @@ export const mockDb: { me: any; students: Record<string, { profile: StudentProfi
   },
 };
 
-export const mockTransactions: Record<string, any[]> = {
+// ─────────────────────────────────────────────────────────────
+// Mock transactions / KSeF invoices
+// ─────────────────────────────────────────────────────────────
+export const mockTransactions: Record<string, Transaction[]> = {
   space: [
-    { id: "tx_001", date: "01.03.2026", title: "Оплата абонемента", sub: "Space Memory · March", amount: "+441 zł", paid: true, ksef: "KSeF OK", fvnum: "FV/2026/03/001" },
-    { id: "tx_002", date: "15.03.2026", title: "Доплата", sub: "Коррекция по тарифу", amount: "+49 zł", paid: true, ksef: null, fvnum: null },
-    { id: "tx_003", date: "28.03.2026", title: "Счет выставлен", sub: "ожидает оплату", amount: "-441 zł", paid: false, ksef: "KSeF pending", fvnum: "FV/2026/03/009" }
+    { id: "tx_001", date: "08.02.2026", title: "Абонемент февраль 2026", sub: "Space Memory · Imoje · FV/2026/02/091", amount: 441, amountFmt: "+441 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/02/091" },
+    { id: "tx_002", date: "05.01.2026", title: "Абонемент январь 2026", sub: "Space Memory · Imoje · FV/2026/01/045", amount: 441, amountFmt: "+441 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/01/045" },
+    { id: "tx_003", date: "28.03.2026", title: "Счет март 2026", sub: "Space Memory · ожидает оплату", amount: 441, amountFmt: "441 zł", status: "pending", type: "month", ksef: "pending", fvnum: "FV/2026/03/009" },
+    { id: "tx_004", date: "20.02.2026", title: "Доп. занятие — мнемотехника", sub: "Space Memory · разовое", amount: 80, amountFmt: "+80 zł", status: "paid", type: "extra", ksef: null, fvnum: null },
   ],
   indigo: [
-    { id: "tx_101", date: "01.03.2026", title: "Оплата абонемента", sub: "INDIGO · March", amount: "+390 zł", paid: true, ksef: "KSeF OK", fvnum: "FV/2026/03/101" },
-    { id: "tx_102", date: "05.03.2026", title: "Refund", sub: "Возврат по переплате", amount: "-50 zł", paid: true, ksef: null, fvnum: "FV/2026/03/101" }
+    { id: "tx_101", date: "06.02.2026", title: "Абонемент февраль 2026", sub: "Indigo · Imoje · FV/2026/02/092", amount: 405, amountFmt: "+405 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/02/092" },
+    { id: "tx_102", date: "05.01.2026", title: "Абонемент январь 2026", sub: "Indigo · Imoje · FV/2026/01/055", amount: 405, amountFmt: "+405 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/01/055" },
+    { id: "tx_103", date: "01.03.2026", title: "Счет март 2026", sub: "Indigo · просрочка", amount: 405, amountFmt: "405 zł", status: "pending", type: "month", ksef: "error", fvnum: "FV/2026/03/110" },
   ],
   extras: [
-    { id: "tx_201", date: "10.03.2026", title: "Доп. материалы", sub: "Extras", amount: "+30 zł", paid: true, ksef: null, fvnum: null }
+    { id: "tx_201", date: "10.03.2026", title: "Доп. материалы", sub: "Extras · разовое", amount: 30, amountFmt: "+30 zł", status: "paid", type: "extra", ksef: null, fvnum: null }
   ]
 };
 
 
-export const mockKsefInvoices: Record<string, any[]> = {
+export const mockKsefInvoices: Record<string, KsefInvoice[]> = {
   space: [
     { fvnum: "FV/2026/02/091", title: "Абонемент февраль 2026", status: "OK", statusClass: "ksef-ok" },
     { fvnum: "FV/2026/01/045", title: "Абонемент январь 2026", status: "OK", statusClass: "ksef-ok" },

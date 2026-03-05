@@ -1,9 +1,10 @@
 import { createI18n } from "vue-i18n";
 import en from "../locales/en.json";
 import pl from "../locales/pl.json";
+import ru from "../locales/ru.json";
 import uk from "../locales/uk.json";
 
-const SUPPORTED = ["uk", "pl", "en"] as const;
+const SUPPORTED = ["ru", "uk", "pl", "en"] as const;
 export type Locale = (typeof SUPPORTED)[number];
 
 function detectLocale(): Locale {
@@ -18,7 +19,7 @@ export const i18n = createI18n({
   legacy: false,
   locale: detectLocale(),
   fallbackLocale: "en",
-  messages: { en, pl, uk },
+  messages: { ru, en, pl, uk },
 });
 
 export function setLocale(locale: Locale) {

@@ -24,11 +24,12 @@
     "activePrograms": "Active programs",
     "actions": "Actions",
     "tx": {
-      "title": "Transactions",
+      "title": "Transactions & KSeF Invoices",
       "count": "transactions",
       "loading": "Loading transactions…",
-      "paid": "paid",
-      "pending": "pending"
+      "paid": "✓ Paid",
+      "pending": "🕐 Pending",
+      "empty": "No transactions for this program"
     },
     "legend": {
       "title": "Legend:",
@@ -37,7 +38,8 @@
       "overdue": "Overdue",
       "pause": "Pause",
       "summer": "Summer",
-      "extra": "Extra lessons"
+      "extra": "Extra lessons",
+      "partial": "Partial pause"
     },
     "year": "Year:",
     "view": {
@@ -60,11 +62,18 @@
       "unlock": "Unlock",
       "archive": "Archive",
       "split": "Split",
-      "resume": "Resume"
+      "resume": "Resume",
+      "changeGroup": "Change group",
+      "addExtra": "Extra cl."
     },
     "extras": {
-      "title": "Items",
-      "count": "items"
+      "title": "Extra materials & programs",
+      "subtitle": "One-time services & goods",
+      "items": "items",
+      "paid": "paid",
+      "awaitingPayment": "awaiting payment",
+      "afterPayment": "after payment",
+      "infoText": "One-time services \u2014 no subscription, pauses, or tariff changes."
     },
     "status": {
       "paid": "Paid",
@@ -73,29 +82,82 @@
       "pause": "Pause",
       "summer": "Summer",
       "partial": "Partial",
-      "extra": "Extra"
+      "extra": "Extra",
+      "future": "Future",
+      "pendingFull": "Pending payment",
+      "partialPause": "Partial pause",
+      "extraPaid": "Extra paid",
+      "extraPending": "Extra pending"
     },
     "table": {
       "month": "Month",
       "status": "Status",
       "amount": "Amount",
       "ksef": "KSeF",
-      "lessons": "Lessons"
+      "lessons": "Lessons",
+      "payment": "Payment",
+      "discount": "Discount",
+      "txDate": "Tx Date"
     },
     "labels": {
       "until": "until",
-      "discountShort": "discount"
+      "from": "from",
+      "return": "return",
+      "discountShort": "discount",
+      "free": "Free",
+      "lessonsCount": "lessons",
+      "lessonsSuffix": "les."
     },
     "ksef": {
       "title": "KSeF invoices",
-      "loading": "Loading KSeF…"
+      "loading": "Loading KSeF…",
+      "ok": "✓ Sent",
+      "manual": "✎ Manual",
+      "pending": "⏳ Pending",
+      "error": "✕ Error",
+      "conflict": "! Conflict"
     },
     "korekta": {
       "forInvoice": "Correction to invoice"
     },
     "refund": {
       "forInvoice": "Refund for invoice"
-    }
+    },
+    "detail": {
+      "payStatus": "💰 Payment status",
+      "amount": "💵 Amount due",
+      "lessons": "📊 Lessons",
+      "partialPause": "◐ Partial pause",
+      "activePause": "🌙 Active pause",
+      "distribution": "🔄 Distribution",
+      "discount": "🏷️ Discount",
+      "teacher": "👩‍🏫 Teacher",
+      "bonus": "⭐ Bonus lesson",
+      "ksefLabel": "📄 KSeF",
+      "txHint": "💡 Transactions & invoices — see Transactions below"
+    },
+    "disc": {
+      "family": "Family",
+      "referral": "Referral",
+      "loyalty": "Loyalty",
+      "complaint": "Compensation",
+      "promo": "Promo"
+    },
+    "monthsFull": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "child2badge": "👧 2nd child · −10% family"
   },
   "common": {
     "cancel": "Cancel",
@@ -129,26 +191,87 @@
   },
   "modals": {
     "pause": {
-      "title": "⏸ Pause / holidays",
-      "subtitle": "Freeze subscription for the selected period.",
-      "from": "From",
-      "to": "To",
-      "return": "Return date"
+      "title": "Pause",
+      "scheduleHint1": "The system counts lessons by",
+      "scheduleHint2": "group schedule",
+      "scheduleHint3": "(specific days), not by calendar. Pause and return are visible in the grid with dates.",
+      "from": "Pause from",
+      "to": "Return from",
+      "datesHint": "Return dates are visible on the card and in month details",
+      "calcTitle": "Schedule-based calculation",
+      "lessons": "les",
+      "invoicesTitle": "Invoices:",
+      "invoicesText": "no changes. Missed lessons are transferred to the 1st month after return. Correction only at client's request for refund.",
+      "qualityText1": "After returning from pause —",
+      "qualityText2": "Quality Dept. calls",
+      "qualityText3": "and assigns to a group. Overpayment is recalculated after actual return.",
+      "reason": "Reason",
+      "selectReason": "select a reason",
+      "reasons": {
+        "illness": "Illness / accident",
+        "trip": "Trip / vacation",
+        "exams": "Exams / studies",
+        "family": "Family circumstances",
+        "other": "Other reason"
+      },
+      "comment": "Comment",
+      "optional": "optional",
+      "commentPlaceholder": "Additional information...",
+      "apply": "Apply pause"
     },
     "discount": {
-      "title": "Discount",
-      "subtitle": "Example dialog. Styles/classes match the prototype.",
-      "type": "Discount type",
-      "amount": "Amount (zł)",
-      "comment": "Comment",
-      "kind": "Type",
-      "apply": "Apply",
-      "kinds": {
-        "family": "Family",
-        "referral": "Referral",
-        "promo": "Promo",
-        "loyalty": "Loyalty"
-      }
+      "title": "🏷️ One-time discount",
+      "selectMonth": "SELECT MONTH",
+      "type": "DISCOUNT TYPE",
+      "fixedSum": "Fixed amount (zł)",
+      "percent": "Percentage (%)",
+      "value": "VALUE",
+      "valuePlaceholder": "e.g. 50",
+      "activeAuto": "Active auto-discounts:",
+      "orderInfo": "Order: fixed amounts → percentages. One-time discount applied additionally.",
+      "baseTariff": "BASE TARIFF",
+      "totalDiscounts": "TOTAL DISCOUNTS",
+      "toPay": "TO PAY",
+      "reason": "DISCOUNT REASON",
+      "reasons": {
+        "loyalty": "🤝 Loyalty",
+        "loyaltyDesc": "Long-time client",
+        "referral": "👥 Referral",
+        "referralDesc": "Who refers / who is referred",
+        "complaint": "💬 Complaint",
+        "complaintDesc": "Quality compensation",
+        "promo": "🎫️ Promo",
+        "promoDesc": "Code / promotion"
+      },
+      "referralInfo": "Referrer receives −10%",
+      "referredGets": "−10%",
+      "referredNewGets": "−5%",
+      "referralAutoInfo": "When assigning a discount to one — the system automatically grants a discount to the other.",
+      "referrer": "Referrer (who recommends)",
+      "searchClient": "Search client database...",
+      "willReceive": "Will receive:",
+      "nextMonth": "on their next month",
+      "referred": "Referred (new client)",
+      "thisMonth": "on this month",
+      "complaintDescLabel": "Complaint description",
+      "complaintPlaceholder": "Describe the compensation reason in detail (visible in history and for accounting)...",
+      "requiresApproval": "⏳ Requires approval",
+      "approver": "Approved by",
+      "approvalInfo": "Same manager who approves refunds. Discount active after approval.",
+      "promoCode": "Promo code",
+      "promoPlaceholder": "e.g. LATO2026",
+      "department": "ISSUING DEPARTMENT",
+      "depts": {
+        "quality": "🎯 Quality Dept",
+        "admin": "🏛️ Administration",
+        "accounting": "📊 Accounting",
+        "director": "👔 Director"
+      },
+      "comment": "COMMENT / JUSTIFICATION",
+      "commentPlaceholder": "e.g. Client for 3 years, loyalty discount — please describe the reason",
+      "apply": "💾 Apply discount",
+      "saving": "Saving...",
+      "deptIssuing": "Issuing department"
     },
     "tariff": {
       "title": "Tariff",
@@ -230,12 +353,35 @@
       "title": "Resume"
     },
     "groupSplit": {
-      "title": "Group split",
-      "subtitle": "Template: move 1 lesson/week to another group.",
-      "desc": "Description",
-      "from": "From group",
-      "to": "To group",
-      "date": "Effective date"
+      "title": "🔄 Change group / lesson distribution",
+      "month": "Month",
+      "totalLessons": "total",
+      "lessonsWord": "lessons",
+      "lessonsCount": "Lessons",
+      "specificDates": "Specific lesson dates",
+      "lessonN": "Les.",
+      "noDates": "No dates in schedule",
+      "enterManually": "Enter manually...",
+      "changeReason": "Reason for change",
+      "selectReason": "— select reason —",
+      "describeReason": "Describe the reason...",
+      "reasons": {
+        "teacherAbsent": "Teacher substitution (illness/absence)",
+        "groupChange": "Group change by client request",
+        "scheduleConflict": "Schedule conflict",
+        "trial": "Trial lesson in another group",
+        "makeup": "Makeup for missed lesson",
+        "other": "Other reason (specify manually)"
+      },
+      "addGroup": "Add another group / teacher",
+      "totalCount": "Total lessons",
+      "ready": "Ready",
+      "exceeded": "Exceeded",
+      "remaining": "remaining",
+      "infoText1": "When changing group, the child is",
+      "infoTextBold": "automatically unregistered",
+      "infoText2": "from the previous one. A record is added to the client history.",
+      "saveSplit": "Save distribution"
     },
     "placeholders": {
       "ddmm": "dd.mm",

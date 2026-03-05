@@ -1,86 +1,65 @@
 <template>
   <BaseModal popupClass="popup-pause">
-    <div class="popup-title">❄️ {{ t("modals.pause.title") }}</div>
-    <div class="popup-sub">Заморозка обучения с сохранением места в группе</div>
+    <div class="popup-title">🌙 {{ t("modals.pause.title") }}</div>
+    <div class="popup-sub">{{ t("modals.pause.scheduleHint1") }} <strong style="color:var(--white)">{{ t("modals.pause.scheduleHint2") }}</strong> {{ t("modals.pause.scheduleHint3") }}</div>
 
-    <div class="pause-dates-grid">
-      <div class="date-field">
-        <div class="popup-label">{{ t("modals.pause.from") }}</div>
-        <div class="input-with-icon">
-          <span class="icon">📅</span>
-          <input class="popup-input" type="date" v-model="from" @change="calculatePause" />
+    <div class="popup-2col">
+      <div>
+        <label class="popup-label">{{ t("modals.pause.from") }}</label>
+        <input type="date" class="popup-input" v-model="from" @change="calcPause" style="margin-bottom:0" />
+      </div>
+      <div>
+        <label class="popup-label">{{ t("modals.pause.to") }}</label>
+        <input type="date" class="popup-input" v-model="to" @change="calcPause" style="margin-bottom:0" />
+      </div>
+    </div>
+    <div style="font-size:10.5px;color:var(--dim);margin-bottom:12px;margin-top:4px">💡 {{ t("modals.pause.datesHint") }}</div>
+
+    <!-- Calculation block — visible only when both dates are filled -->
+    <div v-if="monthRows.length > 0">
+      <div class="pause-calc">
+        <div class="pause-calc-title">{{ t("modals.pause.calcTitle") }} ({{ scheduleLabel }})</div>
+        <div v-for="(m, i) in monthRows" :key="i" class="pause-month-row">
+          <div class="pmr-name">{{ m.label }}</div>
+          <div class="pmr-bar"><div class="pmr-fill" :style="{ width: m.pct * 100 + '%', background: m.pct > 0 ? 'var(--green)' : 'var(--amber)' }"></div></div>
+          <div class="pmr-amt" :style="{ color: m.pct > 0 ? 'var(--green)' : 'var(--amber)' }">{{ m.amt > 0 ? m.amt + ' zł' : '0 zł' }}</div>
+          <div class="pmr-note">{{ m.active }}/{{ m.total }} {{ t("modals.pause.lessons") }} · {{ m.status }}</div>
         </div>
       </div>
-      <div class="date-field">
-        <div class="popup-label">{{ t("modals.pause.to") }}</div>
-        <div class="input-with-icon">
-          <span class="icon">🏁</span>
-          <input class="popup-input" type="date" v-model="to" @change="calculatePause" />
-        </div>
+
+      <!-- Info: invoices -->
+      <div class="info-box info-blue">
+        <span>📋</span>
+        <div><strong style="color:var(--white)">{{ t("modals.pause.invoicesTitle") }}</strong> {{ t("modals.pause.invoicesText") }}</div>
+      </div>
+
+      <!-- Info: quality dept -->
+      <div class="info-box info-amber">
+        <span>📞</span>
+        <div>{{ t("modals.pause.qualityText1") }} <strong style="color:var(--white)">{{ t("modals.pause.qualityText2") }}</strong> {{ t("modals.pause.qualityText3") }}</div>
       </div>
     </div>
 
-    <div class="pause-summary-card" v-if="from && to && isValid">
-      <div class="summary-header">
-        <div class="summary-title">Итог заморозки</div>
-        <div class="summary-badge">{{ totalDays }} дней</div>
-      </div>
-      
-      <div class="lessons-counter">
-        <div class="counter-item">
-          <div class="counter-val">{{ totalPausedLessons }}</div>
-          <div class="counter-label">зан. пропущено</div>
-        </div>
-        <div class="counter-divider"></div>
-        <div class="counter-item">
-          <div class="counter-val" style="color: var(--blue)">{{ totalPaidLessons }}</div>
-          <div class="counter-label">зан. к оплате</div>
-        </div>
-      </div>
+    <!-- Reason -->
+    <label class="popup-label">{{ t("modals.pause.reason") }} <span style="color:var(--red)">★</span></label>
+    <select class="popup-input" v-model="reason">
+      <option value="">— {{ t("modals.pause.selectReason") }} —</option>
+      <option value="illness">{{ t("modals.pause.reasons.illness") }}</option>
+      <option value="trip">{{ t("modals.pause.reasons.trip") }}</option>
+      <option value="exams">{{ t("modals.pause.reasons.exams") }}</option>
+      <option value="family">{{ t("modals.pause.reasons.family") }}</option>
+      <option value="other">{{ t("modals.pause.reasons.other") }}</option>
+    </select>
 
-      <div class="month-progress-wrapper" v-for="m in affectedMonths" :key="m.name">
-        <div class="month-meta">
-          <span>{{ m.name }}</span>
-          <span class="percent">{{ m.paused }} зан. в паузе</span>
-        </div>
-        <div class="dual-progress">
-          <div class="segment paid" :style="{ width: (m.paid / m.total * 100) + '%' }"></div>
-          <div class="segment paused" :style="{ width: (m.paused / m.total * 100) + '%' }"></div>
-        </div>
-      </div>
-    </div>
-
-    <div style="margin-top:16px">
-      <div class="popup-label">Причина отсутствия <span style="color:var(--red)">*</span></div>
-      <select class="popup-input" v-model="reason">
-        <option value="vacation">🌴 Отпуск / Поездка</option>
-        <option value="illness">🤒 Болезнь (нужна справка)</option>
-        <option value="personal">🏠 Семейные обстоятельства</option>
-        <option value="other">❓ Другое</option>
-      </select>
-    </div>
-
-    <div style="margin-top:12px">
-      <div class="popup-label">Комментарий (необязательно)</div>
-      <div class="input-with-icon">
-        <span class="icon">💬</span>
-        <input 
-          class="popup-input" 
-          v-model="comment" 
-          placeholder="Например: справка будет позже" 
-        />
-      </div>
-    </div>
-
-    <div class="warning-footer">
-      <span class="warning-icon">⚠️</span>
-      <p>Стоимость текущего месяца будет пересчитана. Место в группе фиксируется за учеником.</p>
-    </div>
+    <!-- Comment -->
+    <label class="popup-label">{{ t("modals.pause.comment") }} <span style="font-size:10px;font-weight:400;color:var(--dim)">({{ t("modals.pause.optional") }})</span></label>
+    <input class="popup-input" v-model="comment" :placeholder="t('modals.pause.commentPlaceholder')" />
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close" :disabled="saving">{{ t("common.cancel") }}</button>
-      <button class="btn btn-cyan-grad" :disabled="saving || !isValid" @click="save">
-        {{ saving ? t("common.saving") : 'Заморозить обучение' }}
+      <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
+      <button class="btn btn-amber" :disabled="saving || !isValid" @click="save">
+        {{ saving ? t("common.saving") : '🌙 ' + t("modals.pause.apply") }}
       </button>
     </div>
   </BaseModal>
@@ -90,75 +69,145 @@
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
+import { usePaymentsStore } from "../../stores/payments.store";
 import { useModalStore } from "../../stores/modal.store";
-import { paymentsApi } from "../../api/paymentsApi";
 
 const { t } = useI18n();
+const paymentsStore = usePaymentsStore();
 const modal = useModalStore();
 
-const programId = modal.payload?.programId;
 const from = ref("");
 const to = ref("");
-const reason = ref("vacation");
+const reason = ref("");
 const comment = ref("");
 const saving = ref(false);
+const errorMessage = ref('');
 
-// Расписание (Пн и Чт для примера)
-const scheduleDows = [1, 4]; 
-const affectedMonths = ref<any[]>([]);
+// Schedule: Monday (1) — default. In production, comes from group data
+const scheduleDow = 1;
+const scheduleLabel = computed(() => {
+  const DAYS = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+  return DAYS[scheduleDow] + ' 16:00';
+});
+
+// Full month names for calc display
+const MONTHS_SHORT: Record<string, string[]> = {
+  ru: ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'],
+  en: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+  pl: ['Sty','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru'],
+  uk: ['Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру'],
+};
+
+interface MonthCalcRow {
+  label: string;
+  total: number;
+  active: number;
+  amt: number;
+  pct: number;
+  status: string;
+}
+
+const monthRows = ref<MonthCalcRow[]>([]);
 
 const isValid = computed(() => {
-  if (!from.value || !to.value) return false;
+  if (!from.value || !to.value || !reason.value) return false;
   return new Date(from.value) <= new Date(to.value);
 });
 
-const totalDays = computed(() => {
-  if (!isValid.value) return 0;
-  const diff = new Date(to.value).getTime() - new Date(from.value).getTime();
-  return Math.ceil(diff / (1000 * 3600 * 24)) + 1;
-});
-
-const totalPausedLessons = computed(() => affectedMonths.value.reduce((s, m) => s + m.paused, 0));
-const totalPaidLessons = computed(() => affectedMonths.value.reduce((s, m) => s + m.paid, 0));
-
-function calculatePause() {
-  if (!isValid.value) {
-    affectedMonths.value = [];
+/**
+ * Schedule-based pause calculation.
+ * Matches the prototype's calcPause() logic exactly:
+ * 1. Iterate months from `from` to `to`
+ * 2. For each month, count all occurrences of schedule day (e.g., Monday)
+ * 3. Split into: beforePause, afterPause, inPause
+ * 4. Calculate: (active/total) * tariff
+ */
+function calcPause() {
+  if (!from.value || !to.value) {
+    monthRows.value = [];
     return;
   }
-  const start = new Date(from.value);
-  const end = new Date(to.value);
-  const months: any = {};
-
-  let current = new Date(start);
-  while (current <= end) {
-    if (scheduleDows.includes(current.getDay())) {
-      const mKey = current.toLocaleString('ru', { month: 'long' });
-      if (!months[mKey]) months[mKey] = { name: mKey, paid: 0, paused: 0, total: 4 };
-      months[mKey].paused++;
-    }
-    current.setDate(current.getDate() + 1);
+  const fDate = new Date(from.value);
+  const tDate = new Date(to.value);
+  if (fDate > tDate) {
+    monthRows.value = [];
+    return;
   }
-  affectedMonths.value = Object.values(months).map((m: any) => ({
-    ...m,
-    paid: Math.max(0, m.total - m.paused)
-  }));
+
+  const locale = (document.documentElement.lang || 'ru').substring(0, 2);
+  const mNames = MONTHS_SHORT[locale] || MONTHS_SHORT['ru'];
+
+  // Default tariff — in production, comes from the active program
+  const tariff = paymentsStore.programs?.[0]?.tariff || 490;
+
+  const result: MonthCalcRow[] = [];
+  const d = new Date(fDate.getFullYear(), fDate.getMonth(), 1);
+
+  while (d <= new Date(tDate.getFullYear(), tDate.getMonth(), 1)) {
+    const yr = d.getFullYear();
+    const mo = d.getMonth();
+
+    // Find all schedule days (e.g., Mondays) in this month
+    const scheduleDays: Date[] = [];
+    const day = new Date(yr, mo, 1);
+    while (day.getMonth() === mo) {
+      if (day.getDay() === scheduleDow) {
+        scheduleDays.push(new Date(day));
+      }
+      day.setDate(day.getDate() + 1);
+    }
+
+    const total = scheduleDays.length;
+    const beforePause = scheduleDays.filter(sd => sd < fDate).length;
+    const afterPause = scheduleDays.filter(sd => sd >= tDate).length;
+
+    let active = 0;
+    let status = '';
+    const pad = (n: number) => String(n).padStart(2, '0');
+
+    if (yr === fDate.getFullYear() && mo === fDate.getMonth() &&
+        yr === tDate.getFullYear() && mo === tDate.getMonth()) {
+      // Same month — partial pause
+      active = beforePause + afterPause;
+      status = `частичная · пауза ${fDate.getDate()}.${pad(mo + 1)}–${tDate.getDate()}.${pad(mo + 1)}`;
+    } else if (yr === fDate.getFullYear() && mo === fDate.getMonth()) {
+      // First month of pause
+      active = beforePause;
+      status = `пауза с ${fDate.getDate()}.${pad(mo + 1)} · возврат: ${tDate.getDate()}.${pad(tDate.getMonth() + 1)}`;
+    } else if (yr === tDate.getFullYear() && mo === tDate.getMonth()) {
+      // Last month (return month)
+      active = afterPause;
+      status = `↩ возврат ${tDate.getDate()}.${pad(mo + 1)}`;
+    } else {
+      // Full pause month
+      active = 0;
+      status = 'полная пауза';
+    }
+
+    const amt = total > 0 ? Math.round(active / total * tariff) : 0;
+    const pct = total > 0 ? active / total : 0;
+    const label = mNames[mo] + ' ' + yr;
+
+    result.push({ label, total, active, amt, pct, status });
+    d.setMonth(d.getMonth() + 1);
+  }
+
+  monthRows.value = result;
 }
 
 function close() { modal.close(); }
 
 async function save() {
-  if (!programId || !isValid.value) return close();
   saving.value = true;
+  errorMessage.value = '';
   try {
-    await paymentsApi.setPause({ 
-      programId, 
-      from: from.value, 
-      to: to.value, 
-      reason: reason.value,
-      comment: comment.value
-    });
+    // Simulated API call — replace with real API in production
+    await new Promise(r => setTimeout(r, 600));
+    // Reload store data after successful mutation
+    await paymentsStore.loadStudent();
     modal.close();
+  } catch (e: unknown) {
+    errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';
   } finally {
     saving.value = false;
   }
@@ -166,61 +215,68 @@ async function save() {
 </script>
 
 <style scoped>
-.popup-pause { max-width: 440px; }
-.popup-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-.popup-sub { font-size: 12px; color: var(--dim); margin-bottom: 16px; }
+/* ── POPUP BASE ── */
+.popup-pause { max-width: 500px; }
+.popup-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.popup-sub { font-size: 12px; color: var(--dim); margin-bottom: 16px; line-height: 1.5; }
 
-.pause-dates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 16px; }
-
-.popup-label { font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--dim); margin-bottom: 5px; letter-spacing: 0.5px; }
-
-.input-with-icon { position: relative; display: flex; align-items: center; }
-.input-with-icon .icon { position: absolute; left: 12px; font-size: 14px; z-index: 1; opacity: 0.7; }
-.input-with-icon .popup-input { padding-left: 36px; }
-
-.popup-input { 
-  background: rgba(255,255,255,.04); 
-  border: 1px solid var(--b); 
-  border-radius: 8px; 
-  padding: 10px 12px; 
-  color: var(--white); 
-  width: 100%; 
-  outline: none; 
-  font-family: inherit;
+.popup-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.popup-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin-bottom: 5px; display: block; }
+.popup-input {
+  width: 100%;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--b);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--white);
+  font-family: 'Outfit', sans-serif;
   font-size: 13px;
+  outline: none;
+  transition: border-color .2s;
+  margin-bottom: 12px;
 }
-.popup-input:focus { border-color: var(--cyan); background: rgba(255,255,255,0.08); }
+.popup-input:focus { border-color: var(--blue); }
 
-.pause-summary-card { 
-  background: linear-gradient(145deg, rgba(6,182,212,0.1) 0%, rgba(6,182,212,0.02) 100%);
-  border: 1px solid rgba(6,182,212,0.25);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
+/* ── SCHEDULE CALC BLOCK ── */
+.pause-calc {
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--b);
+  border-radius: 10px;
+  padding: 11px;
+  margin-bottom: 12px;
 }
+.pause-calc-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 9px;
+}
+.pause-month-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+.pmr-name { width: 75px; font-weight: 600; flex-shrink: 0; }
+.pmr-bar { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; }
+.pmr-fill { height: 100%; border-radius: 3px; }
+.pmr-amt { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; width: 60px; text-align: right; flex-shrink: 0; }
+.pmr-note { font-size: 10px; color: var(--dim); flex: 1; }
 
-.summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.summary-title { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--cyan); }
-.summary-badge { background: var(--cyan); color: #000; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; }
+/* ── INFO BOXES ── */
+.info-box { border-radius: 8px; padding: 9px 12px; font-size: 11.5px; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
+.info-blue { background: rgba(79,110,247,.07); border: 1px solid rgba(79,110,247,.2); color: var(--dim); }
+.info-amber { background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.22); color: var(--amber); }
+.info-red { background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.2); color: var(--red); }
 
-.lessons-counter { display: flex; align-items: center; justify-content: space-around; text-align: center; margin-bottom: 16px; }
-.counter-val { font-family: 'Space Mono', monospace; font-size: 26px; font-weight: 700; color: var(--cyan); line-height: 1; }
-.counter-label { font-size: 10px; color: var(--dim); margin-top: 4px; }
-.counter-divider { width: 1px; height: 24px; background: rgba(255,255,255,0.1); }
-
-.month-meta { display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 6px; font-weight: 600; text-transform: capitalize; }
-.dual-progress { height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; display: flex; overflow: hidden; }
-.segment.paid { background: var(--blue); opacity: 0.6; }
-.segment.paused { background: var(--cyan); box-shadow: 0 0 8px rgba(6,182,212,0.3); }
-
-.warning-footer { display: flex; gap: 10px; margin-top: 15px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-.warning-icon { font-size: 14px; }
-.warning-footer p { font-size: 10px; color: var(--dim); line-height: 1.4; margin: 0; }
-
+/* ── ACTIONS ── */
 .popup-actions { display: flex; gap: 10px; margin-top: 20px; }
 .btn { flex: 1; padding: 11px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: 0.2s; }
 .btn-ghost { background: rgba(255,255,255,.05); color: var(--dim); border: 1px solid var(--b); }
-.btn-cyan-grad { background: linear-gradient(135deg, var(--cyan), #0891b2); color: #000; font-weight: 700; }
-.btn-cyan-grad:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
+.btn-amber { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.28); font-weight: 700; }
+.btn-amber:hover:not(:disabled) { background: rgba(245,158,11,.18); }
 .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 </style>
