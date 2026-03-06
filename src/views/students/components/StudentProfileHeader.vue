@@ -26,17 +26,7 @@
             {{ student?.totalBalance?.value || "—" }}
           </div>
         </div>
-
-        <div style="display:flex; gap:6px; align-items:center; justify-content:flex-end; flex-wrap:wrap">
-          <select class="popup-input" style="margin:0; padding:6px 10px; font-size:12px" :value="locale" @change="onLocale(($event.target as HTMLSelectElement).value)">
-            <option value="ru">RU</option>
-            <option value="uk">UA</option>
-            <option value="pl">PL</option>
-            <option value="en">EN</option>
-          </select>
-          <button class="btn btn-ghost btn-sm" @click="logout">🚪 {{ t("app.logout") }}</button>
         </div>
-      </div>
     </div>
 
     <div class="tabs">
@@ -52,31 +42,18 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { setLocale } from "../../../app/i18n";
-import { useAuthStore } from "../../../stores/auth.store";
 import { usePaymentsStore } from "../../../stores/payments.store";
 
-const { t, locale } = useI18n();
+// Оставили только то, что действительно нужно для вкладки
+const { t } = useI18n();
 const route = useRoute();
-const router = useRouter();
-
-const auth = useAuthStore();
 const payments = usePaymentsStore();
 
 const student = computed(() => payments.student);
 
 function isActive(name: string) {
   return route.name === name;
-}
-
-function onLocale(l: string) {
-  setLocale(l as any);
-}
-
-function logout() {
-  auth.logout();
-  router.push({ name: "sign-in" });
 }
 </script>

@@ -36,13 +36,14 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.secretariat }">
+        
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'students' }" 
           @click="setActive('students')"
         >
           <span class="nav-icon">👩‍🚀</span> Ученики
-          <span class="nav-badge green">42</span>
+          <span class="nav-badge green" v-if="listStore.totalStudents > 0">{{ listStore.totalStudents }}</span>
         </div>
         <div 
           class="nav-item" 
@@ -140,6 +141,15 @@
 
     </nav>
 
+    <div class="sidebar-lang">
+      <select class="lang-select" :value="locale" @change="onLocale(($event.target as HTMLSelectElement).value)">
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="uk">🇺🇦 Українська</option>
+        <option value="pl">🇵🇱 Polski</option>
+        <option value="en">🇬🇧 English</option>
+      </select>
+    </div>
+
     <div class="sidebar-bottom">
       <div class="user-card">
         <div class="user-avatar">АР</div>
@@ -147,6 +157,13 @@
           <div class="user-name">Артём</div>
           <div class="user-role">Отдел продаж</div>
         </div>
+        <button class="logout-btn" @click.stop="handleLogout" title="Выйти">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
@@ -155,9 +172,33 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { setLocale } from '../../app/i18n'
+
+// Подключаем сторы
+import { useStudentsListStore } from '../../stores/studentsList.store'
+import { useAuthStore } from '../../stores/auth.store'
 
 const router = useRouter()
 const route = useRoute()
+const { locale } = useI18n()
+
+// Инициализируем сторы
+const listStore = useStudentsListStore()
+const authStore = useAuthStore()
+
+// Логика смены языка
+function onLocale(l: string) {
+  setLocale(l as any)
+}
+
+// Функция выхода
+const handleLogout = () => {
+  if (authStore.logout) {
+    authStore.logout()
+  }
+  router.push('/auth/sign-in')
+}
 
 const openSections = ref<Record<string, boolean>>({
   secretariat: true,
@@ -244,6 +285,31 @@ const navigateTo = (item: string, path: string) => {
 .nb-red { background: #ef4444; color: #fff; }
 .nb-green { background: #10b981; color: #fff; }
 
+/* === Стили для селекта языка === */
+.sidebar-lang { padding: 0 16px 10px; flex-shrink: 0; }
+.lang-select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(100, 120, 255, 0.15);
+  color: #8892b0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+.lang-select:hover {
+  background: rgba(79, 110, 247, 0.08);
+  color: #e8eeff;
+  border-color: rgba(120, 140, 255, 0.35);
+}
+.lang-select option {
+  background: #0d0d2b;
+  color: #e8eeff;
+}
+
 .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--space-border, rgba(100,120,255,0.15)); flex-shrink: 0; }
 .user-card { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
 .user-card:hover { background: rgba(255,255,255,0.04); }
@@ -251,4 +317,9 @@ const navigateTo = (item: string, path: string) => {
 .user-info { flex: 1; min-width: 0; }
 .user-name { font-size: 12px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .user-role { font-size: 10px; color: #8892b0; }
+
+.logout-btn { background: transparent; border: none; color: #8892b0; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; margin-left: auto; }
+.logout-btn svg { transition: transform 0.2s ease; }
+.logout-btn:hover { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
+.logout-btn:hover svg { transform: translateX(2px); }
 </style>
