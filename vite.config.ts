@@ -1,30 +1,62 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { visualizer } from 'rollup-plugin-visualizer'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-export default defineConfig({
-  plugins: [
-    vue(),
-    {
-      name: 'copy-htaccess',
-      // @ts-expect-error - Vite plugin hook
-      closeBundle() {
-        try {
-          fs.copyFileSync(
-            path.resolve(__dirname, 'public/.htaccess'),
-            path.resolve(__dirname, 'dist/.htaccess')
-          )
-          console.log('.htaccess copied to dist/')
-        } catch (err) {
-          console.warn('Failed to copy .htaccess:', err)
+const copyHtaccessPlugin: PluginOption = {
+  name: 'copy-htaccess',
+  closeBundle() {
+    try {
+      fs.copyFileSync(
+        path.resolve(__dirname, 'public/.htaccess'),
+        path.resolve(__dirname, 'dist/.htaccess')
+      )
+      console.log('.htaccess copied to dist/')
+    } catch (err) {
+      console.warn('Failed to copy .htaccess:', err)
+    }
+  }
+}
+
+function manualChunks(id: string): string | undefined {
+  if (!id.includes('node_modules')) return undefined
+
+  if (id.includes('vue-router') || id.includes('pinia')) return 'vendor-router-pinia'
+  if (id.includes('vue-i18n')) return 'vendor-i18n'
+  if (id.includes('axios')) return 'vendor-axios'
+
+  return 'vendor'
+}
+
+export default defineConfig(({ mode }) => {
+  const plugins: PluginOption[] = [vue(), copyHtaccessPlugin]
+
+  if (mode === 'analyze') {
+    plugins.push(
+      visualizer({
+        filename: 'dist/stats.html',
+        gzipSize: true,
+        brotliSize: true,
+        open: false,
+        template: 'treemap'
+      })
+    )
+  }
+
+  return {
+    plugins,
+    server: { port: 5173 },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks
         }
       }
-    }
-  ],
-  server: { port: 5173 },
-  publicDir: 'public'
+    },
+    publicDir: 'public'
+  }
 })

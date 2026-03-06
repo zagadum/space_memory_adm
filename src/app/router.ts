@@ -1,17 +1,4 @@
 import { createRouter, createWebHistory } from "vue-router";
-import AppLayout from "../layouts/AppLayout.vue";
-import AuthLayout from "../layouts/AuthLayout.vue";
-import SignInPage from "../views/auth/SignInPage.vue";
-import StudentListPage from "../views/students/StudentListPage.vue";
-import StudentProfilePage from "../views/students/StudentProfilePage.vue";
-import NewGroupsPage from "../views/groups/NewGroupsPage.vue";
-
-import PaymentsTab from "../views/students/components/profile-tabs/PaymentsTab.vue";
-import GroupsTab from "../views/students/components/profile-tabs/GroupsTab.vue";
-import InfoTab from "../views/students/components/profile-tabs/InfoTab.vue";
-import AttendanceTab from "../views/students/components/profile-tabs/AttendanceTab.vue";
-import ProgressTab from "../views/students/components/profile-tabs/ProgressTab.vue";
-import NotesTab from "../views/students/components/profile-tabs/NotesTab.vue";
 
 import { useAuthStore } from "../stores/auth.store";
 
@@ -20,13 +7,19 @@ export const router = createRouter({
   routes: [
     {
       path: "/auth",
-      component: AuthLayout,
+      component: () => import("../layouts/AuthLayout.vue"),
       meta: { public: true },
-      children: [{ path: "sign-in", name: "sign-in", component: SignInPage }],
+      children: [
+        {
+          path: "sign-in",
+          name: "sign-in",
+          component: () => import("../views/auth/SignInPage.vue"),
+        },
+      ],
     },
     {
       path: "/",
-      component: AppLayout,
+      component: () => import("../layouts/AppLayout.vue"),
       children: [
         {
           path: "",
@@ -38,13 +31,13 @@ export const router = createRouter({
         {
           path: "students",
           name: "students-list",
-          component: StudentListPage,
+          component: () => import("../views/students/StudentListPage.vue"),
           meta: { title: 'studentList.title', subTitle: 'studentList.secretariat', icon: '👩‍🚀' }
         },
         {
           path: "recruitment/new-groups",
           name: "new-groups",
-          component: NewGroupsPage,
+          component: () => import("../views/groups/NewGroupsPage.vue"),
           meta: { title: 'sidebar.newGroups', icon: '🚀' }
         },
         {
@@ -55,15 +48,15 @@ export const router = createRouter({
         },
         {
           path: "students/:id",
-          component: StudentProfilePage,
+          component: () => import("../views/students/StudentProfilePage.vue"),
           children: [
             { path: "", redirect: { name: "student-payments" } },
-            { path: "payments", name: "student-payments", component: PaymentsTab },
-            { path: "groups", name: "student-groups", component: GroupsTab },
-            { path: "info", name: "student-info", component: InfoTab },
-            { path: "attendance", name: "student-attendance", component: AttendanceTab },
-            { path: "progress", name: "student-progress", component: ProgressTab },
-            { path: "notes", name: "student-notes", component: NotesTab },
+            { path: "payments", name: "student-payments", component: () => import("../views/students/components/profile-tabs/PaymentsTab.vue") },
+            { path: "groups", name: "student-groups", component: () => import("../views/students/components/profile-tabs/GroupsTab.vue") },
+            { path: "info", name: "student-info", component: () => import("../views/students/components/profile-tabs/InfoTab.vue") },
+            { path: "attendance", name: "student-attendance", component: () => import("../views/students/components/profile-tabs/AttendanceTab.vue") },
+            { path: "progress", name: "student-progress", component: () => import("../views/students/components/profile-tabs/ProgressTab.vue") },
+            { path: "notes", name: "student-notes", component: () => import("../views/students/components/profile-tabs/NotesTab.vue") },
           ],
         },
       ],
