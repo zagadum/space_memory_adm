@@ -1,0 +1,89 @@
+<template>
+  <div class="ui-input-wrap" :class="{ 'ui-input-wrap--error': !!error }">
+    <label v-if="label" class="ui-input-label">{{ label }}</label>
+    <input
+      class="ui-input"
+      :type="type"
+      :placeholder="placeholder"
+      :value="modelValue"
+      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+    />
+    <span v-if="error" class="ui-input-error">{{ error }}</span>
+  </div>
+</template>
+
+<script setup lang="ts">
+withDefaults(
+  defineProps<{
+    modelValue?: string | number;
+    label?: string;
+    placeholder?: string;
+    type?: string;
+    error?: string;
+  }>(),
+  { modelValue: "", placeholder: "", type: "text", error: "" }
+);
+
+defineEmits<{
+  (e: "update:modelValue", value: string): void;
+}>();
+</script>
+
+<style scoped>
+.ui-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 12px;
+}
+
+.ui-input-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim, #8892b0);
+  margin-bottom: 5px;
+  display: block;
+}
+
+.ui-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(100, 120, 255, 0.15);
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--white, #e8eeff);
+  font-family: "Outfit", sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ui-input::placeholder {
+  color: var(--dim, #8892b0);
+  opacity: 0.5;
+}
+
+.ui-input:focus {
+  border-color: var(--blue, #4f6ef7);
+  box-shadow: 0 0 0 2px rgba(79, 110, 247, 0.12);
+}
+
+/* ── error state ── */
+.ui-input-wrap--error .ui-input {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.ui-input-wrap--error .ui-input:focus {
+  border-color: var(--red, #ef4444);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.12);
+}
+
+.ui-input-error {
+  margin-top: 4px;
+  font-size: 11px;
+  color: var(--red, #ef4444);
+  font-weight: 500;
+}
+</style>
