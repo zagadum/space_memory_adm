@@ -1,10 +1,24 @@
 import { defineStore } from "pinia";
 import { authApi } from "../api/authApi";
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  initials: string;
+}
+
 export const useAuthStore = defineStore("auth", {
   state: () => ({
-    token: localStorage.getItem("token") || "",
-    user: null as null | { id: string; email: string; name: string },
+    token: localStorage.getItem("token") || null,
+    user: {
+      id: 'u_current',
+      name: 'Artem',
+      email: 'artem@gls.edu.pl',
+      role: 'Dział rekrutacji учащихся',
+      initials: 'AR'
+    } as User | null,
     loading: false,
     error: "" as string,
   }),
@@ -12,14 +26,22 @@ export const useAuthStore = defineStore("auth", {
     isAuthenticated: (s) => !!s.token,
   },
   actions: {
+    setToken(token: string) {
+      this.token = token;
+      localStorage.setItem("token", token);
+    },
+    updateProfile(data: Partial<User>) {
+      if (this.user) {
+        this.user = { ...this.user, ...data };
+      }
+    },
     async signIn(email: string, password: string) {
       this.loading = true;
       this.error = "";
       try {
         const res = await authApi.signIn({ email, password });
-        this.token = res.token;
+        this.setToken(res.token);
         this.user = res.user;
-        localStorage.setItem("token", res.token);
         return true;
       } catch (e: any) {
         this.error = e?.response?.data?.message || "Sign in failed";
@@ -37,7 +59,7 @@ export const useAuthStore = defineStore("auth", {
       }
     },
     logout() {
-      this.token = "";
+      this.token = null;
       this.user = null;
       localStorage.removeItem("token");
     },

@@ -91,14 +91,14 @@
             <div v-if="m.ksef === 'error'" class="cbadge cb-error">✕</div>
             <div v-if="m.bonus" class="bonus-strip">⭐ {{ t('payments.detail.bonus').replace('⭐ ','') }}</div>
 
-            <div class="mc-name">{{ MONTHS_SHORT[i] }}</div>
-            <div class="mc-icon">{{ icon(m) }}</div>
-            <div class="mc-amt">{{ m.a ? m.a + ' zł' : '—' }}</div>
-            <div
-              v-if="m.s.startsWith('extra')"
-              class="mc-pay"
-              :style="{ color: statusColor(m) }"
-            >{{ statusLabel(m) }}</div>
+            <div class="mc-name">{{ shortMonths[i] }}</div>
+            
+            <div class="mc-status" v-if="m.s !== 'future'" :style="{ color: statusData(m).color }">
+              <span class="mcs-icon">{{ statusData(m).icon }}</span>
+              <span class="mcs-text">{{ statusData(m).label }}</span>
+            </div>
+
+            <div class="mc-amt" v-if="m.s !== 'future'">{{ m.a ? m.a + ' zł' : '—' }}</div>
           </button>
 
           <!-- + Доп. занятие -->
@@ -106,8 +106,8 @@
             class="mcell mcell-add"
             @click="modal.open('extra', { programId: progId(enr) })"
           >
-            <div style="font-size:17px;color:var(--pink)">＋</div>
-            <div style="font-size:9px;color:var(--pink);font-weight:700;margin-top:1px">{{ t('payments.btn.addExtra') }}</div>
+            <div style="font-size:20px;color:var(--pink)">＋</div>
+            <div style="font-size:10px;color:var(--pink);font-weight:700;margin-top:2px">{{ t('payments.btn.extra') }}</div>
           </button>
         </div>
 
@@ -133,7 +133,7 @@
                 :class="['ms-' + m.s, { selrow: payments.activeMonth[progId(enr)] === i }]"
                 @click="payments.setMonth(progId(enr), i)"
               >
-                <td class="td-mono">{{ MONTHS_SHORT[i] }}</td>
+                <td class="td-mono">{{ shortMonths[i] }}</td>
                 <td>
                   <span class="st" :class="'st-' + m.s">{{ icon(m) }} {{ statusLabelT(m) }}</span>
                 </td>
@@ -270,15 +270,13 @@ import PaymentActions from "./PaymentActions.vue";
 import PaymentTransactions from "./PaymentTransactions.vue";
 import PaymentMonthDetail from "./PaymentMonthDetail.vue";
 
-const { t } = useI18n();
+const { t, tm } = useI18n();
 const payments = usePaymentsStore();
 const modal = useModalStore();
 const { student: currentStudent } = storeToRefs(payments);
 
-const MONTHS_SHORT = computed(() => {
-  const arr = t('common.monthsShort');
-  return Array.isArray(arr) ? arr : ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"];
-});
+// MONTHS_SHORT is now directly used in template via shortMonths computed
+const shortMonths = computed(() => tm('common.monthsShort') as string[]);
 
 const openProg = ref<string>("space");
 
@@ -309,46 +307,49 @@ function balColor(b: number): string {
   return b > 0 ? "var(--green)" : b < 0 ? "var(--red)" : "var(--white)";
 }
 
-// status → icon
+// ── status logic audit ──
+function statusData(m: MonthObj) {
+  const s = m.s;
+  const data = {
+    icon: '\u00B7',
+    label: '',
+    color: 'rgba(255,255,255,.35)',
+    key: ''
+  };
+
+  const MAP: Record<string, { i: string; k: string; c: string }> = {
+    paid:    { i: '\u2713', k: 'payments.status.paid',    c: 'var(--green)' },
+    pending: { i: '\u231B', k: 'payments.status.pending', c: 'var(--blue)'  },
+    overdue: { i: '\u26A0', k: 'payments.status.overdue', c: 'var(--red)'   },
+    pause:   { i: '\uD83C\uDF19', k: 'payments.status.pause',   c: 'var(--amber)' },
+    summer:  { i: '\u2600', k: 'payments.status.summer',  c: 'var(--gold)'  },
+    partial: { i: '\u25D0', k: 'payments.status.partial', c: 'var(--cyan)'  },
+    "extra-paid":    { i: '\u2795', k: 'payments.status.extra', c: 'var(--pink)' },
+    "extra-pending": { i: '\u2795', k: 'payments.status.extra', c: 'var(--pink)' },
+    future:  { i: '\u00B7', k: 'payments.status.future',  c: 'rgba(255,255,255,.35)' }
+  };
+
+  const entry = MAP[s] || MAP.future;
+  data.icon = entry.i;
+  data.key = 'payments.status.' + s;
+  data.label = t(data.key);
+  data.color = entry.c;
+
+  return data;
+}
+
+// Deprecated in favor of statusData, but kept for table view compatibility if needed
 function icon(m: MonthObj): string {
-  const MAP: Record<string, string> = {
-    paid: '\u2713', pending: '\uD83D\uDD50', overdue: '\u26A0', pause: '\uD83C\uDF19',
-    summer: '\u2600', partial: '\u25D0', 'extra-paid': '\u2795',
-    'extra-pending': '\u2795', future: '\u00B7'
-  };
-  return MAP[m.s] || '\u00B7';
+  return statusData(m).icon;
 }
-
-// status → label
 function statusLabel(m: MonthObj): string {
-  const MAP: Record<string, string> = {
-    paid: t('payments.status.paid'), pending: t('payments.status.pending'),
-    overdue: t('payments.status.overdue'), pause: t('payments.status.pause'),
-    summer: t('payments.status.summer'), partial: t('payments.status.partial'),
-    "extra-paid": t('payments.status.extra'), "extra-pending": t('payments.status.extra')
-  };
-  return MAP[m.s] || "";
+  return statusData(m).label;
 }
-
-// status → translated label
 function statusLabelT(m: MonthObj): string {
-  const keys: Record<string, string> = {
-    paid: "payments.status.paid", pending: "payments.status.pending",
-    overdue: "payments.status.overdue", pause: "payments.status.pause",
-    summer: "payments.status.summer", partial: "payments.status.partial",
-    "extra-paid": "payments.status.extra", "extra-pending": "payments.status.extra"
-  };
-  return keys[m.s] ? t(keys[m.s]) : "";
+  return statusData(m).label;
 }
-
-// status → color
 function statusColor(m: MonthObj): string {
-  const MAP: Record<string, string> = {
-    paid: "var(--green)", pending: "var(--blue)", overdue: "var(--red)",
-    pause: "var(--amber)", summer: "var(--gold)", partial: "var(--cyan)",
-    "extra-paid": "var(--pink)", "extra-pending": "var(--pink)"
-  };
-  return MAP[m.s] || "rgba(255,255,255,.35)";
+  return statusData(m).color;
 }
 
 // transactions for program
@@ -526,10 +527,18 @@ function txsFor(p: Program) {
 }
 .mcell.sel { box-shadow: 0 0 0 2px rgba(79,110,247,.5); }
 
-.mc-name { font-size: 9.5px; font-weight: 700; color: var(--dim); letter-spacing: .02em; }
-.mc-icon { font-size: 13px; line-height: 1; color: var(--white, #E8EEFF); }
-.mc-amt { font-family: 'Space Mono', monospace; font-size: 8px; font-weight: 700; line-height: 1; }
-.mc-pay { font-size: 8px; line-height: 1; font-weight: 700; }
+.mc-name { font-size: 11px; font-weight: 800; color: var(--dim); letter-spacing: .02em; margin-bottom: 2px; text-transform: uppercase; }
+.mc-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.mcs-icon { font-size: 12px; line-height: 1; }
+.mcs-text { font-size: 10px; opacity: 0.9; }
+.mc-amt { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 800; line-height: 1; }
 
 /* corner badges */
 .cbadge {

@@ -122,7 +122,7 @@ import type { MonthObj } from "../../../../../api/mockDb";
 import { useModalStore } from "../../../../../stores/modal.store";
 import { useI18n } from "vue-i18n";
 
-const { t } = useI18n();
+const { t, tm } = useI18n();
 
 const props = defineProps<{
   prog: string;
@@ -139,11 +139,8 @@ const modal = useModalStore();
 
 // ── Dictionaries (из HTML-прототипа) ──
 
-/** Полные названия месяцев — из i18n */
-const MONTHS_F = computed(() => {
-  const arr = t('payments.monthsFull');
-  return typeof arr === 'string' ? arr.split(',') : arr;
-});
+/** Full month names — from i18n */
+const MONTHS_F = computed(() => tm('payments.monthsFull') as string[]);
 
 /** Status → Icon */
 const SI: Record<string, string> = {
@@ -152,14 +149,14 @@ const SI: Record<string, string> = {
   "extra-pending": "➕", future: "•"
 };
 
-/** Status → Label  (i18n) */
-const SL = computed<Record<string, string>>(() => ({
-  paid: t('payments.status.paid'), pending: t('payments.status.pendingFull'),
-  overdue: t('payments.status.overdue'), pause: t('payments.status.pause'),
-  summer: t('payments.status.summer'), partial: t('payments.status.partialPause'),
-  "extra-paid": t('payments.status.extraPaid'), "extra-pending": t('payments.status.extraPending'),
-  future: t('payments.status.future')
-}));
+/** Status → Label (i18n) */
+const SL = computed<Record<string, string>>(() => {
+  if (!props.month) return {};
+  const s = props.month.s;
+  return {
+    [s]: t('payments.status.' + s)
+  };
+});
 
 /** Status → Color */
 const SC: Record<string, string> = {

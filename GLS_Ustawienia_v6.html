@@ -1,0 +1,2109 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GLS · Ustawienia</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#04040f;--card:rgba(12,12,36,.98);--card2:rgba(16,16,46,.97);
+  --b:rgba(100,120,255,.12);--bh:rgba(120,140,255,.28);
+  --blue:#4f6ef7;--purple:#8b5cf6;--cyan:#06b6d4;
+  --amber:#f59e0b;--green:#10b981;--red:#ef4444;
+  --white:#e8eeff;--dim:#8892b0;--faint:rgba(255,255,255,.035);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 7%  12%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 23% 37%,rgba(255,255,255,.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 48%  7%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 67% 54%,rgba(255,255,255,.25)0%,transparent 100%),
+    radial-gradient(1px 1px at 82% 20%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(2px 2px at 36% 83%,rgba(150,170,255,.35)0%,transparent 100%),
+    radial-gradient(220px 220px at 15% 20%,rgba(79,110,247,.06)0%,transparent 70%),
+    radial-gradient(260px 260px at 80% 60%,rgba(139,92,246,.04)0%,transparent 70%);}
+.wrap{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 16px 80px;}
+
+/* NAV */
+.gnav{display:flex;gap:0;border-bottom:1px solid var(--b);overflow-x:auto;padding-top:20px;}
+.gnav::-webkit-scrollbar{height:0;}
+.gnt{padding:9px 16px;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px;}
+.gnt:hover{color:var(--white);}
+.gnt.act{color:var(--blue);border-bottom-color:var(--blue);font-weight:800;}
+
+/* PAGE HEADER */
+.phdr{padding:22px 0 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.ptitle{font-size:22px;font-weight:900;letter-spacing:-.4px;}
+.ptitle span{background:linear-gradient(90deg,#4f6ef7,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.psub{font-size:11.5px;color:var(--dim);margin-top:3px;}
+
+/* LAYOUT */
+.settings-wrap{display:grid;grid-template-columns:220px 1fr;gap:20px;align-items:start;}
+@media(max-width:700px){.settings-wrap{grid-template-columns:1fr;}}
+
+/* SIDEBAR */
+.snav{background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden;position:sticky;top:20px;}
+.snav-group{padding:8px 0;}
+.snav-group:not(:last-child){border-bottom:1px solid var(--b);}
+.snav-label{padding:8px 14px 4px;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);}
+.sni{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:12.5px;font-weight:600;color:var(--dim);cursor:pointer;transition:all .15s;border-left:2px solid transparent;}
+.sni:hover{color:var(--white);background:rgba(255,255,255,.03);}
+.sni.act{color:var(--blue);background:rgba(79,110,247,.07);border-left-color:var(--blue);}
+.sni.act.purple{color:var(--purple);background:rgba(139,92,246,.07);border-left-color:var(--purple);}
+.sni.act.amber{color:var(--amber);background:rgba(245,158,11,.07);border-left-color:var(--amber);}
+.sni.act.green{color:var(--green);background:rgba(16,185,129,.07);border-left-color:var(--green);}
+.sni.act.cyan{color:var(--cyan);background:rgba(6,182,212,.07);border-left-color:var(--cyan);}
+.sni-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sni-badge{margin-left:auto;font-size:9px;font-weight:800;padding:1px 6px;border-radius:10px;}
+.sb-blue{background:rgba(79,110,247,.15);color:var(--blue);}
+.sb-new{background:rgba(16,185,129,.15);color:var(--green);}
+.sb-warn{background:rgba(245,158,11,.15);color:var(--amber);}
+
+/* PANELS */
+.panel{display:none;}
+.panel.act{display:block;}
+
+/* CARDS */
+.scard{background:var(--card);border:1px solid var(--b);border-radius:14px;margin-bottom:14px;overflow:hidden;}
+.scard-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid var(--b);}
+.scard-title{display:flex;align-items:center;gap:10px;}
+.scard-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.si-blue{background:rgba(79,110,247,.15);border:1px solid rgba(79,110,247,.25);}
+.si-purple{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.22);}
+.si-amber{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);}
+.si-green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.22);}
+.si-red{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.22);}
+.si-cyan{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.22);}
+.stitle{font-size:14px;font-weight:800;}
+.ssub{font-size:10.5px;color:var(--dim);margin-top:2px;}
+.scard-body{padding:18px 20px;}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.fg:last-child{margin-bottom:0;}
+.fg label{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);}
+.fg input,.fg select,.fg textarea{padding:9px 13px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:9px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .15s,background .15s;width:100%;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:rgba(79,110,247,.45);background:rgba(79,110,247,.05);}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--dim);}
+.fg input[readonly]{opacity:.65;cursor:default;background:rgba(255,255,255,.02);}
+.fg select{appearance:none;cursor:pointer;padding-right:30px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%238892b0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.fg select option{background:#0d0d2e;}
+.fg textarea{resize:vertical;min-height:70px;font-size:12.5px;line-height:1.65;}
+.hint{font-size:10px;color:var(--dim);margin-top:3px;line-height:1.5;}
+.req{color:var(--red);margin-left:2px;}
+.gr2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.gr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.span2{grid-column:1/-1;}
+@media(max-width:640px){.gr2,.gr3{grid-template-columns:1fr;}}
+
+/* TOGGLES */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(100,120,255,.06);}
+.trow:last-child{border-bottom:none;}
+.tl{font-size:12.5px;font-weight:600;}
+.th{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.4;}
+.tog{position:relative;width:38px;height:22px;flex-shrink:0;margin-left:12px;}
+.tog input{opacity:0;width:0;height:0;}
+.tsl{position:absolute;inset:0;background:rgba(255,255,255,.1);border:1px solid var(--b);border-radius:11px;cursor:pointer;transition:all .2s;}
+.tsl::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--dim);border-radius:50%;transition:all .2s;}
+.tog input:checked+.tsl{background:rgba(79,110,247,.25);border-color:rgba(79,110,247,.5);}
+.tog input:checked+.tsl::before{transform:translateX(16px);background:var(--blue);}
+.tog input:checked+.tsl.g{background:rgba(16,185,129,.25);border-color:rgba(16,185,129,.5);}
+.tog input:checked+.tsl.g::before{background:var(--green);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all .18s;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,#4f6ef7,#8b5cf6);color:#fff;box-shadow:0 4px 16px rgba(79,110,247,.3);}
+.btn-primary:hover{box-shadow:0 6px 22px rgba(79,110,247,.5);transform:translateY(-1px);}
+.btn-sec{background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.25);}
+.btn-sec:hover{background:rgba(79,110,247,.18);}
+.btn-ghost{background:var(--faint);color:var(--dim);border:1px solid var(--b);}
+.btn-ghost:hover{background:rgba(255,255,255,.07);color:var(--white);}
+.btn-sm{padding:5px 11px;font-size:11px;border-radius:7px;}
+.btn-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.btn-amber{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.btn-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+
+/* SAVE BAR */
+.save-bar{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;background:rgba(79,110,247,.06);border-top:1px solid rgba(79,110,247,.15);flex-wrap:wrap;gap:10px;}
+.save-status{font-size:11.5px;color:var(--dim);display:flex;align-items:center;gap:6px;}
+.save-status.saved{color:var(--green);}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--dim);}
+.save-dot.saved{background:var(--green);box-shadow:0 0 6px rgba(16,185,129,.6);}
+.save-dot.dirty{background:var(--amber);box-shadow:0 0 6px rgba(245,158,11,.6);}
+
+/* IBOX */
+.ibox{padding:10px 14px;border-radius:9px;font-size:11.5px;display:flex;gap:9px;margin-bottom:14px;align-items:flex-start;line-height:1.6;}
+.ibox-blue{background:rgba(79,110,247,.07);border:1px solid rgba(79,110,247,.2);color:rgba(180,200,255,.85);}
+.ibox-amber{background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);color:rgba(255,220,130,.85);}
+.ibox-green{background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.2);color:rgba(100,230,180,.85);}
+.ibox-red{background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.2);color:rgba(255,150,150,.85);}
+.ibox-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:800;}
+.b-ok{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+.b-warn{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25);}
+.b-err{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.b-off{background:rgba(100,100,100,.1);color:var(--dim);border:1px solid rgba(100,100,100,.2);}
+
+/* DIVIDER / SECTION */
+.div{height:1px;background:var(--b);margin:14px 0;}
+.sec{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 0 8px;border-bottom:1px solid var(--b);margin-bottom:13px;display:flex;align-items:center;gap:7px;}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* FIRMA CARDS */
+.firma-card{background:var(--card);border:1px solid var(--b);border-radius:14px;margin-bottom:12px;overflow:visible;transition:border-color .2s;}
+.firma-card:hover{border-color:var(--bh);}
+.firma-archived{opacity:.55;}
+.firma-top{display:flex;align-items:flex-start;gap:14px;padding:16px 18px;}
+.firma-logo{width:48px;height:48px;border-radius:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;letter-spacing:-.5px;flex-shrink:0;}
+.firma-info{flex:1;min-width:0;}
+.firma-name{font-size:14px;font-weight:800;margin-bottom:3px;}
+.firma-meta{font-size:10.5px;color:var(--dim);font-family:'Space Mono',monospace;margin-bottom:7px;}
+.firma-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.ftag{font-size:9.5px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.ft-def{background:rgba(79,110,247,.12);color:var(--blue);border:1px solid rgba(79,110,247,.25);}
+.ft-zw{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.ft-vat{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.ft-proj{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);}
+.ft-arch{background:rgba(100,100,100,.1);color:var(--dim);border:1px solid rgba(100,100,100,.2);}
+.firma-actions{display:flex;gap:5px;align-items:flex-start;flex-shrink:0;}
+.firma-projs{display:flex;align-items:center;gap:6px;padding:10px 18px;background:rgba(255,255,255,.018);border-top:1px solid var(--b);flex-wrap:wrap;}
+.fp-label{font-size:9.5px;font-weight:800;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;flex-shrink:0;}
+.fp-tag{font-size:10.5px;font-weight:600;padding:3px 9px;border-radius:20px;border:1px solid var(--b);}
+.fp-none{color:var(--dim);font-style:italic;font-size:10.5px;}
+
+/* MORE MENU */
+.more-wrap{position:relative;}
+.more-menu{position:absolute;right:0;top:calc(100% + 4px);background:var(--card2);border:1px solid var(--bh);border-radius:11px;min-width:200px;z-index:200;box-shadow:0 16px 50px rgba(0,0,0,.75);display:none;overflow:visible;}
+.more-menu.open{display:block;}
+.mi{padding:9px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:background .12s;color:var(--white);}
+.mi:hover{background:rgba(255,255,255,.05);}
+.mi-red{color:var(--red);}
+.mi-red:hover{background:rgba(239,68,68,.07);}
+
+/* VAT CHOICE */
+.vat-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.vat-opt{padding:12px 14px;border:1.5px solid var(--b);border-radius:11px;cursor:pointer;transition:all .2s;}
+.vat-opt.sel-zw{border-color:rgba(245,158,11,.5);background:rgba(245,158,11,.06);}
+.vat-opt.sel-vat{border-color:rgba(79,110,247,.5);background:rgba(79,110,247,.06);}
+.vat-opt-title{font-size:13px;font-weight:800;margin-bottom:2px;}
+.vat-opt-sub{font-size:10.5px;color:var(--dim);line-height:1.4;}
+
+/* ACCOUNT ROW */
+.acc-row{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.025);border:1px solid var(--b);border-radius:10px;margin-bottom:8px;}
+.acc-num{flex:1;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;}
+.acc-label{font-size:10.5px;color:var(--dim);}
+.acc-badge{font-size:9.5px;font-weight:800;padding:2px 7px;border-radius:10px;background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+
+/* SERIES TABLE */
+.series-tbl{width:100%;border-collapse:collapse;}
+.series-tbl thead tr{background:rgba(255,255,255,.02);}
+.series-tbl th{padding:7px 11px;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:left;border-bottom:1px solid var(--b);}
+.series-tbl td{padding:8px 11px;border-bottom:1px solid rgba(100,120,255,.05);font-size:12px;vertical-align:middle;}
+.series-tbl tr:last-child td{border-bottom:none;}
+.mono{font-family:'Space Mono',monospace;font-size:11px;}
+.num-ok{color:var(--green);font-weight:700;}
+
+/* PROJ TABLE */
+.proj-tbl{width:100%;border-collapse:collapse;}
+.proj-tbl thead tr{background:rgba(255,255,255,.02);}
+.proj-tbl th{padding:9px 16px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:left;border-bottom:1px solid var(--b);}
+.proj-tbl td{padding:12px 16px;border-bottom:1px solid rgba(100,120,255,.05);vertical-align:middle;}
+.proj-tbl tr:last-child td{border-bottom:none;}
+.proj-sel{padding:7px 28px 7px 11px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:8px;font-size:12px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;cursor:pointer;min-width:220px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%238892b0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-color:rgba(255,255,255,.04);}
+.proj-sel:focus{border-color:rgba(79,110,247,.45);}
+.proj-sel option{background:#0d0d2e;}
+
+/* USER ROW */
+.user-row{display:flex;align-items:center;gap:12px;padding:11px 14px;background:rgba(255,255,255,.02);border:1px solid var(--b);border-radius:10px;margin-bottom:8px;transition:border-color .15s;}
+.user-row:hover{border-color:var(--bh);}
+.user-ava{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.ua-blue{background:rgba(79,110,247,.15);border:1px solid rgba(79,110,247,.25);color:var(--blue);}
+.ua-purple{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.22);color:var(--purple);}
+.ua-amber{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);color:var(--amber);}
+.ua-green{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.22);color:var(--green);}
+
+/* INTEGRATION CARD */
+.int-card{display:flex;align-items:center;gap:14px;padding:14px 16px;background:rgba(255,255,255,.025);border:1px solid var(--b);border-radius:12px;margin-bottom:10px;transition:border-color .2s;}
+.int-card:hover{border-color:var(--bh);}
+.int-logo{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.int-name{font-size:13px;font-weight:800;}
+.int-desc{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.4;}
+.int-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+
+/* LOGO UPLOAD */
+.logo-upload{display:flex;align-items:center;gap:14px;padding:14px;background:rgba(255,255,255,.03);border:1.5px dashed var(--b);border-radius:11px;cursor:pointer;transition:all .2s;}
+.logo-upload:hover{border-color:rgba(79,110,247,.35);background:rgba(79,110,247,.04);}
+.logo-preview{width:80px;height:50px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--blue);letter-spacing:-1px;flex-shrink:0;}
+
+/* ── TEMPLATE CARDS ─────────────────────── */
+.tpl-card{background:var(--card);border:1px solid var(--b);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s;}
+.tpl-card:hover{border-color:var(--bh);}
+.tpl-top{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.tpl-filter-sel{padding:7px 28px 7px 11px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:8px;font-size:12px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%238892b0' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;background-color:rgba(255,255,255,.04);}
+.tpl-filter-sel:focus{border-color:rgba(79,110,247,.45);}
+.tpl-filter-sel option,.tpl-filter-sel optgroup{background:#0d0d2e;}
+/* ── VAT TABLE ──────────────────────────── */
+.vat-pill{font-size:11.5px;font-weight:800;font-family:'Space Mono',monospace;padding:3px 9px;border-radius:7px;display:inline-block;}
+.vat-zw{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.vat-23{background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.2);}
+.vat-8{background:rgba(79,110,247,.12);color:var(--blue);border:1px solid rgba(79,110,247,.2);}
+.vat-5{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.vat-0{background:rgba(100,100,100,.1);color:var(--dim);border:1px solid rgba(100,100,100,.2);}
+.vat-ftab{padding:7px 14px;font-size:11.5px;font-weight:700;color:var(--dim);cursor:pointer;border:1px solid var(--b);border-radius:8px;transition:all .15s;}
+.vat-ftab:hover{color:var(--white);border-color:var(--bh);}
+.vat-ftab.act{color:var(--blue);border-color:rgba(79,110,247,.4);background:rgba(79,110,247,.08);}
+/* ── USERS TABS ─────────────────────────── */
+.users-tab{padding:8px 16px;font-size:12.5px;font-weight:700;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;}
+.users-tab:hover{color:var(--white);}
+.users-tab.act{color:var(--blue);border-bottom-color:var(--blue);}
+/* ── PERMISSIONS TABLE ──────────────────── */
+.perm-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.perm-tbl th{padding:7px 8px;font-size:8px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);background:rgba(255,255,255,.02);border:1px solid rgba(100,120,255,.08);text-align:center;white-space:nowrap;}
+.perm-tbl th:first-child{text-align:left;min-width:160px;}
+.perm-tbl td{padding:5px 8px;border:1px solid rgba(100,120,255,.06);text-align:center;vertical-align:middle;font-size:12px;}
+.perm-tbl td:first-child{text-align:left;font-size:11px;font-weight:600;white-space:nowrap;color:var(--dim);}
+.perm-tbl tr:hover td{background:rgba(79,110,247,.03);}
+.perm-section td{background:rgba(79,110,247,.06) !important;font-size:9.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--blue) !important;padding:7px 10px;text-align:left !important;}
+/* ── VARIABLE CHIPS ─────────────────────── */
+.var-chip{display:inline-block;font-family:'Space Mono',monospace;font-size:10px;padding:2px 7px;background:rgba(79,110,247,.1);border:1px solid rgba(79,110,247,.2);border-radius:5px;color:var(--blue);cursor:pointer;margin:3px 3px 0 0;transition:background .12s;user-select:none;}
+.var-chip:hover{background:rgba(79,110,247,.25);}
+/* ── MULTI-SELECT PROJECTS ──────────────── */
+.mpj{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1.5px solid var(--b);border-radius:9px;cursor:pointer;font-size:12px;font-weight:600;transition:all .15s;}
+.mpj:hover{border-color:var(--bh);}
+.mpj.sel{border-color:rgba(79,110,247,.45);background:rgba(79,110,247,.08);color:var(--blue);}
+/* ── BUILDER AREA ───────────────────────── */
+.builder-area{font-family:'Outfit',sans-serif;padding:10px 14px;background:rgba(255,255,255,.035);border:1px solid var(--b);border-radius:9px;font-size:13px;color:var(--white);outline:none;width:100%;resize:vertical;min-height:130px;line-height:1.7;}
+.builder-area:focus{border-color:rgba(79,110,247,.45);}
+/* INVOICE PREVIEW */
+.inv-preview{background:#fff;border-radius:10px;padding:24px;color:#1a1a2e;font-family:'Outfit',sans-serif;}
+.inv-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:16px;border-bottom:2px solid #4f6ef7;margin-bottom:16px;}
+.inv-logo-box{width:80px;height:44px;background:linear-gradient(135deg,#4f6ef7,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900;}
+.inv-seller{font-size:11px;color:#333;line-height:1.7;}
+.inv-seller strong{font-size:12px;color:#1a1a2e;display:block;margin-bottom:2px;}
+.inv-nip{font-family:'Space Mono',monospace;font-size:10px;color:#555;}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(4,4,15,.9);backdrop-filter:blur(8px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card2);border:1px solid var(--bh);border-radius:18px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 100px rgba(0,0,0,.7);transform:translateY(14px);transition:transform .22s;}
+.modal.wide{max-width:660px;}
+.overlay.open .modal{transform:translateY(0);}
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-thumb{background:rgba(79,110,247,.2);border-radius:2px;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:17px 21px 13px;border-bottom:1px solid var(--b);}
+.mhl{display:flex;align-items:center;gap:10px;}
+.mhico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.mtitle{font-size:15px;font-weight:800;}
+.msub{font-size:10.5px;color:var(--dim);margin-top:2px;}
+.mclose{width:30px;height:30px;border-radius:7px;background:var(--faint);border:1px solid var(--b);font-size:13px;color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.mclose:hover{background:rgba(239,68,68,.1);color:var(--red);}
+.mbody{padding:18px 21px;}
+.mfooter{padding:13px 21px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:flex-end;gap:8px;background:rgba(255,255,255,.012);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:11px 17px;background:var(--card2);border:1px solid rgba(16,185,129,.4);border-radius:11px;font-size:12.5px;font-weight:600;color:var(--green);box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:999;transform:translateY(24px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.info{border-color:rgba(79,110,247,.4);color:var(--blue);}
+.toast.warn{border-color:rgba(245,158,11,.4);color:var(--amber);}
+.toast.err{border-color:rgba(239,68,68,.4);color:var(--red);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="gnav">
+  <div class="gnt">💳 Płatności</div>
+  <div class="gnt">🧾 Faktury</div>
+  <div class="gnt">📊 Raporty</div>
+  <div class="gnt">🧩 Projekty</div>
+  <div class="gnt act">⚙ Ustawienia</div>
+</div>
+
+<div class="phdr">
+  <div>
+    <div class="ptitle">Ustawienia <span>GLS CRM</span></div>
+    <div class="psub">Konfiguracja systemu · firmy sprzedawcy · serie faktur · użytkownicy · integracje</div>
+  </div>
+</div>
+
+<div class="settings-wrap">
+
+  <!-- SIDEBAR -->
+  <nav class="snav">
+    <div class="snav-group">
+      <div class="snav-label">Firmy</div>
+      <div class="sni act" id="nav-firma" onclick="showPanel('firma')">
+        <span class="sni-icon">🏢</span>Firmy / Sprzedawcy
+        <span class="sni-badge sb-blue">3</span>
+      </div>
+      <div class="sni" id="nav-projekty" onclick="showPanel('projekty')">
+        <span class="sni-icon">🧩</span>Projekty → Firmy
+      </div>
+      <div class="sni" id="nav-konta" onclick="showPanel('konta')">
+        <span class="sni-icon">🏦</span>Konta bankowe
+      </div>
+      <div class="sni" id="nav-logo" onclick="showPanel('logo')">
+        <span class="sni-icon">🖼</span>Logo i wygląd
+      </div>
+    </div>
+    <div class="snav-group">
+      <div class="snav-label">Faktury</div>
+      <div class="sni" id="nav-serie" onclick="showPanel('serie')">
+        <span class="sni-icon">🔢</span>Serie numeracji
+      </div>
+      <div class="sni" id="nav-szablony" onclick="showPanel('szablony')">
+        <span class="sni-icon">📧</span>Szablony e-mail
+      </div>
+      <div class="sni" id="nav-vat" onclick="showPanel('vat')">
+        <span class="sni-icon">📋</span>Stawki VAT / PKWiU
+      </div>
+    </div>
+    <div class="snav-group">
+      <div class="snav-label">System</div>
+      <div class="sni" id="nav-users" onclick="showPanel('users')">
+        <span class="sni-icon">👥</span>Użytkownicy i role
+      </div>
+      <div class="sni" id="nav-integracje" onclick="showPanel('integracje')">
+        <span class="sni-icon">🔌</span>Integracje
+        <span class="sni-badge sb-warn">⚠ KSeF</span>
+      </div>
+      <div class="sni" id="nav-eksport" onclick="showPanel('eksport')">
+        <span class="sni-icon">📤</span>Eksport / Comarch
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT -->
+  <div>
+
+    <!-- ══ PANEL: FIRMY / SPRZEDAWCY ══ -->
+    <div class="panel act" id="panel-firma">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:900;">Firmy / Sprzedawcy</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">Każda firma może być przypisana do projektów · jest sprzedawcą na ich fakturach</div>
+        </div>
+        <button class="btn btn-primary" onclick="openFirmaModal('new')">＋ Dodaj firmę</button>
+      </div>
+
+      <div class="ibox ibox-blue" style="margin-bottom:14px;">
+        <div class="ibox-icon">ℹ</div>
+        <div>Firma <strong>DOMYŚLNA</strong> jest używana gdy projekt nie ma przypisanej konkretnej firmy. Projekt należy do firmy — możesz to ustawić tutaj lub w zakładce <strong>Projekty → Firmy</strong>.</div>
+      </div>
+
+      <!-- FC-1: Global Leaders Skills (DOMYŚLNA) -->
+      <div class="firma-card" id="fc-1">
+        <div class="firma-top">
+          <div class="firma-logo" style="background:linear-gradient(135deg,#4f6ef7,#8b5cf6);">GLS</div>
+          <div class="firma-info">
+            <div class="firma-name">Global Leaders Skills Sp. z o.o.</div>
+            <div class="firma-meta" style="line-height:1.6;">
+              NIP: 5252970924 &nbsp;·&nbsp; KRS: 0001055763 &nbsp;·&nbsp; REGON: 526267569<br>
+              Kabacki Dukt 1 / U1 i U2, 02-798 Warszawa
+            </div>
+            <div class="firma-tags">
+              <span class="ftag ft-def">⭐ DOMYŚLNA</span>
+              <span class="ftag ft-zw">ZW — zwolniony</span>
+              <span class="ftag" style="background:rgba(139,92,246,.08);color:var(--purple);border:1px solid rgba(139,92,246,.18);">Sp. z o.o.</span>
+              <span class="ftag ft-proj">3 projekty</span>
+            </div>
+          </div>
+          <div class="firma-actions">
+            <button class="btn btn-ghost btn-sm" onclick="openFirmaModal('edit',1)">✏ Edytuj</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-preview')">👁</button>
+            <div class="more-wrap">
+              <button class="btn btn-ghost btn-sm" onclick="toggleMore('1')">⋯</button>
+              <div class="more-menu" id="mm-1">
+                <div class="mi" onclick="showToast('Firma już jest domyślna','warn');toggleMore('1')">⭐ Ustaw domyślną</div>
+                <div class="mi" onclick="openFirmaModal('dup',1);toggleMore('1')">⧉ Duplikuj firmę</div>
+                <div class="mi" onclick="openModal('modal-preview');toggleMore('1')">👁 Podgląd na fakturze</div>
+                <div class="mi" onclick="showPanel('projekty');toggleMore('1')">🧩 Przypisz projekty</div>
+                <div class="mi mi-red" onclick="showToast('Nie można archiwizować firmy domyślnej','err');toggleMore('1')">🗃 Archiwizuj</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="firma-projs">
+          <div class="fp-label">Projekty:</div>
+          <span class="fp-tag" style="border-color:rgba(79,110,247,.3);color:var(--blue);">🚀 Space Memory</span>
+          <span class="fp-tag" style="border-color:rgba(139,92,246,.3);color:var(--purple);">🧠 INDIGO / Speedy Mind</span>
+          <span class="fp-tag" style="border-color:rgba(245,158,11,.3);color:var(--amber);">🏆 Olimpiada</span>
+          <span class="fp-none">+ wszystkie bez przypisania (domyślna)</span>
+        </div>
+      </div>
+
+      <!-- FC-2: E-sklep Space Memory Artsiom Hrableuski -->
+      <div class="firma-card" id="fc-2">
+        <div class="firma-top">
+          <div class="firma-logo" style="background:linear-gradient(135deg,#4f6ef7,#06b6d4);font-size:10px;letter-spacing:-.5px;">SM<span style="font-size:6px;display:block;letter-spacing:0;margin-top:1px;">JDG</span></div>
+          <div class="firma-info">
+            <div class="firma-name">E-sklep Space Memory Artsiom Hrableuski</div>
+            <div class="firma-meta" style="line-height:1.6;">
+              NIP: 5272854902 &nbsp;·&nbsp; REGON: 525651337<br>
+              al. Jerozolimskie 123A lok. 19p, 02-017 Warszawa
+            </div>
+            <div class="firma-tags">
+              <span class="ftag" style="background:rgba(6,182,212,.08);color:var(--cyan);border:1px solid rgba(6,182,212,.18);">JDG</span>
+              <span class="ftag ft-zw">ZW — zwolniony</span>
+              <span class="ftag" style="background:rgba(79,110,247,.06);color:var(--dim);border:1px solid var(--b);font-size:9px;">47.61.Z · 47.62.Z</span>
+              <span class="ftag ft-proj">1 projekt</span>
+            </div>
+          </div>
+          <div class="firma-actions">
+            <button class="btn btn-ghost btn-sm" onclick="openFirmaModal('edit',2)">✏ Edytuj</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-preview')">👁</button>
+            <div class="more-wrap">
+              <button class="btn btn-ghost btn-sm" onclick="toggleMore('2')">⋯</button>
+              <div class="more-menu" id="mm-2">
+                <div class="mi" onclick="setDefaultFirma(2);toggleMore('2')">⭐ Ustaw domyślną</div>
+                <div class="mi" onclick="openFirmaModal('dup',2);toggleMore('2')">⧉ Duplikuj firmę</div>
+                <div class="mi" onclick="openModal('modal-preview');toggleMore('2')">👁 Podgląd na fakturze</div>
+                <div class="mi" onclick="showPanel('projekty');toggleMore('2')">🧩 Przypisz projekty</div>
+                <div class="mi mi-red" onclick="archiveFirma(2);toggleMore('2')">🗃 Archiwizuj</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="firma-projs">
+          <div class="fp-label">Projekty:</div>
+          <span class="fp-tag" style="border-color:rgba(79,110,247,.3);color:var(--blue);">🚀 Space Memory — sklep</span>
+        </div>
+      </div>
+
+      <!-- FC-3: OLEKSII LUBENETS -->
+      <div class="firma-card" id="fc-3">
+        <div class="firma-top">
+          <div class="firma-logo" style="background:linear-gradient(135deg,#10b981,#8b5cf6);font-size:10px;letter-spacing:-.5px;">OL<span style="font-size:6px;display:block;letter-spacing:0;margin-top:1px;">JDG</span></div>
+          <div class="firma-info">
+            <div class="firma-name">Oleksii Lubenets</div>
+            <div class="firma-meta" style="line-height:1.6;">
+              NIP: 5273003388 &nbsp;·&nbsp; REGON: 522099129
+            </div>
+            <div class="firma-tags">
+              <span class="ftag" style="background:rgba(16,185,129,.08);color:var(--green);border:1px solid rgba(16,185,129,.18);">JDG</span>
+              <span class="ftag ft-zw">ZW — zwolniony</span>
+              <span class="ftag" style="background:rgba(79,110,247,.06);color:var(--dim);border:1px solid var(--b);font-size:9px;">47.61.Z</span>
+              <span class="ftag ft-proj">0 projektów</span>
+            </div>
+          </div>
+          <div class="firma-actions">
+            <button class="btn btn-ghost btn-sm" onclick="openFirmaModal('edit',3)">✏ Edytuj</button>
+            <button class="btn btn-ghost btn-sm" onclick="openModal('modal-preview')">👁</button>
+            <div class="more-wrap">
+              <button class="btn btn-ghost btn-sm" onclick="toggleMore('3')">⋯</button>
+              <div class="more-menu" id="mm-3">
+                <div class="mi" onclick="setDefaultFirma(3);toggleMore('3')">⭐ Ustaw domyślną</div>
+                <div class="mi" onclick="openFirmaModal('dup',3);toggleMore('3')">⧉ Duplikuj firmę</div>
+                <div class="mi" onclick="openModal('modal-preview');toggleMore('3')">👁 Podgląd na fakturze</div>
+                <div class="mi" onclick="showPanel('projekty');toggleMore('3')">🧩 Przypisz projekty</div>
+                <div class="mi mi-red" onclick="archiveFirma(3);toggleMore('3')">🗃 Archiwizuj</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="firma-projs">
+          <div class="fp-label">Projekty:</div>
+          <span class="fp-none">Brak przypisanych projektów</span>
+        </div>
+      </div>
+    </div><!-- /panel-firma -->
+
+    <!-- ══ PANEL: PROJEKTY → FIRMY ══ -->
+    <div class="panel" id="panel-projekty">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:900;">Projekty → Firmy</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">Każdy projekt należy do jednej firmy — ta firma jest sprzedawcą na jego fakturach</div>
+        </div>
+        <button class="btn btn-sec btn-sm" onclick="openModal('modal-add-proj')">＋ Dodaj projekt</button>
+      </div>
+
+      <div class="ibox ibox-amber" style="margin-bottom:14px;">
+        <div class="ibox-icon">⚠</div>
+        <div>Projekt <strong>bez przypisanej firmy</strong> używa automatycznie firmy DOMYŚLNEJ. Zmiana firmy dotyczy tylko <strong>nowych faktur</strong> — wystawione wcześniej pozostają bez zmian.</div>
+      </div>
+
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-blue">🧩</div>
+            <div><div class="stitle">Przypisanie projektu do firmy</div><div class="ssub">Projekt należy do firmy · firma jest jego sprzedawcą na fakturach</div></div>
+          </div>
+        </div>
+        <div style="padding:0;">
+          <table class="proj-tbl">
+            <thead><tr>
+              <th>Projekt</th><th>Seria faktur</th><th>Firma / Sprzedawca</th><th>Status</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🚀</span><div><div style="font-size:13px;font-weight:700;">Space Memory</div><div style="font-size:10.5px;color:var(--dim);">Warszawa, Gdańsk</div></div></div></td>
+                <td><span class="mono" style="color:var(--blue);">FA/SPACE</span></td>
+                <td>
+                  <select class="proj-sel" onchange="onProjChange(this,'space')">
+                    <option value="1" selected>⭐ Global Leaders Skills Sp. z o.o. (domyślna)</option>
+                    <option value="2">E-sklep Space Memory (Hrableuski)</option>
+                    <option value="3">Oleksii Lubenets (JDG)</option>
+                    <option value="new">＋ Nowa firma...</option>
+                  </select>
+                </td>
+                <td><span class="badge b-ok" style="font-size:9px;">Domyślna</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🧠</span><div><div style="font-size:13px;font-weight:700;">INDIGO / Speedy Mind</div><div style="font-size:10.5px;color:var(--dim);">Warszawa, Kraków, Wrocław</div></div></div></td>
+                <td><span class="mono" style="color:var(--purple);">FA/INDIGO</span></td>
+                <td>
+                  <select class="proj-sel" onchange="onProjChange(this,'indigo')">
+                    <option value="1" selected>⭐ Global Leaders Skills Sp. z o.o. (domyślna)</option>
+                    <option value="2">E-sklep Space Memory (Hrableuski)</option>
+                    <option value="3">Oleksii Lubenets (JDG)</option>
+                    <option value="new">＋ Nowa firma...</option>
+                  </select>
+                </td>
+                <td><span class="badge b-ok" style="font-size:9px;">Domyślna</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🏆</span><div><div style="font-size:13px;font-weight:700;">Olimpiada</div><div style="font-size:10.5px;color:var(--dim);">Wszystkie miasta</div></div></div></td>
+                <td><span class="mono" style="color:var(--amber);">FA/OLIMP</span></td>
+                <td>
+                  <select class="proj-sel" onchange="onProjChange(this,'olimp')">
+                    <option value="1" selected>⭐ Global Leaders Skills Sp. z o.o. (domyślna)</option>
+                    <option value="2">E-sklep Space Memory (Hrableuski)</option>
+                    <option value="3">Oleksii Lubenets (JDG)</option>
+                    <option value="new">＋ Nowa firma...</option>
+                  </select>
+                </td>
+                <td><span class="badge b-ok" style="font-size:9px;">Domyślna</span></td>
+              </tr>
+              <tr>
+                <td><div style="display:flex;align-items:center;gap:8px;"><span style="font-size:16px;">🎓</span><div><div style="font-size:13px;font-weight:700;">Warsztaty / Obozy</div><div style="font-size:10.5px;color:var(--dim);">Projekt sezonowy</div></div></div></td>
+                <td><span class="mono" style="color:var(--cyan);">FA/CAMP</span></td>
+                <td>
+                  <select class="proj-sel" onchange="onProjChange(this,'camp')">
+                    <option value="1">⭐ Global Leaders Skills Sp. z o.o. (domyślna)</option>
+                    <option value="2" selected>E-sklep Space Memory (Hrableuski)</option>
+                    <option value="new">＋ Nowa firma...</option>
+                  </select>
+                </td>
+                <td><span class="badge" style="background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);font-size:9px;">E-sklep SM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="save-bar">
+          <div style="font-size:11px;color:var(--dim);">Zmiany obowiązują od następnej wystawionej faktury</div>
+          <button class="btn btn-primary" onclick="showToast('✔ Przypisania projektów do firm zapisane')">💾 Zapisz przypisania</button>
+        </div>
+      </div>
+    </div><!-- /panel-projekty -->
+
+    <!-- ══ PANEL: KONTA BANKOWE ══ -->
+    <div class="panel" id="panel-konta">
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-green">🏦</div>
+            <div><div class="stitle">Konta bankowe</div><div class="ssub">Numery rachunków drukowane na fakturach</div></div>
+          </div>
+          <button class="btn btn-sec btn-sm" onclick="openModal('modal-add-acc')">＋ Dodaj konto</button>
+        </div>
+        <div class="scard-body">
+          <div class="ibox ibox-blue" style="margin-bottom:16px;">
+            <div class="ibox-icon">ℹ</div>
+            <div>Możesz dodać kilka kont — np. osobne dla Warszawa, Kraków, Wrocław, Gdańsk. Konto <strong>DOMYŚLNE</strong> pojawia się automatycznie na fakturach. Na fakturach B2B — zawsze konto domyślne.</div>
+          </div>
+          <div class="acc-row" id="acc-1">
+            <div style="flex:1;">
+              <div class="acc-num">PL 12 1234 5678 0000 0001 2345 6789</div>
+              <div class="acc-label">Santander Bank Polska · PLN · Warszawa — główne</div>
+            </div>
+            <div class="acc-badge">DOMYŚLNE</div>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Edycja konta bankowego','info')">✏</button>
+          </div>
+          <div class="acc-row" id="acc-2">
+            <div style="flex:1;">
+              <div class="acc-num">PL 34 2500 0003 0000 4567 8901 2345</div>
+              <div class="acc-label">mBank · PLN · Kraków</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="setDefaultAcc('acc-2')">Ustaw domyślne</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Edycja konta bankowego','info')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="removeAcc('acc-2')">✕</button>
+          </div>
+          <div class="acc-row" id="acc-3">
+            <div style="flex:1;">
+              <div class="acc-num">PL 56 1090 2590 0000 0001 4950 3219</div>
+              <div class="acc-label">PKO BP · PLN · Wrocław</div>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="setDefaultAcc('acc-3')">Ustaw domyślne</button>
+            <button class="btn btn-ghost btn-sm" onclick="showToast('Edycja konta bankowego','info')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="removeAcc('acc-3')">✕</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-konta -->
+
+    <!-- ══ PANEL: LOGO I WYGLĄD ══ -->
+    <div class="panel" id="panel-logo">
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-purple">🖼</div>
+            <div><div class="stitle">Logo firmy</div><div class="ssub">Drukowane w nagłówku PDF każdej faktury</div></div>
+          </div>
+        </div>
+        <div class="scard-body">
+          <div class="logo-upload" id="logo-drop" onclick="triggerLogoUpload()">
+            <div class="logo-preview" id="logo-preview">GLS<br><span style="font-size:7px;color:var(--purple);">·edu</span></div>
+            <div>
+              <div style="font-size:12.5px;font-weight:700;">Kliknij aby wgrać logo</div>
+              <div style="font-size:11px;color:var(--dim);margin-top:2px;">PNG lub SVG · maks. 2 MB · zalecany rozmiar 300×80px · przezroczyste tło</div>
+            </div>
+          </div>
+          <input type="file" id="logo-input" accept="image/png,image/svg+xml" style="display:none;" onchange="handleLogoUpload(this)">
+          <div class="div"></div>
+          <div class="gr2">
+            <div class="fg">
+              <label>Kolor akcentu na fakturze</label>
+              <div style="display:flex;gap:8px;align-items:center;">
+                <input type="color" id="color-pick" value="#4f6ef7" style="width:44px;height:36px;padding:2px;border-radius:7px;border:1px solid var(--b);background:var(--faint);cursor:pointer;" oninput="syncColor(this,'color-hex')">
+                <input type="text" id="color-hex" value="#4f6ef7" style="font-family:'Space Mono',monospace;flex:1;" oninput="syncColor(this,'color-pick')">
+              </div>
+            </div>
+            <div class="fg">
+              <label>Styl faktury PDF</label>
+              <select>
+                <option>Klasyczny (biały z logiem)</option>
+                <option>Nowoczesny (kolorowa belka nagłówka)</option>
+                <option>Minimalistyczny</option>
+              </select>
+            </div>
+          </div>
+          <div class="trow">
+            <div><div class="tl">Wyświetl logo na fakturze PDF</div></div>
+            <label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label>
+          </div>
+          <div class="trow">
+            <div><div class="tl">Dodaj stopkę z danymi kontaktowymi</div><div class="th">Telefon i e-mail firmy w stopce PDF</div></div>
+            <label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label>
+          </div>
+        </div>
+        <div class="save-bar">
+          <div></div>
+          <button class="btn btn-primary" onclick="showToast('✔ Ustawienia wyglądu zapisane')">💾 Zapisz</button>
+        </div>
+      </div>
+    </div><!-- /panel-logo -->
+
+    <!-- ══ PANEL: SERIE NUMERACJI ══ -->
+    <div class="panel" id="panel-serie">
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-blue">🔢</div>
+            <div><div class="stitle">Aktywne serie numeracji</div><div class="ssub">Stan liczników · maj 2025</div></div>
+          </div>
+        </div>
+        <div class="scard-body">
+          <div class="ibox ibox-red" style="margin-bottom:16px;">
+            <div class="ibox-icon">🔒</div>
+            <div>Liczniki są <strong>atomowe</strong> (SELECT FOR UPDATE). Ręczna edycja możliwa <strong>tylko dla Super-Admin</strong> z pisemnym uzasadnieniem. Każda zmiana jest logowana.</div>
+          </div>
+          <table class="series-tbl">
+            <thead><tr><th>Seria</th><th>Projekt</th><th>Firma</th><th>Ostatni nr</th><th>Następny</th><th>Miesiąc</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="mono" style="color:var(--blue);font-weight:700;">FA/SPACE</span></td><td style="font-size:11px;">🚀 Space Memory</td><td style="font-size:11px;color:var(--dim);">GLS Sp. z o.o.</td><td class="mono">042</td><td class="mono num-ok">043</td><td class="mono" style="color:var(--dim);">2025/05</td><td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-serie-log')">🔒 Log</button></td></tr>
+              <tr><td><span class="mono" style="color:var(--purple);font-weight:700;">FA/INDIGO</span></td><td style="font-size:11px;">🧠 INDIGO</td><td style="font-size:11px;color:var(--dim);">GLS Sp. z o.o.</td><td class="mono">018</td><td class="mono num-ok">019</td><td class="mono" style="color:var(--dim);">2025/05</td><td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-serie-log')">🔒 Log</button></td></tr>
+              <tr><td><span class="mono" style="color:var(--amber);font-weight:700;">FA/OLIMP</span></td><td style="font-size:11px;">🏆 Olimpiada</td><td style="font-size:11px;color:var(--dim);">GLS Sp. z o.o.</td><td class="mono">067</td><td class="mono num-ok">068</td><td class="mono" style="color:var(--dim);">2025/05</td><td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-serie-log')">🔒 Log</button></td></tr>
+              <tr><td><span class="mono" style="color:var(--cyan);font-weight:700;">FA/CAMP</span></td><td style="font-size:11px;">🎓 Warsztaty</td><td style="font-size:11px;color:var(--dim);">E-sklep SM</td><td class="mono">011</td><td class="mono num-ok">012</td><td class="mono" style="color:var(--dim);">2025/05</td><td><button class="btn btn-ghost btn-sm" onclick="openModal('modal-serie-log')">🔒 Log</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div><!-- /panel-serie -->
+
+    <!-- ══ PANEL: SZABLONY E-MAIL ══ -->
+    <div class="panel" id="panel-szablony">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:900;">Szablony wiadomości e-mail</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">Wysyłane automatycznie lub ręcznie · per firma per typ dokumentu</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-tpl-new')">＋ Nowy szablon</button>
+      </div>
+
+      <div class="ibox ibox-blue" style="margin-bottom:14px;">
+        <div class="ibox-icon">ℹ</div>
+        <div>Każda firma może mieć swój własny szablon dla każdego typu dokumentu. Jeśli firma nie ma własnego szablonu — używany jest <strong>szablon globalny (domyślny)</strong>. Zmienne <span style="font-family:'Space Mono',monospace;color:var(--blue);">{{klucz}}</span> są podmieniane automatycznie przy wysyłce.</div>
+      </div>
+
+      <!-- FILTER BAR -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <select id="tpl-filter-firma" class="tpl-filter-sel" onchange="filterTemplates()">
+          <option value="">Wszystkie firmy</option>
+          <option value="global">🌐 Globalny (domyślny)</option>
+          <option value="1">⭐ Global Leaders Skills Sp. z o.o.</option>
+          <option value="2">E-sklep Space Memory (Hrableuski)</option>
+          <option value="3">Oleksii Lubenets</option>
+        </select>
+        <select id="tpl-filter-type" class="tpl-filter-sel" onchange="filterTemplates()">
+          <option value="">Wszystkie typy</option>
+          <option value="b2c">B2C — Faktura automatyczna</option>
+          <option value="b2b">B2B — Faktura ręczna</option>
+          <option value="korekta">Faktura korygująca (FK/)</option>
+          <option value="przypomnienie">Przypomnienie o płatności</option>
+          <option value="potwierdzenie">Potwierdzenie zapisu</option>
+          <option value="custom">Niestandardowy</option>
+        </select>
+      </div>
+
+      <!-- TEMPLATE LIST -->
+      <div id="tpl-list">
+
+        <!-- TPL 1: Global B2C -->
+        <div class="tpl-card" data-firma="global" data-type="b2c">
+          <div class="tpl-top">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span class="ftag" style="background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.2);">B2C</span>
+                <span class="ftag ft-arch" style="font-size:9px;">🌐 Globalny</span>
+                <span class="ftag ft-def" style="font-size:9px;">⭐ Domyślny</span>
+              </div>
+              <div style="font-size:13px;font-weight:800;">Faktura automatyczna po płatności Imoje</div>
+              <div style="font-size:10.5px;color:var(--dim);margin-top:2px;font-family:'Space Mono',monospace;">Temat: Faktura {{nr_faktury}} — Global Leaders Skills</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tpl-preview')">👁 Podgląd</button>
+              <button class="btn btn-ghost btn-sm" onclick="openTplEditor('global-b2c')">✏ Edytuj</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TPL 2: Global B2B -->
+        <div class="tpl-card" data-firma="global" data-type="b2b">
+          <div class="tpl-top">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span class="ftag" style="background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);">B2B</span>
+                <span class="ftag ft-arch" style="font-size:9px;">🌐 Globalny</span>
+              </div>
+              <div style="font-size:13px;font-weight:800;">Faktura B2B (wystawiana ręcznie)</div>
+              <div style="font-size:10.5px;color:var(--dim);margin-top:2px;font-family:'Space Mono',monospace;">Temat: Faktura {{nr_faktury}} dla {{nazwa_firmy_klienta}}</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tpl-preview')">👁 Podgląd</button>
+              <button class="btn btn-ghost btn-sm" onclick="openTplEditor('global-b2b')">✏ Edytuj</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TPL 3: Global Korekta -->
+        <div class="tpl-card" data-firma="global" data-type="korekta">
+          <div class="tpl-top">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span class="ftag" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);">FK/</span>
+                <span class="ftag ft-arch" style="font-size:9px;">🌐 Globalny</span>
+              </div>
+              <div style="font-size:13px;font-weight:800;">Faktura korygująca (zwrot / korekta)</div>
+              <div style="font-size:10.5px;color:var(--dim);margin-top:2px;font-family:'Space Mono',monospace;">Temat: Faktura korygująca {{nr_korekty}} — GLS</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tpl-preview')">👁 Podgląd</button>
+              <button class="btn btn-ghost btn-sm" onclick="openTplEditor('global-korekta')">✏ Edytuj</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- TPL 4: E-sklep SM B2C (przykład per-firma) -->
+        <div class="tpl-card" data-firma="2" data-type="b2c">
+          <div class="tpl-top">
+            <div style="flex:1;min-width:0;">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+                <span class="ftag" style="background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.2);">B2C</span>
+                <span class="ftag ft-proj" style="font-size:9px;">E-sklep Space Memory (Hrableuski)</span>
+                <span style="font-size:9.5px;color:var(--dim);">nadpisuje globalny</span>
+              </div>
+              <div style="font-size:13px;font-weight:800;">Faktura automatyczna — Południe</div>
+              <div style="font-size:10.5px;color:var(--dim);margin-top:2px;font-family:'Space Mono',monospace;">Temat: Faktura {{nr_faktury}} — E-sklep SM</div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-tpl-preview')">👁 Podgląd</button>
+              <button class="btn btn-ghost btn-sm" onclick="openTplEditor('gls2-b2c')">✏ Edytuj</button>
+              <button class="btn btn-sm btn-red" onclick="showToast('Szablon usunięty · powrót do globalnego','warn')">✕</button>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tpl-list -->
+    </div><!-- /panel-szablony -->
+
+    <!-- ══ PANEL: STAWKI VAT ══ -->
+    <div class="panel" id="panel-vat">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:900;">Stawki VAT i kody PKWiU</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">Konfiguracja per firma · można nadpisać per projekt</div>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('modal-add-vat')">＋ Dodaj stawkę</button>
+      </div>
+
+      <!-- FIRMA SELECTOR -->
+      <div class="scard" style="margin-bottom:12px;">
+        <div class="scard-body" style="padding:13px 18px;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <span style="font-size:11.5px;font-weight:700;color:var(--dim);">Konfiguruj dla firmy:</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;" id="vat-firma-tabs">
+              <div class="vat-ftab act" onclick="setVatFirma(this,'global')">🌐 Globalny (domyślny)</div>
+              <div class="vat-ftab" onclick="setVatFirma(this,'1')">⭐ Global Leaders Skills Sp. z o.o.</div>
+              <div class="vat-ftab" onclick="setVatFirma(this,'2')">E-sklep SM (Hrableuski)</div>
+              <div class="vat-ftab" onclick="setVatFirma(this,'3')">Oleksii Lubenets</div>
+            </div>
+            <div style="margin-left:auto;font-size:10.5px;color:var(--dim);">Firma bez własnych stawek używa stawek globalnych</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ibox ibox-green" style="margin-bottom:14px;">
+        <div class="ibox-icon">✓</div>
+        <div>Usługi edukacyjne GLS są <strong>zwolnione z VAT</strong> na podstawie art. 43 ust. 1 pkt 26 lit. b. Stawka <strong>ZW</strong> używana domyślnie dla wszystkich produktów edukacyjnych. Kursy komercyjne i B2B mogą wymagać 23%.</div>
+      </div>
+
+      <!-- RATES TABLE -->
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-amber">📋</div>
+            <div><div class="stitle">Aktywne stawki VAT</div><div class="ssub" id="vat-firma-label">Globalny · obowiązuje dla wszystkich firm bez własnych ustawień</div></div>
+          </div>
+        </div>
+        <div style="padding:0;">
+          <table class="series-tbl" id="vat-rates-tbl">
+            <thead><tr><th>Stawka</th><th>Opis / Nazwa usługi</th><th>PKWiU</th><th>Typ klienta</th><th>Domyślna</th><th></th></tr></thead>
+            <tbody>
+              <tr>
+                <td><span class="vat-pill vat-zw">ZW</span></td>
+                <td style="font-size:12px;max-width:280px;"><div style="font-weight:700;">Usługi edukacyjne (zwolnione)</div><div style="font-size:10.5px;color:var(--dim);">art. 43 ust. 1 pkt 26 lit. b · Space Memory, INDIGO</div></td>
+                <td><span class="mono" style="font-size:10.5px;">85.59.19.0</span></td>
+                <td><span class="ftag" style="background:rgba(79,110,247,.08);color:var(--blue);border:1px solid rgba(79,110,247,.18);">B2C + B2B</span></td>
+                <td><span class="badge b-ok" style="font-size:9px;">✓ Domyślna</span></td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditVAT('zw')">✏</button></td>
+              </tr>
+              <tr>
+                <td><span class="vat-pill vat-23">23%</span></td>
+                <td style="font-size:12px;"><div style="font-weight:700;">Usługi komercyjne / B2B standard</div><div style="font-size:10.5px;color:var(--dim);">Kursy dla firm, szkolenia spoza zakresu art. 43</div></td>
+                <td><span class="mono" style="font-size:10.5px;">85.59.19.0</span></td>
+                <td><span class="ftag" style="background:rgba(139,92,246,.08);color:var(--purple);border:1px solid rgba(139,92,246,.18);">B2B</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditVAT('23')">✏</button><button class="btn btn-sm btn-red" onclick="showToast('Stawka 23% usunięta','warn')" style="margin-left:4px;">✕</button></td>
+              </tr>
+              <tr>
+                <td><span class="vat-pill vat-8">8%</span></td>
+                <td style="font-size:12px;"><div style="font-weight:700;">Usługi sportowe / rekreacyjne</div><div style="font-size:10.5px;color:var(--dim);">Obozy letnie, aktywność fizyczna dla dzieci</div></td>
+                <td><span class="mono" style="font-size:10.5px;">93.13.10.0</span></td>
+                <td><span class="ftag" style="background:rgba(79,110,247,.08);color:var(--blue);border:1px solid rgba(79,110,247,.18);">B2C + B2B</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditVAT('8')">✏</button><button class="btn btn-sm btn-red" onclick="showToast('Stawka 8% usunięta','warn')" style="margin-left:4px;">✕</button></td>
+              </tr>
+              <tr>
+                <td><span class="vat-pill vat-5">5%</span></td>
+                <td style="font-size:12px;"><div style="font-weight:700;">Materiały edukacyjne / książki</div><div style="font-size:10.5px;color:var(--dim);">Podręczniki, zestawy ćwiczeń sprzedawane osobno</div></td>
+                <td><span class="mono" style="font-size:10.5px;">58.11.1</span></td>
+                <td><span class="ftag" style="background:rgba(79,110,247,.08);color:var(--blue);border:1px solid rgba(79,110,247,.18);">B2C</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditVAT('5')">✏</button><button class="btn btn-sm btn-red" onclick="showToast('Stawka 5% usunięta','warn')" style="margin-left:4px;">✕</button></td>
+              </tr>
+              <tr>
+                <td><span class="vat-pill vat-0">0%</span></td>
+                <td style="font-size:12px;"><div style="font-weight:700;">Eksport usług poza UE</div><div style="font-size:10.5px;color:var(--dim);">Świadczenie usług dla kontrahentów spoza Unii</div></td>
+                <td><span class="mono" style="font-size:10.5px;">85.59.19.0</span></td>
+                <td><span class="ftag" style="background:rgba(139,92,246,.08);color:var(--purple);border:1px solid rgba(139,92,246,.18);">B2B eksport</span></td>
+                <td>—</td>
+                <td><button class="btn btn-ghost btn-sm" onclick="openEditVAT('0')">✏</button><button class="btn btn-sm btn-red" onclick="showToast('Stawka 0% usunięta','warn')" style="margin-left:4px;">✕</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="save-bar">
+          <div style="font-size:11px;color:var(--dim);">Zmiany dotyczą nowo wystawianych faktur</div>
+          <button class="btn btn-primary" onclick="showToast('✔ Stawki VAT zapisane')">💾 Zapisz stawki</button>
+        </div>
+      </div>
+    </div><!-- /panel-vat -->
+
+    <!-- ══ PANEL: UŻYTKOWNICY ══ -->
+    <div class="panel" id="panel-users">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div>
+          <div style="font-size:16px;font-weight:900;">Użytkownicy systemu</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">Role i uprawnienia · dostęp do modułów per rola</div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="showUsersTab('permissions')">🔐 Tabela uprawnień</button>
+          <button class="btn btn-primary" onclick="openAddUser()">＋ Dodaj użytkownika</button>
+        </div>
+      </div>
+
+      <!-- SUBTABS -->
+      <div style="display:flex;gap:0;border-bottom:1px solid var(--b);margin-bottom:16px;">
+        <div class="users-tab act" id="utab-list" onclick="showUsersTab('list')">👥 Lista użytkowników</div>
+        <div class="users-tab" id="utab-permissions" onclick="showUsersTab('permissions')">🔐 Uprawnienia ról</div>
+      </div>
+
+      <!-- TAB: LISTA -->
+      <div id="users-list-tab">
+        <!-- Filters -->
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <select class="tpl-filter-sel" id="users-filter-role" onchange="filterUsers()">
+            <option value="">Wszystkie role</option>
+            <optgroup label="Zarząd / Administracja">
+              <option>Super-Admin</option><option>Admin</option>
+            </optgroup>
+            <optgroup label="Rekrutacja">
+              <option>Kierownik działu rekrutacji</option><option>Dział rekrutacji uczniów</option>
+            </optgroup>
+            <optgroup label="Jakość">
+              <option>Kierownik Działu Jakości Space</option><option>Dział Jakości Space</option>
+              <option>Kierownik Działu Jakości INDIGO</option><option>Dział Jakości INDIGO</option>
+            </optgroup>
+            <optgroup label="Trenerzy">
+              <option>Trener Space Memory</option><option>Trener INDIGO</option>
+            </optgroup>
+            <optgroup label="Finanse / Admin">
+              <option>Główna Księgowa</option><option>Pracownik działu finansów i administracji</option><option>Pracownik sekretariatu</option>
+            </optgroup>
+            <optgroup label="HR">
+              <option>HR</option>
+            </optgroup>
+          </select>
+          <select class="tpl-filter-sel" id="users-filter-proj" onchange="filterUsers()">
+            <option value="">Wszystkie projekty</option>
+            <option>🚀 Space Memory</option>
+            <option>🧠 INDIGO / Speedy Mind</option>
+            <option>🏆 Olimpiada</option>
+            <option>🎓 Warsztaty / Obozy</option>
+          </select>
+        </div>
+
+        <div id="users-rows">
+          <!-- Super-Admin -->
+          <div class="user-row" data-role="Super-Admin">
+            <div class="user-ava ua-blue">KN</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Karolina Nowak</div><div style="font-size:10.5px;color:var(--dim);">biuro@gls.edu.pl · Wszystkie projekty</div></div>
+            <span class="badge b-ok" style="font-size:9.5px;">Super-Admin</span>
+            <span style="font-size:10px;color:var(--green);display:flex;align-items:center;gap:3px;"><span style="width:6px;height:6px;background:var(--green);border-radius:50%;display:inline-block;"></span>Online</span>
+            <button class="btn btn-ghost btn-sm" onclick="openEditUser('KN','Karolina Nowak','Super-Admin','biuro@gls.edu.pl')">✏</button>
+          </div>
+          <!-- Admin -->
+          <div class="user-row" data-role="Admin">
+            <div class="user-ava ua-purple">MK</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Marta Kowalczyk</div><div style="font-size:10.5px;color:var(--dim);">marta@gls.edu.pl · Space Memory, INDIGO</div></div>
+            <span class="badge" style="background:rgba(139,92,246,.12);color:var(--purple);border:1px solid rgba(139,92,246,.2);font-size:9.5px;">Admin</span>
+            <button class="btn btn-ghost btn-sm" onclick="openEditUser('MK','Marta Kowalczyk','Admin','marta@gls.edu.pl')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="confirmDeleteUser('Marta Kowalczyk')">✕</button>
+          </div>
+          <!-- Rekrutacja kierownik -->
+          <div class="user-row" data-role="Kierownik działu rekrutacji">
+            <div class="user-ava ua-amber">PW</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Piotr Wiśniewski</div><div style="font-size:10.5px;color:var(--dim);">p.wisniewski@gls.edu.pl · Space Memory, Olimpiada</div></div>
+            <span class="badge" style="background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.2);font-size:9.5px;">Kier. Rekrutacji</span>
+            <button class="btn btn-ghost btn-sm" onclick="openEditUser('PW','Piotr Wiśniewski','Kierownik działu rekrutacji','p.wisniewski@gls.edu.pl')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="confirmDeleteUser('Piotr Wiśniewski')">✕</button>
+          </div>
+          <!-- DQ Space -->
+          <div class="user-row" data-role="Kierownik Działu Jakości Space">
+            <div class="user-ava ua-green">AB</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Anna Brzozowska</div><div style="font-size:10.5px;color:var(--dim);">a.brzozowska@gls.edu.pl · Space Memory</div></div>
+            <span class="badge" style="background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);font-size:9.5px;">Kier. DQ Space</span>
+            <button class="btn btn-ghost btn-sm" onclick="openEditUser('AB','Anna Brzozowska','Kierownik Działu Jakości Space','a.brzozowska@gls.edu.pl')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="confirmDeleteUser('Anna Brzozowska')">✕</button>
+          </div>
+          <!-- Trener Space -->
+          <div class="user-row" data-role="Trener Space Memory">
+            <div class="user-ava ua-green">TA</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Tomasz Adamski</div><div style="font-size:10.5px;color:var(--dim);">t.adamski@gls.edu.pl · Space Memory · Warszawa</div></div>
+            <span class="badge" style="background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2);font-size:9.5px;">Trener Space</span>
+            <button class="btn btn-ghost btn-sm" onclick="openEditUser('TA','Tomasz Adamski','Trener Space Memory','t.adamski@gls.edu.pl')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="confirmDeleteUser('Tomasz Adamski')">✕</button>
+          </div>
+          <!-- Sekretariat -->
+          <div class="user-row" data-role="Pracownik sekretariatu">
+            <div class="user-ava" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.22);color:var(--cyan);">ZN</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:700;">Zofia Nowak</div><div style="font-size:10.5px;color:var(--dim);">z.nowak@gls.edu.pl · Wszystkie projekty</div></div>
+            <span class="badge" style="background:rgba(6,182,212,.12);color:var(--cyan);border:1px solid rgba(6,182,212,.2);font-size:9.5px;">Sekretariat</span>
+            <button class="btn btn-ghost btn-sm" onclick="openEditUser('ZN','Zofia Nowak','Pracownik sekretariatu','z.nowak@gls.edu.pl')">✏</button>
+            <button class="btn btn-sm btn-red" onclick="confirmDeleteUser('Zofia Nowak')">✕</button>
+          </div>
+        </div>
+      </div><!-- /users-list-tab -->
+
+      <!-- TAB: UPRAWNIENIA -->
+      <div id="users-perm-tab" style="display:none;">
+        <div class="ibox ibox-blue" style="margin-bottom:14px;">
+          <div class="ibox-icon">ℹ</div>
+          <div>Tabela pokazuje <strong>domyślne uprawnienia per rola</strong>. Super-Admin może nadać lub odebrać indywidualne uprawnienia każdemu użytkownikowi.</div>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="perm-tbl">
+            <thead>
+              <tr>
+                <th style="min-width:180px;">Moduł / Zakładka</th>
+                <th>Super-Admin</th><th>Admin</th>
+                <th>Kier. Rekr.</th><th>Rekrutacja</th>
+                <th>Kier. DQ</th><th>Dział Jakości</th>
+                <th>Trener</th>
+                <th>Gł. Ks.</th><th>Finanse/Adm.</th>
+                <th>Sekretariat</th><th>HR</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="perm-section"><td colspan="12">🏠 Dashboard</td></tr>
+              <tr><td>Dashboard ogólny</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>👁 własne</td><td>✅</td><td>✅</td><td>✅</td><td>👁</td></tr>
+
+              <tr class="perm-section"><td colspan="12">👨‍🎓 Uczniowie (Sekretariat)</td></tr>
+              <tr><td>Lista uczniów — widok</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>👁</td><td>👁 własne</td><td>👁</td><td>✅</td><td>✅</td><td>—</td></tr>
+              <tr><td>Dodaj / edytuj ucznia</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+              <tr><td>Zakładka Płatności ucznia</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>👁</td><td>—</td></tr>
+              <tr><td>Zakładka Grupy ucznia</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+              <tr><td>Zakładka Obecność</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>👁</td><td>—</td></tr>
+              <tr><td>Zakładka Postępy / Zaliczenia</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>👁</td><td>—</td></tr>
+              <tr><td>Zakładka Notatki</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>👁</td><td>👁</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+              <tr><td>Pauza / Rezygnacja</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+
+              <tr class="perm-section"><td colspan="12">💳 Finanse</td></tr>
+              <tr><td>Przegląd płatności</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>👁</td><td>—</td></tr>
+              <tr><td>Wystawianie faktur</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td></tr>
+              <tr><td>Zwroty (inicjowanie)</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td></tr>
+              <tr><td>Zwroty (zatwierdzanie)</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Wypłaty trenerów</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>👁 własne</td><td>✅</td><td>✅</td><td>—</td><td>—</td></tr>
+              <tr><td>Eksport / Comarch XML</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td></tr>
+
+              <tr class="perm-section"><td colspan="12">🎓 Grupy / Trenerzy</td></tr>
+              <tr><td>Lista grup</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>👁 własne</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+              <tr><td>Edycja grupy</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+              <tr><td>Dziennik lekcji (tracker)</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+
+              <tr class="perm-section"><td colspan="12">🔍 Dział Jakości</td></tr>
+              <tr><td>Rezygnacje (workflow)</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>👁 własne</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+              <tr><td>Analityka / Dashboard DQ</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Powrót z pauzy</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td></tr>
+
+              <tr class="perm-section"><td colspan="12">⚙ Ustawienia</td></tr>
+              <tr><td>Firmy / Sprzedawcy</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td><td>—</td><td>—</td><td>—</td></tr>
+              <tr><td>Użytkownicy i role</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>✅</td></tr>
+              <tr><td>Integracje (Imoje, KSeF)</td><td>✅</td><td>✅</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:16px;font-size:11px;color:var(--dim);">
+          <span>✅ Pełen dostęp</span>
+          <span>👁 Tylko odczyt</span>
+          <span>👁 własne = tylko swoje dane</span>
+          <span>— Brak dostępu</span>
+        </div>
+      </div><!-- /users-perm-tab -->
+
+    </div><!-- /panel-users -->
+
+    <!-- ══ PANEL: INTEGRACJE ══ -->
+    <div class="panel" id="panel-integracje">
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-cyan">🔌</div>
+            <div><div class="stitle">Integracje zewnętrzne</div><div class="ssub">Połączenia z systemami płatności, KSeF i komunikatami</div></div>
+          </div>
+        </div>
+        <div class="scard-body">
+          <div class="int-card">
+            <div class="int-logo" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.22);">💳</div>
+            <div style="flex:1;">
+              <div class="int-name">Imoje (ING Bank Śląski)</div>
+              <div class="int-desc">Bramka płatności online · webhook → auto-faktura · endpoint: /api/v1/webhooks/imoje</div>
+            </div>
+            <div class="int-right">
+              <span class="badge b-ok">✓ Aktywna</span>
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-imoje')">⚙ Konfiguracja</button>
+            </div>
+          </div>
+          <div class="int-card">
+            <div class="int-logo" style="background:rgba(79,110,247,.12);border:1px solid rgba(79,110,247,.22);">🟦</div>
+            <div style="flex:1;">
+              <div class="int-name">KSeF — Krajowy System e-Faktur</div>
+              <div class="int-desc">Obowiązkowy od <strong>1 kwietnia 2026</strong> · Format FA(3) XML · bramka Ministerstwa Finansów</div>
+            </div>
+            <div class="int-right">
+              <span class="badge b-warn">⚠ Nieaktywna</span>
+              <button class="btn btn-amber btn-sm" onclick="openModal('modal-ksef')">⚙ Skonfiguruj</button>
+            </div>
+          </div>
+          <div class="int-card">
+            <div class="int-logo" style="background:rgba(37,211,102,.12);border:1px solid rgba(37,211,102,.22);">💬</div>
+            <div style="flex:1;">
+              <div class="int-name">WhatsApp Business API</div>
+              <div class="int-desc">Automatyczne wiadomości do rodziców · powiadomienia o fakturach i płatnościach</div>
+            </div>
+            <div class="int-right">
+              <span class="badge b-off">Nieaktywna</span>
+              <button class="btn btn-ghost btn-sm" onclick="showToast('WhatsApp Business API — skontaktuj się z dostawcą Meta Business','info')">ℹ Jak podłączyć</button>
+            </div>
+          </div>
+          <div class="int-card">
+            <div class="int-logo" style="background:rgba(0,123,255,.12);border:1px solid rgba(0,123,255,.22);">🎥</div>
+            <div style="flex:1;">
+              <div class="int-name">Zoom API</div>
+              <div class="int-desc">Auto-generowanie linków do zajęć online · synchronizacja z harmonogramem grup</div>
+            </div>
+            <div class="int-right">
+              <span class="badge b-off">Nieaktywna</span>
+              <button class="btn btn-ghost btn-sm" onclick="openModal('modal-zoom')">⚙ Podłącz</button>
+            </div>
+          </div>
+          <div class="int-card">
+            <div class="int-logo" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);">📊</div>
+            <div style="flex:1;">
+              <div class="int-name">Comarch ERP Optima</div>
+              <div class="int-desc">Eksport faktur XML · bez bezpośredniego API · pliki do ręcznego importu w Comarch</div>
+            </div>
+            <div class="int-right">
+              <span class="badge b-ok">✓ Eksport XML</span>
+              <button class="btn btn-ghost btn-sm" onclick="showPanel('eksport')">⚙ Ustawienia eksportu</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /panel-integracje -->
+
+    <!-- ══ PANEL: EKSPORT / COMARCH ══ -->
+    <div class="panel" id="panel-eksport">
+      <div class="scard">
+        <div class="scard-hdr">
+          <div class="scard-title">
+            <div class="scard-ico si-amber">📤</div>
+            <div><div class="stitle">Eksport danych i Comarch ERP Optima</div><div class="ssub">Konfiguracja formatów eksportu</div></div>
+          </div>
+        </div>
+        <div class="scard-body">
+          <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Dostępne formaty eksportu</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
+            <div style="padding:14px;background:rgba(79,110,247,.05);border:1px solid rgba(79,110,247,.15);border-radius:12px;">
+              <div style="font-size:13px;font-weight:800;color:var(--blue);margin-bottom:4px;">📊 XLSX — Rejestr faktur</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.6;">Nr faktury · Data · Klient · NIP · Netto · VAT · Brutto · Status<br><strong style="color:var(--white);">Dla:</strong> buchalteria, kontrola wewnętrzna</div>
+            </div>
+            <div style="padding:14px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.15);border-radius:12px;">
+              <div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:4px;">🗜 ZIP — Paczka PDF</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.6;">Zbiór PDF faktur za wybrany okres + indeks CSV<br><strong style="color:var(--white);">Dla:</strong> archiwum, wysyłka do US</div>
+            </div>
+            <div style="padding:14px;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.15);border-radius:12px;">
+              <div style="font-size:13px;font-weight:800;color:var(--amber);margin-bottom:4px;">⚙ XML Comarch — Optima</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.6;">Format natywny Comarch ERP Optima · import: Funkcje dodatkowe → Import z XML<br><strong style="color:var(--white);">Dla:</strong> biuro rachunkowe</div>
+            </div>
+            <div style="padding:14px;background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.15);border-radius:12px;">
+              <div style="font-size:13px;font-weight:800;color:var(--red);margin-bottom:4px;">🏛 JPK_FA — Urząd Skarbowy</div>
+              <div style="font-size:11px;color:var(--dim);line-height:1.6;">Format XML wg schematu MF (JPK_FA v3) · wymaga kodu US z danych firmy<br><strong style="color:var(--white);">Dla:</strong> kontrola podatkowa (na żądanie)</div>
+            </div>
+          </div>
+          <div class="sec"><div class="sdot" style="background:var(--amber);"></div>Ustawienia Comarch ERP Optima XML</div>
+          <div class="gr2">
+            <div class="fg">
+              <label>Identyfikator księgowy Comarch</label>
+              <input type="text" value="K1" style="font-family:'Space Mono',monospace;">
+              <div class="hint">Domyślnie K1. Zmień jeśli biuro rachunkowe używa innego ID.</div>
+            </div>
+            <div class="fg">
+              <label>Kodowanie pliku XML</label>
+              <select><option>UTF-8 (zalecane)</option><option>Windows-1250</option><option>ISO-8859-2</option></select>
+            </div>
+            <div class="fg">
+              <label>Kategoria faktur w Comarch</label>
+              <input type="text" value="FAKTURA">
+            </div>
+            <div class="fg">
+              <label>Rejestr sprzedaży</label>
+              <input type="text" value="SPRZEDAŻ">
+            </div>
+          </div>
+          <div class="trow">
+            <div><div class="tl">Automatycznie zakładaj kartoteki kontrahentów</div><div class="th">Jeśli klient nie istnieje w Comarch — zostanie dodany podczas importu XML</div></div>
+            <label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label>
+          </div>
+          <div class="trow">
+            <div><div class="tl">Dołącz faktury korygujące (FK/) do eksportu Comarch</div></div>
+            <label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label>
+          </div>
+          <div class="trow">
+            <div><div class="tl">Dołącz anulowane faktury do rejestru XLSX</div><div class="th">Ze statusem ANULOWANA — ważne dla rejestru z lukami</div></div>
+            <label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label>
+          </div>
+        </div>
+        <div class="save-bar">
+          <div></div>
+          <button class="btn btn-primary" onclick="showToast('✔ Ustawienia eksportu zapisane')">💾 Zapisz ustawienia eksportu</button>
+        </div>
+      </div>
+    </div><!-- /panel-eksport -->
+
+  </div><!-- /content -->
+</div><!-- /settings-wrap -->
+</div><!-- /wrap -->
+
+<!-- ══════════ MODALS ══════════ -->
+
+<!-- MODAL: FIRMA EDIT / ADD -->
+<div class="overlay" id="modal-firma">
+<div class="modal wide">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico" id="mf-ico" style="background:rgba(79,110,247,.12);border:1px solid rgba(79,110,247,.22);">🏢</div>
+      <div><div class="mtitle" id="mf-title">Dodaj firmę</div><div class="msub" id="mf-sub">Nowy sprzedawca · dane będą drukowane na fakturach</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-firma')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Dane identyfikacyjne</div>
+    <div class="gr2">
+      <div class="fg span2"><label>Pełna nazwa firmy <span class="req">*</span></label><input type="text" id="mf-name" placeholder="np. E-sklep Space Memory (Hrableuski)"></div>
+      <div class="fg"><label>Skrócona nazwa</label><input type="text" placeholder="np. E-sklep SM"></div>
+      <div class="fg"><label>Forma prawna</label><select><option>Spółka z o.o.</option><option>JDG</option><option>S.A.</option><option>Sp.j.</option></select></div>
+      <div class="fg"><label>NIP <span class="req">*</span></label><input type="text" id="mf-nip" placeholder="000-000-00-00" oninput="mfValidateNIP(this)"><div class="hint" id="mf-nip-hint"></div></div>
+      <div class="fg"><label>REGON</label><input type="text" placeholder="9-cyfrowy"></div>
+      <div class="fg"><label>KRS (jeśli dotyczy)</label><input type="text" placeholder="0000000000"></div>
+    </div>
+    <div class="div"></div>
+    <div class="sec"><div class="sdot" style="background:var(--purple);"></div>Adres siedziby</div>
+    <div class="gr2">
+      <div class="fg"><label>Ulica i numer domu <span class="req">*</span></label><input type="text" placeholder="ul. Przykładowa 12"></div>
+      <div class="fg"><label>Numer lokalu</label><input type="text" placeholder="3"></div>
+      <div class="fg"><label>Kod pocztowy <span class="req">*</span></label><input type="text" placeholder="00-000"></div>
+      <div class="fg"><label>Miasto <span class="req">*</span></label><input type="text" placeholder="Kraków"></div>
+      <div class="fg"><label>Województwo</label><select><option>mazowieckie</option><option>małopolskie</option><option>dolnośląskie</option><option>pomorskie</option><option>śląskie</option><option>wielkopolskie</option></select></div>
+      <div class="fg"><label>E-mail do faktur <span class="req">*</span></label><input type="email" placeholder="faktury@firma.pl"></div>
+    </div>
+    <div class="div"></div>
+    <div class="sec"><div class="sdot" style="background:var(--amber);"></div>Status VAT</div>
+    <div class="vat-choice">
+      <div class="vat-opt sel-zw" id="mf-zw" onclick="mfSetVAT('zw')">
+        <div class="vat-opt-title" style="color:var(--amber);">🟡 Zwolniony z VAT</div>
+        <div class="vat-opt-sub">art. 43 ust. 1 pkt 26 lit. b</div>
+      </div>
+      <div class="vat-opt" id="mf-vat" onclick="mfSetVAT('vat')">
+        <div class="vat-opt-title" style="color:var(--blue);">🔵 Czynny podatnik VAT</div>
+        <div class="vat-opt-sub">Faktury z VAT 23% / 8% / 5%</div>
+      </div>
+    </div>
+    <div class="div"></div>
+    <div class="sec"><div class="sdot" style="background:var(--green);"></div>Przypisz do projektów</div>
+    <div style="display:flex;flex-direction:column;gap:4px;">
+      <label style="display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;cursor:pointer;padding:7px 0;border-bottom:1px solid rgba(100,120,255,.06);">
+        <input type="checkbox" style="accent-color:var(--blue);width:14px;height:14px;"> 🚀 Space Memory
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;cursor:pointer;padding:7px 0;border-bottom:1px solid rgba(100,120,255,.06);">
+        <input type="checkbox" style="accent-color:var(--purple);width:14px;height:14px;"> 🧠 INDIGO / Speedy Mind
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;cursor:pointer;padding:7px 0;border-bottom:1px solid rgba(100,120,255,.06);">
+        <input type="checkbox" style="accent-color:var(--amber);width:14px;height:14px;"> 🏆 Olimpiada
+      </label>
+      <label style="display:flex;align-items:center;gap:10px;font-size:12.5px;font-weight:600;cursor:pointer;padding:7px 0;">
+        <input type="checkbox" style="accent-color:var(--cyan);width:14px;height:14px;"> 🎓 Warsztaty / Obozy
+      </label>
+    </div>
+    <div class="div"></div>
+    <div class="trow" style="border:none;padding-top:0;">
+      <div><div class="tl">Ustaw jako firmę domyślną</div><div class="th">Używana gdy projekt nie ma przypisanego sprzedawcy</div></div>
+      <label class="tog"><input type="checkbox" id="mf-default"><div class="tsl g"></div></label>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-firma')">Anuluj</button>
+    <button class="btn btn-primary" onclick="saveFirma()">💾 Zapisz firmę</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: PREVIEW FAKTURY -->
+<div class="overlay" id="modal-preview">
+<div class="modal" style="max-width:580px;">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(79,110,247,.12);border:1px solid rgba(79,110,247,.22);">👁</div>
+      <div><div class="mtitle">Podgląd sprzedawcy na fakturze</div><div class="msub">Tak będą wyglądać dane GLS na PDF</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-preview')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="inv-preview">
+      <div class="inv-header">
+        <div><div style="font-size:20px;font-weight:900;color:#1a1a2e;">FAKTURA VAT</div><div style="font-size:11px;color:#666;font-family:'Space Mono',monospace;">FA/SPACE/043/2025/05</div></div>
+        <div class="inv-logo-box">GLS<br><span style="font-size:7px;">·edu</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div>
+          <div style="font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#999;margin-bottom:6px;">SPRZEDAWCA</div>
+          <div class="inv-seller">
+            <strong>Global Leaders Skills Sp. z o.o.</strong>
+            Kabacki Dukt 1 / U1 i U2, 02-798 Warszawa<br>
+            <span class="inv-nip">NIP: 5252970924 &nbsp;|&nbsp; REGON: 526267569</span><br>
+            <span style="font-size:10px;color:#555;">biuro@indigomental.pl</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#999;margin-bottom:6px;">NABYWCA</div>
+          <div class="inv-seller"><strong>Jan Kowalski</strong>ul. Klienta 10, 00-100 Warszawa</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px;background:#f8f9ff;border-radius:7px;font-size:10px;color:#666;border:1px solid #e8ecff;">
+        <strong style="color:#4f6ef7;">Podstawa zwolnienia z VAT:</strong> art. 43 ust. 1 pkt 26 lit. b ustawy z dnia 11 marca 2004 r. o podatku od towarów i usług.
+      </div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-preview')">Zamknij</button>
+    <button class="btn btn-primary" onclick="closeModal('modal-preview');showPanel('logo')">🎨 Edytuj szablon PDF</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: SERIE LOG -->
+<div class="overlay" id="modal-serie-log">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.22);">🔒</div>
+      <div><div class="mtitle">Log zmian licznika serii</div><div class="msub">Historia korekt · tylko Super-Admin</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-serie-log')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-red"><div class="ibox-icon">⚠</div><div>Ręczna korekta licznika wymaga pisemnego uzasadnienia. Każda zmiana jest nieodwracalnie zapisana w logu audytowym.</div></div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--b);border-radius:8px;font-size:11px;"><div class="mono" style="color:var(--green);">042 → 043 (auto)</div><div style="color:var(--dim);margin-top:2px;">15.05.2025 10:32 · System · TXN-2025-04821</div></div>
+      <div style="padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid var(--b);border-radius:8px;font-size:11px;"><div class="mono" style="color:var(--green);">041 → 042 (auto)</div><div style="color:var(--dim);margin-top:2px;">15.05.2025 09:14 · System · TXN-2025-04819</div></div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-serie-log')">Zamknij</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: IMOJE -->
+<div class="overlay" id="modal-imoje">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.22);">💳</div>
+      <div><div class="mtitle">Konfiguracja Imoje</div><div class="msub">ING Bank Śląski · bramka płatności</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-imoje')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="fg"><label>Merchant ID</label><input type="text" value="GLS-MERCHANT-001" style="font-family:'Space Mono',monospace;"></div>
+    <div class="fg"><label>Service ID</label><input type="text" value="SRV-00442" style="font-family:'Space Mono',monospace;"></div>
+    <div class="fg"><label>Klucz HMAC-SHA256 (Secret)</label><input type="password" value="••••••••••••••••••••"><div class="hint">Klucz weryfikacji podpisu webhooka · nigdy nie wysyłany do klienta</div></div>
+    <div class="fg"><label>Endpoint webhooka (tylko do odczytu)</label><input type="text" value="https://crm.gls.edu.pl/api/v1/webhooks/imoje" readonly style="font-family:'Space Mono',monospace;font-size:11px;"></div>
+    <div class="trow"><div><div class="tl">Auto-wystawianie faktury po płatności</div></div><label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-imoje')">Anuluj</button>
+    <button class="btn btn-primary" onclick="closeModal('modal-imoje');showToast('✔ Konfiguracja Imoje zapisana')">💾 Zapisz</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: KSEF -->
+<div class="overlay" id="modal-ksef">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(79,110,247,.15);border:1px solid rgba(79,110,247,.25);">🟦</div>
+      <div><div class="mtitle">Konfiguracja KSeF</div><div class="msub">Obowiązkowy od 1 kwietnia 2026 r.</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-ksef')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber"><div class="ibox-icon">⏰</div><div>KSeF będzie obowiązkowy dla GLS od <strong>1 kwietnia 2026</strong>. Token generujesz w portalu <strong>podatki.gov.pl</strong> po uwierzytelnieniu przez Profil Zaufany lub e-dowód.</div></div>
+    <div class="fg"><label>Token autoryzacyjny KSeF</label><input type="password" placeholder="Wklej token z e-Urzędu..."></div>
+    <div class="fg"><label>Środowisko</label><select><option>Test (demo.ksef.gov.pl)</option><option>Produkcja (ksef.gov.pl)</option></select></div>
+    <div class="trow"><div><div class="tl">Aktywuj KSeF (wysyłaj faktury)</div></div><label class="tog"><input type="checkbox"><div class="tsl"></div></label></div>
+    <div class="trow"><div><div class="tl">Wysyłaj faktury korygujące (FK/)</div></div><label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-ksef')">Anuluj</button>
+    <button class="btn btn-primary" onclick="closeModal('modal-ksef');showToast('✔ Ustawienia KSeF zapisane','info')">💾 Zapisz</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: ZOOM -->
+<div class="overlay" id="modal-zoom">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(0,123,255,.12);border:1px solid rgba(0,123,255,.22);">🎥</div>
+      <div><div class="mtitle">Konfiguracja Zoom API</div><div class="msub">Auto-linki do zajęć online</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-zoom')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="fg"><label>Account ID (OAuth)</label><input type="text" placeholder="np. AbCdEfGhIj_12345" style="font-family:'Space Mono',monospace;"></div>
+    <div class="fg"><label>Client ID</label><input type="text" placeholder="zoom_client_id" style="font-family:'Space Mono',monospace;"></div>
+    <div class="fg"><label>Client Secret</label><input type="password" placeholder="zoom_client_secret"></div>
+    <div class="trow"><div><div class="tl">Auto-generuj link Zoom przy tworzeniu grupy</div></div><label class="tog"><input type="checkbox"><div class="tsl g"></div></label></div>
+    <div class="trow"><div><div class="tl">Wyślij link do rodziców przed pierwszymi zajęciami</div></div><label class="tog"><input type="checkbox"><div class="tsl g"></div></label></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-zoom')">Anuluj</button>
+    <button class="btn btn-primary" onclick="closeModal('modal-zoom');showToast('✔ Zoom API połączony')">💾 Zapisz i połącz</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: ADD ACCOUNT -->
+<div class="overlay" id="modal-add-acc">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.22);">🏦</div>
+      <div><div class="mtitle">Dodaj konto bankowe</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-add-acc')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="fg"><label>Numer IBAN <span class="req">*</span></label><input type="text" id="new-iban" placeholder="PL 00 0000 0000 0000 0000 0000 0000" style="font-family:'Space Mono',monospace;"></div>
+    <div class="fg"><label>Nazwa banku</label><input type="text" id="new-bank" placeholder="np. PKO Bank Polski"></div>
+    <div class="fg"><label>Opis (miasto / przeznaczenie)</label><input type="text" id="new-bank-desc" placeholder="np. Gdańsk — oddział Nord"></div>
+    <div class="fg"><label>Waluta</label><select><option>PLN</option><option>EUR</option><option>USD</option></select></div>
+    <div class="trow"><div><div class="tl">Ustaw jako konto domyślne</div></div><label class="tog"><input type="checkbox" id="new-acc-def"><div class="tsl g"></div></label></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-add-acc')">Anuluj</button>
+    <button class="btn btn-primary" onclick="addAccount()">＋ Dodaj konto</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: ADD / EDIT USER -->
+<div class="overlay" id="modal-add-user">
+<div class="modal wide">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.22);">👤</div>
+      <div><div class="mtitle" id="mu-title">Dodaj użytkownika</div><div class="msub" id="mu-sub">Nowe konto · zaproszenie e-mail zostanie wysłane automatycznie</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-add-user')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="sec"><div class="sdot" style="background:var(--purple);"></div>Dane personalne</div>
+    <div class="gr2">
+      <div class="fg"><label>Imię <span class="req">*</span></label><input type="text" id="mu-imie" placeholder="Imię"></div>
+      <div class="fg"><label>Nazwisko <span class="req">*</span></label><input type="text" id="mu-nazwisko" placeholder="Nazwisko"></div>
+      <div class="fg span2"><label>E-mail (login) <span class="req">*</span></label><input type="email" id="mu-email" placeholder="email@gls.edu.pl"></div>
+    </div>
+    <div class="div"></div>
+    <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Rola i dostęp</div>
+    <div class="fg">
+      <label>Rola <span class="req">*</span></label>
+      <select id="mu-rola" onchange="onRoleChange()">
+        <optgroup label="Zarząd / Administracja">
+          <option value="Super-Admin">Super-Admin</option>
+          <option value="Admin">Admin</option>
+        </optgroup>
+        <optgroup label="Rekrutacja">
+          <option value="Kierownik działu rekrutacji">Kierownik działu rekrutacji uczniów</option>
+          <option value="Dział rekrutacji uczniów">Pracownik — Dział rekrutacji uczniów</option>
+        </optgroup>
+        <optgroup label="Dział Jakości Space Memory">
+          <option value="Kierownik Działu Jakości Space">Kierownik Działu Jakości Space</option>
+          <option value="Dział Jakości Space">Pracownik — Dział Jakości Space</option>
+        </optgroup>
+        <optgroup label="Dział Jakości INDIGO">
+          <option value="Kierownik Działu Jakości INDIGO">Kierownik Działu Jakości INDIGO</option>
+          <option value="Dział Jakości INDIGO">Pracownik — Dział Jakości INDIGO</option>
+        </optgroup>
+        <optgroup label="Trenerzy">
+          <option value="Trener Space Memory">Trener Space Memory</option>
+          <option value="Trener INDIGO">Trener INDIGO / Speedy Mind</option>
+        </optgroup>
+        <optgroup label="Finanse i administracja">
+          <option value="Główna Księgowa">Główna Księgowa</option>
+          <option value="Pracownik działu finansów i administracji">Pracownik działu administracji i finansów</option>
+          <option value="Kierownik działu finansów i administracji">Kierownik działu administracji i finansów</option>
+          <option value="Pracownik sekretariatu">Pracownik sekretariatu</option>
+        </optgroup>
+        <optgroup label="HR">
+          <option value="HR">HR</option>
+        </optgroup>
+      </select>
+    </div>
+    <div class="fg" id="mu-role-info" style="display:none;">
+      <div class="ibox ibox-blue" style="margin:0;"><div class="ibox-icon">🔐</div><div id="mu-role-desc" style="font-size:11px;"></div></div>
+    </div>
+    <div class="div"></div>
+    <div class="sec"><div class="sdot" style="background:var(--green);"></div>Przypisz do projektów <span style="font-weight:400;text-transform:none;font-size:9px;">(można wybrać kilka)</span></div>
+    <div class="multi-proj-wrap" id="mu-projs">
+      <div class="mpj sel" onclick="toggleProj(this)" data-val="space">🚀 Space Memory</div>
+      <div class="mpj" onclick="toggleProj(this)" data-val="indigo">🧠 INDIGO / Speedy Mind</div>
+      <div class="mpj" onclick="toggleProj(this)" data-val="olimp">🏆 Olimpiada</div>
+      <div class="mpj" onclick="toggleProj(this)" data-val="camp">🎓 Warsztaty / Obozy</div>
+      <div class="mpj" onclick="toggleProjAll(this)" data-val="all" style="border-style:dashed;color:var(--dim);">🌐 Wszystkie projekty</div>
+    </div>
+    <div class="div"></div>
+    <div class="trow" style="border:none;padding-top:0;">
+      <div><div class="tl">Wyślij zaproszenie e-mail</div><div class="th">Użytkownik otrzyma link do ustawienia hasła</div></div>
+      <label class="tog"><input type="checkbox" id="mu-invite" checked><div class="tsl g"></div></label>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-add-user')">Anuluj</button>
+    <button class="btn btn-primary" id="mu-btn" onclick="saveUser()">＋ Dodaj użytkownika</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: ADD PROJECT -->
+<div class="overlay" id="modal-add-proj">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(79,110,247,.12);border:1px solid rgba(79,110,247,.22);">🧩</div>
+      <div><div class="mtitle">Dodaj projekt</div><div class="msub">Projekt od razu przypisany do firmy</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-add-proj')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="fg"><label>Nazwa projektu <span class="req">*</span></label><input type="text" placeholder="np. Space Memory — Gdańsk"></div>
+    <div class="fg"><label>Ikona / Emoji</label><input type="text" placeholder="🚀" style="font-size:20px;text-align:center;width:60px;"></div>
+    <div class="fg">
+      <label>Firma (sprzedawca na fakturach) <span class="req">*</span></label>
+      <select>
+        <option value="1">⭐ Global Leaders Skills Sp. z o.o. (domyślna)</option>
+        <option value="2">E-sklep Space Memory (Hrableuski)</option>
+        <option value="new">＋ Utwórz nową firmę...</option>
+      </select>
+      <div class="hint">Projekt od razu należy do wybranej firmy — można zmienić w dowolnym momencie</div>
+    </div>
+    <div class="fg"><label>Seria numeracji faktur <span class="req">*</span></label><input type="text" placeholder="np. FA/SPACE2" style="font-family:'Space Mono',monospace;"></div>
+    <div class="fg"><label>Opis projektu</label><textarea placeholder="Opcjonalny opis..."></textarea></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-add-proj')">Anuluj</button>
+    <button class="btn btn-primary" onclick="closeModal('modal-add-proj');showToast('✔ Projekt dodany i przypisany do firmy')">＋ Utwórz projekt</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: TPL EDITOR -->
+<div class="overlay" id="modal-tpl-editor">
+<div class="modal wide">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.22);">📧</div>
+      <div><div class="mtitle" id="tpl-editor-title">Edytuj szablon e-mail</div><div class="msub" id="tpl-editor-sub">Globalne · B2C</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-tpl-editor')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="gr2">
+      <div class="fg">
+        <label>Typ szablonu <span class="req">*</span></label>
+        <select id="tpl-type">
+          <option>B2C — Faktura automatyczna po Imoje</option>
+          <option>B2B — Faktura wystawiana ręcznie</option>
+          <option>FK/ — Faktura korygująca</option>
+          <option>Przypomnienie o płatności</option>
+          <option>Potwierdzenie zapisu dziecka</option>
+          <option>Niestandardowy</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Firma (sprzedawca)</label>
+        <select id="tpl-firma">
+          <option value="global">🌐 Globalny — używany przez wszystkie firmy</option>
+          <option value="1">⭐ Global Leaders Skills Sp. z o.o. — nadpisuje globalny</option>
+          <option value="2">E-sklep Space Memory (Hrableuski) — nadpisuje globalny</option>
+          <option value="3">Oleksii Lubenets — nadpisuje globalny</option>
+        </select>
+        <div class="hint">Wybierz firmę jeśli ten szablon ma nadpisywać globalny tylko dla tej firmy</div>
+      </div>
+    </div>
+    <div class="fg">
+      <label>Temat wiadomości <span class="req">*</span></label>
+      <input type="text" id="tpl-subject" placeholder="np. Faktura {{nr_faktury}} — {{nazwa_firmy}}">
+    </div>
+    <div class="fg">
+      <label>Treść wiadomości <span class="req">*</span></label>
+      <textarea class="builder-area" id="tpl-body" placeholder="Treść e-mail...">Szanowna/ny {{imie_nazwisko}},
+
+w załączniku przesyłamy fakturę {{nr_faktury}} za {{opis_uslugi}} ({{miesiac}}).
+
+Kwota: {{kwota}} zł · Termin płatności: {{termin_platnosci}}
+
+W przypadku pytań prosimy o kontakt: {{email_firmy}}
+
+Dziękujemy za zaufanie,
+{{nazwa_firmy}}</textarea>
+    </div>
+    <div class="fg">
+      <label>Dostępne zmienne — kliknij aby wstawić do treści</label>
+      <div>
+        <span class="var-chip" onclick="insertVar('{{imie_nazwisko}}')">{{imie_nazwisko}}</span>
+        <span class="var-chip" onclick="insertVar('{{nr_faktury}}')">{{nr_faktury}}</span>
+        <span class="var-chip" onclick="insertVar('{{nr_korekty}}')">{{nr_korekty}}</span>
+        <span class="var-chip" onclick="insertVar('{{nr_oryginalu}}')">{{nr_oryginalu}}</span>
+        <span class="var-chip" onclick="insertVar('{{opis_uslugi}}')">{{opis_uslugi}}</span>
+        <span class="var-chip" onclick="insertVar('{{kwota}}')">{{kwota}}</span>
+        <span class="var-chip" onclick="insertVar('{{miesiac}}')">{{miesiac}}</span>
+        <span class="var-chip" onclick="insertVar('{{termin_platnosci}}')">{{termin_platnosci}}</span>
+        <span class="var-chip" onclick="insertVar('{{nazwa_firmy}}')">{{nazwa_firmy}}</span>
+        <span class="var-chip" onclick="insertVar('{{email_firmy}}')">{{email_firmy}}</span>
+        <span class="var-chip" onclick="insertVar('{{nazwa_firmy_klienta}}')">{{nazwa_firmy_klienta}}</span>
+        <span class="var-chip" onclick="insertVar('{{nip_klienta}}')">{{nip_klienta}}</span>
+        <span class="var-chip" onclick="insertVar('{{projekt}}')">{{projekt}}</span>
+        <span class="var-chip" onclick="insertVar('{{imie_dziecka}}')">{{imie_dziecka}}</span>
+        <span class="var-chip" onclick="insertVar('{{nazwa_grupy}}')">{{nazwa_grupy}}</span>
+        <span class="var-chip" onclick="insertVar('{{trener}}')">{{trener}}</span>
+        <span class="var-chip" onclick="insertVar('{{link_platnosci}}')">{{link_platnosci}}</span>
+      </div>
+      <div class="hint" style="margin-top:6px;">Zmienne B2B: {{nazwa_firmy_klienta}} {{nip_klienta}} · zmienne dla FK/: {{nr_korekty}} {{nr_oryginalu}} {{kwota_korekty}}</div>
+    </div>
+    <div class="div"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <button class="btn btn-ghost btn-sm" onclick="previewTpl()">👁 Podgląd z przykładowymi danymi</button>
+      <button class="btn btn-ghost btn-sm" onclick="showToast('Testowy e-mail wysłany na biuro@gls.edu.pl','info')">✉ Wyślij testowy</button>
+    </div>
+    <div class="ibox ibox-amber" id="tpl-preview-box" style="display:none;margin-top:12px;margin-bottom:0;">
+      <div class="ibox-icon">👁</div>
+      <div id="tpl-preview-content" style="font-size:11.5px;white-space:pre-wrap;"></div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-tpl-editor')">Anuluj</button>
+    <button class="btn btn-primary" onclick="saveTpl()">💾 Zapisz szablon</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: TPL NEW (shortcut → editor) -->
+<div class="overlay" id="modal-tpl-new">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.22);">＋</div>
+      <div><div class="mtitle">Nowy szablon e-mail</div><div class="msub">Wybierz typ — otworzysz pełny konstruktor</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-tpl-new')">✕</div>
+  </div>
+  <div class="mbody">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div class="tpl-card" style="cursor:pointer;" onclick="closeModal('modal-tpl-new');openTplEditor('new-b2c')">
+        <div class="tpl-top"><span class="ftag" style="background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.2);">B2C</span><div><div style="font-size:12.5px;font-weight:700;">Faktura automatyczna B2C</div><div style="font-size:10.5px;color:var(--dim);">Po płatności przez Imoje</div></div><span style="margin-left:auto;font-size:18px;color:var(--dim);">›</span></div>
+      </div>
+      <div class="tpl-card" style="cursor:pointer;" onclick="closeModal('modal-tpl-new');openTplEditor('new-b2b')">
+        <div class="tpl-top"><span class="ftag" style="background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);">B2B</span><div><div style="font-size:12.5px;font-weight:700;">Faktura B2B (ręczna)</div><div style="font-size:10.5px;color:var(--dim);">Dla firm — z NIP nabywcy</div></div><span style="margin-left:auto;font-size:18px;color:var(--dim);">›</span></div>
+      </div>
+      <div class="tpl-card" style="cursor:pointer;" onclick="closeModal('modal-tpl-new');openTplEditor('new-fk')">
+        <div class="tpl-top"><span class="ftag" style="background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);">FK/</span><div><div style="font-size:12.5px;font-weight:700;">Faktura korygująca</div><div style="font-size:10.5px;color:var(--dim);">Zwrot lub korekta</div></div><span style="margin-left:auto;font-size:18px;color:var(--dim);">›</span></div>
+      </div>
+      <div class="tpl-card" style="cursor:pointer;" onclick="closeModal('modal-tpl-new');openTplEditor('new-reminder')">
+        <div class="tpl-top"><span class="ftag" style="background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2);">⚠</span><div><div style="font-size:12.5px;font-weight:700;">Przypomnienie o płatności</div><div style="font-size:10.5px;color:var(--dim);">Wysyłane do dłużników</div></div><span style="margin-left:auto;font-size:18px;color:var(--dim);">›</span></div>
+      </div>
+      <div class="tpl-card" style="cursor:pointer;" onclick="closeModal('modal-tpl-new');openTplEditor('new-custom')">
+        <div class="tpl-top"><span class="ftag ft-arch">✏</span><div><div style="font-size:12.5px;font-weight:700;">Niestandardowy</div><div style="font-size:10.5px;color:var(--dim);">Własny typ i nazwa</div></div><span style="margin-left:auto;font-size:18px;color:var(--dim);">›</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-tpl-new')">Anuluj</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL: ADD VAT RATE -->
+<div class="overlay" id="modal-add-vat">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico" style="background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);">📋</div>
+      <div><div class="mtitle" id="vat-modal-title">Dodaj stawkę VAT</div><div class="msub">Nowa stawka · zostanie dodana do listy</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-add-vat')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="gr2">
+      <div class="fg">
+        <label>Stawka VAT <span class="req">*</span></label>
+        <select id="vat-rate" onchange="toggleVatCustom(this)">
+          <option>ZW (zwolnienie)</option><option>0%</option><option>5%</option>
+          <option>8%</option><option>23%</option><option>Niestandardowa</option>
+        </select>
+      </div>
+      <div class="fg" id="vat-custom-field" style="display:none;">
+        <label>Własna stawka % <span class="req">*</span></label>
+        <input type="number" id="vat-custom-pct" placeholder="np. 4" min="0" max="100" step="0.5" style="font-family:'Space Mono',monospace;">
+        <div class="hint">Wpisz dowolną stawkę procentową</div>
+      </div>
+      <div class="fg span2">
+        <label>Opis / Nazwa usługi <span class="req">*</span></label>
+        <input type="text" id="vat-desc" placeholder="np. Usługi komercyjne dla firm spoza UE">
+      </div>
+      <div class="fg">
+        <label>Kod PKWiU</label>
+        <input type="text" placeholder="np. 85.59.19.0" style="font-family:'Space Mono',monospace;">
+      </div>
+      <div class="fg">
+        <label>Typ klienta</label>
+        <select>
+          <option>B2C + B2B</option><option>B2C (tylko osoby prywatne)</option><option>B2B (tylko firmy)</option><option>B2B eksport</option>
+        </select>
+      </div>
+      <div class="fg span2">
+        <label>Podstawa prawna (opcjonalnie)</label>
+        <input type="text" placeholder="np. art. 43 ust. 1 pkt 26 lit. b">
+      </div>
+      <div class="fg">
+        <label>Przypisz do firmy</label>
+        <select>
+          <option value="global">🌐 Globalny — wszystkie firmy</option>
+          <option value="1">⭐ Global Leaders Skills Sp. z o.o.</option>
+          <option value="2">E-sklep Space Memory (Hrableuski)</option>
+          <option value="3">Oleksii Lubenets (JDG)</option>
+        </select>
+      </div>
+    </div>
+    <div class="trow"><div><div class="tl">Ustaw jako domyślną stawkę</div><div class="th">Używana automatycznie gdy brak innego dopasowania</div></div><label class="tog"><input type="checkbox"><div class="tsl g"></div></label></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-add-vat')">Anuluj</button>
+    <button class="btn btn-primary" onclick="saveVAT()">💾 Dodaj stawkę</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── NAV ──────────────────────────────────── */
+function showPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
+  document.querySelectorAll('.sni').forEach(n=>n.classList.remove('act','purple','amber','green','cyan'));
+  document.getElementById('panel-'+id).classList.add('act');
+  const ni=document.getElementById('nav-'+id);
+  if(ni){
+    ni.classList.add('act');
+    const c={projekty:'green',konta:'green',logo:'purple',serie:'blue',szablony:'cyan',vat:'amber',users:'purple',integracje:'cyan',eksport:'amber'};
+    if(c[id]) ni.classList.add(c[id]);
+  }
+}
+
+/* ── MODALS ───────────────────────────────── */
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+}
+document.querySelectorAll('.overlay').forEach(o=>{
+  o.addEventListener('click',e=>{ if(e.target===o) closeModal(o.id); });
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape') document.querySelectorAll('.overlay.open').forEach(o=>closeModal(o.id));
+});
+
+/* ── FIRMA CARD ───────────────────────────── */
+function toggleMore(id){
+  const menu=document.getElementById('mm-'+id);
+  document.querySelectorAll('.more-menu').forEach(m=>{ if(m!==menu) m.classList.remove('open'); });
+  menu?.classList.toggle('open');
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.more-wrap')) document.querySelectorAll('.more-menu').forEach(m=>m.classList.remove('open'));
+});
+
+function openFirmaModal(mode, id){
+  const titles={new:'Dodaj firmę',edit:'Edytuj firmę',dup:'Duplikuj firmę'};
+  const subs={new:'Nowy sprzedawca · dane będą drukowane na fakturach',edit:'Zmiany obowiązują od następnej wystawionej faktury',dup:'Skopiowane dane · zmień NIP przed zapisem'};
+  document.getElementById('mf-title').textContent=titles[mode];
+  document.getElementById('mf-sub').textContent=subs[mode];
+  if(mode==='new'){ document.getElementById('mf-name').value=''; document.getElementById('mf-nip').value=''; document.getElementById('mf-nip-hint').textContent=''; }
+  if(mode==='dup') showToast('Dane firmy skopiowane · zmień NIP przed zapisem','warn');
+  openModal('modal-firma');
+}
+
+function saveFirma(){
+  const n=document.getElementById('mf-name').value.trim();
+  if(!n){ showToast('Wprowadź nazwę firmy','err'); return; }
+  closeModal('modal-firma');
+  showToast('✔ Firma zapisana — pojawi się na liście sprzedawców');
+}
+
+function setDefaultFirma(id){
+  document.querySelectorAll('.firma-card:not(.firma-archived) .ft-def').forEach(b=>b.remove());
+  const card=document.getElementById('fc-'+id);
+  if(card){
+    const tags=card.querySelector('.firma-tags');
+    const b=document.createElement('span');
+    b.className='ftag ft-def'; b.textContent='⭐ DOMYŚLNA';
+    tags.prepend(b);
+  }
+  showToast('✔ Firma domyślna zmieniona · dotyczy nowych faktur');
+}
+
+function archiveFirma(id){
+  document.getElementById('fc-'+id)?.classList.add('firma-archived');
+  showToast('Firma zarchiwizowana · można przywrócić w każdej chwili','warn');
+}
+
+function restoreFirma(id){
+  document.getElementById('fc-'+id)?.classList.remove('firma-archived');
+  showToast('✔ Firma przywrócona');
+}
+
+/* ── NIP VALIDATION (modal) ──────────────── */
+function mfValidateNIP(el){
+  const v=el.value.replace(/[^0-9]/g,'');
+  const h=document.getElementById('mf-nip-hint');
+  if(v.length===10){
+    const w=[6,5,7,2,3,4,5,6,7];
+    const sum=w.reduce((s,ww,i)=>s+ww*parseInt(v[i]),0);
+    const ok=(sum%11)===parseInt(v[9]);
+    h.textContent=ok?'✓ NIP poprawny':'✕ Błędny NIP — suma kontrolna nieprawidłowa';
+    h.style.color=ok?'var(--green)':'var(--red)';
+  } else {
+    h.textContent=v.length?'NIP: '+v.length+'/10 cyfr':'';
+    h.style.color='var(--dim)';
+  }
+}
+
+/* ── VAT TOGGLE (modal) ──────────────────── */
+function mfSetVAT(mode){
+  document.getElementById('mf-zw').className='vat-opt'+(mode==='zw'?' sel-zw':'');
+  document.getElementById('mf-vat').className='vat-opt'+(mode==='vat'?' sel-vat':'');
+}
+
+/* ── PROJEKTY → FIRMY ────────────────────── */
+function onProjChange(sel, proj){
+  if(sel.value==='new'){
+    sel.value=sel.options[0].value;
+    openFirmaModal('new');
+    return;
+  }
+  const td=sel.closest('tr')?.querySelector('td:last-child');
+  if(td){
+    const names={1:'Domyślna',2:'E-sklep SM',3:'O. Lubenets'};
+    const colors={1:'b-ok',2:''};
+    td.innerHTML='<span class="badge '+(sel.value==='1'?'b-ok':'')+(sel.value==='2'?'style="background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);"':'')+'" style="font-size:9px;">'+(names[sel.value]||'')+'</span>';
+  }
+  showToast('✔ Zmiana zapisana · nowe faktury tego projektu użyją wybranej firmy');
+}
+
+/* ── KONTA BANKOWE ───────────────────────── */
+function setDefaultAcc(id){
+  document.querySelectorAll('.acc-badge').forEach(b=>b.remove());
+  const row=document.getElementById(id);
+  if(row){
+    const b=document.createElement('div');
+    b.className='acc-badge'; b.textContent='DOMYŚLNE';
+    row.insertBefore(b, row.querySelector('button'));
+  }
+  showToast('✔ Konto domyślne zmienione');
+}
+function removeAcc(id){
+  const r=document.getElementById(id);
+  if(r){ r.style.opacity='0'; r.style.transform='translateX(20px)'; r.style.transition='all .3s'; setTimeout(()=>r.remove(),300); }
+  showToast('Konto bankowe usunięte','warn');
+}
+function addAccount(){
+  const iban=document.getElementById('new-iban').value.trim();
+  if(!iban){ showToast('Wprowadź numer IBAN','err'); return; }
+  const bank=document.getElementById('new-bank').value||'';
+  const desc=document.getElementById('new-bank-desc').value||'';
+  closeModal('modal-add-acc');
+  showToast('✔ Konto bankowe '+iban.slice(0,12)+'... dodane');
+}
+
+/* ── LOGO ────────────────────────────────── */
+function triggerLogoUpload(){ document.getElementById('logo-input').click(); }
+function handleLogoUpload(inp){
+  if(!inp.files[0]) return;
+  const r=new FileReader();
+  r.onload=e=>{ document.getElementById('logo-preview').innerHTML='<img src="'+e.target.result+'" style="max-width:100%;max-height:100%;border-radius:6px;">'; };
+  r.readAsDataURL(inp.files[0]);
+  showToast('✔ Logo wgrane — zapisz aby zastosować');
+}
+function syncColor(el, targetId){
+  const val=el.value;
+  const other=document.getElementById(targetId);
+  if(other && other.value!==val) other.value=val;
+}
+
+/* ── UŻYTKOWNICY ─────────────────────────── */
+const ROLE_DESC = {
+  'Super-Admin':'Pełen dostęp do całego systemu · edycja uprawnień · usuwanie danych · Super-Admin nie może być usunięty.',
+  'Admin':'Dostęp do wszystkich modułów oprócz ustawień uprawnień i trwałego usuwania danych.',
+  'Kierownik działu rekrutacji':'Zarządzanie listą uczniów · dodawanie / edycja · pauzowanie i rezygnacje · widok raportów rekrutacji.',
+  'Dział rekrutacji uczniów':'Dodawanie uczniów · edycja danych · notatki po rozmowach · bez dostępu do finansów.',
+  'Kierownik Działu Jakości Space':'Pełen dostęp do modułu Jakości dla Space Memory · workflow rezygnacji · analityka · zarządzanie trenerami Space.',
+  'Dział Jakości Space':'Workflow rezygnacji i powrotów dla Space Memory · notatki · obecność · bez dostępu do finansów.',
+  'Kierownik Działu Jakości INDIGO':'Pełen dostęp do modułu Jakości dla INDIGO · workflow rezygnacji · analityka · zarządzanie trenerami INDIGO.',
+  'Dział Jakości INDIGO':'Workflow rezygnacji i powrotów dla INDIGO · notatki · obecność · bez dostępu do finansów.',
+  'Trener Space Memory':'Widok własnych grup · dziennik lekcji · tracker · brak dostępu do finansów innych uczniów.',
+  'Trener INDIGO':'Widok własnych grup INDIGO · dziennik lekcji · techniki dodatkowe · brak dostępu do finansów.',
+  'Główna Księgowa':'Dostęp do całego modułu finansów · zwroty · wypłaty trenerów · eksport Comarch · KSeF · firmy.',
+  'Pracownik działu finansów i administracji':'Płatności · faktury · eksport · bez zatwierdzania zwrotów.',
+  'Kierownik działu finansów i administracji':'Jak Główna Księgowa + zatwierdzanie zwrotów · bez ustawień systemu.',
+  'Pracownik sekretariatu':'Lista uczniów · grupy · pauzowanie · notatki · podgląd płatności (bez edycji).',
+  'HR':'Zarządzanie użytkownikami systemu · kartoteki pracowników · brak dostępu do finansów i danych uczniów.',
+};
+
+function onRoleChange(){
+  const r=document.getElementById('mu-rola').value;
+  const info=document.getElementById('mu-role-info');
+  const desc=document.getElementById('mu-role-desc');
+  if(ROLE_DESC[r]){ desc.textContent=ROLE_DESC[r]; info.style.display='block'; }
+  else info.style.display='none';
+}
+
+function toggleProj(el){
+  el.classList.toggle('sel');
+  // deselect "all"
+  document.querySelector('.mpj[data-val="all"]')?.classList.remove('sel');
+}
+function toggleProjAll(el){
+  const sel=el.classList.contains('sel');
+  document.querySelectorAll('.mpj:not([data-val="all"])').forEach(p=>p.classList.remove('sel'));
+  el.classList.toggle('sel',!sel);
+}
+
+function openAddUser(){
+  document.getElementById('mu-title').textContent='Dodaj użytkownika';
+  document.getElementById('mu-sub').textContent='Nowe konto · zaproszenie e-mail zostanie wysłane automatycznie';
+  document.getElementById('mu-imie').value='';
+  document.getElementById('mu-nazwisko').value='';
+  document.getElementById('mu-email').value='';
+  document.getElementById('mu-btn').textContent='＋ Dodaj użytkownika';
+  document.getElementById('mu-btn').onclick=function(){ saveUser(false); };
+  document.getElementById('mu-role-info').style.display='none';
+  openModal('modal-add-user');
+}
+function openEditUser(initials, name, role, email){
+  document.getElementById('mu-title').textContent='Edytuj: '+name;
+  document.getElementById('mu-sub').textContent='Zmiana hasła wymaga nowego zaproszenia';
+  document.getElementById('mu-imie').value=name.split(' ')[0];
+  document.getElementById('mu-nazwisko').value=name.split(' ').slice(1).join(' ');
+  document.getElementById('mu-email').value=email||'';
+  const roleEl=document.getElementById('mu-rola');
+  for(let o of roleEl.options){ if(o.value===role){ o.selected=true; break; } }
+  onRoleChange();
+  document.getElementById('mu-btn').textContent='💾 Zapisz zmiany';
+  document.getElementById('mu-btn').onclick=function(){ saveUser(true); };
+  openModal('modal-add-user');
+}
+function saveUser(edit){
+  const n=document.getElementById('mu-imie').value.trim();
+  if(!n){ showToast('Wprowadź imię użytkownika','err'); return; }
+  closeModal('modal-add-user');
+  showToast(edit?'✔ Dane użytkownika zaktualizowane':'✔ Użytkownik dodany · zaproszenie wysłane');
+  document.getElementById('mu-btn').textContent='＋ Dodaj użytkownika';
+  document.getElementById('mu-btn').onclick=function(){ saveUser(false); };
+  document.getElementById('mu-title').textContent='Dodaj użytkownika';
+}
+function confirmDeleteUser(name){ if(confirm('Usunąć użytkownika '+name+'?')) showToast('Użytkownik '+name+' usunięty','warn'); }
+
+function showUsersTab(tab){
+  document.getElementById('users-list-tab').style.display=tab==='list'?'block':'none';
+  document.getElementById('users-perm-tab').style.display=tab==='permissions'?'block':'none';
+  document.getElementById('utab-list').className='users-tab'+(tab==='list'?' act':'');
+  document.getElementById('utab-permissions').className='users-tab'+(tab==='permissions'?' act':'');
+}
+function filterUsers(){ /* demo: no actual filter */ }
+
+/* ── SZABLONY E-MAIL ─────────────────────── */
+function filterTemplates(){
+  const f=document.getElementById('tpl-filter-firma').value;
+  const t=document.getElementById('tpl-filter-type').value;
+  document.querySelectorAll('.tpl-card').forEach(c=>{
+    const mf=!f||c.dataset.firma===f;
+    const mt=!t||c.dataset.type===t;
+    c.style.display=(mf&&mt)?'':'none';
+  });
+}
+function openTplEditor(id){
+  const titles={
+    'global-b2c':'B2C — Faktura automatyczna','global-b2b':'B2B — Faktura ręczna',
+    'global-korekta':'FK/ — Faktura korygująca','gls2-b2c':'B2C — E-sklep SM Hrableuski',
+    'new-b2c':'Nowy szablon B2C','new-b2b':'Nowy szablon B2B',
+    'new-fk':'Nowy szablon FK/','new-reminder':'Nowy szablon — Przypomnienie',
+    'new-custom':'Nowy szablon niestandardowy'
+  };
+  document.getElementById('tpl-editor-title').textContent=titles[id]||'Edytuj szablon';
+  document.getElementById('tpl-editor-sub').textContent='ID: '+id;
+  openModal('modal-tpl-editor');
+}
+function insertVar(v){
+  const ta=document.getElementById('tpl-body');
+  const start=ta.selectionStart, end=ta.selectionEnd;
+  ta.value=ta.value.slice(0,start)+v+ta.value.slice(end);
+  ta.selectionStart=ta.selectionEnd=start+v.length;
+  ta.focus();
+}
+function previewTpl(){
+  const body=document.getElementById('tpl-body').value;
+  const preview=body
+    .replace(/{{imie_nazwisko}}/g,'Jan Kowalski')
+    .replace(/{{nr_faktury}}/g,'FA/SPACE/043/2025/05')
+    .replace(/{{opis_uslugi}}/g,'Space Memory — abonament')
+    .replace(/{{kwota}}/g,'489,00')
+    .replace(/{{miesiac}}/g,'maj 2025')
+    .replace(/{{termin_platnosci}}/g,'30.05.2025')
+    .replace(/{{nazwa_firmy}}/g,'Global Leaders Skills Sp. z o.o.')
+    .replace(/{{email_firmy}}/g,'faktury@gls.edu.pl')
+    .replace(/{{nazwa_firmy_klienta}}/g,'ABC Sp. z o.o.')
+    .replace(/{{nip_klienta}}/g,'111-222-33-44')
+    .replace(/{{imie_dziecka}}/g,'Zosia Kowalska')
+    .replace(/{{nazwa_grupy}}/g,'SM-Wawa-01')
+    .replace(/{{trener}}/g,'Anna Malinowska')
+    .replace(/{{link_platnosci}}/g,'https://pay.imoje.pl/...');
+  const box=document.getElementById('tpl-preview-box');
+  document.getElementById('tpl-preview-content').textContent=preview;
+  box.style.display='flex';
+}
+function saveTpl(){
+  const s=document.getElementById('tpl-subject').value.trim();
+  if(!s){ showToast('Wprowadź temat wiadomości','err'); return; }
+  closeModal('modal-tpl-editor');
+  showToast('✔ Szablon e-mail zapisany');
+}
+
+function toggleVatCustom(sel){
+  const isCustom = sel.value === 'Niestandardowa';
+  const field = document.getElementById('vat-custom-field');
+  field.style.display = isCustom ? 'block' : 'none';
+  // adjust grid: if custom shown, span2 for desc field should still work
+  if(isCustom) field.style.gridColumn = '2';
+}
+
+function setVatFirma(el, firma){
+  document.querySelectorAll('.vat-ftab').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act');
+  const labels={'global':'Globalny · obowiązuje dla wszystkich firm bez własnych ustawień','1':'GLS Sp. z o.o. · nadpisuje stawki globalne dla tej firmy','2':'E-sklep Space Memory (Hrableuski) · nadpisuje stawki globalne dla tej firmy'};
+  document.getElementById('vat-firma-label').textContent=labels[firma]||'';
+}
+function openEditVAT(rate){ showToast('Edycja stawki '+rate+' — konstruktor w pełnej wersji','info'); }
+function saveVAT(){
+  const d=document.getElementById('vat-desc').value.trim();
+  if(!d){ showToast('Wprowadź opis stawki','err'); return; }
+  closeModal('modal-add-vat');
+  showToast('✔ Stawka VAT dodana do listy');
+}
+
+
+/* ── TOAST ───────────────────────────────── */
+let toastT;
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast'+(type?' '+type:'');
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>t.classList.remove('show'),3400);
+}
+</script>
+</body>
+</html>

@@ -35,7 +35,7 @@
           <tr v-for="row in attendance.items" :key="row.id">
             <td class="mono" style="color:var(--dim)">{{ row.num }}</td>
             <td class="mono">{{ row.date }}</td>
-            <td style="font-size:12px;color:var(--dim)">{{ row.topic }}</td>
+            <td style="font-size:12px;color:var(--dim)">{{ formatTopic(row.topic) }}</td>
             <td style="font-size:12px">{{ row.trainer }}</td>
             <td>
               <span class="att-mark" :class="markClass(row.mark)" @click="openMark(row)" :title="t('attendance.change')">
@@ -74,6 +74,14 @@ function markIcon(mark: string) {
 
 function markClass(mark: string) {
   return ({ present: "mark-present", absent: "mark-absent", late: "mark-late", makeup: "mark-makeup", empty: "mark-empty" } as any)[mark] ?? "mark-empty";
+}
+
+function formatTopic(topic: string) {
+  if (topic === 'Скорость ×5') return t('attendance.topics.speed5');
+  if (topic === 'Зачёт блок 3') return t('attendance.topics.exam3');
+  if (topic === '80 карт') return t('attendance.topics.cards80');
+  if (topic === 'Ассоциации') return t('attendance.topics.assoc');
+  return topic;
 }
 
 onMounted(() => {

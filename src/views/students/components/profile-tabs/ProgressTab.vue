@@ -7,9 +7,9 @@
     <template v-else-if="progress">
       <div class="kpi-grid">
         <div class="kpi-card" v-for="k in progress.kpi" :key="k.id">
-          <div class="kpi-title">{{ k.title }}</div>
+          <div class="kpi-title">{{ formatKpiTitle(k.title) }}</div>
           <div class="kpi-val">{{ k.value }}</div>
-          <div class="kpi-hint">{{ k.hint }}</div>
+          <div class="kpi-hint">{{ formatKpiHint(k.hint) }}</div>
         </div>
       </div>
 
@@ -41,6 +41,20 @@ onMounted(() => {
   const studentId = route.params.id as string;
   if (studentId) st.loadProgress(studentId);
 });
+
+function formatKpiTitle(title: string) {
+  if (title === 'Скорость запоминания') return t('progress.kpi.speed');
+  if (title === 'Точность') return t('progress.kpi.accuracy');
+  if (title === 'Домашние') return t('progress.kpi.homework');
+  return title;
+}
+
+function formatKpiHint(hint: string) {
+  if (hint === 'февраль 2026') return t('progress.kpi.february');
+  if (hint === 'последние 4 занятия') return t('progress.kpi.last4');
+  if (hint === 'за месяц') return t('progress.kpi.month');
+  return hint;
+}
 </script>
 
 <style scoped>

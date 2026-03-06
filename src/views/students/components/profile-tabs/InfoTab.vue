@@ -1,18 +1,18 @@
 <template>
   <div class="info-tab">
     <div v-if="!paymentsStore.student" class="loading-placeholder">
-      Загрузка данных...
+      {{ t('info.loadingData') }}
     </div>
     <template v-else>
-      <div class="sp-section-title">Основные данные ученика</div>
+      <div class="sp-section-title">{{ t('info.studentSection') }}</div>
       <div class="sp-field" style="margin-bottom:10px">
-        <div class="sp-field-label">Email</div>
+        <div class="sp-field-label">{{ t('info.email') }}</div>
         <input class="sp-input" type="email" v-model="formData.email">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="sp-field"><div class="sp-field-label">Имя</div><input class="sp-input" v-model="formData.firstName"></div>
-        <div class="sp-field"><div class="sp-field-label">Фамилия</div><input class="sp-input" v-model="formData.lastName"></div>
-        <div class="sp-field"><div class="sp-field-label">Дата рождения</div><input class="sp-input" type="date" v-model="formData.birthDate"></div>
+        <div class="sp-field"><div class="sp-field-label">{{ t('info.fullName') }} ({{ t('info.studentData') }})</div><input class="sp-input" v-model="formData.firstName"></div>
+        <div class="sp-field"><div class="sp-field-label">{{ t('info.fullName') }}</div><input class="sp-input" v-model="formData.lastName"></div>
+        <div class="sp-field"><div class="sp-field-label">{{ t('info.birthDate') }}</div><input class="sp-input" type="date" v-model="formData.birthDate"></div>
         <div class="sp-field"><div class="sp-field-label">Страна</div><input class="sp-input" v-model="formData.country"></div>
         <div class="sp-field"><div class="sp-field-label">Город</div><input class="sp-input" v-model="formData.city"></div>
         <div class="sp-field"><div class="sp-field-label">Улица и номер дома</div><input class="sp-input" v-model="formData.street"></div>
@@ -20,25 +20,25 @@
         <div class="sp-field"><div class="sp-field-label">Почтовый код</div><input class="sp-input" v-model="formData.postalCode"></div>
       </div>
 
-      <div class="sp-section-title" style="margin-top:20px">Данные родителя</div>
+      <div class="sp-section-title" style="margin-top:20px">{{ t('info.parentSection') }}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div class="sp-field"><div class="sp-field-label">Имя</div><input class="sp-input" v-model="formData.parentFirstName"></div>
-        <div class="sp-field"><div class="sp-field-label">Фамилия</div><input class="sp-input" v-model="formData.parentLastName"></div>
-        <div class="sp-field"><div class="sp-field-label">Номер телефона</div><input class="sp-input" type="tel" v-model="formData.parentPhone"></div>
+        <div class="sp-field"><div class="sp-field-label">{{ t('info.fullName') }} ({{ t('info.parentData') }})</div><input class="sp-input" v-model="formData.parentFirstName"></div>
+        <div class="sp-field"><div class="sp-field-label">{{ t('info.fullName') }}</div><input class="sp-input" v-model="formData.parentLastName"></div>
+        <div class="sp-field"><div class="sp-field-label">{{ t('info.phone') }}</div><input class="sp-input" type="tel" v-model="formData.parentPhone"></div>
         <div class="sp-field"><div class="sp-field-label">ID паспорта</div><input class="sp-input" v-model="formData.parentPassport"></div>
       </div>
 
-      <div class="sp-section-title" style="margin-top:20px">Прочее</div>
+      <div class="sp-section-title" style="margin-top:20px">{{ t('info.otherSection') }}</div>
       <div class="sp-toggle-row">
-        <span class="sp-toggle-label">📷 Согласие на фото- и видеосъёмку</span>
+        <span class="sp-toggle-label">{{ t('info.photoConsent') }}</span>
         <div class="sp-toggle" :class="{ on: formData.photoConsent }" @click="formData.photoConsent = !formData.photoConsent"></div>
       </div>
       <div class="sp-field" style="margin-top:12px">
-        <div class="sp-field-label">Комментарий при регистрации</div>
+        <div class="sp-field-label">{{ t('info.regComment') }}</div>
         <textarea class="sp-textarea" v-model="formData.regComment"></textarea>
       </div>
       <div style="margin-top:16px">
-        <button class="btn btn-primary" style="width:100%;justify-content:center" @click="saveChanges">✓ Сохранить изменения</button>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" @click="saveChanges">{{ t('info.save') }}</button>
       </div>
     </template>
   </div>
@@ -46,8 +46,10 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePaymentsStore } from '../../../../stores/payments.store'
 
+const { t } = useI18n()
 const paymentsStore = usePaymentsStore()
 const formData = ref<any>({})
 

@@ -2,27 +2,27 @@
   <div class="content">
     <div class="stats-grid">
       <div class="stat-card blue">
-        <div class="stat-label">Активных учеников</div>
+        <div class="stat-label">{{ t('studentList.stats.activeStudents') }}</div>
         <div class="stat-value">{{ students.length }}</div>
-        <div class="stat-sub">всего в системе</div>
+        <div class="stat-sub">{{ t('studentList.stats.totalInSystem') }}</div>
         <div class="stat-icon">👩‍🚀</div>
       </div>
       <div class="stat-card green">
-        <div class="stat-label">Оплачено сейчас</div>
+        <div class="stat-label">{{ t('studentList.stats.paidNow') }}</div>
         <div class="stat-value">{{ students.filter(s => s.paid).length }}</div>
-        <div class="stat-sub"><span class="up">↑ активные</span></div>
+        <div class="stat-sub"><span class="up">↑ {{ t('studentList.stats.active') }}</span></div>
         <div class="stat-icon">✅</div>
       </div>
       <div class="stat-card amber">
-        <div class="stat-label">Среднее обучение</div>
+        <div class="stat-label">{{ t('studentList.stats.avgTraining') }}</div>
         <div class="stat-value">124</div>
-        <div class="stat-sub"><span class="warn">дней средний срок</span></div>
+        <div class="stat-sub"><span class="warn">{{ t('studentList.stats.avgDays') }}</span></div>
         <div class="stat-icon">⏱</div>
       </div>
       <div class="stat-card cyan">
-        <div class="stat-label">Без контакта 7+ дней</div>
+        <div class="stat-label">{{ t('studentList.stats.noContact7') }}</div>
         <div class="stat-value">{{ students.filter(s => s.daysSinceContact >= 7).length }}</div>
-        <div class="stat-sub">требуют внимания</div>
+        <div class="stat-sub">{{ t('studentList.stats.requireAttention') }}</div>
         <div class="stat-icon">⚠️</div>
       </div>
     </div>
@@ -30,21 +30,21 @@
     <div class="table-toolbar">
       <div class="toolbar-left">
         <div class="section-title">
-          Список учеников
-          <span class="section-count">{{ students.length }} учеников</span>
+          {{ t('studentList.toolbar.listTitle') }}
+          <span class="section-count">{{ t('common.studentsCount', { n: students.length }) }}</span>
         </div>
         <div class="filter-chips">
           <div class="chip">
-            <span class="chip-dot amber"></span> Без контакта 7+ дней
+            <span class="chip-dot amber"></span> {{ t('studentList.toolbar.noContact7') }}
           </div>
           <div class="chip">
-            <span class="chip-dot blue"></span> Только мои
+            <span class="chip-dot blue"></span> {{ t('studentList.toolbar.onlyMine') }}
           </div>
         </div>
       </div>
       <div style="display:flex; gap:8px;">
-        <button class="dropdown-filter-btn">Группа ▾</button>
-        <button class="dropdown-filter-btn">Учитель ▾</button>
+        <button class="dropdown-filter-btn">{{ t('studentList.toolbar.group') }} ▾</button>
+        <button class="dropdown-filter-btn">{{ t('studentList.toolbar.teacher') }} ▾</button>
       </div>
     </div>
 
@@ -53,22 +53,22 @@
         <thead>
           <tr>
             <th @click="sortBy('name')" style="cursor:pointer; user-select:none">
-              Имя Фамилия <span class="sort-icon" :style="{ color: sortCol === 'name' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'name' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+              {{ t('studentList.table.name') }} <span class="sort-icon" :style="{ color: sortCol === 'name' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'name' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
             </th>
             <th @click="sortBy('startDate')" style="cursor:pointer; user-select:none">
-              Дата старта <span class="sort-icon" :style="{ color: sortCol === 'startDate' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'startDate' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+              {{ t('studentList.table.startDate') }} <span class="sort-icon" :style="{ color: sortCol === 'startDate' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'startDate' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
             </th>
             <th @click="sortBy('daysInSystem')" style="cursor:pointer; user-select:none">
-              Срок обучения <span class="sort-icon" :style="{ color: sortCol === 'daysInSystem' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'daysInSystem' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+              {{ t('studentList.table.trainingTerm') }} <span class="sort-icon" :style="{ color: sortCol === 'daysInSystem' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'daysInSystem' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th>Школа</th>
-            <th>Учитель</th>
-            <th>Группа</th>
+            <th>{{ t('studentList.table.school') }}</th>
+            <th>{{ t('studentList.table.teacher') }}</th>
+            <th>{{ t('studentList.table.group') }}</th>
             <th @click="sortBy('lastContact')" style="cursor:pointer; user-select:none">
-              Последний контакт <span class="sort-icon" :style="{ color: sortCol === 'lastContact' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'lastContact' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+              {{ t('studentList.table.lastContact') }} <span class="sort-icon" :style="{ color: sortCol === 'lastContact' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'lastContact' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th>Кто общался</th>
-            <th class="comment-header">Последний комментарий</th>
+            <th>{{ t('studentList.table.whoTalked') }}</th>
+            <th class="comment-header">{{ t('studentList.table.lastComment') }}</th>
             <th class="actions-header">···</th>
           </tr>
         </thead>
@@ -86,7 +86,7 @@
                 <span class="timer-days" :class="{ 'high-alert': (student.daysSinceContact || 0) > 10 }">
                   {{ student.daysInSystem || 0 }}
                 </span>
-                <span class="timer-label">дней</span>
+                <span class="timer-label">{{ t('common.daysCount', { n: student.daysInSystem || 0 }) }}</span>
               </div>
             </td>
             <td>
@@ -131,11 +131,11 @@
               <div class="actions-wrap" @click.stop>
                 <button class="actions-btn" @click="toggleDropdown(student.id)">⋮</button>
                 <div class="actions-dropdown" :class="{ open: activeDropdownId === student.id }">
-                  <div class="action-item" @click="openStudent(student.id); activeDropdownId = null">👤 Открыть профиль</div>
-                  <div class="action-item" @click="openContactModal(student); activeDropdownId = null">📅 Обновить контакт</div>
-                  <div class="action-item" @click="activeDropdownId = null">👤 Сменить куратора</div>
-                  <div class="action-item" @click="activeDropdownId = null">📧 Отправить Email</div>
-                  <div class="action-item danger" @click="activeDropdownId = null">📦 В архив</div>
+                  <div class="action-item" @click="openStudent(student.id); activeDropdownId = null">👤 {{ t('studentList.actions.openProfile') }}</div>
+                  <div class="action-item" @click="openContactModal(student); activeDropdownId = null">📅 {{ t('studentList.actions.updateContact') }}</div>
+                  <div class="action-item" @click="activeDropdownId = null">👤 {{ t('studentList.actions.changeManager') }}</div>
+                  <div class="action-item" @click="activeDropdownId = null">📧 {{ t('studentList.actions.sendEmail') }}</div>
+                  <div class="action-item danger" @click="activeDropdownId = null">📦 {{ t('studentList.actions.toArchive') }}</div>
                 </div>
               </div>
             </td>
@@ -147,21 +147,21 @@
     <!-- Модальное окно "Контакт" -->
     <div class="modal-backdrop" :class="{ active: isContactModalOpen }" @click.self="closeContactModal">
       <div class="modal">
-        <div class="popup-title">Редактировать контакт: {{ editingStudent?.name }}</div>
-        <div class="popup-sub">Обновите дату последнего контакта и добавьте комментарий</div>
+        <div class="popup-title">{{ t('studentList.modal.editContact', { name: editingStudent?.name }) }}</div>
+        <div class="popup-sub">{{ t('studentList.modal.sub') }}</div>
 
         <div class="popup-label-row">
-          <label class="popup-label">Дата и время контакта</label>
-          <button class="quick-date-btn" @click="setNow">⚡ Только что</button>
+          <label class="popup-label">{{ t('studentList.modal.dateTime') }}</label>
+          <button class="quick-date-btn" @click="setNow">⚡ {{ t('studentList.modal.justNow') }}</button>
         </div>
         <input type="datetime-local" v-model="contactDateTimeForm" class="modal-input">
 
-        <label class="popup-label">Комментарий</label>
-        <input type="text" v-model="contactCommentForm" class="popup-input" placeholder="Введите текст...">
+        <label class="popup-label">{{ t('studentList.modal.comment') }}</label>
+        <input type="text" v-model="contactCommentForm" class="popup-input" :placeholder="t('studentList.modal.commentPlaceholder')">
 
         <div class="popup-actions">
-          <button class="btn btn-ghost" @click="closeContactModal">Отмена</button>
-          <button class="btn btn-primary" @click="saveContact">Сохранить</button>
+          <button class="btn btn-ghost" @click="closeContactModal">{{ t('common.cancel') }}</button>
+          <button class="btn btn-primary" @click="saveContact">{{ t('common.save') }}</button>
         </div>
       </div>
     </div>
@@ -171,11 +171,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { TEACHERS_DB } from '../../api/mockDb'
 // Подключаем наш новый стор
 import { useStudentsListStore } from '../../stores/studentsList.store'
 
 const router = useRouter()
+const { t } = useI18n()
 // Инициализируем стор
 const listStore = useStudentsListStore()
 

@@ -2,9 +2,9 @@
   <div class="tx-section" :class="{ open: isOpen }">
     <!-- ── Toggle header ── -->
     <div class="tx-toggle" @click="toggle">
-      <div class="tx-toggle-left">💳 Транзакции и счета KSeF</div>
+      <div class="tx-toggle-left">💳 {{ t('payments.tx.combinedTitle') }}</div>
       <div class="tx-toggle-right">
-        <span class="tx-cnt">{{ txList.length }} transactions</span>
+        <span class="tx-cnt">{{ t('payments.tx.count', txList.length) }}</span>
         <div class="tx-arrow" :class="{ rotated: isOpen }">›</div>
       </div>
     </div>
@@ -23,7 +23,7 @@
 
           <!-- description -->
           <div class="tx-desc">
-            <div class="tx-title">{{ tx.title }}</div>
+            <div class="tx-title">{{ formatTxTitle(tx.title) }}</div>
             <div class="tx-sub">{{ tx.sub || '' }}</div>
           </div>
 
@@ -36,7 +36,7 @@
               class="tx-status"
               :style="{ color: tx.status === 'paid' ? 'var(--green)' : 'var(--blue)' }"
             >
-              {{ tx.status === 'paid' ? '✓ Оплачен' : '🕐 Ожидает' }}
+              {{ tx.status === 'paid' ? t('payments.tx.paid') : t('payments.tx.pending') }}
             </div>
           </div>
 
@@ -50,15 +50,15 @@
 
           <!-- action buttons -->
           <div class="tx-btns">
-            <button class="tx-btn" title="Редактировать счёт" @click.stop="onEdit(tx)">✏️</button>
-            <button class="tx-btn" title="Коррекция" @click.stop="onKorekta(tx)">📋</button>
-            <button class="tx-btn" title="Возврат" @click.stop="onRefund(tx)">↩️</button>
+            <button class="tx-btn" :title="t('payments.tx.edit')" @click.stop="onEdit(tx)">✏️</button>
+            <button class="tx-btn" :title="t('payments.tx.correction')" @click.stop="onKorekta(tx)">📋</button>
+            <button class="tx-btn" :title="t('payments.tx.refund')" @click.stop="onRefund(tx)">↩️</button>
           </div>
         </div>
 
         <!-- empty state -->
         <div v-if="!txList.length" class="tx-empty">
-          Нет транзакций для этой программы
+          {{ t('payments.tx.empty') }}
         </div>
       </div>
     </div>
@@ -67,10 +67,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { usePaymentsStore } from "../../../../../stores/payments.store";
 import { useModalStore } from "../../../../../stores/modal.store";
 import type { Transaction } from "../../../../../api/paymentsApi";
 
+const { t, tm } = useI18n();
 const payments = usePaymentsStore();
 const modal = useModalStore();
 
@@ -79,6 +81,51 @@ const props = defineProps<{
 }>();
 
 const isOpen = ref(false);
+
+/** 
+ * Translates hardcoded Russian titles to localized versions.
+ * "Абонемент февраль 2026" -> Localized string
+ */
+function formatTxTitle(title: string): string {
+  if (!title) return "";
+  
+  let res = title;
+  
+  // 1. Map type keywords
+  const types: Record<string, string> = {
+    "Абонемент": t('payments.tx.subscription'),
+    "Счет": t('payments.tx.invoice'),
+    "Доп. занятие": t('payments.tx.extra')
+  };
+  
+  for (const [key, val] of Object.entries(types)) {
+    if (res.includes(key)) {
+      res = res.replace(key, val);
+    }
+  }
+
+  // 2. Map months (if present)
+  // We look for Russian month names in the string
+  const ruMonths = [
+    "январь", "февраль", "март", "апрель", "май", "июнь", 
+    "июль", "август", "сентябрь", "октябрь", "ноябрь", "декабрь"
+  ];
+  const fullMonths = tm('payments.monthsFull') as string[];
+
+  ruMonths.forEach((m, idx) => {
+    // Check both lowercase and Capitalized (common in titles)
+    const capitalized = m.charAt(0).toUpperCase() + m.slice(1);
+    const localized = fullMonths[idx];
+
+    if (res.toLowerCase().includes(m)) {
+      // We use a regex for case-insensitive replace to preserve year/rest of string
+      const reg = new RegExp(m, 'gi');
+      res = res.replace(reg, localized);
+    }
+  });
+
+  return res;
+}
 
 /** Transactions from store (loaded on expand) or from program.transactions fallback */
 const txList = computed<Transaction[]>(() => {
@@ -99,13 +146,13 @@ async function toggle() {
 }
 
 /** KSeF → short label */
-const KL: Record<string, string> = {
+const KL = computed<Record<string, string>>(() => ({
   ok: "✓ OK",
-  manual: "✎ Ручной",
-  pending: "⏳ Ожидает",
-  error: "✕ Ошибка",
-  conflict: "! Конфликт",
-};
+  manual: "✎ " + t('payments.ksef.manual'),
+  pending: "⏳ " + t('payments.ksef.pending'),
+  error: "✕ " + t('payments.ksef.error'),
+  conflict: "! " + t('payments.ksef.conflict'),
+}));
 
 // ── action handlers → open modals ──
 function onEdit(tx: Transaction) {

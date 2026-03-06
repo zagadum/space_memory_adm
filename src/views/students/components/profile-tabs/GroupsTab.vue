@@ -7,16 +7,16 @@
         </div>
         <div class="prog-title-wrap">
           <div class="prog-title">{{ enr.school }}</div>
-          <div class="prog-subtitle">Текущая группа: {{ enr.group }} · {{ enr.teacher }}</div>
+          <div class="prog-subtitle">{{ t('groups.lessons.current') }}: {{ enr.group }} · {{ enr.teacher }}</div>
         </div>
       </div>
 
       <div class="prog-body open">
         <div class="cg-card">
           <div class="cg-stats">
-            <div class="cg-stat"><div class="cg-stat-val">{{ enr.lessons?.length || 0 }}</div><div class="cg-stat-label">Всего</div></div>
-            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--green)">{{ enr.lessons?.filter(l => l.attendance === 'Присутствовал').length || 0 }}</div><div class="cg-stat-label">Посещено</div></div>
-            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--red)">{{ enr.lessons?.filter(l => l.attendance === 'Отсутствовал').length || 0 }}</div><div class="cg-stat-label">Пропущено</div></div>
+            <div class="cg-stat"><div class="cg-stat-val">{{ enr.lessons?.length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statTotal') }}</div></div>
+            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--green)">{{ enr.lessons?.filter(l => l.attendance === 'Присутствовал' || l.attendance === 'present').length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statPresent') }}</div></div>
+            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--red)">{{ enr.lessons?.filter(l => l.attendance === 'Отсутствовал' || l.attendance === 'absent').length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statAbsent') }}</div></div>
           </div>
         </div>
 
@@ -25,12 +25,12 @@
             <thead>
               <tr>
                 <th>#</th>
-                <th>ДАТА</th>
-                <th>БЛОК / ТЕМА</th>
-                <th>ЭЛЕМЕНТ</th>
-                <th>ТРЕНЕР</th>
-                <th style="text-align:center">ЯВКА</th>
-                <th>СТАТУС</th>
+                <th>{{ t('groups.lessons.date') }}</th>
+                <th>{{ t('groups.lessons.block') }}</th>
+                <th>{{ t('groups.lessons.element') }}</th>
+                <th>{{ t('groups.lessons.trainer') }}</th>
+                <th style="text-align:center">{{ t('groups.lessons.attendance') }}</th>
+                <th>{{ t('groups.lessons.status') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -40,7 +40,7 @@
                 <td>
                   <div class="topic-cell">
                     <select class="topic-select" v-model="lesson.theme">
-                      <option value="">— тема —</option>
+                      <option value="">{{ t('groups.lessons.selectBlock') }}</option>
                       <option v-if="enr.school === 'Speedy Mind Indigo'">Просто друзья</option>
                       <option v-if="enr.school === 'Speedy Mind Indigo'">Маленькие друзья</option>
                       <option v-if="enr.school === 'Speedy Mind Indigo'">Большие друзья</option>
@@ -52,7 +52,7 @@
                 </td>
                 <td>
                   <select class="topic-select lvl2" :class="{'topic-select-ind': enr.school === 'Speedy Mind Indigo'}" v-model="lesson.element">
-                    <option value="">— элемент —</option>
+                    <option value="">{{ t('groups.lessons.selectElement') }}</option>
                     <option v-if="enr.school === 'Speedy Mind Indigo'">1</option>
                     <option v-if="enr.school === 'Speedy Mind Indigo'">10</option>
                     <option v-if="enr.school === 'Space Memory'">Слова</option>
@@ -63,17 +63,17 @@
                 <td><div class="trainer-main">{{ lesson.teacher }}</div></td>
                 <td style="text-align:center">
                   <span class="att-dot" @click="openAttendanceModal(enr, lesson, enr.lessons.length - lIdx)" :class="{
-                    'att-ok': lesson.attendance === 'Присутствовал',
-                    'att-no': lesson.attendance === 'Отсутствовал',
-                    'att-future': lesson.attendance === 'Будет'
-                  }">{{ lesson.attendance === 'Присутствовал' ? '✓' : lesson.attendance === 'Отсутствовал' ? '✕' : '–' }}</span>
+                    'att-ok': lesson.attendance === 'Присутствовал' || lesson.attendance === 'present',
+                    'att-no': lesson.attendance === 'Отсутствовал' || lesson.attendance === 'absent',
+                    'att-future': lesson.attendance === 'Будет' || lesson.attendance === 'future'
+                  }">{{ (lesson.attendance === 'Присутствовал' || lesson.attendance === 'present') ? '✓' : (lesson.attendance === 'Отсутствовал' || lesson.attendance === 'absent') ? '✕' : '–' }}</span>
                 </td>
                 <td>
                   <span class="sc" :class="{
                     'sc-green': lesson.status === 'Оплачено',
                     'sc-blue': lesson.status === 'Ожидает',
                     'sc-makeup': lesson.status === 'Отработка'
-                  }">{{ lesson.status }}</span>
+                  }">{{ formatStatus(lesson.status) }}</span>
                 </td>
               </tr>
             </tbody>
@@ -81,13 +81,13 @@
         </div>
 
         <div class="history-wrap">
-          <div class="history-label">История групп</div>
+          <div class="history-label">{{ t('groups.lessons.history') }}</div>
           <div class="history-flow">
             <div class="hi hi-current" :class="{'hi-current-ind': enr.school === 'Speedy Mind Indigo'}">
               <div class="hi-body">
                 <div class="hi-name">{{ enr.group }}</div>
-                <div class="hi-dates">Текущий тренер: {{ enr.teacher }}</div>
-                <div class="hi-now">● Текущая группа</div>
+                <div class="hi-dates">{{ t('attendance.trainer') }}: {{ enr.teacher }}</div>
+                <div class="hi-now">● {{ t('groups.lessons.current') }}</div>
               </div>
             </div>
           </div>
@@ -99,15 +99,27 @@
 </template>
 
 <script setup lang="ts">
+import { useI18n } from "vue-i18n";
 import { useStudentTabsStore } from "../../../../stores/studentTabs.store";
 import { useModalStore } from "../../../../stores/modal.store";
 import { storeToRefs } from "pinia";
 
+const { t } = useI18n();
 const studentTabsStore = useStudentTabsStore();
 const { student: currentStudent } = storeToRefs(studentTabsStore);
 
 // modalStore initialization in case it's needed for future actions
 const modalStore = useModalStore();
+
+/**
+ * Maps hardcoded statuses to localized strings
+ */
+function formatStatus(status: string) {
+  if (status === 'Оплачено') return t('payments.status.paid');
+  if (status === 'Ожидает') return t('payments.status.pending');
+  if (status === 'Отработка') return t('groups.lessons.statusMakeup');
+  return status;
+}
 
 const openAttendanceModal = (enrollment: any, lesson: any, lessonNum: number) => {
   modalStore.openModal('attendance', {

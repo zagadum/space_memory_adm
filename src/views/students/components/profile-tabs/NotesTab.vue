@@ -10,7 +10,7 @@
           <div class="note-type-icon" :class="typeClass(n.type)">{{ typeIcon(n.type) }}</div>
           <div class="note-meta">
             <div class="note-who">{{ n.who }}</div>
-            <div class="note-when">{{ n.when }} · {{ n.title }}</div>
+            <div class="note-when">{{ n.when }} · {{ formatNoteTitle(n.title) }}</div>
             <div class="note-status-badges">
               <span class="chip" :class="n.status==='open' ? 'chip-red' : 'chip-green'" style="font-size:10px;padding:2px 7px">
                 {{ n.status==='open' ? '🔴 ' + t('notes.open') : '✓ ' + t('notes.done') }}
@@ -87,6 +87,12 @@ function typeIcon(type: string) {
 }
 function typeClass(type: string) {
   return ({ call: "nt-call", email: "nt-email", meet: "nt-meet", note: "nt-note" } as any)[type] ?? "nt-note";
+}
+
+function formatNoteTitle(title: string) {
+  if (title === 'Входящий звонок') return t('notes.incomingCall');
+  if (title === 'Исходящий email') return t('notes.outgoingEmail');
+  return title;
 }
 
 async function save() {

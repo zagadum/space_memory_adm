@@ -2,7 +2,9 @@
   <div class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-badge">
-        <div class="logo-icon">🌌</div>
+        <div class="logo-icon">
+          <img src="http://indigomental-sklep.pl/wp-content/uploads/2026/03/Edugls-logo.png" alt="GLS Logo" class="brand-logo" />
+        </div>
         <div>
           <div class="logo-text">GLS Admin</div>
           <div class="logo-sub">Space Memory</div>
@@ -23,7 +25,7 @@
         :class="{ active: activeItem === 'dashboard' }" 
         @click="setActive('dashboard')"
       >
-        <span class="nav-icon">🏠</span> Дашборд
+        <span class="nav-icon">🏠</span> {{ t('sidebar.dashboard') }}
       </div>
 
       <div 
@@ -32,7 +34,7 @@
         @click="toggleSection('secretariat')"
       >
         <span class="nav-section-icon">🗂️</span>
-        <span class="nav-section-label">Секретариат</span>
+        <span class="nav-section-label">{{ t('sidebar.secretariat') }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.secretariat }">
@@ -42,7 +44,7 @@
           :class="{ active: activeItem === 'students' }" 
           @click="setActive('students')"
         >
-          <span class="nav-icon">👩‍🚀</span> Ученики
+          <span class="nav-icon">👩‍🚀</span> {{ t('sidebar.students') }}
           <span class="nav-badge green" v-if="listStore.totalStudents > 0">{{ listStore.totalStudents }}</span>
         </div>
         <div 
@@ -50,7 +52,7 @@
           :class="{ active: activeItem === 'groups' }" 
           @click="setActive('groups')"
         >
-          <span class="nav-icon">🎓</span> Группы
+          <span class="nav-icon">🎓</span> {{ t('sidebar.groups') }}
           <span class="nav-badge blue">12</span>
         </div>
         <div 
@@ -58,21 +60,21 @@
           :class="{ active: activeItem === 'teachers' }" 
           @click="setActive('teachers')"
         >
-          <span class="nav-icon">👨‍🏫</span> Учителя
+          <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.teachers') }}
         </div>
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'docs' }" 
           @click="setActive('docs')"
         >
-          <span class="nav-icon">📄</span> Документы / шаблоны
+          <span class="nav-icon">📄</span> {{ t('sidebar.docs') }}
         </div>
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'inpost' }" 
           @click="setActive('inpost')"
         >
-          <span class="nav-icon">📦</span> Заказы InPost
+          <span class="nav-icon">📦</span> {{ t('sidebar.inpost') }}
         </div>
       </div>
 
@@ -82,7 +84,7 @@
         @click="toggleSection('finance')"
       >
         <span class="nav-section-icon">💫</span>
-        <span class="nav-section-label">Финансы</span>
+        <span class="nav-section-label">{{ t('sidebar.finance') }}</span>
         <span class="nav-section-badge nb-red">7</span>
         <span class="nav-section-arrow">›</span>
       </div>
@@ -92,8 +94,15 @@
           :class="{ active: activeItem === 'returns' }" 
           @click="setActive('returns')"
         >
-          <span class="nav-icon">🔙</span> Возвраты
+          <span class="nav-icon">🔙</span> {{ t('sidebar.returns') }}
           <span class="nav-badge cyan">2</span>
+        </div>
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'settings' }" 
+          @click="setActive('settings')"
+        >
+          <span class="nav-icon">⚙️</span> {{ t('sidebar.settings') }}
         </div>
       </div>
 
@@ -103,7 +112,7 @@
         @click="toggleSection('recruitment')"
       >
         <span class="nav-section-icon">🚀</span>
-        <span class="nav-section-label">Рекрутация</span>
+        <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
         <span class="nav-section-badge nb-green">8</span>
         <span class="nav-section-arrow">›</span>
       </div>
@@ -113,7 +122,7 @@
           :class="{ active: activeItem === 'new-students' }" 
           @click="setActive('new-students')"
         >
-          <span class="nav-icon">🌟</span> Новые ученики
+          <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
           <span class="nav-badge green">8</span>
         </div>
         <div 
@@ -121,21 +130,21 @@
           :class="{ active: activeItem === 'new-groups' }" 
           @click="navigateTo('new-groups', '/recruitment/new-groups')"
         >
-          <span class="nav-icon">🎓</span> Новые группы
+          <span class="nav-icon">🎓</span> {{ t('sidebar.newGroups') }}
         </div>
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'expelled' }" 
           @click="setActive('expelled')"
         >
-          <span class="nav-icon">📤</span> Выписанные ученики
+          <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'recruit-archive' }" 
           @click="setActive('recruit-archive')"
         >
-          <span class="nav-icon">🗃️</span> Архив
+          <span class="nav-icon">🗃️</span> {{ t('sidebar.archive') }}
         </div>
       </div>
 
@@ -152,12 +161,12 @@
 
     <div class="sidebar-bottom">
       <div class="user-card">
-        <div class="user-avatar">АР</div>
+        <div class="user-avatar">{{ authStore.user?.initials }}</div>
         <div class="user-info">
-          <div class="user-name">Артём</div>
-          <div class="user-role">Отдел продаж</div>
+          <div class="user-name">{{ authStore.user?.name }}</div>
+          <div class="user-role">{{ authStore.user?.role }}</div>
         </div>
-        <button class="logout-btn" @click.stop="handleLogout" title="Выйти">
+        <button class="logout-btn" @click.stop="handleLogout" :title="t('app.logout')">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -181,7 +190,7 @@ import { useAuthStore } from '../../stores/auth.store'
 
 const router = useRouter()
 const route = useRoute()
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 // Инициализируем сторы
 const listStore = useStudentsListStore()
@@ -214,6 +223,8 @@ watch(() => route.path, (path) => {
     openSections.value.recruitment = true
   } else if (path.startsWith('/students')) {
     activeItem.value = 'students'
+  } else if (path === '/' || path === '/dashboard') {
+    activeItem.value = 'dashboard'
   }
 }, { immediate: true })
 
@@ -223,8 +234,12 @@ const toggleSection = (section: string) => {
 
 const setActive = (item: string) => {
   activeItem.value = item
-  if (item === 'students') {
+  if (item === 'dashboard') {
+    router.push('/')
+  } else if (item === 'students') {
     router.push('/students')
+  } else if (item === 'settings') {
+    router.push('/finance/settings')
   }
 }
 
@@ -241,14 +256,22 @@ const navigateTo = (item: string, path: string) => {
   z-index: 100; display: flex; flex-direction: column; backdrop-filter: blur(20px); 
 }
 .sidebar-logo { padding: 20px 16px 16px; border-bottom: 1px solid var(--space-border, rgba(100,120,255,0.15)); flex-shrink: 0; }
-.logo-badge { display: flex; align-items: center; gap: 10px; }
+.logo-badge { display: flex; align-items: center; gap: 12px; }
 .logo-icon { 
-  width: 36px; height: 36px; background: linear-gradient(135deg, #4f6ef7, #8b5cf6); 
-  border-radius: 10px; display: flex; align-items: center; justify-content: center; 
-  font-size: 18px; box-shadow: 0 0 20px rgba(79,110,247,0.4); flex-shrink: 0; 
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 .logo-text { font-size: 15px; font-weight: 800; color: #e8eeff; letter-spacing: 0.01em; }
 .logo-sub { font-size: 9.5px; color: #8892b0; font-family: 'Space Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+.brand-logo {
+  height: 42px;
+  width: auto;
+  object-fit: contain;
+  background: transparent !important;
+}
 
 .school-pill { margin-top: 10px; display: flex; align-items: center; gap: 7px; padding: 6px 9px; background: rgba(79,110,247,0.07); border: 1px solid rgba(79,110,247,0.18); border-radius: 8px; }
 .school-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }

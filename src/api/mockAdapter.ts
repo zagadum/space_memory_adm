@@ -70,6 +70,19 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { student: data.profile, programs: data.programs });
   }
 
+  /*
+   * [x] Research current implementation of `.mcell` and status logic in `PaymentPrograms.vue`
+   * [x] Audit and fix i18n keys in `ru.json`, `en.json`, `pl.json`
+   * [x] Implement redesigned `.mcell` structure and styles
+   * [x] Implement status logic helper/computed property
+   * [x] Verify changes
+   * [ ] Strictly align `payments.status` with API contracts [/]
+   * [ ] Remove hardcoded months and strings in `PaymentPrograms.vue` [ ]
+   * [ ] Audit and clean `PaymentMonthDetail.vue` for hardcoded strings [ ]
+   * [ ] Fix i18n keys across all 4 languages (ru, en, pl, uk) [ ]
+   * [ ] Final verification and TS check [ ]
+   */
+
   // Example mutation endpoints (no real persistence, but realistic response shape)
   if (method === "post" && url === "api/payments/refund") {
     const body = readBody(config);

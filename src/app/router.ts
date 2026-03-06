@@ -28,9 +28,31 @@ export const router = createRouter({
       path: "/",
       component: AppLayout,
       children: [
-        { path: "", redirect: "/students" },
-        { path: "students", name: "students-list", component: StudentListPage },
-        { path: "recruitment/new-groups", name: "new-groups", component: NewGroupsPage },
+        {
+          path: "",
+          name: "dashboard",
+          component: () => import("../views/dashboard/DashboardIndex.vue"),
+          meta: { title: 'sidebar.dashboard', icon: '📊' }
+        },
+        { path: "dashboard", redirect: { name: "dashboard" } },
+        {
+          path: "students",
+          name: "students-list",
+          component: StudentListPage,
+          meta: { title: 'studentList.title', subTitle: 'studentList.secretariat', icon: '👩‍🚀' }
+        },
+        {
+          path: "recruitment/new-groups",
+          name: "new-groups",
+          component: NewGroupsPage,
+          meta: { title: 'sidebar.newGroups', icon: '🚀' }
+        },
+        {
+          path: "finance/settings",
+          name: "settings",
+          component: () => import("../views/finance/settings/SettingsIndex.vue"),
+          meta: { title: 'financeSettings.pageTitle', subTitle: 'financeSettings.pageSubTitle', icon: '⚙️' }
+        },
         {
           path: "students/:id",
           component: StudentProfilePage,

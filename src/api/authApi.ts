@@ -1,7 +1,8 @@
 import { http } from "./http";
 
 export interface SignInDto { email: string; password: string }
-export interface SignInResponse { token: string; user: { id: string; email: string; name: string } }
+export interface UserDto { id: string; email: string; name: string; role: string; initials: string }
+export interface SignInResponse { token: string; user: UserDto }
 
 export const authApi = {
   async signIn(dto: SignInDto) {
@@ -9,7 +10,7 @@ export const authApi = {
     return data;
   },
   async me() {
-    const { data } = await http.get<{ id: string; email: string; name: string }>("api/auth/me");
+    const { data } = await http.get<UserDto>("api/auth/me");
     return data;
   },
 };
