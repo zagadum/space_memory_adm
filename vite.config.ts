@@ -1,6 +1,5 @@
 import { defineConfig, type PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import { visualizer } from 'rollup-plugin-visualizer'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -32,19 +31,24 @@ function manualChunks(id: string): string | undefined {
   return 'vendor'
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(async ({ mode }) => {
   const plugins: PluginOption[] = [vue(), copyHtaccessPlugin]
 
   if (mode === 'analyze') {
-    plugins.push(
-      visualizer({
-        filename: 'dist/stats.html',
-        gzipSize: true,
-        brotliSize: true,
-        open: false,
-        template: 'treemap'
-      })
-    )
+    try {
+      const { visualizer } = await import('rollup-plugin-visualizer')
+      plugins.push(
+        visualizer({
+          filename: 'dist/stats.html',
+          gzipSize: true,
+          brotliSize: true,
+          open: false,
+          template: 'treemap'
+        })
+      )
+    } catch {
+      console.warn('[vite] analyze mode: rollup-plugin-visualizer is not installed, skipping stats report')
+    }
   }
 
   return {
