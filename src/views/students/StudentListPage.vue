@@ -21,7 +21,7 @@
       </div>
       <div class="stat-card cyan">
         <div class="stat-label">{{ t('studentList.stats.noContact7') }}</div>
-        <div class="stat-value">{{ students.filter(s => s.daysSinceContact >= 7).length }}</div>
+        <div class="stat-value">{{ students.filter(s => (s.daysSinceContact ?? 0) >= 7).length }}</div>
         <div class="stat-sub">{{ t('studentList.stats.requireAttention') }}</div>
         <div class="stat-icon">⚠️</div>
       </div>
@@ -50,7 +50,7 @@
 
     <div class="table-container">
       <table id="studentsTable">
-        <thead>
+        <thead v-if="!listStore.loading">
           <tr>
             <th @click="sortBy('name')" style="cursor:pointer; user-select:none">
               {{ t('studentList.table.name') }} <span class="sort-icon" :style="{ color: sortCol === 'name' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'name' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
@@ -72,7 +72,7 @@
             <th class="actions-header">···</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="!listStore.loading">
           <tr v-for="student in sortedStudents" :key="student.id" class="table-row" @click="openStudent(student.id)">
             <td>
               <div class="name-cell">
@@ -138,6 +138,14 @@
                   <div class="action-item danger" @click="activeDropdownId = null">📦 {{ t('studentList.actions.toArchive') }}</div>
                 </div>
               </div>
+            </td>
+          </tr>
+        </tbody>
+
+        <tbody v-else>
+          <tr v-for="i in 5" :key="i">
+            <td colspan="10" style="text-align:center; padding: 40px; color: #8892b0;">
+              {{ t('common.loading') }}...
             </td>
           </tr>
         </tbody>
@@ -271,8 +279,9 @@ function saveContact() {
 // ── ВЫПАДАЮЩЕЕ МЕНЮ ДЕЙСТВИЙ ──
 const activeDropdownId = ref<string | null>(null)
 
-function toggleDropdown(id: string) {
-  activeDropdownId.value = activeDropdownId.value === id ? null : id
+function toggleDropdown(id: string | number) {
+  const sId = id.toString()
+  activeDropdownId.value = activeDropdownId.value === sId ? null : sId
 }
 
 const handleClickOutside = (event: MouseEvent) => {
@@ -284,6 +293,7 @@ const handleClickOutside = (event: MouseEvent) => {
 
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
+  listStore.fetchStudents()
 })
 
 onUnmounted(() => {

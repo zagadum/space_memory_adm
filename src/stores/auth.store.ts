@@ -12,13 +12,7 @@ export interface User {
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     token: localStorage.getItem("token") || null,
-    user: {
-      id: 'u_current',
-      name: 'Artem',
-      email: 'artem@gls.edu.pl',
-      role: 'Dział rekrutacji учащихся',
-      initials: 'AR'
-    } as User | null,
+    user: null as User | null,
     loading: false,
     error: "" as string,
   }),
@@ -33,6 +27,9 @@ export const useAuthStore = defineStore("auth", {
     updateProfile(data: Partial<User>) {
       if (this.user) {
         this.user = { ...this.user, ...data };
+        if (!this.user.initials && this.user.email) {
+          this.user.initials = this.user.email.substring(0, 2).toUpperCase();
+        }
       }
     },
     async signIn(email: string, password: string) {
@@ -41,6 +38,9 @@ export const useAuthStore = defineStore("auth", {
       try {
         const res = await authApi.signIn({ email, password });
         this.setToken(res.token);
+        if (!res.user.initials && res.user.email) {
+          res.user.initials = res.user.email.substring(0, 2).toUpperCase();
+        }
         this.user = res.user;
         return true;
       } catch (e: any) {
@@ -53,7 +53,11 @@ export const useAuthStore = defineStore("auth", {
     async loadMe() {
       if (!this.token) return;
       try {
-        this.user = await authApi.me();
+        const user = await authApi.me();
+        if (!user.initials && user.email) {
+          user.initials = user.email.substring(0, 2).toUpperCase();
+        }
+        this.user = user;
       } catch {
         this.logout();
       }

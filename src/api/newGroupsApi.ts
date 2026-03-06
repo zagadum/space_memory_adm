@@ -50,22 +50,22 @@ export interface MasterStudent {
 }
 
 export async function getNewGroups() {
-    const res = await http.get("/api/new-groups");
+    const res = await http.get("/new-groups");
     return res.data as { items: NewGroup[] };
 }
 
 export async function getNewGroupStudents(groupId: number) {
-    const res = await http.get("/api/new-groups/students", { params: { groupId } });
+    const res = await http.get("/new-groups/students", { params: { groupId } });
     return res.data as { items: NewGroupStudent[] };
 }
 
 export async function getMasterStudents() {
-    const res = await http.get("/api/new-groups/master-students");
+    const res = await http.get("/new-groups/master-students");
     return res.data as { items: MasterStudent[] };
 }
 
 export async function getTeachers() {
-    const res = await http.get("/api/new-groups/teachers");
+    const res = await http.get("/new-groups/teachers");
     return res.data as { items: NewGroupTeacher[] };
 }
 
@@ -79,26 +79,26 @@ export async function createNewGroup(payload: {
     teacherId: number | null;
     studentIds: number[];
 }) {
-    const res = await http.post("/api/new-groups/create", payload);
+    const res = await http.post("/new-groups/create", payload);
     return res.data as { ok: true; group: NewGroup };
 }
 
 export async function startGroup(groupId: number) {
-    const res = await http.post("/api/new-groups/start", { groupId });
+    const res = await http.post("/new-groups/start", { groupId });
     return res.data as { ok: true };
 }
 
 export async function deleteNewGroup(groupId: number) {
-    const res = await http.post("/api/new-groups/delete", { groupId });
+    const res = await http.post("/new-groups/delete", { groupId });
     return res.data as { ok: true };
 }
 
 export async function addStudentsToGroup(payload: { groupId: number; studentIds: number[] }) {
-    const res = await http.post("/api/new-groups/add-students", payload);
+    const res = await http.post("/new-groups/add-students", payload);
     return res.data as { ok: true; added: number };
 }
 
 export async function removeStudentFromGroup(payload: { groupId: number; studentName: string }) {
-    const res = await http.post("/api/new-groups/remove-student", payload);
+    const res = await http.post("/new-groups/remove-student", payload);
     return res.data as { ok: true };
 }

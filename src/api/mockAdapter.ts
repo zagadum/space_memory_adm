@@ -51,6 +51,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   const method = (config.method || "get").toLowerCase();
 
   // --- AUTH ---
+  /*
   if (method === "post" && url === "api/auth/sign-in") {
     const body = readBody(config);
     if (!body?.email || !body?.password) return err(config, 400, "Missing credentials");
@@ -61,6 +62,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     if (!String(auth).startsWith("Bearer ")) return err(config, 401, "Unauthorized");
     return ok(config, mockDb.me);
   }
+  */
 
   // --- PAYMENTS ---
   if (method === "get" && url.startsWith("api/payments/student/")) {

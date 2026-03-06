@@ -6,11 +6,11 @@ export interface SignInResponse { token: string; user: UserDto }
 
 export const authApi = {
   async signIn(dto: SignInDto) {
-    const { data } = await http.post<SignInResponse>("api/auth/sign-in", dto);
+    const { data } = await http.post<SignInResponse>("auth/sign-in", dto);
     return data;
   },
   async me() {
-    const { data } = await http.get<UserDto>("api/auth/me");
+    const { data } = await http.get<UserDto>("auth/me");
     return data;
   },
 };
