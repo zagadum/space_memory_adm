@@ -1,6 +1,6 @@
 <template>
-  <div class="groups-tab" v-if="currentStudent">
-    <div v-for="(enr, index) in currentStudent.enrollments" :key="index" class="prog-block">
+  <div class="groups-tab" v-if="enrollments.length">
+    <div v-for="(enr, index) in enrollments" :key="index" class="prog-block">
       <div class="prog-block-toggle">
         <div class="prog-icon" :class="enr.school === 'Space Memory' ? 'prog-icon-sm' : 'prog-icon-ind'">
           {{ enr.school === 'Space Memory' ? '🧠' : '⚡' }}
@@ -96,20 +96,41 @@
       </div>
     </div>
   </div>
+  <div v-else class="groups-tab">
+    <div class="prog-block" style="padding:14px 16px; color:#8892b0;">
+      {{ t('common.loadingData') }}
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
-import { useStudentTabsStore } from "../../../../stores/studentTabs.store";
+import { usePaymentsStore } from "../../../../stores/payments.store";
 import { useModalStore } from "../../../../stores/modal.store";
-import { storeToRefs } from "pinia";
 
 const { t } = useI18n();
-const studentTabsStore = useStudentTabsStore();
-const { student: currentStudent } = storeToRefs(studentTabsStore);
+const paymentsStore = usePaymentsStore();
 
 // modalStore initialization in case it's needed for future actions
 const modalStore = useModalStore();
+
+const enrollments = computed(() => {
+  const fromStudent = paymentsStore.student?.enrollments || [];
+  if (fromStudent.length) return fromStudent;
+
+  // Fallback: строим список групп из programs API, если enrollments пусты.
+  return (paymentsStore.programs || []).map((p: any, idx: number) => {
+    const rawSub = String(p?.sub || "");
+    const parts = rawSub.split("·").map((x: string) => x.trim());
+    return {
+      school: String(p?.name || `Program ${idx + 1}`).replace(/^[^\p{L}\p{N}]+/u, "").trim(),
+      group: parts[0] || "—",
+      teacher: parts[2] || "—",
+      lessons: [],
+    };
+  });
+});
 
 /**
  * Maps hardcoded statuses to localized strings
@@ -124,7 +145,7 @@ function formatStatus(status: string) {
 const openAttendanceModal = (enrollment: any, lesson: any, lessonNum: number) => {
   modalStore.openModal('attendance', {
     enrollmentId: enrollment.school, // Используем для поиска школы при сохранении
-    studentId: currentStudent.value?.id,
+    studentId: paymentsStore.student?.id,
     schoolName: enrollment.school,
     lessonId: lesson.id,
     lessonNum: lessonNum, // Передаем реальное число
@@ -140,7 +161,7 @@ const openAttendanceModal = (enrollment: any, lesson: any, lessonNum: number) =>
 
 <style scoped>
 .groups-tab { padding: 10px 0; }
-.prog-block { border:1px solid var(--border-color, rgba(100,120,255,0.15)); border-radius:14px; overflow:hidden; margin-bottom:20px; background: rgba(255,255,255,0.01); }
+.prog-block { border:1px solid rgba(100,120,255,0.15); border-radius:14px; overflow:hidden; margin-bottom:20px; background: rgba(255,255,255,0.01); }
 .prog-block-toggle { display:flex; align-items:center; gap:11px; padding:12px 16px; background:rgba(255,255,255,0.03); border-bottom:1px solid rgba(100,120,255,0.15); }
 .prog-icon { width:34px; height:34px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
 .prog-icon-sm { background:linear-gradient(135deg,#4f6ef7,#8b5cf6); box-shadow:0 0 10px rgba(79,110,247,.3); }

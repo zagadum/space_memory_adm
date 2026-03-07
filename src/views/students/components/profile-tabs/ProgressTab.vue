@@ -22,11 +22,15 @@
         </div>
       </div>
     </template>
+
+    <div v-else class="sk-card" style="display:flex;align-items:center;justify-content:center;color:var(--dim)">
+      {{ t('common.loadingData') }}
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
@@ -41,6 +45,13 @@ onMounted(() => {
   const studentId = route.params.id as string;
   if (studentId) st.loadProgress(studentId);
 });
+
+watch(
+  () => route.params.id,
+  (id) => {
+    if (id) st.loadProgress(id as string);
+  }
+);
 
 function formatKpiTitle(title: string) {
   if (title === 'Скорость запоминания') return t('progress.kpi.speed');

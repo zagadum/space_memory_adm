@@ -29,6 +29,7 @@
     "close": "Close",
     "loading": "Loading…",
     "loadingData": "Loading data…",
+    "retry": "Retry",
     "monthsShort": [
       "JAN",
       "FEB",

@@ -30,12 +30,12 @@
     </div>
 
     <div class="tabs">
-      <RouterLink class="tab" :class="{ active: isActive('student-payments') }" :to="{ name: 'student-payments', params: { id: student?.id || 's_1' } }">💳 {{ t("tabs.payments") }}</RouterLink>
-      <RouterLink class="tab" :class="{ active: isActive('student-groups') }" :to="{ name: 'student-groups', params: { id: student?.id || 's_1' } }">🎓 {{ t("tabs.groups") }}</RouterLink>
-      <RouterLink class="tab" :class="{ active: isActive('student-info') }" :to="{ name: 'student-info', params: { id: student?.id || 's_1' } }">👤 {{ t("tabs.info") }}</RouterLink>
-      <RouterLink class="tab" :class="{ active: isActive('student-attendance') }" :to="{ name: 'student-attendance', params: { id: student?.id || 's_1' } }">📅 {{ t("tabs.attendance") }}</RouterLink>
-      <RouterLink class="tab" :class="{ active: isActive('student-progress') }" :to="{ name: 'student-progress', params: { id: student?.id || 's_1' } }">⭐ {{ t("tabs.progress") }}</RouterLink>
-      <RouterLink class="tab" :class="{ active: isActive('student-notes') }" :to="{ name: 'student-notes', params: { id: student?.id || 's_1' } }">📝 {{ t("tabs.notes") }}</RouterLink>
+      <RouterLink class="tab" :class="{ active: isActive('student-payments') }" :to="{ name: 'student-payments', params: { id: formatStudentId() } }">💳 {{ t("tabs.payments") }}</RouterLink>
+      <RouterLink class="tab" :class="{ active: isActive('student-groups') }" :to="{ name: 'student-groups', params: { id: formatStudentId() } }">🎓 {{ t("tabs.groups") }}</RouterLink>
+      <RouterLink class="tab" :class="{ active: isActive('student-info') }" :to="{ name: 'student-info', params: { id: formatStudentId() } }">👤 {{ t("tabs.info") }}</RouterLink>
+      <RouterLink class="tab" :class="{ active: isActive('student-attendance') }" :to="{ name: 'student-attendance', params: { id: formatStudentId() } }">📅 {{ t("tabs.attendance") }}</RouterLink>
+      <RouterLink class="tab" :class="{ active: isActive('student-progress') }" :to="{ name: 'student-progress', params: { id: formatStudentId() } }">⭐ {{ t("tabs.progress") }}</RouterLink>
+      <RouterLink class="tab" :class="{ active: isActive('student-notes') }" :to="{ name: 'student-notes', params: { id: formatStudentId() } }">📝 {{ t("tabs.notes") }}</RouterLink>
     </div>
   </div>
 </template>
@@ -55,5 +55,11 @@ const student = computed(() => payments.student);
 
 function isActive(name: string) {
   return route.name === name;
+}
+
+function formatStudentId(): string {
+  // Используем ID из route params напрямую
+  const routeId = route.params.id as string;
+  return routeId || '1';
 }
 </script>

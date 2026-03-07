@@ -29,7 +29,7 @@ async function loadData() {
   if (studentId) {
     payments.reset();
     st.resetAll();
-    //await payments.loadStudent(studentId);
+    await payments.loadStudent(studentId);
     //await st.loadStudent(studentId);
   }
 }

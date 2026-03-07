@@ -144,7 +144,7 @@
             <td>
               <div class="actions-wrap" @click.stop>
                 <button class="actions-btn" @click="toggleDropdown(student.id)">⋮</button>
-                <div class="actions-dropdown" :class="{ open: activeDropdownId === student.id }">
+                <div class="actions-dropdown" :class="{ open: activeDropdownId === student.id.toString() }">
                   <div class="action-item" @click="openStudent(student.id); activeDropdownId = null">👤 {{ t('studentList.actions.openProfile') }}</div>
                   <div class="action-item" @click="openContactModal(student); activeDropdownId = null">📅 {{ t('studentList.actions.updateContact') }}</div>
                   <div class="action-item" @click="activeDropdownId = null">👤 {{ t('studentList.actions.changeManager') }}</div>
