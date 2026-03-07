@@ -4,11 +4,43 @@ export interface StudentTabsResponse<T> {
   data: T;
 }
 
-export const STUDENTS_ENDPOINT = "/settings/users";
+export interface StudentListParams {
+  search?: string;
+  page?: number;
+  per_page?: number;
+  orderBy?: string;
+  orderDirection?: "asc" | "desc";
+  group_id?: number | null;
+  teacher_id?: number | null;
+  without_contact_7_plus?: boolean;
+  only_mine?: boolean;
+}
 
-export async function getStudents() {
-  const res = await http.get(STUDENTS_ENDPOINT, { params: { role: 'student' } });
-  return res.data as { items: any[] };
+export interface StudentListResponse {
+  data: any[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    from?: number | null;
+    to?: number | null;
+  };
+}
+
+export async function getStudents(params: StudentListParams = {}) {
+  const res = await http.get("/v1/student/list", { params });
+  return res.data as StudentListResponse;
+}
+
+export async function getStudentGroupsFilter(params: Pick<StudentListParams, "search" | "without_contact_7_plus" | "only_mine"> = {}) {
+  const res = await http.get("/v1/student/groups-filter", { params });
+  return res.data as { items: Array<{ id: number; name: string }> };
+}
+
+export async function getStudentTeacherFilter(params: Pick<StudentListParams, "search" | "without_contact_7_plus" | "only_mine"> = {}) {
+  const res = await http.get("/v1/student/teacher-filter", { params });
+  return res.data as { items: Array<{ id: number; name: string }> };
 }
 
 export async function getStudentGroups(studentId: string) {

@@ -103,7 +103,9 @@ export const usePaymentsStore = defineStore("payments", {
     async loadStudent(studentId = "s_1") {
       this.loading = true;
       this.error = "";
+
       try {
+          alert('load student');
         const res = await paymentsApi.getStudentPayments(studentId);
         this.student = res.student || null;
         this.programs = res.programs || [];

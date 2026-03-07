@@ -26,7 +26,7 @@ const payments = usePaymentsStore();
 
 onMounted(async () => {
   await auth.loadMe();
-  if (!payments.student) await payments.loadStudent("s_1");
+  //if (!payments.student) await payments.loadStudent("s_1");
 });
 </script>
 

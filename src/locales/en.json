@@ -56,7 +56,8 @@
     "studentsCount": "{n} student | {n} students",
     "daysCount": "{n} day | {n} days",
     "export": "Export",
-    "searchHint": "Search by name, phone..."
+    "searchHint": "Search by name, phone...",
+    "search": "Search"
   },
   "auth": {
     "title": "Sign In",

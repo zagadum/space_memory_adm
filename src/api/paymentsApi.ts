@@ -10,6 +10,7 @@ export interface StudentPaymentsResponse {
 
 export const paymentsApi = {
   async getStudentPayments(studentId: string) {
+      alert('getStudentPayments');
     const { data } = await http.get<StudentPaymentsResponse>(`payments/student/${studentId}`);
     return data;
   },
