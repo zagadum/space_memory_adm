@@ -4,9 +4,16 @@ import type { Program, StudentProfile, MonthObj, KsefInvoice } from "../api/mock
 import type { Transaction } from "../api/paymentsApi";
 
 function extractErrorMessage(e: unknown, fallback: string): string {
-  if (e && typeof e === 'object' && 'response' in e) {
-    const resp = (e as { response?: { data?: { message?: string } } }).response;
-    if (resp?.data?.message) return resp.data.message;
+  // Проверяем timeout ошибку
+  if (e && typeof e === 'object') {
+    const err = e as any;
+    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+      return 'Большая нагрузка на сервер. Пожалуйста, повторите попытку через несколько секунд.';
+    }
+    if ('response' in err) {
+      const resp = err.response as { data?: { message?: string } };
+      if (resp?.data?.message) return resp.data.message;
+    }
   }
   if (e instanceof Error) return e.message;
   return fallback;
@@ -103,6 +110,7 @@ export const usePaymentsStore = defineStore("payments", {
     async loadStudent(studentId = "s_1") {
       this.loading = true;
       this.error = "";
+
       try {
         const res = await paymentsApi.getStudentPayments(studentId);
         this.student = res.student || null;
@@ -179,6 +187,8 @@ export const usePaymentsStore = defineStore("payments", {
     reset() {
       this.student = null;
       this.programs = [];
+      this.loading = false;
+      this.error = "";
       this.transactionsByProgram = {};
       this.txLoading = {};
       this.txError = {};

@@ -45,6 +45,17 @@ httpClient.interceptors.response.use(
 
         appStore.endRequest();
 
+        // Handle timeout errors
+        if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+            error.message = 'Большая нагрузка на сервер. Пожалуйста, повторите попытку через несколько секунд.';
+            console.error('⏱️ [TIMEOUT ERROR]', {
+                url: error.config?.url,
+                method: error.config?.method,
+                timeout: error.config?.timeout,
+                timestamp: new Date().toISOString(),
+            });
+        }
+
         if (error.response?.status === 401) {
             // Automatic logout on 401 Unauthorized
             authStore.logout();

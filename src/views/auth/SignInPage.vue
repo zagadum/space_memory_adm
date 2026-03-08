@@ -18,7 +18,7 @@
     </button>
 
     <div class="note">
-      Подсказка: в mock API пароль не проверяется — лишь бы не пустой 😉
+      Вход с паролями space memory
     </div>
   </form>
 </template>

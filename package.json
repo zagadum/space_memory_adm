@@ -9,7 +9,9 @@
     "dev:api": "cross-env VITE_USE_MOCK=false vite",
     "build": "vite build",
     "analyze": "vite build --mode analyze",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "clean": "rimraf node_modules/.vite dist",
+    "fresh": "npm run clean && npm run dev"
   },
   "dependencies": {
     "axios": "^1.7.7",
@@ -22,6 +24,7 @@
     "@types/node": "^25.3.5",
     "@vitejs/plugin-vue": "^5.1.4",
     "cross-env": "^7.0.3",
+    "rimraf": "^5.0.10",
     "rollup-plugin-visualizer": "^5.12.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.8"

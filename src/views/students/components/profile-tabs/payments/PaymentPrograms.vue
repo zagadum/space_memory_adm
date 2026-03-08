@@ -1,59 +1,51 @@
 <template>
   <!-- Programs accordion -->
   <div
-    v-for="(enr, idx) in currentStudent?.enrollments"
-    :key="idx"
+    v-for="(prog, idx) in payments.programs"
+    :key="prog.id"
     class="prog"
-    :class="{ open: progId(enr) === openProg }"
+    :class="{ open: prog.id === openProg }"
   >
     <!-- ── head ── -->
-    <div class="prog-head" @click="toggleProg(progId(enr))">
+    <div class="prog-head" @click="toggleProg(prog.id)">
       <div
         class="prog-bar"
-        :style="{ background: progFor(enr)?.barGradient || 'var(--blue)' }"
+        :style="{ background: prog.barGradient || 'var(--blue)' }"
       ></div>
 
       <div class="prog-info">
-        <div class="prog-name">{{ progFor(enr)?.name || enr.school }}</div>
+        <div class="prog-name">{{ prog.name }}</div>
         <div class="prog-sub">
-          <span>{{ enr.group }} · {{ enr.teacher }}</span>
-          <span> · {{ schedule(enr.teacher) }}</span>
-          <span> · {{ progFor(enr)?.tariff || 0 }} zł/{{ t('payments.table.month').toLowerCase() }}</span>
-          <span
-            v-if="enr.school.includes('Indigo')"
-            class="badge badge-child2"
-          >
-            {{ t('payments.child2badge') }}
-          </span>
+          <span>{{ prog.sub }}</span>
         </div>
       </div>
 
-      <div class="prog-bal" v-if="progFor(enr)">
+      <div class="prog-bal">
         <div
           class="prog-bal-val"
-          :style="{ color: balColor(progFor(enr)!.balance) }"
+          :style="{ color: balColor(prog.balance) }"
         >
-          {{ progFor(enr)!.balance > 0 ? '+' : '' }}{{ progFor(enr)!.balance }} zł
+          {{ prog.balance > 0 ? '+' : '' }}{{ prog.balance }} zł
         </div>
-        <div class="prog-bal-sub">{{ progFor(enr)?.balanceLabel || t('payments.balance') }}</div>
+        <div class="prog-bal-sub">{{ prog.balanceLabel || t('payments.balance') }}</div>
       </div>
 
       <div class="prog-arrow">›</div>
     </div>
 
     <!-- ── body ── -->
-    <div class="prog-body" v-show="progId(enr) === openProg">
+    <div class="prog-body" v-show="prog.id === openProg">
       <div class="prog-inner">
 
         <!-- year toggle + view toggle -->
         <div class="year-row">
           <span class="yr-label">{{ t("payments.year") }}</span>
           <button
-            v-for="y in payments.yearsForProgram(progId(enr))"
+            v-for="y in payments.yearsForProgram(prog.id)"
             :key="y"
             class="yr-btn"
-            :class="{ active: payments.activeYear[progId(enr)] === y }"
-            @click="payments.setYear(progId(enr), y)"
+            :class="{ active: payments.activeYear[prog.id] === y }"
+            @click="payments.setYear(prog.id, y)"
           >
             {{ y }}
           </button>
@@ -61,29 +53,29 @@
           <div class="view-toggle">
             <button
               class="vt-btn"
-              :class="{ active: payments.activeView[progId(enr)] !== 'table' }"
-              @click.stop="payments.setView(progId(enr), 'grid')"
+              :class="{ active: payments.activeView[prog.id] !== 'table' }"
+              @click.stop="payments.setView(prog.id, 'grid')"
             >⬛ {{ t("payments.view.grid") }}</button>
             <button
               class="vt-btn"
-              :class="{ active: payments.activeView[progId(enr)] === 'table' }"
-              @click.stop="payments.setView(progId(enr), 'table')"
+              :class="{ active: payments.activeView[prog.id] === 'table' }"
+              @click.stop="payments.setView(prog.id, 'table')"
             >☰ {{ t("payments.view.table") }}</button>
           </div>
         </div>
 
         <!-- ════════ GRID VIEW ════════ -->
         <div
-          v-if="payments.activeView[progId(enr)] !== 'table'"
+          v-if="payments.activeView[prog.id] !== 'table'"
           class="month-grid"
         >
           <button
-            v-for="(m, i) in payments.monthsForProgram(progId(enr))"
+            v-for="(m, i) in payments.monthsForProgram(prog.id)"
             :key="i"
             type="button"
             class="mcell"
-            :class="['ms-' + m.s, { sel: payments.activeMonth[progId(enr)] === i }]"
-            @click="payments.setMonth(progId(enr), i)"
+            :class="['ms-' + m.s, { sel: payments.activeMonth[prog.id] === i }]"
+            @click="payments.setMonth(prog.id, i)"
           >
             <!-- KSeF / split / bonus badges -->
             <div v-if="m.split" class="cbadge cb-split">⇄</div>
@@ -104,7 +96,7 @@
           <!-- + Доп. занятие -->
           <button
             class="mcell mcell-add"
-            @click="modal.open('extra', { programId: progId(enr) })"
+            @click="modal.open('extra', { programId: prog.id })"
           >
             <div style="font-size:20px;color:var(--pink)">＋</div>
             <div style="font-size:10px;color:var(--pink);font-weight:700;margin-top:2px">{{ t('payments.btn.extra') }}</div>
@@ -128,10 +120,10 @@
             </thead>
             <tbody>
               <tr
-                v-for="(m, i) in payments.monthsForProgram(progId(enr))"
+                v-for="(m, i) in payments.monthsForProgram(prog.id)"
                 :key="i"
-                :class="['ms-' + m.s, { selrow: payments.activeMonth[progId(enr)] === i }]"
-                @click="payments.setMonth(progId(enr), i)"
+                :class="['ms-' + m.s, { selrow: payments.activeMonth[prog.id] === i }]"
+                @click="payments.setMonth(prog.id, i)"
               >
                 <td class="td-mono">{{ shortMonths[i] }}</td>
                 <td>
@@ -157,23 +149,23 @@
 
         <!-- ════════ MONTH DETAIL ════════ -->
         <PaymentMonthDetail
-          v-if="payments.activeMonth[progId(enr)] != null"
-          :prog="progId(enr)"
-          :monthIdx="payments.activeMonth[progId(enr)]!"
-          :year="payments.activeYear[progId(enr)] || 2026"
-          :month="payments.currentMonth(progId(enr))"
+          v-if="payments.activeMonth[prog.id] != null"
+          :prog="prog.id"
+          :monthIdx="payments.activeMonth[prog.id]!"
+          :year="payments.activeYear[prog.id] || 2026"
+          :month="payments.currentMonth(prog.id)"
         />
 
       </div><!-- /prog-inner -->
 
       <!-- Actions & Transactions will be added in next steps -->
       <PaymentActions
-        :programId="progId(enr)"
-        :year="String(payments.activeYear[progId(enr)] || 2026)"
-        :monthIndex="payments.activeMonth[progId(enr)] ?? 0"
+        :programId="prog.id"
+        :year="String(payments.activeYear[prog.id] || 2026)"
+        :monthIndex="payments.activeMonth[prog.id] ?? 0"
       />
 
-      <PaymentTransactions :prog="progId(enr)" />
+      <PaymentTransactions :prog="prog.id" />
     </div>
   </div>
 
@@ -258,13 +250,12 @@
 
 <!-- ══════════════════════════════════════════════════════════ -->
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import { storeToRefs } from "pinia";
 import { usePaymentsStore } from "../../../../../stores/payments.store";
 import { useModalStore } from "../../../../../stores/modal.store";
-import { TEACHERS_DB } from "../../../../../api/mockDb";
-import type { MonthObj, Program, Enrollment } from "../../../../../api/mockDb";
+import type { MonthObj, Program } from "../../../../../api/mockDb";
 
 import PaymentActions from "./PaymentActions.vue";
 import PaymentTransactions from "./PaymentTransactions.vue";
@@ -278,7 +269,15 @@ const { student: currentStudent } = storeToRefs(payments);
 // MONTHS_SHORT is now directly used in template via shortMonths computed
 const shortMonths = computed(() => tm('common.monthsShort') as string[]);
 
-const openProg = ref<string>("space");
+// Открываем первую программу по умолчанию
+const openProg = ref<string>("");
+
+// Автоматически открываем первую программу при загрузке данных
+watch(() => payments.programs, (newPrograms) => {
+  if (newPrograms.length > 0 && !openProg.value) {
+    openProg.value = newPrograms[0].id;
+  }
+}, { immediate: true });
 
 const extrasProgram = computed(() => {
   const p = payments.programs.find(p => p.id === 'extras');
@@ -290,16 +289,6 @@ const totalExtrasPaid = computed(() => {
 });
 
 // ── helpers ──
-function progId(e: Enrollment): string {
-  return e.school.includes("Indigo") ? "indigo" : "space";
-}
-function progFor(e: Enrollment): Program | null {
-  return payments.programs.find(p => p.id === progId(e)) || null;
-}
-function schedule(teacher?: string): string {
-  if (!teacher) return "—";
-  return TEACHERS_DB.find(t => t.name === teacher)?.schedule || "—";
-}
 function toggleProg(id: string) {
   openProg.value = openProg.value === id ? "" : id;
 }

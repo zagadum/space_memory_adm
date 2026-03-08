@@ -65,9 +65,88 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   */
 
   // --- PAYMENTS ---
-  if (method === "get" && url.startsWith("api/payments/student/")) {
+  if (method === "get" && url.startsWith("v1/payments/student/")) {
     const studentId = url.split("/").pop();
-    const data = studentId ? mockDb.students[studentId] : null;
+    let data: { profile: StudentProfile; programs: Program[] } | null = studentId ? mockDb.students[studentId] : null;
+    
+    // Если студента нет в БД, генерируем mock данные
+    if (!data && studentId) {
+      const id = studentId.replace(/^\D+/, ''); // Удаляем префикс
+      const names = ["Иван Иванов", "Мария Петрова", "Алексей Сидоров", "Елена Смирнова", "Петр Федоров", "Юлия Кравцова"];
+      const teachers = ["Клара Левит", "Ханна Боян"];
+      const groups = ["Вт 17 Младшая", "Ср 15 Младшая", "Чт 16 Средняя", "Сб 10 Старшая"];
+      
+      const nameIdx = parseInt(id) % names.length;
+      const teacherIdx = parseInt(id) % teachers.length;
+      const groupIdx = parseInt(id) % groups.length;
+      
+      const mockStudent = {
+        profile: {
+          id: studentId,
+          initials: names[nameIdx].split(' ').map(n => n[0]).join(''),
+          name: names[nameIdx],
+          firstName: names[nameIdx].split(' ')[0],
+          lastName: names[nameIdx].split(' ')[1],
+          email: `student${id}@demo.local`,
+          birthDate: "2012-05-15",
+          country: "Польша",
+          city: "Варшава",
+          street: "Aleje Jerozolimskie 100",
+          apartment: "12",
+          postalCode: "00-001",
+          age: 12,
+          parentName: "Марина Иванова",
+          parentFirstName: "Марина",
+          parentLastName: "Иванова",
+          parentPhone: "+48 777 000 222",
+          parentRole: "мама",
+          parentPassport: "AB 1234567",
+          phone: "+48 777 000 111",
+          status: "Активна",
+          statusColor: "var(--green)",
+          photoConsent: true,
+          regComment: "Хочет заниматься по выходным",
+          totalBalance: { value: "+220 zł", label: "переплата", color: "var(--green)" },
+          nextPay: { date: "01.03.2026", approx: "~837 зл · с учётом скидок" },
+          enrollments: [
+            {
+              school: 'Space Memory',
+              group: groups[groupIdx],
+              teacher: teachers[teacherIdx],
+              lessons: [
+                { id: 'm1', date: '10.03.2026', block: 'Память', theme: 'Ассоциации', element: 'Слова', teacher: teachers[teacherIdx], attendance: 'Присутствовал', status: 'Оплачено' },
+                { id: 'm2', date: '17.03.2026', block: 'Техники', theme: 'Дворец памяти', element: 'Локации', teacher: teachers[teacherIdx], attendance: 'Присутствовал', status: 'Оплачено' }
+              ]
+            }
+          ]
+        },
+        programs: [
+          {
+            id: "space_" + id,
+            name: "🌌 Space Memory",
+            sub: `${groups[groupIdx]} · Вт 17:00 · ${teachers[teacherIdx]} · 490 зл/мес · 👦 1-й ребёнок · без скидки`,
+            tariff: 490,
+            balance: 120,
+            balanceLabel: "переплата",
+            barGradient: "linear-gradient(180deg,var(--blue),var(--purple))",
+            years: {
+              "2025": [
+                { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "03.01.2025", lessons: 4, totalLessons: 4 },
+                { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "02.02.2025", lessons: 4, totalLessons: 4 },
+                { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "01.03.2025", lessons: 4, totalLessons: 4 },
+              ],
+              "2026": [
+                { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "01.01.2026", lessons: 4, totalLessons: 4 },
+                { s: "paid", payStatus: "paid", a: 490, ksef: "ok", g1: 4, g2: 0, txDate: "01.02.2026", lessons: 4, totalLessons: 4 },
+                { s: "pending", payStatus: "pending", a: 490, ksef: null, g1: 4, g2: 0, lessons: 0, totalLessons: 4 },
+              ]
+            }
+          }
+        ]
+      };
+      data = mockStudent;
+    }
+    
     if (!data) return err(config, 404, "Student not found");
     return ok(config, { student: data.profile, programs: data.programs });
   }
@@ -86,7 +165,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
    */
 
   // Example mutation endpoints (no real persistence, but realistic response shape)
-  if (method === "post" && url === "api/payments/refund") {
+  if (method === "post" && url === "v1/payments/refund") {
     const body = readBody(config);
     if (!body?.fvnum) return err(config, 400, "fvnum is required");
     return ok(config, {
@@ -96,75 +175,75 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  if (method === "post" && url === "api/payments/tariff") {
+  if (method === "post" && url === "v1/payments/tariff") {
     const body = readBody(config);
     if (!body?.programId || !body?.value) return err(config, 400, "programId/value required");
     return ok(config, { ok: true, programId: body.programId, value: body.value });
   }
 
 
-  if (method === "get" && url === "api/payments/transactions") {
+  if (method === "get" && url === "v1/payments/transactions") {
     const programId = (config.params as any)?.programId;
     if (!programId || !mockTransactions[programId]) return err(config, 400, "programId is required");
     return ok(config, { items: mockTransactions[programId] });
   }
 
-  if (method === "get" && url === "api/payments/ksef-invoices") {
+  if (method === "get" && url === "v1/payments/ksef-invoices") {
     const programId = (config.params as any)?.programId;
     if (!programId || !mockKsefInvoices[programId]) return err(config, 400, "programId is required");
     return ok(config, { items: mockKsefInvoices[programId] });
   }
 
 
-  if (method === "post" && url === "api/payments/invoice") {
+  if (method === "post" && url === "v1/payments/invoice") {
     const body = readBody(config);
     if (!body?.programId || !body?.fvnum) return err(config, 400, "programId/fvnum required");
     return ok(config, { ok: true, fvnum: body.fvnum });
   }
 
-  if (method === "post" && url === "api/payments/correction") {
+  if (method === "post" && url === "v1/payments/correction") {
     const body = readBody(config);
     if (!body?.programId || body?.amount == null) return err(config, 400, "programId/amount required");
     return ok(config, { ok: true, correctionId: "corr_" + Math.random().toString(16).slice(2) });
   }
 
-  if (method === "post" && url === "api/payments/pause") {
+  if (method === "post" && url === "v1/payments/pause") {
     const body = readBody(config);
     if (!body?.programId || !body?.from || !body?.to) return err(config, 400, "programId/from/to required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "api/payments/discount") {
+  if (method === "post" && url === "v1/payments/discount") {
     const body = readBody(config);
     if (!body?.programId || !body?.kind || body?.value == null) return err(config, 400, "programId/kind/value required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "api/payments/extra") {
+  if (method === "post" && url === "v1/payments/extra") {
     const body = readBody(config);
     if (!body?.programId || !body?.date || !body?.title || body?.amount == null) return err(config, 400, "programId/date/title/amount required");
     return ok(config, { ok: true, extraId: "extra_" + Math.random().toString(16).slice(2) });
   }
 
-  if (method === "post" && url === "api/payments/unlock") {
+  if (method === "post" && url === "v1/payments/unlock") {
     const body = readBody(config);
     if (!body?.programId) return err(config, 400, "programId required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "api/payments/archive") {
+  if (method === "post" && url === "v1/payments/archive") {
     const body = readBody(config);
     if (!body?.programId || !body?.reason) return err(config, 400, "programId/reason required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "api/payments/split") {
+  if (method === "post" && url === "v1/payments/split") {
     const body = readBody(config);
     if (!body?.programId || !body?.fromGroup || !body?.toGroup || !body?.effectiveDate) return err(config, 400, "programId/fromGroup/toGroup/effectiveDate required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "api/payments/resume") {
+  if (method === "post" && url === "v1/payments/resume") {
     const body = readBody(config);
     if (!body?.programId) return err(config, 400, "programId required");
     return ok(config, { ok: true });
@@ -354,6 +433,163 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.name !== body.studentName);
     }
     return ok(config, { ok: true });
+  }
+
+  // --- STUDENTS LIST ---
+  if (method === "get" && url === "v1/student/groups-filter") {
+    return ok(config, {
+      items: [
+        { id: 1, name: "Вт 17 Младшая" },
+        { id: 2, name: "Ср 15 Младшая" },
+        { id: 3, name: "Чт 16 Средняя" },
+        { id: 4, name: "Сб 10 Старшая" }
+      ]
+    });
+  }
+
+  if (method === "get" && url === "v1/student/teacher-filter") {
+    return ok(config, {
+      items: [
+        { id: 1, name: "Клара Левит" },
+        { id: 2, name: "Ханна Боян" }
+      ]
+    });
+  }
+
+  if (method === "get" && url === "v1/student/list") {
+    // Генерируем mock данные для списка студентов
+    const mockStudentsList = [
+      {
+        id: 1,
+        full_name: "Иван Иванов",
+        name: "Иван Иванов",
+        phone: "+48 777 000 111",
+        email: "ivan.ivanov@gmail.com",
+        created_at: "2025-12-15",
+        start_date: "2025-12-15",
+        training_term_days: 82,
+        daysSinceContact: 2,
+        lastContact: "05.03.2026, 14:30",
+        comment: "Активный студент",
+        is_paid: true,
+        paid: true,
+        status: "Активна",
+        statusColor: "#10b981",
+        initials: "ИИ",
+        avatarColor: "#4f6ef7",
+        staffInitials: "КЛ",
+        staff: "Клара Левит",
+        groups: [
+          { school_name: "Space Memory", name: "Вт 17 Младшая", teacher_name: "Клара Левит" }
+        ],
+        enrollments: [
+          { school: "Space Memory", group: "Вт 17 Младшая", teacher: "Клара Левит" }
+        ]
+      },
+      {
+        id: 2,
+        full_name: "Мария Петрова",
+        name: "Мария Петрова",
+        phone: "+48 777 000 222",
+        email: "maria.petrova@gmail.com",
+        created_at: "2025-11-01",
+        start_date: "2025-11-01",
+        training_term_days: 127,
+        daysSinceContact: 8,
+        lastContact: "28.02.2026, 10:15",
+        comment: "Требует внимания",
+        is_paid: false,
+        paid: false,
+        status: "Требует внимания",
+        statusColor: "#f59e0b",
+        initials: "МП",
+        avatarColor: "#8b5cf6",
+        staffInitials: "ХБ",
+        staff: "Ханна Боян",
+        groups: [
+          { school_name: "Speedy Mind Indigo", name: "Ср 15 Младшая", teacher_name: "Ханна Боян" }
+        ],
+        enrollments: [
+          { school: "Speedy Mind Indigo", group: "Ср 15 Младшая", teacher: "Ханна Боян" }
+        ]
+      },
+      {
+        id: 3,
+        full_name: "Алексей Сидоров",
+        name: "Алексей Сидоров",
+        phone: "+48 777 000 333",
+        email: "alexey.sidorov@gmail.com",
+        created_at: "2025-10-20",
+        start_date: "2025-10-20",
+        training_term_days: 139,
+        daysSinceContact: 15,
+        lastContact: "20.02.2026, 16:45",
+        comment: "Без контакта 15 дней",
+        is_paid: true,
+        paid: true,
+        status: "Критично",
+        statusColor: "#ef4444",
+        initials: "АС",
+        avatarColor: "#06b6d4",
+        staffInitials: "КЛ",
+        staff: "Клара Левит",
+        groups: [
+          { school_name: "Space Memory", name: "Чт 16 Средняя", teacher_name: "Клара Левит" }
+        ],
+        enrollments: [
+          { school: "Space Memory", group: "Чт 16 Средняя", teacher: "Клара Левит" }
+        ]
+      },
+      {
+        id: 4,
+        full_name: "Елена Смирнова",
+        name: "Елена Смирнова",
+        phone: "+48 777 000 444",
+        email: "elena.smirnova@gmail.com",
+        created_at: "2025-09-10",
+        start_date: "2025-09-10",
+        training_term_days: 179,
+        daysSinceContact: 3,
+        lastContact: "04.03.2026, 19:00",
+        comment: "Успешная студентка",
+        is_paid: true,
+        paid: true,
+        status: "Активна",
+        statusColor: "#10b981",
+        initials: "ЕС",
+        avatarColor: "#f59e0b",
+        staffInitials: "ХБ",
+        staff: "Ханна Боян",
+        groups: [
+          { school_name: "Speedy Mind Indigo", name: "Сб 10 Старшая", teacher_name: "Ханна Боян" }
+        ],
+        enrollments: [
+          { school: "Speedy Mind Indigo", group: "Сб 10 Старшая", teacher: "Ханна Боян" }
+        ]
+      }
+    ];
+
+    const page = Number((config.params as any)?.page) || 1;
+    const perPage = Number((config.params as any)?.per_page) || 20;
+    const total = mockStudentsList.length;
+    
+    const from = (page - 1) * perPage + 1;
+    const to = Math.min(page * perPage, total);
+    const lastPage = Math.ceil(total / perPage);
+    
+    const paginatedStudents = mockStudentsList.slice((page - 1) * perPage, page * perPage);
+
+    return ok(config, {
+      data: paginatedStudents,
+      meta: {
+        current_page: page,
+        last_page: lastPage,
+        per_page: perPage,
+        total: total,
+        from: from,
+        to: to
+      }
+    });
   }
 
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);

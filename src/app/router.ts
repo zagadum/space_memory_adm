@@ -47,7 +47,7 @@ export const router = createRouter({
           meta: { title: 'financeSettings.pageTitle', subTitle: 'financeSettings.pageSubTitle', icon: '⚙️' }
         },
         {
-          path: "students/:id",
+          path: "payments/:id",
           component: () => import("../views/students/StudentProfilePage.vue"),
           children: [
             { path: "", redirect: { name: "student-payments" } },

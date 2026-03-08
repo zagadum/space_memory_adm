@@ -30,7 +30,7 @@ async function loadData() {
     payments.reset();
     st.resetAll();
     await payments.loadStudent(studentId);
-    await st.loadStudent(studentId);
+    //await st.loadStudent(studentId);
   }
 }
 

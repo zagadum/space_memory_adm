@@ -29,6 +29,7 @@
         "close": "Закрыть",
         "loading": "Загрузка…",
         "loadingData": "Загрузка данных…",
+        "retry": "Повторить попытку",
         "monthsShort": [
             "ЯНВ",
             "ФЕВ",
@@ -57,7 +58,8 @@
         "daysCount": "{n} день | {n} дня | {n} дней",
         "export": "Экспорт",
         "searchHint": "Поиск по имени, телефону...",
-        "welcome": "Привет, {name}! 👋"
+        "welcome": "Привет, {name}! 👋",
+        "search": "Поиск"
     },
     "dashboard": {
         "header": {

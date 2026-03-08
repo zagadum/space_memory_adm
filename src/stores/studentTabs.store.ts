@@ -6,7 +6,7 @@ import {
   getStudentProgress,
   getStudentNotes,
 } from "../api/studentApi";
-import { paymentsApi } from "../api/paymentsApi";
+
 import type { StudentProfile } from "../api/mockDb";
 
 export const useStudentTabsStore = defineStore("studentTabs", {
@@ -71,14 +71,14 @@ export const useStudentTabsStore = defineStore("studentTabs", {
         this.loading.notes = false;
       }
     },
-    async loadStudent(studentId: string) {
-      try {
-        const res = await paymentsApi.getStudentPayments(studentId);
-        this.student = res.student || null;
-      } catch (e) {
-        console.error("Failed to load student in studentTabsStore", e);
-      }
-    },
+    // async loadStudent(studentId: string) {
+    //   // try {
+    //   //   const res = await studentsApi.getStudentPayments(studentId);
+    //   //   this.student = res.student || null;
+    //   // } catch (e) {
+    //   //   console.error("Failed to load student in studentTabsStore", e);
+    //   // }
+    // },
     resetAll() {
       this.groups = [];
       this.info = null;

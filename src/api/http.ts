@@ -48,6 +48,22 @@ http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
+// Response interceptor for timeout errors
+http.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      error.message = 'Большая нагрузка на сервер. Пожалуйста, повторите попытку через несколько секунд.';
+      console.error('⏱️ [TIMEOUT ERROR]', {
+        url: error.config?.url,
+        method: error.config?.method,
+        timeout: error.config?.timeout,
+      });
+    }
+    return Promise.reject(error);
+  }
+);
+
 const axiosAny = axios as any;
 const defaultAdapter: AxiosAdapter = axiosAny.getAdapter
   ? axiosAny.getAdapter(http.defaults.adapter)

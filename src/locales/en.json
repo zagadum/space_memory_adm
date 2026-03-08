@@ -29,6 +29,7 @@
     "close": "Close",
     "loading": "Loading…",
     "loadingData": "Loading data…",
+    "retry": "Retry",
     "monthsShort": [
       "JAN",
       "FEB",
@@ -57,7 +58,8 @@
     "daysCount": "{n} day | {n} days",
     "export": "Export",
     "searchHint": "Search by name, phone...",
-    "welcome": "Hi, {name}! 👋"
+    "welcome": "Hi, {name}! 👋",
+    "search": "Search"
   },
   "dashboard": {
     "header": {

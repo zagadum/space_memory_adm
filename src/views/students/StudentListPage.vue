@@ -3,7 +3,7 @@
     <div class="stats-grid">
       <div class="stat-card blue">
         <div class="stat-label">{{ t('studentList.stats.activeStudents') }}</div>
-        <div class="stat-value">{{ students.length }}</div>
+        <div class="stat-value">{{ listStore.pagination.total }}</div>
         <div class="stat-sub">{{ t('studentList.stats.totalInSystem') }}</div>
         <div class="stat-icon">👩‍🚀</div>
       </div>
@@ -31,20 +31,34 @@
       <div class="toolbar-left">
         <div class="section-title">
           {{ t('studentList.toolbar.listTitle') }}
-          <span class="section-count">{{ t('common.studentsCount', { n: students.length }) }}</span>
+          <span class="section-count">{{ t('common.studentsCount', { n: listStore.pagination.total }) }}</span>
         </div>
         <div class="filter-chips">
-          <div class="chip">
+          <button class="chip" :class="{ active: listStore.filters.withoutContact7Plus }" @click="toggleWithoutContact">
             <span class="chip-dot amber"></span> {{ t('studentList.toolbar.noContact7') }}
-          </div>
-          <div class="chip">
+          </button>
+          <button class="chip" :class="{ active: listStore.filters.onlyMine }" @click="toggleOnlyMine">
             <span class="chip-dot blue"></span> {{ t('studentList.toolbar.onlyMine') }}
-          </div>
+          </button>
         </div>
       </div>
-      <div style="display:flex; gap:8px;">
-        <button class="dropdown-filter-btn">{{ t('studentList.toolbar.group') }} ▾</button>
-        <button class="dropdown-filter-btn">{{ t('studentList.toolbar.teacher') }} ▾</button>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <input
+          v-model="searchInput"
+          class="dropdown-filter-btn"
+          style="min-width: 220px;"
+          :placeholder="t('common.search')"
+          @keyup.enter="applySearch"
+        />
+        <button class="dropdown-filter-btn" @click="applySearch">{{ t('common.search') }}</button>
+        <select class="dropdown-filter-btn" v-model.number="selectedGroupId" @change="applySelectFilters">
+          <option :value="0">{{ t('studentList.toolbar.group') }}</option>
+          <option v-for="group in listStore.groupsFilterOptions" :key="group.id" :value="group.id">{{ group.name }}</option>
+        </select>
+        <select class="dropdown-filter-btn" v-model.number="selectedTeacherId" @change="applySelectFilters">
+          <option :value="0">{{ t('studentList.toolbar.teacher') }}</option>
+          <option v-for="teacher in listStore.teachersFilterOptions" :key="teacher.id" :value="teacher.id">{{ teacher.name }}</option>
+        </select>
       </div>
     </div>
 
@@ -73,7 +87,7 @@
           </tr>
         </thead>
         <tbody v-if="!listStore.loading">
-          <tr v-for="student in sortedStudents" :key="student.id" class="table-row" @click="openStudent(student.id)">
+          <tr v-for="student in students" :key="student.id" class="table-row" @click="openStudent(student.id)">
             <td>
               <div class="name-cell">
                 <span class="student-name">{{ student.name }}</span>
@@ -130,7 +144,7 @@
             <td>
               <div class="actions-wrap" @click.stop>
                 <button class="actions-btn" @click="toggleDropdown(student.id)">⋮</button>
-                <div class="actions-dropdown" :class="{ open: activeDropdownId === student.id }">
+                <div class="actions-dropdown" :class="{ open: activeDropdownId === student.id.toString() }">
                   <div class="action-item" @click="openStudent(student.id); activeDropdownId = null">👤 {{ t('studentList.actions.openProfile') }}</div>
                   <div class="action-item" @click="openContactModal(student); activeDropdownId = null">📅 {{ t('studentList.actions.updateContact') }}</div>
                   <div class="action-item" @click="activeDropdownId = null">👤 {{ t('studentList.actions.changeManager') }}</div>
@@ -150,6 +164,17 @@
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="table-toolbar" style="margin-top: 12px;">
+      <div class="section-count">
+        {{ listStore.pagination.from || 0 }}-{{ listStore.pagination.to || students.length }} / {{ listStore.pagination.total }}
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button class="dropdown-filter-btn" :disabled="listStore.pagination.currentPage <= 1" @click="goPrevPage">←</button>
+        <span class="section-count">{{ listStore.pagination.currentPage }} / {{ listStore.pagination.lastPage }}</span>
+        <button class="dropdown-filter-btn" :disabled="listStore.pagination.currentPage >= listStore.pagination.lastPage" @click="goNextPage">→</button>
+      </div>
     </div>
 
     <!-- Модальное окно "Контакт" -->
@@ -180,7 +205,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { TEACHERS_DB } from '../../api/mockDb'
 // Подключаем наш новый стор
 import { useStudentsListStore } from '../../stores/studentsList.store'
 
@@ -195,40 +219,61 @@ function openStudent(id: number | string) {
 
 // Делаем переменную students реактивной ссылкой на массив из стора
 const students = computed(() => listStore.students)
+const searchInput = ref('')
+const selectedGroupId = ref(0)
+const selectedTeacherId = ref(0)
 
 // ── СОРТИРОВКА ──
 const sortCol = ref('name')
 const sortDir = ref(1) // 1 - asc, -1 - desc
 
-function sortBy(col: string) {
+async function sortBy(col: string) {
   if (sortCol.value === col) {
     sortDir.value *= -1
   } else {
     sortCol.value = col
     sortDir.value = 1
   }
+
+  const orderMap: Record<string, string> = {
+    name: 'full_name',
+    startDate: 'start_date',
+    daysInSystem: 'training_term',
+    lastContact: 'last_contract',
+  }
+
+  listStore.setSort(orderMap[col] || 'full_name', sortDir.value === 1 ? 'asc' : 'desc')
+  await listStore.fetchStudents(1)
 }
 
-const sortedStudents = computed(() => {
-  return [...students.value].sort((a: any, b: any) => {
-    let valA = a[sortCol.value]
-    let valB = b[sortCol.value]
+async function applySearch() {
+  listStore.filters.search = searchInput.value.trim()
+  await listStore.applyFilters()
+}
 
-    // Специальная логика для дат (очень наивная, но для моков сойдет)
-    if (sortCol.value === 'startDate') {
-      const parseDate = (d: string) => {
-        const [day, month, year] = d.split('.').map(Number)
-        return new Date(year, month - 1, day).getTime()
-      }
-      valA = parseDate(valA)
-      valB = parseDate(valB)
-    }
+async function applySelectFilters() {
+  listStore.filters.groupId = selectedGroupId.value > 0 ? selectedGroupId.value : null
+  listStore.filters.teacherId = selectedTeacherId.value > 0 ? selectedTeacherId.value : null
+  await listStore.applyFilters()
+}
 
-    if (valA < valB) return -1 * sortDir.value
-    if (valA > valB) return 1 * sortDir.value
-    return 0
-  })
-})
+async function toggleWithoutContact() {
+  listStore.filters.withoutContact7Plus = !listStore.filters.withoutContact7Plus
+  await listStore.applyFilters()
+}
+
+async function toggleOnlyMine() {
+  listStore.filters.onlyMine = !listStore.filters.onlyMine
+  await listStore.applyFilters()
+}
+
+async function goPrevPage() {
+  await listStore.setPage(listStore.pagination.currentPage - 1)
+}
+
+async function goNextPage() {
+  await listStore.setPage(listStore.pagination.currentPage + 1)
+}
 
 // ── МОДАЛЬНОЕ ОКНО "КОНТАКТ" ──
 const isContactModalOpen = ref(false)
@@ -294,6 +339,7 @@ const handleClickOutside = (event: MouseEvent) => {
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
   listStore.fetchStudents()
+  listStore.fetchFilterOptions()
 })
 
 onUnmounted(() => {
@@ -330,12 +376,14 @@ onUnmounted(() => {
 .filter-chips { display: flex; gap: 6px; }
 .chip { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid rgba(100,120,255,0.15); background: rgba(255,255,255,0.04); color: #8892b0; transition: all 0.15s; }
 .chip:hover { border-color: rgba(120,140,255,0.35); color: #e8eeff; }
+.chip.active { border-color: rgba(79,110,247,0.55); color: #e8eeff; background: rgba(79,110,247,0.15); }
 .chip-dot { width: 6px; height: 6px; border-radius: 50%; }
 .chip-dot.amber { background: #f59e0b; }
 .chip-dot.blue { background: #4f6ef7; }
 
 .dropdown-filter-btn { padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 500; cursor: pointer; border: 1px solid rgba(100,120,255,0.15); background: rgba(255,255,255,0.04); color: #8892b0; transition: all 0.15s; }
 .dropdown-filter-btn:hover { border-color: rgba(120,140,255,0.35); color: #e8eeff; }
+.dropdown-filter-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
 /* ── ИДЕАЛЬНАЯ ТАБЛИЦА ── */
 .table-container { background: rgba(15, 15, 46, 0.9); border: 1px solid rgba(100,120,255,0.15); border-radius: 14px; overflow-x: auto; }
@@ -376,7 +424,7 @@ td { padding: 12px 14px; font-size: 13.5px; color: #e8eeff; border-bottom: 1px s
 .comment-cell { max-width: 250px; overflow: hidden; text-overflow: ellipsis; font-size: 12.5px; color: #8892b0; font-style: italic; white-space: nowrap; }
 
 .actions-wrap { display: flex; justify-content: center; position: relative; }
-.actions-btn { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid rgba(100,120,255,0.15); color: #8892b0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; font-size: 16px; border-color: transparent; }
+.actions-btn { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid transparent; color: #8892b0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; font-size: 16px; }
 .actions-btn:hover { background: rgba(79,110,247,0.1); border-color: rgba(120,140,255,0.35); color: #e8eeff; }
 
 .actions-dropdown { position: absolute; top: calc(100% + 5px); right: 0; background: #0d0d2b; border: 1px solid rgba(120,140,255,0.25); border-radius: 10px; padding: 6px; min-width: 180px; z-index: 300; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
