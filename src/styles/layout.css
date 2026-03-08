@@ -54,15 +54,40 @@
     margin-top: 1px;
 }
 
-.school-pill {
+.school-pill-link {
+    display: block;
     margin-top: 10px;
+    text-decoration: none;
+    transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.school-pill {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding: 6px 9px;
-    background: rgba(79, 110, 247, 0.07);
-    border: 1px solid rgba(79, 110, 247, 0.18);
-    border-radius: 8px;
+    gap: 9px;
+    padding: 8px 12px;
+    background: rgba(79, 110, 247, 0.05);
+    border: 1px solid rgba(79, 110, 247, 0.15);
+    border-radius: 10px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.school-pill-link:hover .school-pill {
+    background: rgba(79, 110, 247, 0.12);
+    border-color: rgba(79, 110, 247, 0.35);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.school-pill-link.active .school-pill {
+    background: linear-gradient(135deg, rgba(79, 110, 247, 0.15), rgba(139, 92, 246, 0.12));
+    border-color: rgba(79, 110, 247, 0.5);
+    box-shadow: 0 0 15px rgba(79, 110, 247, 0.2);
+}
+
+.school-pill-link.active .school-name {
+    color: var(--blue);
 }
 
 .school-dot {

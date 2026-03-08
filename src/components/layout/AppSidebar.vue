@@ -10,13 +10,15 @@
           <div class="logo-sub">Space Memory</div>
         </div>
       </div>
-      <div class="school-pill" @click="navigateTo('projects', '/projects')">
-        <div class="school-dot"></div>
-        <div>
-          <div class="school-name">{{ t('sidebar.allProjects') }}</div>
-          <div class="school-city">GLS Network</div>
+      <RouterLink to="/projects" class="school-pill-link" active-class="active">
+        <div class="school-pill">
+          <div class="school-dot"></div>
+          <div>
+            <div class="school-name">{{ t('sidebar.allProjects') }}</div>
+            <div class="school-city">GLS Network</div>
+          </div>
         </div>
-      </div>
+      </RouterLink>
     </div>
 
     <nav class="sidebar-nav">
