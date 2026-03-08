@@ -56,7 +56,38 @@
         "studentsCount": "{n} ученик | {n} ученика | {n} учеников",
         "daysCount": "{n} день | {n} дня | {n} дней",
         "export": "Экспорт",
-        "searchHint": "Поиск по имени, телефону..."
+        "searchHint": "Поиск по имени, телефону...",
+        "welcome": "Привет, {name}! 👋"
+    },
+    "dashboard": {
+        "header": {
+            "newStudent": "Новый ученик"
+        },
+        "stats": {
+            "totalStudents": "Все ученики",
+            "studentsTrend": "+{n} на этой неделе",
+            "activeGroups": "Активные группы",
+            "groupsTrend": "{n}% заполняемость",
+            "pendingInvoices": "Неоплаченные счета",
+            "invoicesTrend": "Требует внимания",
+            "newLeads": "Новые заявки",
+            "leadsTrend": "Ожидают звонка"
+        },
+        "activity": {
+            "title": "Последняя активность",
+            "viewAll": "Посмотреть все"
+        },
+        "quickActions": {
+            "title": "Быстрые действия",
+            "issueInvoice": "Выставить счет",
+            "addStudent": "Добавить ученика",
+            "newGroup": "Новая группа",
+            "salesReport": "Отчет по продажам"
+        },
+        "status": {
+            "online": "Система онлайн",
+            "version": "v2.4.0"
+        }
     },
     "auth": {
         "title": "Вход",

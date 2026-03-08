@@ -3,52 +3,52 @@
     <!-- Header Section -->
     <header class="dashboard-header">
       <div class="header-left">
-        <h1 class="welcome-text">Cześć, Artem! 👋</h1>
+        <h1 class="welcome-text">{{ $t('common.welcome', { name: authStore.user?.name || 'User' }) }}</h1>
         <p class="date-text">{{ currentDate }}</p>
       </div>
       <div class="header-right">
-        <button class="btn btn-primary btn-icon">
-          <span>＋</span> Nowy uczeń
+        <button class="btn btn-primary btn-icon" @click="navigate('/students/new')">
+          <span>＋</span> {{ $t('dashboard.header.newStudent') }}
         </button>
       </div>
     </header>
 
     <!-- Stats Grid -->
-    <section class="stats-grid">
+    <section class="stats-grid" :class="{ 'stats-loading': store.isLoadingStats }">
       <div class="stat-card blue">
         <div class="stat-icon">👩‍🚀</div>
         <div class="stat-info">
           <div class="stat-value">{{ store.stats.totalStudents }}</div>
-          <div class="stat-label">Wszyscy uczniowie</div>
+          <div class="stat-label">{{ $t('dashboard.stats.totalStudents') }}</div>
         </div>
-        <div class="stat-trend">+2 w tym tygodniu</div>
+        <div class="stat-trend">{{ $t('dashboard.stats.studentsTrend', { n: 0 }) }}</div>
       </div>
       
       <div class="stat-card green">
         <div class="stat-icon">🎓</div>
         <div class="stat-info">
           <div class="stat-value">{{ store.stats.activeGroups }}</div>
-          <div class="stat-label">Aktywne grupy</div>
+          <div class="stat-label">{{ $t('dashboard.stats.activeGroups') }}</div>
         </div>
-        <div class="stat-trend">100% obłożenia</div>
+        <div class="stat-trend">{{ $t('dashboard.stats.groupsTrend', { n: 0 }) }}</div>
       </div>
       
       <div class="stat-card amber">
         <div class="stat-icon">💫</div>
         <div class="stat-info">
           <div class="stat-value">{{ store.stats.pendingInvoices }}</div>
-          <div class="stat-label">Nieopłacone faktury</div>
+          <div class="stat-label">{{ $t('dashboard.stats.pendingInvoices') }}</div>
         </div>
-        <div class="stat-trend warning">Wymaga uwagi</div>
+        <div class="stat-trend warning">{{ $t('dashboard.stats.invoicesTrend') }}</div>
       </div>
       
       <div class="stat-card purple">
         <div class="stat-icon">🚀</div>
         <div class="stat-info">
           <div class="stat-value">{{ store.stats.newLeads }}</div>
-          <div class="stat-label">Nowe zgłoszenia</div>
+          <div class="stat-label">{{ $t('dashboard.stats.newLeads') }}</div>
         </div>
-        <div class="stat-trend info">Oczekują na kontakt</div>
+        <div class="stat-trend info">{{ $t('dashboard.stats.leadsTrend') }}</div>
       </div>
     </section>
 
@@ -58,8 +58,8 @@
       <main class="content-main">
         <div class="scard">
           <div class="scard-hdr">
-            <h2 class="scard-title">Ostatnia aktywność</h2>
-            <button class="btn btn-ghost btn-xs">Zobacz wszystkie</button>
+            <h2 class="scard-title">{{ $t('dashboard.activity.title') }}</h2>
+            <button class="btn btn-ghost btn-xs">{{ $t('dashboard.activity.viewAll') }}</button>
           </div>
           <div class="scard-body no-padding">
             <div class="activity-list">
@@ -82,7 +82,7 @@
       <aside class="content-aside">
         <div class="scard">
           <div class="scard-hdr">
-            <h2 class="scard-title">Szybkie akcje</h2>
+            <h2 class="scard-title">{{ $t('dashboard.quickActions.title') }}</h2>
           </div>
           <div class="scard-body">
             <div class="quick-actions">
@@ -93,7 +93,7 @@
                 @click="navigate(action.path)"
               >
                 <span class="action-icon" :class="action.color">{{ action.icon }}</span>
-                <span class="action-label">{{ action.label }}</span>
+                <span class="action-label">{{ $t(action.label) }}</span>
                 <span class="action-arrow">›</span>
               </button>
             </div>
@@ -104,7 +104,7 @@
           <div class="scard-body">
             <div class="system-status">
               <div class="status-dot online"></div>
-              <span>System online · v2.4.0</span>
+              <span>{{ $t('dashboard.status.online') }} · {{ $t('dashboard.status.version') }}</span>
             </div>
           </div>
         </div>
@@ -114,16 +114,24 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useDashboardStore } from '../../stores/dashboard.store'
+import { useAuthStore } from '../../stores/auth.store'
 
+const { t, locale } = useI18n()
 const store = useDashboardStore()
+const authStore = useAuthStore()
 const router = useRouter()
+
+onMounted(() => {
+  store.fetchStats()
+})
 
 const currentDate = computed(() => {
   const now = new Date()
-  return now.toLocaleDateString('pl-PL', { 
+  return now.toLocaleDateString(locale.value === 'ru' ? 'ru-RU' : locale.value === 'pl' ? 'pl-PL' : locale.value === 'uk' ? 'uk-UA' : 'en-US', { 
     weekday: 'long', 
     year: 'numeric', 
     month: 'long', 
@@ -169,6 +177,11 @@ const navigate = (path: string) => {
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 20px;
   margin-bottom: 32px;
+  transition: opacity 0.3s;
+}
+.stats-loading {
+  opacity: 0.6;
+  pointer-events: none;
 }
 .stat-card {
   background: var(--card, rgba(12,12,36,0.98));

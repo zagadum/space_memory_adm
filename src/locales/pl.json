@@ -56,7 +56,38 @@
     "studentsCount": "{n} student | {n} studentów | {n} studentów",
     "daysCount": "{n} dzień | {n} dni | {n} dni",
     "export": "Eksport",
-    "searchHint": "Szukaj po imieniu, telefonie..."
+    "searchHint": "Szukaj po imieniu, telefonie...",
+    "welcome": "Cześć, {name}! 👋"
+  },
+  "dashboard": {
+    "header": {
+      "newStudent": "Nowy uczeń"
+    },
+    "stats": {
+      "totalStudents": "Wszyscy uczniowie",
+      "studentsTrend": "+{n} w tym tygodniu",
+      "activeGroups": "Aktywne grupy",
+      "groupsTrend": "{n}% obłożenia",
+      "pendingInvoices": "Nieopłacone faktury",
+      "invoicesTrend": "Wymaga uwagi",
+      "newLeads": "Nowe zgłoszenia",
+      "leadsTrend": "Oczekują na kontakt"
+    },
+    "activity": {
+      "title": "Ostatnia aktywność",
+      "viewAll": "Zobacz wszystkie"
+    },
+    "quickActions": {
+      "title": "Szybkie akcje",
+      "issueInvoice": "Wystaw fakturę",
+      "addStudent": "Dodaj ucznia",
+      "newGroup": "Nowa grupa",
+      "salesReport": "Raport sprzedaży"
+    },
+    "status": {
+      "online": "System online",
+      "version": "v2.4.0"
+    }
   },
   "auth": {
     "title": "Logowanie",

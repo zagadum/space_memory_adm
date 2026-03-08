@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { getDashboardStats } from '../api/dashboardApi'
 
 export interface DashboardStats {
     totalStudents: number
@@ -26,11 +27,12 @@ export interface QuickAction {
 
 export const useDashboardStore = defineStore('dashboard', {
     state: () => ({
+        isLoadingStats: false,
         stats: {
-            totalStudents: 42,
-            activeGroups: 12,
-            pendingInvoices: 7,
-            newLeads: 8
+            totalStudents: 0,
+            activeGroups: 0,
+            pendingInvoices: 0,
+            newLeads: 0
         } as DashboardStats,
 
         recentActivity: [
@@ -77,14 +79,31 @@ export const useDashboardStore = defineStore('dashboard', {
         ] as ActivityEvent[],
 
         quickActions: [
-            { id: '1', label: 'Wystaw fakturę', icon: '📝', path: '/finance/invoices/new', color: 'blue' },
-            { id: '2', label: 'Dodaj ucznia', icon: '👤', path: '/students/new', color: 'green' },
-            { id: '3', label: 'Nowa grupa', icon: '🎓', path: '/groups/new', color: 'purple' },
-            { id: '4', label: 'Raport sprzedaży', icon: '📊', path: '/finance/reports', color: 'amber' }
+            { id: '1', label: 'dashboard.quickActions.issueInvoice', icon: '📝', path: '/finance/invoices/new', color: 'blue' },
+            { id: '2', label: 'dashboard.quickActions.addStudent', icon: '👤', path: '/students/new', color: 'green' },
+            { id: '3', label: 'dashboard.quickActions.newGroup', icon: '🎓', path: '/groups/new', color: 'purple' },
+            { id: '4', label: 'dashboard.quickActions.salesReport', icon: '📊', path: '/finance/reports', color: 'amber' }
         ] as QuickAction[]
     }),
 
     actions: {
-        // Future actions can be added here
+        async fetchStats() {
+            this.isLoadingStats = true
+            try {
+                const data = await getDashboardStats()
+                this.stats = data
+            } catch (err) {
+                console.warn('Dashboard stats endpoint not ready or failed. Using defaults.', err)
+                // Keep initial zeros or previous values
+                this.stats = {
+                    totalStudents: 0,
+                    activeGroups: 0,
+                    pendingInvoices: 0,
+                    newLeads: 0
+                }
+            } finally {
+                this.isLoadingStats = false
+            }
+        }
     }
 })

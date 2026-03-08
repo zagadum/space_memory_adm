@@ -56,7 +56,38 @@
     "studentsCount": "{n} учень | {n} учні | {n} учнів",
     "daysCount": "{n} день | {n} дні | {n} днів",
     "export": "Експорт",
-    "searchHint": "Пошук за ім'ям, телефоном..."
+    "searchHint": "Пошук за ім'ям, телефоном...",
+    "welcome": "Привіт, {name}! 👋"
+  },
+  "dashboard": {
+    "header": {
+      "newStudent": "Новий учень"
+    },
+    "stats": {
+      "totalStudents": "Усі учні",
+      "studentsTrend": "+{n} цього тижня",
+      "activeGroups": "Активні групи",
+      "groupsTrend": "{n}% заповнюваність",
+      "pendingInvoices": "Неоплачені рахунки",
+      "invoicesTrend": "Потребує уваги",
+      "newLeads": "Нові заявки",
+      "leadsTrend": "Очікують контакту"
+    },
+    "activity": {
+      "title": "Остання активність",
+      "viewAll": "Подивитись усе"
+    },
+    "quickActions": {
+      "title": "Швидкі дії",
+      "issueInvoice": "Виставити рахунок",
+      "addStudent": "Додати учня",
+      "newGroup": "Нова група",
+      "salesReport": "Звіт з продажу"
+    },
+    "status": {
+      "online": "Система онлайн",
+      "version": "v2.4.0"
+    }
   },
   "auth": {
     "title": "Вхід",

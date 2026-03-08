@@ -56,7 +56,38 @@
     "studentsCount": "{n} student | {n} students",
     "daysCount": "{n} day | {n} days",
     "export": "Export",
-    "searchHint": "Search by name, phone..."
+    "searchHint": "Search by name, phone...",
+    "welcome": "Hi, {name}! 👋"
+  },
+  "dashboard": {
+    "header": {
+      "newStudent": "New Student"
+    },
+    "stats": {
+      "totalStudents": "Total Students",
+      "studentsTrend": "+{n} this week",
+      "activeGroups": "Active Groups",
+      "groupsTrend": "{n}% occupancy",
+      "pendingInvoices": "Unpaid Invoices",
+      "invoicesTrend": "Requires attention",
+      "newLeads": "New Leads",
+      "leadsTrend": "Awaiting contact"
+    },
+    "activity": {
+      "title": "Recent Activity",
+      "viewAll": "View all"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "issueInvoice": "Issue Invoice",
+      "addStudent": "Add Student",
+      "newGroup": "New Group",
+      "salesReport": "Sales Report"
+    },
+    "status": {
+      "online": "System online",
+      "version": "v2.4.0"
+    }
   },
   "auth": {
     "title": "Sign In",
