@@ -10,11 +10,11 @@
           <div class="logo-sub">Space Memory</div>
         </div>
       </div>
-      <div class="school-pill">
+      <div class="school-pill" @click="navigateTo('projects', '/projects')">
         <div class="school-dot"></div>
         <div>
-          <div class="school-name">Warsaw — Centrum</div>
-          <div class="school-city">ul. Marszałkowska 10</div>
+          <div class="school-name">{{ t('sidebar.allProjects') }}</div>
+          <div class="school-city">GLS Network</div>
         </div>
       </div>
     </div>
@@ -99,6 +99,13 @@
         </div>
         <div 
           class="nav-item" 
+          :class="{ active: activeItem === 'projects' }" 
+          @click="navigateTo('projects', '/projects')"
+        >
+          <span class="nav-icon">📁</span> {{ t('sidebar.projects') }}
+        </div>
+        <div 
+          class="nav-item" 
           :class="{ active: activeItem === 'settings' }" 
           @click="setActive('settings')"
         >
@@ -127,6 +134,13 @@
         </div>
         <div 
           class="nav-item" 
+          :class="{ active: activeItem === 'leads' }" 
+          @click="navigateTo('leads', '/recruitment/leads')"
+        >
+          <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div 
+          class="nav-item" 
           :class="{ active: activeItem === 'new-groups' }" 
           @click="navigateTo('new-groups', '/recruitment/new-groups')"
         >
@@ -152,7 +166,7 @@
 
     <div class="sidebar-lang">
       <select class="lang-select" :value="locale" @change="onLocale(($event.target as HTMLSelectElement).value)">
-        <option value="ru">🇷🇺 Русский</option>
+        <option value="ru">Русский</option>
         <option value="uk">🇺🇦 Українська</option>
         <option value="pl">🇵🇱 Polski</option>
         <option value="en">🇬🇧 English</option>
@@ -218,9 +232,15 @@ const openSections = ref<Record<string, boolean>>({
 const activeItem = ref('students')
 
 watch(() => route.path, (path) => {
-  if (path.startsWith('/recruitment/new-groups')) {
+  if (path.startsWith('/recruitment/leads')) {
+    activeItem.value = 'leads'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/new-groups')) {
     activeItem.value = 'new-groups'
     openSections.value.recruitment = true
+  } else if (path.startsWith('/projects')) {
+    activeItem.value = 'projects'
+    openSections.value.finance = true
   } else if (path.startsWith('/students')) {
     activeItem.value = 'students'
   } else if (path === '/' || path === '/dashboard') {

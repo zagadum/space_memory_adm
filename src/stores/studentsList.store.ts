@@ -76,29 +76,35 @@ export const useStudentsListStore = defineStore("studentsList", {
                 };
 
                 const data = await getStudents(params);
-                this.students = (data.data || []).map((u: any) => ({
-                    id: u.id,
-                    name: u.name || u.full_name || u.email || "Unknown Student",
-                    phone: u.phone || u.phone_number || "-",
-                    startDate: u.startDate || u.created_at || "-",
-                    daysInSystem: u.trainingTermDays || u.training_term_days || 0,
-                    enrollments: u.groups?.map((g: any) => ({
-                        school: g.school_name || "Space Memory",
-                        group: g.name || "-",
-                        teacher: g.teacher_name || "-"
-                    })) || u.enrollments || [],
-                    lastContact: u.lastContact || null,
-                    daysSinceContact: u.daysSinceContact ?? null,
-                    staff: u.staff || u.manager_name || "-",
-                    staffInitials: u.staffInitials || "-",
-                    comment: u.comment || "",
-                    paid: !!u.is_paid
-                }));
+                this.students = (data.data || []).map((u: any) => {
+                    // Extract group and teacher info from the new unified response
+                    // Usually backend returns 'groups' as an array of objects
+                    const primaryEnrollment = u.groups?.[0] || {};
+
+                    return {
+                        id: u.id,
+                        name: u.full_name || u.name || "Unknown Student",
+                        phone: u.phone_number || u.phone || "-",
+                        startDate: u.created_at || u.startDate || "-",
+                        daysInSystem: u.training_term_days || 0,
+                        enrollments: u.groups?.map((g: any) => ({
+                            school: g.school_name || "Space Memory",
+                            group: g.name || "-",
+                            teacher: g.teacher_name || "-"
+                        })) || [],
+                        lastContact: u.last_contact_at || u.lastContact || null,
+                        daysSinceContact: u.days_since_last_contact ?? u.daysSinceContact ?? null,
+                        staff: u.manager_name || u.staff || "-",
+                        staffInitials: u.manager_initials || u.staffInitials || "-",
+                        comment: u.last_comment || u.comment || "",
+                        paid: !!u.is_paid
+                    };
+                });
 
                 this.pagination.currentPage = data.meta?.current_page || 1;
                 this.pagination.lastPage = data.meta?.last_page || 1;
                 this.pagination.perPage = data.meta?.per_page || this.pagination.perPage;
-                this.pagination.total = data.meta?.total || this.students.length;
+                this.pagination.total = data.meta?.total || 0;
                 this.pagination.from = data.meta?.from || 0;
                 this.pagination.to = data.meta?.to || 0;
             } catch (e: any) {

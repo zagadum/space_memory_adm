@@ -15,7 +15,10 @@
     "newGroups": "New Groups",
     "expelled": "Withdrawn Students",
     "archive": "Archive",
-    "salesDept": "Sales Dept"
+    "salesDept": "Sales Dept",
+    "leads": "Leads Board",
+    "projects": "Projects & Products",
+    "allProjects": "All Projects"
   },
   "app": {
     "title": "GLS · Payments",
@@ -1026,6 +1029,70 @@
       "thPeriod": "Period",
       "thStatus": "Status",
       "toastExporting": "Generating export {fmt}..."
+    }
+  },
+  "leads": {
+    "title": "Lead Management",
+    "columns": {
+      "new": "New",
+      "in_progress": "In Progress",
+      "trial": "Trial",
+      "decision": "Decision"
+    },
+    "card": {
+      "phone": "Tel:",
+      "subject": "Subject:",
+      "date": "Date:"
+    }
+  },
+  "projects": {
+    "title": "Projects & Products",
+    "subTitle": "Each project = separate invoice series · price from student card",
+    "newProject": "New Project",
+    "newProjectSub": "Create a product with its own invoice series FA/[CODE]/...",
+    "tabs": {
+      "all": "All",
+      "recurring": "Recurring",
+      "onetime": "One-time",
+      "archive": "Archive"
+    },
+    "card": {
+      "students": "students",
+      "invoices": "invoices 2025",
+      "priceFromCard": "price from card",
+      "fixedPrice": "fixed price",
+      "price": "Price"
+    },
+    "modal": {
+      "step": "Step {current} of {total}",
+      "step1": "Step 1 — Project Basics",
+      "step2": "Step 2 — Finance",
+      "step3": "Step 3 — Company & Preview",
+      "basics": "Basic Information",
+      "name": "Project Name",
+      "namePlaceholder": "e.g. Space Memory, Olympics 2026...",
+      "code": "Invoice Series Code",
+      "codePlaceholder": "SPACE",
+      "codeHint": "Example: ",
+      "icon": "Project Icon",
+      "color": "Project Color",
+      "type": "Product Type",
+      "recurring": "Recurring Subscription",
+      "recurringDesc": "Monthly payments. Price is taken from the student card.",
+      "onetime": "One-time Product",
+      "onetimeDesc": "Olympics, courses. One fixed price for everyone.",
+      "description": "Description (optional)",
+      "finance": "Financial Settings",
+      "vat": "VAT Rate",
+      "pkwiu": "PKWiU",
+      "company": "Company",
+      "companyDesc": "Select the firm that will be the seller on invoices for this project.",
+      "preview": "Invoice Number Preview",
+      "next": "Next",
+      "prev": "Back",
+      "cancel": "Cancel",
+      "create": "Create Project",
+      "createSuccess": "Project created successfully"
     }
   }
 }

@@ -7,12 +7,7 @@
         <div class="stat-sub">{{ t('studentList.stats.totalInSystem') }}</div>
         <div class="stat-icon">👩‍🚀</div>
       </div>
-      <div class="stat-card green">
-        <div class="stat-label">{{ t('studentList.stats.paidNow') }}</div>
-        <div class="stat-value">{{ students.filter(s => s.paid).length }}</div>
-        <div class="stat-sub"><span class="up">↑ {{ t('studentList.stats.active') }}</span></div>
-        <div class="stat-icon">✅</div>
-      </div>
+      <!-- Paid card removed as per backend request to avoid extra payments API load -->
       <div class="stat-card amber">
         <div class="stat-label">{{ t('studentList.stats.avgTraining') }}</div>
         <div class="stat-value">124</div>
@@ -42,15 +37,17 @@
           </button>
         </div>
       </div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <input
-          v-model="searchInput"
-          class="dropdown-filter-btn"
-          style="min-width: 220px;"
-          :placeholder="t('common.search')"
-          @keyup.enter="applySearch"
-        />
-        <button class="dropdown-filter-btn" @click="applySearch">{{ t('common.search') }}</button>
+      <div class="toolbar-right">
+        <div class="search-box">
+          <input
+            v-model="searchInput"
+            class="dropdown-filter-btn"
+            style="min-width: 220px;"
+            :placeholder="t('common.search')"
+            @keyup.enter="applySearch"
+          />
+          <button class="search-btn" @click="applySearch">🔍</button>
+        </div>
         <select class="dropdown-filter-btn" v-model.number="selectedGroupId" @change="applySelectFilters">
           <option :value="0">{{ t('studentList.toolbar.group') }}</option>
           <option v-for="group in listStore.groupsFilterOptions" :key="group.id" :value="group.id">{{ group.name }}</option>
@@ -66,20 +63,20 @@
       <table id="studentsTable">
         <thead v-if="!listStore.loading">
           <tr>
-            <th @click="sortBy('name')" style="cursor:pointer; user-select:none">
-              {{ t('studentList.table.name') }} <span class="sort-icon" :style="{ color: sortCol === 'name' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'name' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('full_name')" style="cursor:pointer; user-select:none">
+              {{ t('studentList.table.name') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'full_name' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'full_name' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('startDate')" style="cursor:pointer; user-select:none">
-              {{ t('studentList.table.startDate') }} <span class="sort-icon" :style="{ color: sortCol === 'startDate' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'startDate' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('created_at')" style="cursor:pointer; user-select:none">
+              {{ t('studentList.table.startDate') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'created_at' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'created_at' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('daysInSystem')" style="cursor:pointer; user-select:none">
-              {{ t('studentList.table.trainingTerm') }} <span class="sort-icon" :style="{ color: sortCol === 'daysInSystem' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'daysInSystem' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('training_term_days')" style="cursor:pointer; user-select:none">
+              {{ t('studentList.table.trainingTerm') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'training_term_days' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'training_term_days' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
             <th>{{ t('studentList.table.school') }}</th>
             <th>{{ t('studentList.table.teacher') }}</th>
             <th>{{ t('studentList.table.group') }}</th>
-            <th @click="sortBy('lastContact')" style="cursor:pointer; user-select:none">
-              {{ t('studentList.table.lastContact') }} <span class="sort-icon" :style="{ color: sortCol === 'lastContact' ? 'var(--blue)' : 'inherit' }">{{ sortCol === 'lastContact' ? (sortDir === 1 ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('last_contact_at')" style="cursor:pointer; user-select:none">
+              {{ t('studentList.table.lastContact') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'last_contact_at' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'last_contact_at' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
             <th>{{ t('studentList.table.whoTalked') }}</th>
             <th class="comment-header">{{ t('studentList.table.lastComment') }}</th>
@@ -100,28 +97,30 @@
                 <span class="timer-days" :class="{ 'high-alert': (student.daysSinceContact || 0) > 10 }">
                   {{ student.daysInSystem || 0 }}
                 </span>
-                <span class="timer-label">{{ t('common.daysCount', { n: student.daysInSystem || 0 }) }}</span>
+                <span class="timer-label">дн.</span>
               </div>
             </td>
             <td>
               <div class="enrollment-list">
-                <div v-for="(enr, i) in student.enrollments" :key="i" class="enrollment-item school-name">
-                  {{ enr.school }}
+                <div v-for="(en, idx) in student.enrollments" :key="idx" class="enrollment-item">
+                  <span class="school-name">{{ en.school }}</span>
                 </div>
               </div>
             </td>
             <td>
               <div class="enrollment-list">
-                <div v-for="(enr, i) in student.enrollments" :key="i" class="enrollment-item">
-                  {{ enr.teacher }}
+                <div v-for="(en, idx) in student.enrollments" :key="idx" class="enrollment-item">
+                  <span class="person-name">{{ en.teacher }}</span>
                 </div>
               </div>
             </td>
             <td>
               <div class="enrollment-list">
-                <div v-for="(enr, i) in student.enrollments" :key="i" class="enrollment-item group-cell">
-                  <span class="group-dot" :style="{ background: student.groupColor || '#4f6ef7' }"></span>
-                  <span class="group-name">{{ enr.group }}</span>
+                <div v-for="(en, idx) in student.enrollments" :key="idx" class="enrollment-item">
+                  <div class="group-cell">
+                    <span class="group-dot" :style="{ background: student.groupColor || '#4f6ef7' }"></span>
+                    <span class="group-name">{{ en.group }}</span>
+                  </div>
                 </div>
               </div>
             </td>
@@ -134,33 +133,33 @@
             </td>
             <td>
               <div class="person-cell">
-                <div class="mini-avatar" :style="{ background: student.avatarColor || '#4f6ef7' }">{{ student.staffInitials || "—" }}</div>
-                <span class="person-name">{{ student.staff || "—" }}</span>
+                <div class="mini-avatar" :style="{ background: student.avatarColor || '#4f6ef7' }">{{ student.staffInitials }}</div>
+                <span class="person-name">{{ student.staff }}</span>
               </div>
             </td>
             <td>
-              <div class="comment-cell">{{ student.comment || "—" }}</div>
+              <div class="comment-cell" :title="student.comment">{{ student.comment || "—" }}</div>
             </td>
             <td>
               <div class="actions-wrap" @click.stop>
-                <button class="actions-btn" @click="toggleDropdown(student.id)">⋮</button>
-                <div class="actions-dropdown" :class="{ open: activeDropdownId === student.id.toString() }">
-                  <div class="action-item" @click="openStudent(student.id); activeDropdownId = null">👤 {{ t('studentList.actions.openProfile') }}</div>
-                  <div class="action-item" @click="openContactModal(student); activeDropdownId = null">📅 {{ t('studentList.actions.updateContact') }}</div>
-                  <div class="action-item" @click="activeDropdownId = null">👤 {{ t('studentList.actions.changeManager') }}</div>
-                  <div class="action-item" @click="activeDropdownId = null">📧 {{ t('studentList.actions.sendEmail') }}</div>
-                  <div class="action-item danger" @click="activeDropdownId = null">📦 {{ t('studentList.actions.toArchive') }}</div>
+                <button class="actions-btn" @click="toggleActions(student.id)">⋮</button>
+                <div class="actions-dropdown" :class="{ open: activeActionId === student.id }">
+                  <div class="action-item" @click="openStudent(student.id); activeActionId = null">👤 {{ t('studentList.actions.openProfile') }}</div>
+                  <div class="action-item" @click="openContactModal(student); activeActionId = null">📞 {{ t('studentList.actions.updateContact') }}</div>
+                  <div class="action-item" @click="activeActionId = null">👥 {{ t('studentList.actions.changeManager') }}</div>
+                  <div class="action-item" @click="activeActionId = null">✉️ {{ t('studentList.actions.sendEmail') }}</div>
+                  <div class="action-divider"></div>
+                  <div class="action-item danger" @click="activeActionId = null">📂 {{ t('studentList.actions.toArchive') }}</div>
                 </div>
               </div>
             </td>
           </tr>
         </tbody>
 
+        <!-- Loading Skeletons -->
         <tbody v-else>
-          <tr v-for="i in 5" :key="i">
-            <td colspan="10" style="text-align:center; padding: 40px; color: #8892b0;">
-              {{ t('common.loading') }}...
-            </td>
+          <tr v-for="i in 10" :key="i" class="skeleton-row">
+            <td colspan="10"><div class="skeleton-line"></div></td>
           </tr>
         </tbody>
       </table>
@@ -217,44 +216,34 @@ function openStudent(id: number | string) {
   router.push({ name: 'student-payments', params: { id: id.toString() } })
 }
 
-// Делаем переменную students реактивной ссылкой на массив из стора
-const students = computed(() => listStore.students)
-const searchInput = ref('')
-const selectedGroupId = ref(0)
-const selectedTeacherId = ref(0)
+const searchInput = ref(listStore.filters.search);
+const selectedGroupId = ref(0);
+const selectedTeacherId = ref(0);
+const students = computed(() => listStore.students);
+
+// ── ВЫПАДАЮЩЕЕ МЕНЮ ДЕЙСТВИЙ ──
+const activeActionId = ref<number | string | null>(null);
+
+function toggleActions(id: number | string) {
+  activeActionId.value = activeActionId.value === id ? null : id;
+}
 
 // ── СОРТИРОВКА ──
-const sortCol = ref('name')
-const sortDir = ref(1) // 1 - asc, -1 - desc
-
 async function sortBy(col: string) {
-  if (sortCol.value === col) {
-    sortDir.value *= -1
-  } else {
-    sortCol.value = col
-    sortDir.value = 1
-  }
-
-  const orderMap: Record<string, string> = {
-    name: 'full_name',
-    startDate: 'start_date',
-    daysInSystem: 'training_term',
-    lastContact: 'last_contract',
-  }
-
-  listStore.setSort(orderMap[col] || 'full_name', sortDir.value === 1 ? 'asc' : 'desc')
-  await listStore.fetchStudents(1)
+  const newDir = listStore.sorting.orderBy === col && listStore.sorting.orderDirection === "asc" ? "desc" : "asc";
+  listStore.setSort(col, newDir);
+  await listStore.fetchStudents(1);
 }
 
 async function applySearch() {
-  listStore.filters.search = searchInput.value.trim()
-  await listStore.applyFilters()
+  listStore.filters.search = searchInput.value.trim();
+  await listStore.applyFilters();
 }
 
 async function applySelectFilters() {
-  listStore.filters.groupId = selectedGroupId.value > 0 ? selectedGroupId.value : null
-  listStore.filters.teacherId = selectedTeacherId.value > 0 ? selectedTeacherId.value : null
-  await listStore.applyFilters()
+  listStore.filters.groupId = selectedGroupId.value > 0 ? selectedGroupId.value : null;
+  listStore.filters.teacherId = selectedTeacherId.value > 0 ? selectedTeacherId.value : null;
+  await listStore.applyFilters();
 }
 
 async function toggleWithoutContact() {
@@ -384,6 +373,26 @@ onUnmounted(() => {
 .dropdown-filter-btn { padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 500; cursor: pointer; border: 1px solid rgba(100,120,255,0.15); background: rgba(255,255,255,0.04); color: #8892b0; transition: all 0.15s; }
 .dropdown-filter-btn:hover { border-color: rgba(120,140,255,0.35); color: #e8eeff; }
 .dropdown-filter-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* ── ПАГИНАЦИЯ ── */
+.pagination-footer { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: rgba(255,255,255,0.02); border-top: 1px solid rgba(100,120,255,0.1); }
+.pagination-info { font-size: 13px; color: #8892b0; }
+.pagination-controls { display: flex; align-items: center; gap: 12px; }
+.page-numbers { display: flex; gap: 6px; }
+.page-num { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid rgba(100,120,255,0.15); background: rgba(255,255,255,0.04); color: #8892b0; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+.page-num:hover { border-color: rgba(120,140,255,0.35); color: #e8eeff; }
+.page-num.active { background: #4f6ef7; border-color: #4f6ef7; color: white; box-shadow: 0 0 15px rgba(79,110,247,0.3); }
+
+.action-divider { height: 1px; background: rgba(100,120,255,0.1); margin: 4px 0; }
+
+.toolbar-right { display: flex; gap: 8px; align-items: center; }
+.search-box { display: flex; position: relative; }
+.search-btn { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; opacity: 0.6; transition: opacity 0.15s; }
+.search-btn:hover { opacity: 1; }
+
+.skeleton-row td { padding: 20px 14px; }
+.skeleton-line { height: 12px; background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 6px; }
+@keyframes skeleton-loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
 /* ── ИДЕАЛЬНАЯ ТАБЛИЦА ── */
 .table-container { background: rgba(15, 15, 46, 0.9); border: 1px solid rgba(100,120,255,0.15); border-radius: 14px; overflow-x: auto; }

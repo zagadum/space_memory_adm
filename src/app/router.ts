@@ -35,6 +35,12 @@ export const router = createRouter({
           meta: { title: 'studentList.title', subTitle: 'studentList.secretariat', icon: '👩‍🚀' }
         },
         {
+          path: "recruitment/leads",
+          name: "leads",
+          component: () => import("../views/recruitment/LeadsPage.vue"),
+          meta: { title: 'sidebar.leads', icon: '📋' }
+        },
+        {
           path: "recruitment/new-groups",
           name: "new-groups",
           component: () => import("../views/groups/NewGroupsPage.vue"),
@@ -45,6 +51,12 @@ export const router = createRouter({
           name: "settings",
           component: () => import("../views/finance/settings/SettingsIndex.vue"),
           meta: { title: 'financeSettings.pageTitle', subTitle: 'financeSettings.pageSubTitle', icon: '⚙️' }
+        },
+        {
+          path: "projects",
+          name: "projects-list",
+          component: () => import("../views/projects/ProjectsListPage.vue"),
+          meta: { title: 'projects.title', subTitle: 'projects.subTitle', icon: '📁' }
         },
         {
           path: "payments/:id",

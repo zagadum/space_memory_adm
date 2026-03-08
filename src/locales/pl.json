@@ -15,7 +15,10 @@
     "newGroups": "Nowe grupy",
     "expelled": "Skreśleni uczniowie",
     "archive": "Archiwum",
-    "salesDept": "Dział sprzedaży"
+    "salesDept": "Dział sprzedaży",
+    "leads": "Tablica Kanban",
+    "projects": "Projekty i Produkty",
+    "allProjects": "Wszystkie Projekty"
   },
   "app": {
     "title": "GLS · Płatności",
@@ -1022,6 +1025,71 @@
       "thPeriod": "Okres",
       "thStatus": "Status",
       "toastExporting": "Generowanie eksportu {fmt}..."
+    }
+  },
+  "leads": {
+    "title": "Zarządzanie leadami",
+    "columns": {
+      "new": "Nowe",
+      "in_progress": "W toku",
+      "trial": "Lekcja próbna",
+      "decision": "Decyzja"
+    },
+    "card": {
+      "phone": "Tel:",
+      "subject": "Przedmiot:",
+      "date": "Data:"
+    }
+  },
+  "projects": {
+    "title": "Projekty & Produkty",
+    "subTitle": "Każdy projekt = osobna seria faktur · cena z karty ucznia",
+    "newProject": "Nowy Projekt",
+    "newProjectSub": "Utwórz produkt z własną serią faktur FA/[KOD]/...",
+    "tabs": {
+      "all": "Wszystkie",
+      "recurring": "Cykliczne",
+      "onetime": "Jednorazowe",
+      "archive": "Archiwum"
+    },
+    "card": {
+      "students": "uczniów",
+      "invoices": "faktur 2025",
+      "priceFromCard": "cena z karty",
+      "fixedPrice": "cena stała",
+      "price": "Cena"
+    },
+    "modal": {
+      "step": "Krok {current} z {total}",
+      "step1": "Krok 1 — Podstawy projektu",
+      "step2": "Krok 2 — Finanse i zasady",
+      "step3": "Krok 3 — Firma i podgląd",
+      "basics": "Informacje podstawowe",
+      "name": "Nazwa projektu",
+      "namePlaceholder": "np. Space Memory, Olimpiada 2026...",
+      "code": "Kod serii faktur",
+      "codePlaceholder": "SPACE",
+      "codeHint": "Przykład: ",
+      "icon": "Ikona projektu",
+      "color": "Kolor projektu",
+      "type": "Typ produktu",
+      "recurring": "Abonament cykliczny",
+      "recurringDesc": "Miesięczne płatności. Cena abonamentu pochodzi z karty ucznia.",
+      "onetime": "Produkt jednorazowy",
+      "onetimeDesc": "Olimpiada, kurs, materiały. Jedna stała cena dla wszystkich.",
+      "description": "Opis (opcjonalnie)",
+      "finance": "Ustawienia finansowe",
+      "price": "Cena (PLN)",
+      "vat": "Stawka VAT",
+      "pkwiu": "PKWiU",
+      "company": "Firma",
+      "companyDesc": "Wybierz firmę wystawiającą faktury dla tego projektu.",
+      "preview": "Podgląd numeru faktury",
+      "next": "Dalej",
+      "prev": "Wstecz",
+      "cancel": "Anuluj",
+      "create": "Utwórz Projekt",
+      "createSuccess": "Projekt został pomyślnie utworzony"
     }
   }
 }
