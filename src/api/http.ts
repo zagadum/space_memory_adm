@@ -3,7 +3,7 @@ import { mockAdapter } from "./mockAdapter";
 
 const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? "false").toLowerCase();
 const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
-const API_URL = (import.meta as any).env?.VITE_API_URL || "https://memory.firm.kiev.ua/api";
+const API_URL = (import.meta as any).env?.VITE_API_URL || "https://memory.firm.kiev.ua/api/v1/";
 
 function parsePrefixList(value: unknown): string[] {
   return String(value ?? "")

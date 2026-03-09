@@ -1,33 +1,5 @@
 <template>
   <div class="content">
-    <!-- STATS -->
-    <div class="ng-stats-grid">
-      <div class="ng-stat-card blue">
-        <div class="ng-stat-label">Всего групп</div>
-        <div class="ng-stat-value">{{ groups.length }}</div>
-        <div class="ng-stat-sub">ожидают старта</div>
-        <div class="ng-stat-icon">👥</div>
-      </div>
-      <div class="ng-stat-card green">
-        <div class="ng-stat-label">Готовы к старту</div>
-        <div class="ng-stat-value">{{ readyCount }}</div>
-        <div class="ng-stat-sub"><span class="up">↑ укомплектованы</span></div>
-        <div class="ng-stat-icon">✅</div>
-      </div>
-      <div class="ng-stat-card amber">
-        <div class="ng-stat-label">Среднее ожидание</div>
-        <div class="ng-stat-value">{{ avgDays }}</div>
-        <div class="ng-stat-sub">дней с момента создания</div>
-        <div class="ng-stat-icon">⏱</div>
-      </div>
-      <div class="ng-stat-card cyan">
-        <div class="ng-stat-label">Учеников записано</div>
-        <div class="ng-stat-value">{{ totalStudents }}</div>
-        <div class="ng-stat-sub">по всем новым группам</div>
-        <div class="ng-stat-icon">🎓</div>
-      </div>
-    </div>
-
     <!-- TOOLBAR -->
     <div class="ng-toolbar">
       <div class="toolbar-left">
@@ -169,13 +141,6 @@ const sortCol = ref<string>('')
 const sortDir = ref<1 | -1>(1)
 
 // ── Computed ──
-const readyCount = computed(() => groups.value.filter(g => g.paid === g.totalSlots).length)
-const totalStudents = computed(() => groups.value.reduce((a, g) => a + g.totalSlots, 0))
-const avgDays = computed(() => {
-  if (!groups.value.length) return 0
-  return Math.round(groups.value.reduce((a, g) => a + daysDiff(g.createdDate), 0) / groups.value.length)
-})
-
 const filteredGroups = computed(() => groups.value)
 
 const sortedGroups = computed(() => {
@@ -317,66 +282,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-/* ── STATS ── */
-.ng-stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.ng-stat-card {
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 14px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s;
-  cursor: default;
-}
-
-.ng-stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  border-radius: 14px 14px 0 0;
-}
-
-.ng-stat-card.blue::before   { background: linear-gradient(90deg, #4f6ef7, #8b5cf6); }
-.ng-stat-card.green::before  { background: linear-gradient(90deg, #10b981, #06b6d2); }
-.ng-stat-card.amber::before  { background: linear-gradient(90deg, #f59e0b, #f97316); }
-.ng-stat-card.cyan::before   { background: linear-gradient(90deg, #06b6d2, #4f6ef7); }
-
-.ng-stat-card:hover {
-  border-color: var(--app-border-hi);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
-
-.ng-stat-label {
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--app-text-dim);
-  margin-bottom: 10px;
-}
-
-.ng-stat-value {
-  font-size: 26px;
-  font-weight: 700;
-  font-family: 'Space Mono', monospace;
-  color: var(--app-text-main);
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.ng-stat-sub { font-size: 11.5px; color: var(--app-text-dim); }
-.ng-stat-sub .up { color: #10b981; }
-.ng-stat-icon { position: absolute; top: 16px; right: 16px; font-size: 22px; opacity: 0.4; }
-
 /* ── TOOLBAR ── */
 .ng-toolbar {
   display: flex;

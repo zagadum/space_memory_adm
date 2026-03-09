@@ -80,20 +80,6 @@ const goBack = () => {
         </div>
       </header>
 
-      <!-- Блок статистики -->
-      <div class="stats-grid">
-        <div class="stat-card glass">
-          <div class="stat-icon enrolled">👥</div>
-          <div class="stat-value">{{ project.stats.studentsCount }}</div>
-          <div class="stat-label">{{ t('projectDetail.stats.enrolledStudents') }}</div>
-        </div>
-        <div class="stat-card glass">
-          <div class="stat-icon invoices">📄</div>
-          <div class="stat-value">{{ project.stats.invoicesCount }}</div>
-          <div class="stat-label">{{ t('projectDetail.stats.invoicesIssued') }}</div>
-        </div>
-      </div>
-
       <!-- Табы -->
       <div class="tabs-container">
         <div class="tabs-nav glass">
@@ -217,53 +203,6 @@ const goBack = () => {
 .status-badge.active {
   background: var(--status-success-bg);
   color: #10b981;
-}
-
-/* Stats Grid */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-bottom: 24px;
-}
-
-.stat-card {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-.stat-card:hover {
-  transform: translateY(-5px);
-  background: var(--app-surface);
-}
-
-.stat-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-  width: 60px;
-  height: 60px;
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--app-surface);
-}
-
-.stat-value {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--app-text-main);
-  line-height: 1;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  color: var(--app-text-dim);
-  font-size: 14px;
 }
 
 /* Tabs */

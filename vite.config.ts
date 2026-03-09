@@ -53,7 +53,17 @@ export default defineConfig(async ({ mode }) => {
 
   return {
     plugins,
-    server: { port: 5173 },
+    server: {
+      port: 5173,
+      proxy: {
+        '/api/v1': {
+          target: 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+          // rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1') // no change needed if backend expects /api/v1
+        }
+      }
+    },
     build: {
       rollupOptions: {
         output: {
