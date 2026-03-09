@@ -11,11 +11,11 @@ import type { User } from '../stores/settingsUsers.store';
 export const usersApi = {
     /**
      * Fetches the list of all users from the backend.
-     * Path: GET /api/settings/users
+     * Path: GET /api/v1/settings/users
      */
     async fetchUsers(): Promise<User[]> {
         // BACKEND DEV: Uncomment the line below when the endpoint is ready
-        // const { data } = await httpClient.get<User[]>('/settings/users');
+        // const { data } = await httpClient.get<User[]>('/v1/settings/users');
         // return data;
 
         // For now, we return an empty array or handle it in the store
@@ -24,11 +24,11 @@ export const usersApi = {
 
     /**
      * Updates a specific user's profile.
-     * Path: PATCH /api/settings/users/{id}
+     * Path: PATCH /api/v1/settings/users/{id}
      */
     async updateUser(id: string, userData: Partial<User>): Promise<User> {
         // BACKEND DEV: Uncomment the line below when the endpoint is ready
-        // const { data } = await httpClient.patch<User>(`/settings/users/${id}`, userData);
+        // const { data } = await httpClient.patch<User>(`/v1/settings/users/${id}`, userData);
         // return data;
 
         // Mock return
@@ -37,10 +37,10 @@ export const usersApi = {
 
     /**
      * Deletes (archives) a user.
-     * Path: DELETE /api/settings/users/{id}
+     * Path: DELETE /api/v1/settings/users/{id}
      */
     async deleteUser(id: string): Promise<void> {
         // BACKEND DEV: Uncomment the line below when the endpoint is ready
-        // await httpClient.delete(`/settings/users/${id}`);
+        // await httpClient.delete(`/v1/settings/users/${id}`);
     }
 };
