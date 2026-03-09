@@ -879,6 +879,5 @@ const onMonthChange = (e: Event) => {
   .final-block{flex-direction:column}
   .rezygn-stat-bar{grid-template-columns:1fr 1fr}
 }
-}
 </style>
 
