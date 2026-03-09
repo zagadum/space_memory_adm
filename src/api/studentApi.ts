@@ -36,22 +36,22 @@ export async function getStudents(params: StudentListParams = {}) {
     ...params,
     limit: params.per_page || 20,
   };
-  const res = await http.get("/api/students", { params: queryParams });
+  const res = await http.get("students", { params: queryParams });
   return res.data as StudentListResponse;
 }
 
 export async function getStudentGroupsFilter(params: Pick<StudentListParams, "search" | "without_contact_7_plus" | "only_mine"> = {}) {
-  const res = await http.get("/v1/student/groups-filter", { params });
+  const res = await http.get("student/groups-filter", { params });
   return res.data as { items: Array<{ id: number; name: string }> };
 }
 
 export async function getStudentTeacherFilter(params: Pick<StudentListParams, "search" | "without_contact_7_plus" | "only_mine"> = {}) {
-  const res = await http.get("/v1/student/teacher-filter", { params });
+  const res = await http.get("student/teacher-filter", { params });
   return res.data as { items: Array<{ id: number; name: string }> };
 }
 
 export async function getStudentGroups(studentId: string) {
-  const res = await http.get("/student/groups", { params: { studentId } });
+  const res = await http.get("student/groups", { params: { studentId } });
   return res.data as { items: any[] };
 }
 
@@ -62,7 +62,7 @@ export async function changeStudentGroup(payload: {
   toGroup: string;
   reason?: string;
 }) {
-  const res = await http.post("/student/change-group", payload);
+  const res = await http.post("student/change-group", payload);
   return res.data as { ok: true };
 }
 
@@ -72,22 +72,22 @@ export async function setTrainerPresence(payload: {
   trainerId: string;
   presence: string;
 }) {
-  const res = await http.post("/student/trainer-presence", payload);
+  const res = await http.post("student/trainer-presence", payload);
   return res.data as { ok: true };
 }
 
 export async function getStudentInfo(studentId: string) {
-  const res = await http.get("/student/info", { params: { studentId } });
+  const res = await http.get("student/info", { params: { studentId } });
   return res.data as { info: any };
 }
 
 export async function updateStudentInfo(payload: { studentId: string; patch: any }) {
-  const res = await http.post("/student/info", payload);
+  const res = await http.post("student/info", payload);
   return res.data as { ok: true; info: any };
 }
 
 export async function getStudentAttendance(studentId: string) {
-  const res = await http.get("/student/attendance", { params: { studentId } });
+  const res = await http.get("student/attendance", { params: { studentId } });
   return res.data as { attendance: any };
 }
 
@@ -97,17 +97,17 @@ export async function setAttendanceMark(payload: {
   mark: string;
   note?: string;
 }) {
-  const res = await http.post("/student/attendance", payload);
+  const res = await http.post("student/attendance", payload);
   return res.data as { ok: true };
 }
 
 export async function getStudentProgress(studentId: string) {
-  const res = await http.get("/student/progress", { params: { studentId } });
+  const res = await http.get("student/progress", { params: { studentId } });
   return res.data as { progress: any };
 }
 
 export async function getStudentNotes(studentId: string) {
-  const res = await http.get("/student/notes", { params: { studentId } });
+  const res = await http.get("student/notes", { params: { studentId } });
   return res.data as { items: any[] };
 }
 
@@ -120,6 +120,6 @@ export async function createStudentNote(payload: {
   tags: string[];
   text: string;
 }) {
-  const res = await http.post("/student/notes", payload);
+  const res = await http.post("student/notes", payload);
   return res.data as { ok: true; note: any };
 }
