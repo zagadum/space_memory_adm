@@ -140,11 +140,11 @@ const isQualified = (row: any) => {
 <style scoped>
 .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; min-width: 700px; }
-.data-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, .02); }
-.data-table td { padding: 11px 16px; border-bottom: 1px solid rgba(255, 255, 255, .04); font-size: 13px; vertical-align: middle; }
+.data-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--app-surface); }
+.data-table td { padding: 11px 16px; border-bottom: 1px solid var(--app-border); font-size: 13px; vertical-align: middle; }
 .data-table th:last-child, .data-table td:last-child { text-align: right; }
 .data-table td:last-child { font-family: 'Space Mono', monospace; font-weight: 700; }
-.data-table tr:hover td { background: rgba(255, 255, 255, .02); }
+.data-table tr:hover td { background: var(--status-info-bg); }
 
 .mono { font-family: 'Space Mono', monospace; }
 .val-green { color: var(--green); }
@@ -165,8 +165,8 @@ const isQualified = (row: any) => {
 .chip-purple { background: rgba(139, 92, 246, .12); color: var(--purple); border-color: rgba(139, 92, 246, .25); }
 
 .trial-row { cursor: pointer; transition: background .15s; }
-.trial-row:hover td { background: rgba(6, 182, 212, .04); }
-.trial-row.open td { background: rgba(6, 182, 212, .04); border-bottom-color: rgba(6, 182, 212, .15); }
+.trial-row:hover td { background: var(--status-info-bg); }
+.trial-row.open td { background: var(--status-info-bg); border-bottom-color: var(--app-border-hi); }
 .trial-expand-icon { display: inline-block; font-size: 8px; margin-right: 8px; transition: transform .2s; vertical-align: middle; color: var(--dim); font-family: 'Space Mono', monospace; }
 .trial-row.open .trial-expand-icon { transform: rotate(90deg); color: #06b6d4; }
 
@@ -174,30 +174,30 @@ const isQualified = (row: any) => {
 .trial-pct-container { display: flex; align-items: center; gap: 8px; flex: 1; }
 .trial-pct-bar { display: inline-block; width: 60px; height: 6px; background: rgba(255, 255, 255, .05); border-radius: 3px; overflow: hidden; vertical-align: middle; }
 .trial-pct-fill { height: 100%; border-radius: 3px; display: block; position: relative; }
-.trial-pct-fill.ok { background: var(--green); box-shadow: 0 0 10px rgba(34, 197, 94, .5); }
-.trial-pct-fill.fail { background: var(--red); box-shadow: 0 0 10px rgba(239, 68, 68, .3); }
+.trial-pct-fill.ok { background: var(--green); box-shadow: var(--app-glow); }
+.trial-pct-fill.fail { background: var(--red); box-shadow: var(--app-glow); }
 .pct-val { min-width: 40px; }
 
 .trial-payment { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 13px; text-align: right; }
-.trial-paid-badge { color: var(--green); text-shadow: 0 0 10px rgba(34, 197, 94, .2); }
-.trial-nopay-badge { color: var(--dim2); font-size: 10.5px; font-style: italic; font-weight: 400; font-family: 'Outfit', sans-serif; }
+.trial-paid-badge { color: var(--green); text-shadow: var(--app-glow); }
+.trial-nopay-badge { color: var(--app-text-dim); font-size: 10.5px; font-style: italic; font-weight: 400; font-family: 'Outfit', sans-serif; }
 
 .trial-children-panel { display: none; }
-.trial-children-panel.open { display: table-row; background: rgba(4, 4, 15, .6); }
+.trial-children-panel.open { display: table-row; background: var(--app-bg); }
 .child-table { width: 100%; border-collapse: collapse; min-width: 400px; }
 .child-table th { font-size: 9px; font-weight: 700; color: var(--dim2); letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px 6px; text-align: left; border-bottom: 1px solid rgba(6, 182, 212, .08); background: rgba(6, 182, 212, .03); }
 .child-table td { padding: 7px 12px; font-size: 11.5px; border-bottom: 1px solid rgba(255, 255, 255, .025); vertical-align: middle; }
 .child-table th:last-child, .child-table td:last-child { text-align: right; }
-.child-table tr:hover td { background: rgba(255, 255, 255, .015); }
+.child-table tr:hover td { background: var(--status-info-bg); }
 
 .trial-st { font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
-.tr-won { background: rgba(34, 197, 94, .1); color: var(--green); border: 1px solid rgba(34, 197, 94, .2); }
-.tr-lost { background: rgba(239, 68, 68, .1); color: var(--red); border: 1px solid rgba(239, 68, 68, .2); }
+.tr-won { background: var(--status-success-bg); color: var(--green); border: 1px solid var(--app-border); }
+.tr-lost { background: var(--status-danger-bg); color: var(--red); border: 1px solid var(--app-border); }
 
 .trial-subtotal { padding: 8px 12px; background: rgba(6, 182, 212, .04); border-top: 1px solid rgba(6, 182, 212, .1); display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
 .val-amount { color: var(--white); font-size: 13px; }
 
-.qa-confirmed-footer { margin: 16px 14px; padding: 12px 16px; background: rgba(34, 197, 94, .05); border: 1px solid rgba(34, 197, 94, .1); border-radius: 12px; font-size: 11.5px; font-weight: 600; color: var(--green); }
+.qa-confirmed-footer { margin: 16px 14px; padding: 12px 16px; background: var(--status-success-bg); border: 1px solid var(--app-border); border-radius: 12px; font-size: 11.5px; font-weight: 600; color: var(--green); }
 .qa-flex { display: flex; justify-content: space-between; align-items: center; }
-.hint { padding: 8px 14px; font-size: 11px; color: var(--dim); background: rgba(6, 182, 212, .03); border-bottom: 1px solid var(--border); }
+.hint { padding: 8px 14px; font-size: 11px; color: var(--dim); background: var(--app-surface); border-bottom: 1px solid var(--border); }
 </style>

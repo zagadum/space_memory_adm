@@ -148,64 +148,64 @@ const formatCurrency = (val: number) => {
 /* Inherited styles from TeacherSalaryPage.vue */
 .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .data-table { width: 100%; border-collapse: collapse; margin-top: 12px; min-width: 700px; }
-.data-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, .02); }
-.data-table td { padding: 11px 16px; border-bottom: 1px solid rgba(255, 255, 255, .04); font-size: 13px; vertical-align: middle; }
+.data-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--app-text-dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--app-border); background: var(--app-surface); }
+.data-table td { padding: 11px 16px; border-bottom: 1px solid var(--app-border); font-size: 13px; vertical-align: middle; color: var(--app-text-main); }
 .data-table th:last-child, .data-table td:last-child { text-align: right; }
 .data-table td:last-child { font-family: 'Space Mono', monospace; font-weight: 700; }
-.data-table tr:hover td { background: rgba(255, 255, 255, .02); }
+.data-table tr:hover td { background: var(--status-info-bg); }
 
 .group-row { cursor: pointer; transition: background .15s; }
-.group-row:hover td { background: rgba(79, 110, 247, .04); }
-.group-row.open td { background: rgba(79, 110, 247, .04); border-bottom-color: rgba(79, 110, 247, .15); }
+.group-row:hover td { background: var(--status-info-bg); }
+.group-row.open td { background: var(--status-info-bg); border-bottom-color: var(--app-border-hi); }
 .group-expand-icon { display: inline-block; font-size: 8px; margin-right: 8px; transition: transform .2s; vertical-align: middle; color: var(--dim); font-family: 'Space Mono', monospace; }
 .group-row.open .group-expand-icon { transform: rotate(90deg); color: var(--blue); }
 
 .children-panel { display: none; }
-.children-panel.open { display: table-row; background: rgba(4, 4, 15, .6); }
+.children-panel.open { display: table-row; background: var(--app-bg); }
 
 .child-table { width: 100%; border-collapse: collapse; min-width: 650px; }
-.child-table th { font-size: 9px; font-weight: 700; color: var(--dim2); letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px 6px; text-align: left; border-bottom: 1px solid rgba(79, 110, 247, .08); background: rgba(79, 110, 247, .03); }
-.child-table td { padding: 7px 12px; font-size: 11.5px; border-bottom: 1px solid rgba(255, 255, 255, .025); vertical-align: middle; }
+.child-table th { font-size: 9px; font-weight: 700; color: var(--app-text-dim); letter-spacing: .08em; text-transform: uppercase; padding: 8px 12px 6px; text-align: left; border-bottom: 1px solid var(--app-border); background: var(--app-surface); }
+.child-table td { padding: 7px 12px; font-size: 11.5px; border-bottom: 1px solid var(--app-border); vertical-align: middle; color: var(--app-text-main); }
 .child-table th:last-child, .child-table td:last-child { text-align: right; }
 .child-table td:last-child { font-family: 'Space Mono', monospace; font-weight: 700; }
-.child-table tr:hover td { background: rgba(255, 255, 255, .015); }
+.child-table tr:hover td { background: var(--status-info-bg); }
 
 .chip { padding: 3px 8px; border-radius: 20px; font-size: 10.5px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; border: 1px solid transparent; }
-.chip-blue { background: rgba(79, 110, 247, .12); color: var(--blue); border-color: rgba(79, 110, 247, .25); }
-.chip-purple { background: rgba(139, 92, 246, .12); color: var(--purple); border-color: rgba(139, 92, 246, .25); }
+.chip-blue { background: var(--status-info-bg); color: var(--blue); }
+.chip-purple { background: rgba(139, 92, 246, .12); color: var(--purple); }
 
 .price-stack { display: flex; flex-direction: column; }
-.old-price { text-decoration: line-through; color: var(--dim2); font-size: 10px; }
+.old-price { text-decoration: line-through; color: var(--app-text-dim); font-size: 10px; }
 .child-abon { font-family: 'Space Mono', monospace; font-weight: 600; color: var(--blue); }
-.val-white { color: var(--white); }
+.val-white { color: var(--app-text-main); }
 
 .discounts-cell { display: flex; flex-wrap: wrap; gap: 4px; }
 .child-discount { display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 10px; font-size: 9.5px; font-weight: 700; }
-.cd-family { background: rgba(236, 72, 153, .1); color: var(--pink); border: 1px solid rgba(236, 72, 153, .2); }
-.cd-promo { background: rgba(139, 92, 246, .1); color: var(--purple); border: 1px solid rgba(139, 92, 246, .2); }
-.cd-quality { background: rgba(6, 182, 212, .1); color: var(--cyan); border: 1px solid rgba(6, 182, 212, .2); }
-.cd-individual { background: rgba(245, 158, 11, .1); color: var(--amber); border: 1px solid rgba(245, 158, 11, .2); }
+.cd-family { background: var(--status-danger-bg); color: var(--pink); border: 1px solid var(--app-border); }
+.cd-promo { background: rgba(139, 92, 246, .1); color: var(--purple); border: 1px solid var(--app-border); }
+.cd-quality { background: rgba(6, 182, 212, .1); color: var(--cyan); border: 1px solid var(--app-border); }
+.cd-individual { background: var(--status-warning-bg); color: var(--amber); border: 1px solid var(--app-border); }
 
 .child-lessons { display: flex; align-items: center; gap: 6px; }
 .lessons-dots { display: flex; gap: 3px; }
-.ldot { width: 8px; height: 8px; border-radius: 50%; opacity: .15; background: var(--white); }
+.ldot { width: 8px; height: 8px; border-radius: 50%; opacity: .15; background: var(--app-text-main); }
 .ldot-ok { background: var(--green); opacity: 1; box-shadow: 0 0 4px rgba(34, 197, 94, .4); }
 .ldot-miss { background: var(--red); opacity: 1; box-shadow: 0 0 4px rgba(239, 68, 68, .3); }
 .ldot-bonus { background: var(--amber); opacity: 1; box-shadow: 0 0 4px rgba(245, 158, 11, .3); }
-.ldot-future { background: rgba(255, 255, 255, .1); border: 1px solid rgba(255, 255, 255, .15); }
+.ldot-future { background: var(--app-surface); border: 1px solid var(--app-border); }
 
 .status-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 10.5px; font-weight: 700; }
 .st-paid { color: var(--green); }
 .st-overdue { color: var(--red); }
 .st-pending { color: var(--amber); }
 
-.children-subtotal { padding: 8px 12px; background: rgba(79, 110, 247, .04); border-top: 1px solid rgba(79, 110, 247, .1); display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-.children-subtotal-label { color: var(--dim); font-weight: 600; }
+.children-subtotal { padding: 8px 12px; background: var(--app-surface); border-top: 1px solid var(--app-border); display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+.children-subtotal-label { color: var(--app-text-dim); font-weight: 600; }
 .children-subtotal-val { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--blue); }
 
-.formula-box { margin-top: 10px; padding: 11px 14px; background: rgba(79, 110, 247, .06); border: 1px solid rgba(79, 110, 247, .2); border-radius: 10px; margin: 10px 14px; }
-.fline { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11.5px; color: var(--dim); line-height: 1.9; }
-.fline.total { border-top: 1px solid rgba(79, 110, 247, .25); margin-top: 3px; padding-top: 6px; font-weight: 700; color: var(--blue); }
+.formula-box { margin-top: 10px; padding: 11px 14px; background: var(--app-surface); border: 1px solid var(--app-border); border-radius: 10px; margin: 10px 14px; }
+.fline { display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11.5px; color: var(--app-text-dim); line-height: 1.9; }
+.fline.total { border-top: 1px solid var(--app-border); margin-top: 3px; padding-top: 6px; font-weight: 700; color: var(--blue); }
 
 .mono { font-family: 'Space Mono', monospace; }
 .val-blue { color: var(--blue); }
@@ -217,5 +217,5 @@ const formatCurrency = (val: number) => {
 .fs-115 { font-size: 11.5px; }
 .fs-105 { font-size: 10.5px; }
 .fs-12 { font-size: 12px; }
-.hint { padding: 8px 14px; font-size: 11px; color: var(--dim); background: rgba(79, 110, 247, .03); border-bottom: 1px solid var(--border); }
+.hint { padding: 8px 14px; font-size: 11px; color: var(--app-text-dim); background: var(--app-surface); border-bottom: 1px solid var(--app-border); }
 </style>

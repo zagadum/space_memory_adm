@@ -50,12 +50,13 @@ const getAmountClass = () => {
 
 <style scoped>
 .section {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 18px;
   overflow: hidden;
   margin-bottom: 20px;
   transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--app-shadow);
 }
 
 .section-header {
@@ -64,11 +65,11 @@ const getAmountClass = () => {
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--app-surface);
   user-select: none;
 }
 
-.section-header:hover { background: rgba(255, 255, 255, 0.04); }
+.section-header:hover { background: rgba(79, 110, 247, 0.05); }
 
 .section-title {
   display: flex;
@@ -76,17 +77,19 @@ const getAmountClass = () => {
   gap: 14px;
   font-size: 15px;
   font-weight: 700;
+  color: var(--app-text-main);
 }
 
 .section-icon {
   width: 32px;
   height: 32px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--app-bg);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  border: 1px solid var(--app-border);
 }
 
 .section-amount {
@@ -97,15 +100,15 @@ const getAmountClass = () => {
   font-weight: 700;
 }
 
-.val-blue { color: #4f6ef7; }
-.val-purple { color: #8b5cf6; }
-.val-green { color: #22c55e; }
-.val-pink { color: #ec4899; }
-.val-cyan { color: #06b6d4; }
+.val-blue { color: var(--blue); }
+.val-purple { color: var(--purple); }
+.val-green { color: var(--green); }
+.val-pink { color: var(--pink); }
+.val-cyan { color: var(--cyan); }
 
 .section-chevron {
   font-size: 10px;
-  color: #4b5563;
+  color: var(--app-text-dim);
   transition: transform .3s;
 }
 

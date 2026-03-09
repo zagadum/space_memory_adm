@@ -140,7 +140,7 @@ const goBack = () => {
 .back-btn {
   background: transparent;
   border: none;
-  color: var(--dim);
+  color: var(--app-text-dim);
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -150,15 +150,15 @@ const goBack = () => {
 }
 
 .back-btn:hover {
-  color: var(--white);
+  color: var(--app-text-main);
   transform: translateX(-4px);
 }
 
 /* Glassmorphism Common Styles */
 .glass {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-card);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--app-border);
   border-radius: 20px;
 }
 
@@ -189,7 +189,7 @@ const goBack = () => {
   margin: 0;
   font-size: 28px;
   font-weight: 800;
-  color: var(--white);
+  color: var(--app-text-main);
 }
 
 .project-meta {
@@ -200,7 +200,7 @@ const goBack = () => {
 }
 
 .project-code {
-  color: var(--dim);
+  color: var(--app-text-dim);
   font-family: 'Space Mono', monospace;
   font-size: 14px;
   letter-spacing: 0.1em;
@@ -215,7 +215,7 @@ const goBack = () => {
 }
 
 .status-badge.active {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--status-success-bg);
   color: #10b981;
 }
 
@@ -238,7 +238,7 @@ const goBack = () => {
 
 .stat-card:hover {
   transform: translateY(-5px);
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--app-surface);
 }
 
 .stat-icon {
@@ -250,19 +250,19 @@ const goBack = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-surface);
 }
 
 .stat-value {
   font-size: 36px;
   font-weight: 800;
-  color: var(--white);
+  color: var(--app-text-main);
   line-height: 1;
   margin-bottom: 4px;
 }
 
 .stat-label {
-  color: var(--dim);
+  color: var(--app-text-dim);
   font-size: 14px;
 }
 
@@ -285,7 +285,7 @@ const goBack = () => {
   border-radius: 14px;
   border: none;
   background: transparent;
-  color: var(--dim);
+  color: var(--app-text-dim);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -293,12 +293,12 @@ const goBack = () => {
 }
 
 .tab-btn:hover {
-  color: var(--white);
+  color: var(--app-text-main);
 }
 
 .tab-btn.active {
-  background: rgba(79, 110, 247, 0.2);
-  color: var(--blue);
+  background: var(--status-info-bg);
+  color: #4f6ef7;
   box-shadow: 0 4px 12px rgba(79, 110, 247, 0.1);
 }
 
@@ -313,7 +313,7 @@ const goBack = () => {
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: var(--dim);
+  color: var(--app-text-dim);
 }
 
 .placeholder-icon {
@@ -325,7 +325,7 @@ const goBack = () => {
 /* Skeleton Loading */
 .skeleton-header {
   height: 140px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-surface);
   border-radius: 20px;
   margin-bottom: 24px;
   overflow: hidden;
@@ -346,7 +346,7 @@ const goBack = () => {
 
 .skeleton-card {
   height: 140px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-surface);
   border-radius: 20px;
   position: relative;
   overflow: hidden;
@@ -354,7 +354,7 @@ const goBack = () => {
 
 .skeleton-content {
   height: 400px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-surface);
   border-radius: 20px;
   position: relative;
   overflow: hidden;
@@ -376,7 +376,7 @@ const goBack = () => {
 .retry-btn {
   margin-top: 24px;
   padding: 12px 32px;
-  background: var(--blue);
+  background: #4f6ef7;
   color: white;
   border: none;
   border-radius: 12px;

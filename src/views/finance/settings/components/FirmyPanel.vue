@@ -135,25 +135,25 @@ function getLogoGradient(f: Firma) {
 .panel-title {
   font-size: 16px;
   font-weight: 900;
-  color: var(--white);
+  color: var(--app-text-main);
 }
 .panel-sub {
   font-size: 11px;
-  color: var(--dim);
+  color: var(--app-text-dim);
   margin-top: 2px;
 }
 
 /* FIRMA CARDS */
 .firma-card {
-  background: var(--card);
-  border: 1px solid var(--b);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 14px;
   margin-bottom: 12px;
   overflow: visible;
   transition: border-color .2s;
 }
 .firma-card:hover {
-  border-color: var(--bh);
+  border-color: var(--app-border-hi);
 }
 .firma-archived {
   opacity: .55;
@@ -185,11 +185,11 @@ function getLogoGradient(f: Firma) {
   font-size: 14px;
   font-weight: 800;
   margin-bottom: 3px;
-  color: var(--white);
+  color: var(--app-text-main);
 }
 .firma-meta {
   font-size: 10.5px;
-  color: var(--dim);
+  color: var(--app-text-dim);
   font-family: 'Space Mono', monospace;
   margin-bottom: 7px;
   line-height: 1.6;
@@ -239,13 +239,13 @@ function getLogoGradient(f: Firma) {
   gap: 6px;
   padding: 10px 18px;
   background: rgba(255, 255, 255, 0.018);
-  border-top: 1px solid var(--b);
+  border-top: 1px solid var(--app-border);
   flex-wrap: wrap;
 }
 .fp-label {
   font-size: 9.5px;
   font-weight: 800;
-  color: var(--dim);
+  color: var(--app-text-dim);
   text-transform: uppercase;
   letter-spacing: .06em;
   flex-shrink: 0;
@@ -255,11 +255,11 @@ function getLogoGradient(f: Firma) {
   font-weight: 600;
   padding: 3px 9px;
   border-radius: 20px;
-  border: 1px solid var(--b);
-  color: var(--white);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-main);
 }
 .fp-none {
-  color: var(--dim);
+  color: var(--app-text-dim);
   font-style: italic;
   font-size: 10.5px;
 }
@@ -272,12 +272,12 @@ function getLogoGradient(f: Firma) {
   position: absolute;
   right: 0;
   top: calc(100% + 4px);
-  background: var(--card2);
-  border: 1px solid var(--bh);
+  background: var(--app-card);
+  border: 1px solid var(--app-border-hi);
   border-radius: 11px;
   min-width: 200px;
   z-index: 200;
-  box-shadow: 0 16px 50px rgba(0, 0, 0, .75);
+  box-shadow: var(--app-shadow-lg);
   display: none;
 }
 .more-menu.open {
@@ -289,10 +289,10 @@ function getLogoGradient(f: Firma) {
   font-weight: 600;
   cursor: pointer;
   transition: background .12s;
-  color: var(--white);
+  color: var(--app-text-main);
 }
 .mi:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--status-info-bg);
 }
 .mi-red {
   color: var(--red);

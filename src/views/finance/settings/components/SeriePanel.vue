@@ -67,8 +67,8 @@ function openLog(id: number) {
 </script>
 
 <style scoped>
-.stitle { font-size: 13px; font-weight: 800; color: var(--white); }
-.ssub { font-size: 10.5px; color: var(--dim); }
+.stitle { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.ssub { font-size: 10.5px; color: var(--app-text-dim); }
 
 .series-tbl {
   width: 100%;
@@ -81,27 +81,27 @@ function openLog(id: number) {
   font-size: 10px;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--dim);
-  border-bottom: 1px solid var(--b);
+  color: var(--app-text-dim);
+  border-bottom: 1px solid var(--app-border);
 }
 .series-tbl td {
   padding: 12px 14px;
-  border-bottom: 1px solid var(--faint);
+  border-bottom: 1px solid var(--app-border);
   font-size: 12.5px;
 }
 
 .mono { font-family: 'Space Mono', monospace; font-weight: 700; }
 .num-ok { color: var(--green); }
 .td-small { font-size: 11px; }
-.td-faded { color: var(--dim); font-size: 11px; }
+.td-faded { color: var(--app-text-dim); font-size: 11px; }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--dim);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  border: 1px solid var(--app-border);
 }
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--white);
+  background: var(--status-info-bg);
+  color: var(--app-text-main);
 }
 </style>

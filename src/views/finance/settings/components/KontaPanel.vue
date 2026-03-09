@@ -85,8 +85,8 @@ function deleteAccount(id: number) {
 </script>
 
 <style scoped>
-.stitle { font-size: 13px; font-weight: 800; color: var(--white); }
-.ssub { font-size: 10.5px; color: var(--dim); }
+.stitle { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.ssub { font-size: 10.5px; color: var(--app-text-dim); }
 
 /* ACCOUNT ROWS */
 .acc-row {
@@ -94,30 +94,30 @@ function deleteAccount(id: number) {
   align-items: center;
   gap: 12px;
   padding: 14px 16px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   margin-bottom: 8px;
   transition: all .15s;
 }
 .acc-row:hover {
-  border-color: var(--bh);
-  background: rgba(255, 255, 255, 0.035);
+  border-color: var(--app-border-hi);
+  background: var(--status-info-bg);
 }
 .acc-num {
   font-family: 'Space Mono', monospace;
   font-size: 13px;
   font-weight: 700;
-  color: var(--white);
+  color: var(--app-text-main);
   letter-spacing: 0.5px;
 }
 .acc-label {
   font-size: 11px;
-  color: var(--dim);
+  color: var(--app-text-dim);
   margin-top: 2px;
 }
 .acc-badge {
-  background: rgba(16, 185, 129, 0.15);
+  background: var(--status-success-bg);
   color: var(--green);
   font-size: 9px;
   font-weight: 900;
@@ -126,6 +126,6 @@ function deleteAccount(id: number) {
   letter-spacing: 0.5px;
 }
 
-.btn-red { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+.btn-red { background: var(--status-danger-bg); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
 .btn-red:hover { background: rgba(239, 68, 68, 0.2); }
 </style>

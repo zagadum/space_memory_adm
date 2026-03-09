@@ -59,6 +59,7 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "themeDark": "Dark",
+    "themeLight": "Light",
     "studentsCount": "{n} student | {n} students",
     "daysCount": "{n} day | {n} days",
     "export": "Export",

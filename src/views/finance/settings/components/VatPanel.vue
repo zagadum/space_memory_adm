@@ -12,7 +12,7 @@
     <div class="scard" style="margin-bottom:12px;">
       <div class="scard-body" style="padding:13px 18px;">
         <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-          <span style="font-size:11.5px;font-weight:700;color:#8892b0;">{{ $t('financeSettings.vat.labelConfigFor') }}</span>
+          <span style="font-size:11.5px;font-weight:700;color:var(--app-text-dim);">{{ $t('financeSettings.vat.labelConfigFor') }}</span>
           <div class="vat-ftabs">
             <div 
               class="vat-ftab" 
@@ -31,7 +31,7 @@
               {{ f.id === 1 ? '⭐ ' : '' }}{{ f.name }}
             </div>
           </div>
-          <div style="margin-left:auto;font-size:10.5px;color:#8892b0;">
+          <div style="margin-left:auto;font-size:10.5px;color:var(--app-text-dim);">
             {{ $t('financeSettings.vat.hintGlobal') }}
           </div>
         </div>
@@ -71,7 +71,7 @@
               <td><span class="vat-pill" :class="getPillClass(rate.rate)">{{ rate.rate }}</span></td>
               <td style="font-size:12px;max-width:280px;">
                 <div style="font-weight:700;">{{ rate.name }}</div>
-                <div v-if="rate.legal_base" style="font-size:10.5px;color:#8892b0;">{{ rate.legal_base }}</div>
+                <div v-if="rate.legal_base" style="font-size:10.5px;color:var(--app-text-dim);">{{ rate.legal_base }}</div>
               </td>
               <td><span class="mono" style="font-size:10.5px;">{{ rate.pkwiu }}</span></td>
               <td>
@@ -168,29 +168,29 @@ function saveRates() {
   flex-wrap: wrap;
   gap: 10px;
 }
-.panel-title { font-size: 16px; font-weight: 900; color: var(--white); }
-.panel-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.panel-title { font-size: 16px; font-weight: 900; color: var(--app-text-main); }
+.panel-sub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
 
-.stitle { font-size: 13px; font-weight: 800; color: var(--white); }
-.ssub { font-size: 10.5px; color: var(--dim); }
+.stitle { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.ssub { font-size: 10.5px; color: var(--app-text-dim); }
 
 /* FIRMA TABS */
 .vat-ftabs { display: flex; gap: 6px; flex-wrap: wrap; }
 .vat-ftab {
   padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--dim);
+  color: var(--app-text-dim);
   cursor: pointer;
   transition: all .2s;
 }
-.vat-ftab:hover { background: rgba(255, 255, 255, 0.08); color: var(--white); }
+.vat-ftab:hover { background: var(--status-info-bg); color: var(--app-text-main); }
 .vat-ftab.act {
-  background: rgba(79, 110, 247, 0.1);
-  border-color: rgba(79, 110, 247, 0.3);
+  background: var(--status-info-bg);
+  border-color: var(--blue);
   color: var(--blue);
 }
 
@@ -198,39 +198,39 @@ function saveRates() {
 .vat-tbl { width: 100%; border-collapse: collapse; }
 .vat-tbl th {
   text-align: left; padding: 10px 18px;
-  font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--dim);
-  background: rgba(255, 255, 255, 0.02);
-  border-bottom: 1px solid var(--b);
+  font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--app-text-dim);
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
 }
-.vat-tbl td { padding: 12px 18px; border-bottom: 1px solid rgba(100, 120, 255, 0.06); }
+.vat-tbl td { padding: 12px 18px; border-bottom: 1px solid var(--app-border); }
 
 .vat-pill {
   padding: 2px 7px; border-radius: 6px; font-size: 10px; font-weight: 900; letter-spacing: 0.5px;
 }
 .vat-zw { background: var(--blue); color: #fff; }
 .vat-23 { background: var(--green); color: #fff; }
-.vat-8 { background: rgba(16, 185, 129, 0.2); color: var(--green); border: 1px solid var(--green); }
+.vat-8 { background: var(--status-success-bg); color: var(--green); border: 1px solid var(--green); }
 .vat-5 { background: var(--amber); color: #fff; }
-.vat-0 { background: var(--dim); color: #fff; }
+.vat-0 { background: var(--app-text-dim); color: #fff; }
 
 .mono { font-family: 'Space Mono', monospace; }
 
 .ftag {
   font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;
 }
-.ft-blue { background: rgba(79, 110, 247, 0.08); color: var(--blue); border: 1px solid rgba(79, 110, 247, 0.18); }
+.ft-blue { background: var(--status-info-bg); color: var(--blue); border: 1px solid rgba(79, 110, 247, 0.18); }
 .ft-purple { background: rgba(139, 92, 246, 0.08); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.18); }
 
 .badge { font-size: 9px; font-weight: 800; padding: 2px 7px; border-radius: 5px; }
-.b-ok { background: rgba(16, 185, 129, 0.12); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.22); }
+.b-ok { background: var(--status-success-bg); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.22); }
 
 .save-bar {
   padding: 14px 18px;
   display: flex; align-items: center; justify-content: space-between;
-  background: rgba(255, 255, 255, 0.015);
-  border-top: 1px solid var(--b);
+  background: var(--app-surface);
+  border-top: 1px solid var(--app-border);
 }
 
-.btn-red { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+.btn-red { background: var(--status-danger-bg); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
 .btn-red:hover { background: rgba(239, 68, 68, 0.2); }
 </style>

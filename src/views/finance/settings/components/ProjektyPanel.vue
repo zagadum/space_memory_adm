@@ -40,7 +40,7 @@
                   <span style="font-size:16px;">{{ p.emoji }}</span>
                   <div>
                     <div style="font-size:13px;font-weight:700;">{{ p.name }}</div>
-                    <div style="font-size:10.5px;color:var(--dim);">{{ p.cities?.join(', ') }}</div>
+                    <div style="font-size:10.5px;color:var(--app-text-dim);">{{ p.cities?.join(', ') }}</div>
                   </div>
                 </div>
               </td>
@@ -66,7 +66,7 @@
         </table>
       </div>
       <div class="save-bar">
-        <div style="font-size:11px;color:var(--dim);">{{ $t('financeSettings.projects.saveHint') }}</div>
+        <div style="font-size:11px;color:var(--app-text-dim);">{{ $t('financeSettings.projects.saveHint') }}</div>
         <button class="btn btn-primary" @click="saveAssignments">💾 Zapisz przypisania</button>
       </div>
     </div>
@@ -138,16 +138,60 @@ function getSerieColor(serie: string) {
 .panel-title {
   font-size: 16px;
   font-weight: 900;
-  color: var(--white);
+  color: var(--app-text-main);
 }
 .panel-sub {
   font-size: 11px;
-  color: var(--dim);
+  color: var(--app-text-dim);
   margin-top: 2px;
 }
+.stitle { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.ssub { font-size: 10.5px; color: var(--app-text-dim); }
 
-.stitle { font-size: 13px; font-weight: 800; color: var(--white); }
-.ssub { font-size: 10.5px; color: var(--dim); }
+.project-card {
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: all .15s;
+}
+.project-card:hover {
+  border-color: var(--app-border-hi);
+  transform: translateX(4px);
+}
+.p-meta {
+  font-size: 11px;
+  color: var(--app-text-dim);
+  margin-top: 2px;
+  border-bottom: 1px solid var(--app-border);
+  padding-bottom: 4px;
+}
+.p-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 4px;
+}
+.p-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+.card-edit {
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-main);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11.5px;
+  cursor: pointer;
+}
+
+.edit-projs {
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid var(--app-border);
+}
 
 .proj-tbl {
   width: 100%;

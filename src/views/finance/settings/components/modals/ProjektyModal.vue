@@ -81,32 +81,32 @@ function save() {
   backdrop-filter: blur(4px);
 }
 .modal {
-  background: var(--card); border: 1px solid var(--b);
-  border-radius: 16px; width: 95%; max-width: 500px;
+  background: var(--app-card); border: 1px solid var(--app-border);
+  border-radius: 16px; width: 90%; max-width: 460px;
   display: flex; flex-direction: column; overflow: hidden;
 }
-.mhdr { padding: 18px 20px; border-bottom: 1px solid var(--b); display: flex; align-items: center; justify-content: space-between; }
+.mhdr { padding: 18px 20px; border-bottom: 1px solid var(--app-border); display: flex; align-items: center; justify-content: space-between; }
 .mhl { display: flex; align-items: center; gap: 14px; }
-.mhico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-.mtitle { font-size: 14px; font-weight: 800; color: var(--white); }
-.msub { font-size: 10.5px; color: var(--dim); margin-top: 2px; }
-.mclose { cursor: pointer; color: var(--dim); font-size: 18px; }
+.mhico { width: 38px; height: 38px; background: rgba(79,110,247,0.12); border: 1px solid rgba(79,110,247,0.22); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--blue); }
+.mtitle { font-size: 14px; font-weight: 800; color: var(--app-text-main); }
+.msub { font-size: 10.5px; color: var(--app-text-dim); margin-top: 2px; }
+.mclose { cursor: pointer; color: var(--app-text-dim); font-size: 18px; }
 
 .mbody { padding: 20px; }
 
 .gr2 { display: grid; grid-template-columns: 80px 1fr; gap: 16px; }
-.fg { display: flex; flex-direction: column; gap: 6px; }
-.fg label { font-size: 11px; font-weight: 800; color: var(--dim); text-transform: uppercase; }
+.fg { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.fg label { font-size: 11px; font-weight: 800; color: var(--app-text-dim); text-transform: uppercase; }
 .req { color: var(--red); }
 
-input, select {
-  background: rgba(12, 12, 32, 0.8); border: 1px solid var(--b);
-  color: var(--white); border-radius: 8px; padding: 10px 12px; font-size: 13px;
+select, input {
+  background: var(--app-surface); border: 1px solid var(--app-border);
+  color: var(--app-text-main); border-radius: 8px; padding: 10px 12px; font-size: 13px;
 }
 
-.mfooter { padding: 14px 20px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--b); display: flex; justify-content: flex-end; gap: 10px; }
+.mfooter { padding: 14px 20px; background: var(--app-surface); border-top: 1px solid var(--app-border); display: flex; justify-content: flex-end; gap: 10px; }
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
 .btn-primary { background: linear-gradient(135deg, var(--purple), var(--blue)); color: #fff; }
-.btn-ghost { background: var(--faint); color: var(--dim); border: 1px solid var(--b); }
+.btn-ghost { background: var(--app-surface); color: var(--app-text-dim); border: 1px solid var(--app-border); }
 .btn-sm { padding: 5px 11px; font-size: 11px; }
 </style>

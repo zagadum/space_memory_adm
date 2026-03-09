@@ -43,12 +43,13 @@ const formatCurrency = (val: number) => {
 }
 
 .sum-card {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 18px;
   padding: 18px 22px;
   position: relative;
   overflow: hidden;
+  box-shadow: var(--app-shadow);
 }
 
 .sum-card::after {
@@ -59,26 +60,27 @@ const formatCurrency = (val: number) => {
   opacity: .5;
 }
 
-.c-subscription::after { background: #4f6ef7; }
-.c-replacement::after { background: #4f6ef7; }
-.c-meetings::after { background: #8b5cf6; }
-.c-individual::after { background: #ec4899; }
-.c-olympiad::after { background: #4f6ef7; }
-.c-admin::after { background: #22c55e; }
-.c-bonus::after { background: #22c55e; }
-.c-trial::after { background: #06b6d4; }
-.c-rezygnacje::after { background: #ef4444; }
+.c-subscription::after { background: var(--blue); }
+.c-replacement::after { background: var(--blue); }
+.c-meetings::after { background: var(--purple); }
+.c-individual::after { background: var(--pink); }
+.c-olympiad::after { background: var(--blue); }
+.c-admin::after { background: var(--green); }
+.c-bonus::after { background: var(--green); }
+.c-trial::after { background: var(--cyan); }
+.c-rezygnacje::after { background: var(--red); }
 
-.sum-label { font-size: 10px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
-.sum-val { font-size: 19px; font-weight: 800; }
-.sum-sub { font-size: 11px; color: #4b5563; margin-top: 4px; }
+.sum-label { font-size: 10px; font-weight: 800; color: var(--app-text-dim); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.sum-val { font-size: 19px; font-weight: 800; color: var(--app-text-main); }
+.sum-sub { font-size: 11px; color: var(--app-text-dim); margin-top: 4px; }
 
 .sum-card-total {
-  background: linear-gradient(135deg, rgba(79,110,247,.15), rgba(139,92,246,.15));
-  border-color: rgba(79,110,247,.3);
+  background: linear-gradient(135deg, var(--status-info-bg), rgba(139,92,246,.15));
+  border-color: var(--blue);
+  box-shadow: var(--app-shadow);
 }
-.sum-card-total::after { background: linear-gradient(90deg, #4f6ef7, #8b5cf6); opacity: 1; }
-.sum-card-total .sum-val { color: #f0f0ff; text-shadow: 0 0 10px rgba(79, 110, 247, 0.4); }
+.sum-card-total::after { background: linear-gradient(90deg, var(--blue), var(--purple)); opacity: 1; }
+.sum-card-total .sum-val { color: var(--app-text-main); text-shadow: var(--app-glow); }
 
 .mono { font-family: 'Space Mono', monospace; }
 </style>

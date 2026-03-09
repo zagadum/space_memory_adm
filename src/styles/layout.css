@@ -414,20 +414,22 @@
 .topbar {
     position: sticky;
     top: 0;
-    background: rgba(4, 4, 15, 0.85);
+    background: var(--app-topbar);
     backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--app-border);
     padding: 0 28px;
     height: 58px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     z-index: 50;
+    transition: all 0.3s ease;
 }
 
 .topbar-title {
     font-size: 18px;
     font-weight: 600;
+    color: var(--app-text-main);
     display: flex;
     align-items: center;
     gap: 10px;
@@ -448,25 +450,25 @@
 .search-box {
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 7px 12px;
-    transition: all 0.2s;
+    gap: 10px;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    padding: 7px 14px;
+    border-radius: 10px;
+    transition: all 0.2s ease;
 }
 
 .search-box:focus-within {
-    border-color: var(--border-hi);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 12px rgba(79, 110, 247, 0.1);
+    border-color: var(--blue);
+    background: var(--app-card);
+    box-shadow: 0 0 12px rgba(79, 110, 247, 0.15);
 }
 
 .search-box input {
-    background: none;
+    background: transparent;
     border: none;
     outline: none;
-    color: var(--white);
+    color: var(--app-text-main);
     font-family: 'Outfit', sans-serif;
     font-size: 13px;
     width: 200px;
@@ -486,12 +488,18 @@
     font-size: 12.5px;
     font-weight: 600;
     font-family: 'Outfit', sans-serif;
-    border: 1px solid var(--border-hi);
-    background: rgba(255, 255, 255, 0.06);
-    color: var(--dim);
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    color: var(--app-text-dim);
     transition: all 0.25s;
     user-select: none;
     white-space: nowrap;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--status-info-bg);
+    color: var(--app-text-main);
+    border-color: var(--app-border-hi);
 }
 
 /* ─── CONTENT ─── */

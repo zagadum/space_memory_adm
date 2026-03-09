@@ -52,8 +52,8 @@ defineEmits(['close'])
 }
 
 .modal {
-  background: #0c0c24;
-  border: 1px solid rgba(100, 120, 255, 0.2);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 16px;
   width: 90%;
   max-width: 480px;
@@ -63,7 +63,7 @@ defineEmits(['close'])
 
 .mhdr {
   padding: 18px 20px;
-  border-bottom: 1px solid rgba(100, 120, 255, 0.1);
+  border-bottom: 1px solid var(--app-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -72,7 +72,7 @@ defineEmits(['close'])
 .mhico {
   width: 38px;
   height: 38px;
-  background: rgba(239, 68, 68, 0.1);
+  background: var(--status-danger-bg);
   border: 1px solid rgba(239, 68, 68, 0.2);
   border-radius: 10px;
   display: flex;
@@ -80,9 +80,9 @@ defineEmits(['close'])
   justify-content: center;
   font-size: 18px;
 }
-.mtitle { font-size: 15px; font-weight: 800; color: #e8eeff; }
-.msub { font-size: 11px; color: #8892b0; margin-top: 2px; }
-.mclose { cursor: pointer; color: #8892b0; font-size: 18px; }
+.mtitle { font-size: 15px; font-weight: 800; color: var(--app-text-main); }
+.msub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
+.mclose { cursor: pointer; color: var(--app-text-dim); font-size: 18px; }
 
 .mbody { padding: 20px; }
 
@@ -96,26 +96,26 @@ defineEmits(['close'])
   margin-bottom: 16px;
 }
 .ibox-red {
-  background: rgba(239, 68, 68, 0.08);
+  background: var(--status-danger-bg);
   border: 1px solid rgba(239, 68, 68, 0.2);
-  color: #ffb4b4;
+  color: var(--red);
 }
 .ibox-icon { font-size: 16px; flex-shrink: 0; }
 
 .log-rows { display: flex; flex-direction: column; gap: 8px; }
 .log-row {
   padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(100, 120, 255, 0.1);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
 }
 .log-val { font-family: 'Space Mono', monospace; color: #10b981; font-size: 12px; font-weight: 700; }
-.log-meta { font-size: 10.5px; color: #8892b0; margin-top: 4px; }
+.log-meta { font-size: 10.5px; color: var(--app-text-dim); margin-top: 4px; }
 
 .mfooter {
   padding: 14px 20px;
-  background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid rgba(100, 120, 255, 0.1);
+  background: var(--app-surface);
+  border-top: 1px solid var(--app-border);
   display: flex;
   justify-content: flex-end;
 }
@@ -131,12 +131,12 @@ defineEmits(['close'])
   transition: all .15s;
 }
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.05);
-  color: #8892b0;
-  border: 1px solid rgba(100, 120, 255, 0.1);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  border: 1px solid var(--app-border);
 }
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #e8eeff;
+  background: var(--status-info-bg);
+  color: var(--app-text-main);
 }
 </style>

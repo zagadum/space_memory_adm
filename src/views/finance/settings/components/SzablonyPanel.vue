@@ -148,8 +148,8 @@ function deleteTpl(id: string) {
   flex-wrap: wrap;
   gap: 10px;
 }
-.panel-title { font-size: 16px; font-weight: 900; color: var(--white); }
-.panel-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.panel-title { font-size: 16px; font-weight: 900; color: var(--app-text-main); }
+.panel-sub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
 
 .filter-bar {
   display: flex;
@@ -160,9 +160,9 @@ function deleteTpl(id: string) {
 }
 
 .tpl-filter-sel {
-  background: rgba(12, 12, 32, 0.8);
-  border: 1px solid var(--b);
-  color: var(--white);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-main);
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 12px;
@@ -173,15 +173,15 @@ function deleteTpl(id: string) {
 .tpl-list { display: flex; flex-direction: column; gap: 10px; }
 
 .tpl-card {
-  background: var(--card);
-  border: 1px solid var(--b);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   padding: 14px 18px;
   transition: all .2s;
 }
 .tpl-card:hover {
-  border-color: var(--bh);
-  background: rgba(12, 12, 36, 1);
+  border-color: var(--app-border-hi);
+  background: var(--status-info-bg);
 }
 
 .tpl-top {
@@ -191,8 +191,8 @@ function deleteTpl(id: string) {
   gap: 12px;
 }
 
-.tpl-title { font-size: 13px; font-weight: 800; color: var(--white); }
-.tpl-subject { font-size: 10.5px; color: var(--dim); margin-top: 2px; font-family: 'Space Mono', monospace; }
+.tpl-title { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.tpl-subject { font-size: 10.5px; color: var(--app-text-dim); margin-top: 2px; font-family: 'Space Mono', monospace; }
 
 .ftag {
   font-size: 9px;
@@ -201,16 +201,16 @@ function deleteTpl(id: string) {
   border-radius: 4px;
   text-transform: uppercase;
 }
-.ft-blue { background: rgba(79, 110, 247, 0.12); color: var(--blue); border: 1px solid rgba(79, 110, 247, 0.22); }
-.ft-purple { background: rgba(139, 92, 246, 0.12); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.22); }
-.ft-amber { background: rgba(245, 158, 11, 0.12); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.22); }
-.ft-red { background: rgba(239, 68, 68, 0.12); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.22); }
-.ft-arch { background: rgba(255, 255, 255, 0.05); color: var(--dim); border: 1px solid rgba(255, 255, 255, 0.1); }
-.ft-proj { background: rgba(79, 110, 247, 0.08); color: var(--blue); border: 1px solid rgba(79, 110, 247, 0.15); }
-.ft-def { background: rgba(16, 185, 129, 0.15); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.25); }
+.ft-blue { background: var(--status-info-bg); color: var(--blue); border: 1px solid rgba(79, 110, 247, 0.22); }
+.ft-purple { background: rgba(139, 92, 246, 0.08); color: var(--purple); border: 1px solid rgba(139, 92, 246, 0.22); }
+.ft-amber { background: var(--status-warning-bg); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.22); }
+.ft-red { background: var(--status-danger-bg); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.22); }
+.ft-arch { background: var(--app-surface); color: var(--app-text-dim); border: 1px solid var(--app-border); }
+.ft-proj { background: var(--status-info-bg); color: var(--blue); border: 1px solid rgba(79, 110, 247, 0.15); }
+.ft-def { background: var(--status-success-bg); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.25); }
 
 .mono-var { font-family: 'Space Mono', monospace; color: var(--blue); }
 
-.btn-red { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
+.btn-red { background: var(--status-danger-bg); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
 .btn-red:hover { background: rgba(239, 68, 68, 0.2); }
 </style>

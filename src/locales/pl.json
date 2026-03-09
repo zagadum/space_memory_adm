@@ -59,6 +59,7 @@
     "expand": "Rozwiń",
     "collapse": "Zwiń",
     "themeDark": "Ciemny",
+    "themeLight": "Jasny",
     "studentsCount": "{n} student | {n} studentów | {n} studentów",
     "daysCount": "{n} dzień | {n} dni | {n} dni",
     "export": "Eksport",
