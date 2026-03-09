@@ -3,9 +3,6 @@
     <header class="leads-header">
       <div class="header-left">
         <h1 class="page-title">{{ t('leads.title') }}</h1>
-        <div class="leads-stats">
-          <span class="stat-item"><span class="dot blue"></span> {{ leadsStore.leads.length }} {{ t('dashboard.stats.newLeads') }}</span>
-        </div>
       </div>
       <div class="header-right">
         <button class="btn btn-primary">＋ {{ t('dashboard.quickActions.addStudent') }}</button>
@@ -117,23 +114,6 @@ const onDrop = (newStatus: LeadStatus) => {
   font-weight: 800;
   color: var(--app-text-main);
   margin: 0 0 8px 0;
-}
-
-.leads-stats {
-  font-size: 13px;
-  color: var(--app-text-dim);
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
 }
 
 .dot.blue { background: #4f6ef7; box-shadow: 0 0 8px rgba(79,110,247,0.4); }

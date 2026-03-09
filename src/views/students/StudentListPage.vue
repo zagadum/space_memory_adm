@@ -1,27 +1,5 @@
 <template>
   <div class="content">
-    <div class="stats-grid">
-      <div class="stat-card blue">
-        <div class="stat-label">{{ t('studentList.stats.activeStudents') }}</div>
-        <div class="stat-value">{{ listStore.pagination.total }}</div>
-        <div class="stat-sub">{{ t('studentList.stats.totalInSystem') }}</div>
-        <div class="stat-icon">👩‍🚀</div>
-      </div>
-      <!-- Paid card removed as per backend request to avoid extra payments API load -->
-      <div class="stat-card amber">
-        <div class="stat-label">{{ t('studentList.stats.avgTraining') }}</div>
-        <div class="stat-value">124</div>
-        <div class="stat-sub"><span class="warn">{{ t('studentList.stats.avgDays') }}</span></div>
-        <div class="stat-icon">⏱</div>
-      </div>
-      <div class="stat-card cyan">
-        <div class="stat-label">{{ t('studentList.stats.noContact7') }}</div>
-        <div class="stat-value">{{ students.filter(s => (s.daysSinceContact ?? 0) >= 7).length }}</div>
-        <div class="stat-sub">{{ t('studentList.stats.requireAttention') }}</div>
-        <div class="stat-icon">⚠️</div>
-      </div>
-    </div>
-
     <div class="table-toolbar">
       <div class="toolbar-left">
         <div class="section-title">
@@ -339,22 +317,6 @@ onUnmounted(() => {
 <style scoped>
 /* ── КОСМИЧЕСКИЕ СТИЛИ (Исправленные) ── */
 .content { padding: 24px 28px; }
-
-/* Статистика */
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-.stat-card { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px; padding: 20px; position: relative; overflow: hidden; transition: all 0.3s; box-shadow: var(--app-shadow); }
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 14px 14px 0 0; }
-.stat-card.blue::before { background: linear-gradient(90deg, #4f6ef7, #8b5cf6); }
-.stat-card.green::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
-.stat-card.amber::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
-.stat-card.cyan::before { background: linear-gradient(90deg, #06b6d4, #4f6ef7); }
-.stat-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(0,0,0,0.12); border-color: var(--app-border-hi); }
-.stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--app-text-dim); margin-bottom: 10px; }
-.stat-value { font-size: 26px; font-weight: 700; font-family: 'Space Mono', monospace; color: var(--app-text-main); margin-bottom: 6px; }
-.stat-sub { font-size: 11.5px; color: var(--app-text-dim); }
-.stat-sub .up { color: var(--green); }
-.stat-sub .warn { color: var(--amber); }
-.stat-icon { position: absolute; top: 16px; right: 16px; font-size: 22px; opacity: 0.6; }
 
 /* Тулбар и фильтры */
 .table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
