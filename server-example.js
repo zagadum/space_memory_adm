@@ -45,8 +45,8 @@ const testData = {
 
 // Routes
 
-// GET /api/student/programs
-app.get('/api/student/programs', (req, res) => {
+// GET /api/v1/student/programs
+app.get('/api/v1/student/programs', (req, res) => {
   const { studentId } = req.query;
   console.log(`[GET] Student programs: ${studentId}`);
   res.json({
@@ -54,8 +54,8 @@ app.get('/api/student/programs', (req, res) => {
   });
 });
 
-// GET /api/student/info
-app.get('/api/student/info', (req, res) => {
+// GET /api/v1/student/info
+app.get('/api/v1/student/info', (req, res) => {
   const { studentId } = req.query;
   console.log(`[GET] Student info: ${studentId}`);
   res.json({
@@ -63,8 +63,8 @@ app.get('/api/student/info', (req, res) => {
   });
 });
 
-// GET /api/student/groups
-app.get('/api/student/groups', (req, res) => {
+// GET /api/v1/student/groups
+app.get('/api/v1/student/groups', (req, res) => {
   const { studentId } = req.query;
   console.log(`[GET] Student groups: ${studentId}`);
   res.json({
@@ -79,14 +79,14 @@ app.get('/api/student/groups', (req, res) => {
   });
 });
 
-// POST /api/student/change-group
-app.post('/api/student/change-group', (req, res) => {
+// POST /api/v1/student/change-group
+app.post('/api/v1/student/change-group', (req, res) => {
   console.log(`[POST] Change group:`, req.body);
   res.json({ ok: true });
 });
 
-// GET /api/student/attendance
-app.get('/api/student/attendance', (req, res) => {
+// GET /api/v1/student/attendance
+app.get('/api/v1/student/attendance', (req, res) => {
   const { studentId } = req.query;
   console.log(`[GET] Student attendance: ${studentId}`);
   res.json({
@@ -97,14 +97,14 @@ app.get('/api/student/attendance', (req, res) => {
   });
 });
 
-// POST /api/student/trainer-presence
-app.post('/api/student/trainer-presence', (req, res) => {
+// POST /api/v1/student/trainer-presence
+app.post('/api/v1/student/trainer-presence', (req, res) => {
   console.log(`[POST] Trainer presence:`, req.body);
   res.json({ ok: true });
 });
 
-// POST /api/student/info
-app.post('/api/student/info', (req, res) => {
+// POST /api/v1/student/info
+app.post('/api/v1/student/info', (req, res) => {
   console.log(`[POST] Update student info:`, req.body);
   res.json({
     ok: true,
@@ -112,8 +112,8 @@ app.post('/api/student/info', (req, res) => {
   });
 });
 
-// GET /api/auth/me
-app.get('/api/auth/me', (req, res) => {
+// GET /api/v1/auth/me
+app.get('/api/v1/auth/me', (req, res) => {
   console.log(`[GET] Current user`);
   res.json({
     id: "u_1",

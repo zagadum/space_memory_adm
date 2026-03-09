@@ -65,21 +65,21 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   */
 
   // --- PAYMENTS ---
-  if (method === "get" && url.startsWith("v1/payments/student/")) {
+  if (method === "get" && url.startsWith("payments/student/")) {
     const studentId = url.split("/").pop();
     let data: { profile: StudentProfile; programs: Program[] } | null = studentId ? mockDb.students[studentId] : null;
-    
+
     // Если студента нет в БД, генерируем mock данные
     if (!data && studentId) {
       const id = studentId.replace(/^\D+/, ''); // Удаляем префикс
       const names = ["Иван Иванов", "Мария Петрова", "Алексей Сидоров", "Елена Смирнова", "Петр Федоров", "Юлия Кравцова"];
       const teachers = ["Клара Левит", "Ханна Боян"];
       const groups = ["Вт 17 Младшая", "Ср 15 Младшая", "Чт 16 Средняя", "Сб 10 Старшая"];
-      
+
       const nameIdx = parseInt(id) % names.length;
       const teacherIdx = parseInt(id) % teachers.length;
       const groupIdx = parseInt(id) % groups.length;
-      
+
       const mockStudent = {
         profile: {
           id: studentId,
@@ -146,7 +146,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       };
       data = mockStudent;
     }
-    
+
     if (!data) return err(config, 404, "Student not found");
     return ok(config, { student: data.profile, programs: data.programs });
   }
@@ -165,7 +165,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
    */
 
   // Example mutation endpoints (no real persistence, but realistic response shape)
-  if (method === "post" && url === "v1/payments/refund") {
+  if (method === "post" && url === "payments/refund") {
     const body = readBody(config);
     if (!body?.fvnum) return err(config, 400, "fvnum is required");
     return ok(config, {
@@ -175,88 +175,88 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  if (method === "post" && url === "v1/payments/tariff") {
+  if (method === "post" && url === "payments/tariff") {
     const body = readBody(config);
     if (!body?.programId || !body?.value) return err(config, 400, "programId/value required");
     return ok(config, { ok: true, programId: body.programId, value: body.value });
   }
 
 
-  if (method === "get" && url === "v1/payments/transactions") {
+  if (method === "get" && url === "payments/transactions") {
     const programId = (config.params as any)?.programId;
     if (!programId || !mockTransactions[programId]) return err(config, 400, "programId is required");
     return ok(config, { items: mockTransactions[programId] });
   }
 
-  if (method === "get" && url === "v1/payments/ksef-invoices") {
+  if (method === "get" && url === "payments/ksef-invoices") {
     const programId = (config.params as any)?.programId;
     if (!programId || !mockKsefInvoices[programId]) return err(config, 400, "programId is required");
     return ok(config, { items: mockKsefInvoices[programId] });
   }
 
 
-  if (method === "post" && url === "v1/payments/invoice") {
+  if (method === "post" && url === "payments/invoice") {
     const body = readBody(config);
     if (!body?.programId || !body?.fvnum) return err(config, 400, "programId/fvnum required");
     return ok(config, { ok: true, fvnum: body.fvnum });
   }
 
-  if (method === "post" && url === "v1/payments/correction") {
+  if (method === "post" && url === "payments/correction") {
     const body = readBody(config);
     if (!body?.programId || body?.amount == null) return err(config, 400, "programId/amount required");
     return ok(config, { ok: true, correctionId: "corr_" + Math.random().toString(16).slice(2) });
   }
 
-  if (method === "post" && url === "v1/payments/pause") {
+  if (method === "post" && url === "payments/pause") {
     const body = readBody(config);
     if (!body?.programId || !body?.from || !body?.to) return err(config, 400, "programId/from/to required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "v1/payments/discount") {
+  if (method === "post" && url === "payments/discount") {
     const body = readBody(config);
     if (!body?.programId || !body?.kind || body?.value == null) return err(config, 400, "programId/kind/value required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "v1/payments/extra") {
+  if (method === "post" && url === "payments/extra") {
     const body = readBody(config);
     if (!body?.programId || !body?.date || !body?.title || body?.amount == null) return err(config, 400, "programId/date/title/amount required");
     return ok(config, { ok: true, extraId: "extra_" + Math.random().toString(16).slice(2) });
   }
 
-  if (method === "post" && url === "v1/payments/unlock") {
+  if (method === "post" && url === "payments/unlock") {
     const body = readBody(config);
     if (!body?.programId) return err(config, 400, "programId required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "v1/payments/archive") {
+  if (method === "post" && url === "payments/archive") {
     const body = readBody(config);
     if (!body?.programId || !body?.reason) return err(config, 400, "programId/reason required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "v1/payments/split") {
+  if (method === "post" && url === "payments/split") {
     const body = readBody(config);
     if (!body?.programId || !body?.fromGroup || !body?.toGroup || !body?.effectiveDate) return err(config, 400, "programId/fromGroup/toGroup/effectiveDate required");
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "v1/payments/resume") {
+  if (method === "post" && url === "payments/resume") {
     const body = readBody(config);
     if (!body?.programId) return err(config, 400, "programId required");
     return ok(config, { ok: true });
   }
 
   // --- STUDENT: GROUPS ---
-  if (method === "get" && url === "api/student/groups") {
+  if (method === "get" && url === "student/groups") {
     const studentId = (config.params as any)?.studentId;
     if (!studentId) return err(config, 400, "studentId is required");
     return ok(config, { items: g });
   }
 
-  if (method === "post" && url === "api/student/change-group") {
+  if (method === "post" && url === "student/change-group") {
     const body = readBody(config);
     if (!body?.studentId || !body?.programId || !body?.fromGroup || !body?.toGroup) {
       return err(config, 400, "studentId/programId/fromGroup/toGroup required");
@@ -268,7 +268,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "api/student/trainer-presence") {
+  if (method === "post" && url === "student/trainer-presence") {
     const body = readBody(config);
     if (!body?.studentId || !body?.groupId || !body?.trainerId || !body?.presence) {
       return err(config, 400, "studentId/groupId/trainerId/presence required");
@@ -280,13 +280,13 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   // --- STUDENT: INFO ---
-  if (method === "get" && url === "api/student/info") {
+  if (method === "get" && url === "student/info") {
     const studentId = (config.params as any)?.studentId;
     if (!studentId) return err(config, 400, "studentId is required");
     return ok(config, { info });
   }
 
-  if (method === "post" && url === "api/student/info") {
+  if (method === "post" && url === "student/info") {
     const body = readBody(config);
     if (!body?.studentId || !body?.patch) return err(config, 400, "studentId/patch required");
     // naive deep merge for demo
@@ -295,302 +295,303 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   // --- STUDENT: ATTENDANCE ---
-  if (method === "get" && url === "api/student/attendance") {
+  if (method === "get" && url === "student/attendance") {
     const studentId = (config.params as any)?.studentId;
     if (!studentId) return err(config, 400, "studentId is required");
     return ok(config, { attendance: att });
   }
 
-  if (method === "post" && url === "api/student/attendance") {
-    const body = readBody(config);
-    if (!body?.studentId || !body?.attendanceId || !body?.mark) {
-      return err(config, 400, "studentId/attendanceId/mark required");
-    }
-    const row = att.items.find((x: any) => x.id === body.attendanceId);
-    if (row) {
-      row.mark = body.mark;
-      row.note = body.note ?? "";
-    }
-    return ok(config, { ok: true });
-  }
-
-  // --- STUDENT: PROGRESS ---
-  if (method === "get" && url === "api/student/progress") {
-    const studentId = (config.params as any)?.studentId;
-    if (!studentId) return err(config, 400, "studentId is required");
-    return ok(config, { progress: mockProgress });
-  }
-
-  // --- STUDENT: NOTES ---
-  if (method === "get" && url === "api/student/notes") {
-    const studentId = (config.params as any)?.studentId;
-    if (!studentId) return err(config, 400, "studentId is required");
-    return ok(config, { items: notes });
-  }
-
-  if (method === "post" && url === "api/student/notes") {
-    const body = readBody(config);
-    if (!body?.studentId || !body?.text) return err(config, 400, "studentId/text required");
-    const now = new Date();
-    const note = {
-      id: "n_" + Math.random().toString(16).slice(2),
-      type: body.type || "note",
-      status: body.status || "open",
-      category: body.category || "general",
-      who: "Demo Admin",
-      when: now.toLocaleDateString("ru-RU") + " · " + now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
-      title: body.direction ? `${body.direction}` : "",
-      text: body.text,
-      tags: Array.isArray(body.tags) ? body.tags : [],
-    };
-    notes.unshift(note);
-    return ok(config, { ok: true, note });
-  }
-
-  // --- NEW GROUPS ---
-  const ng: any[] = (globalThis as any).__mock_new_groups ?? ((globalThis as any).__mock_new_groups = JSON.parse(JSON.stringify(mockNewGroups)));
-  const ngStudents: any = (globalThis as any).__mock_ng_students ?? ((globalThis as any).__mock_ng_students = JSON.parse(JSON.stringify(mockGroupStudents)));
-
-  if (method === "get" && url === "api/new-groups") {
-    return ok(config, { items: ng });
-  }
-
-  if (method === "get" && url === "api/new-groups/students") {
-    const groupId = Number((config.params as any)?.groupId);
-    if (!groupId) return err(config, 400, "groupId is required");
-    return ok(config, { items: ngStudents[groupId] ?? [] });
-  }
-
-  if (method === "get" && url === "api/new-groups/master-students") {
-    return ok(config, { items: mockMasterStudents });
-  }
-
-  if (method === "get" && url === "api/new-groups/teachers") {
-    return ok(config, { items: mockTeachers });
-  }
-
-  if (method === "post" && url === "api/new-groups/create") {
-    const body = readBody(config);
-    if (!body?.name || !body?.day) return err(config, 400, "name/day required");
-    const today = new Date().toISOString().slice(0, 10);
-    const newGroup = {
-      id: Date.now(),
-      name: body.name,
-      type: body.type ?? "group",
-      startDate: body.startDate || (() => { const d = new Date(); d.setDate(d.getDate() + 14); return d.toISOString().slice(0, 10); })(),
-      createdDate: today,
-      totalSlots: body.type === "individual" ? 1 : 10,
-      paid: 0,
-      manager: mockManagers[0],
-      teacher: body.teacherId ? mockTeachers.find(t => t.id === body.teacherId) ?? null : null,
-      day: body.day,
-      time: body.time ?? "16:00",
-      age: body.age ?? null,
-      students: body.studentIds ?? [],
-    };
-    ng.unshift(newGroup);
-    ngStudents[newGroup.id] = [];
-    return ok(config, { ok: true, group: newGroup });
-  }
-
-  if (method === "post" && url === "api/new-groups/start") {
-    const body = readBody(config);
-    if (!body?.groupId) return err(config, 400, "groupId required");
-    const idx = ng.findIndex(x => x.id === body.groupId);
-    if (idx !== -1) ng.splice(idx, 1);
-    return ok(config, { ok: true });
-  }
-
-  if (method === "post" && url === "api/new-groups/delete") {
-    const body = readBody(config);
-    if (!body?.groupId) return err(config, 400, "groupId required");
-    const idx = ng.findIndex(x => x.id === body.groupId);
-    if (idx !== -1) ng.splice(idx, 1);
-    return ok(config, { ok: true });
-  }
-
-  if (method === "post" && url === "api/new-groups/add-students") {
-    const body = readBody(config);
-    if (!body?.groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
-    const today = new Date().toISOString().slice(0, 10);
-    if (!ngStudents[body.groupId]) ngStudents[body.groupId] = [];
-    const existing = new Set(ngStudents[body.groupId].map((s: any) => s.name));
-    let added = 0;
-    for (const sid of body.studentIds) {
-      const ms = mockMasterStudents.find(s => s.id === sid);
-      if (ms && !existing.has(ms.name)) {
-        ngStudents[body.groupId].push({ id: Date.now() + Math.random(), name: ms.name, age: ms.age, contract: "pending", paymentStr: "0 zł", createdDate: today, manager: null });
-        added++;
+  if (method === "post" && url === "api/student/attendance") { // Wait, why api/ here in original? Correcting to student/attendance
+    if (method === "post" && url === "student/attendance") {
+      const body = readBody(config);
+      if (!body?.studentId || !body?.attendanceId || !body?.mark) {
+        return err(config, 400, "studentId/attendanceId/mark required");
       }
-    }
-    return ok(config, { ok: true, added });
-  }
-
-  if (method === "post" && url === "api/new-groups/remove-student") {
-    const body = readBody(config);
-    if (!body?.groupId || !body?.studentName) return err(config, 400, "groupId/studentName required");
-    if (ngStudents[body.groupId]) {
-      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.name !== body.studentName);
-    }
-    return ok(config, { ok: true });
-  }
-
-  // --- STUDENTS LIST ---
-  if (method === "get" && url === "v1/student/groups-filter") {
-    return ok(config, {
-      items: [
-        { id: 1, name: "Вт 17 Младшая" },
-        { id: 2, name: "Ср 15 Младшая" },
-        { id: 3, name: "Чт 16 Средняя" },
-        { id: 4, name: "Сб 10 Старшая" }
-      ]
-    });
-  }
-
-  if (method === "get" && url === "v1/student/teacher-filter") {
-    return ok(config, {
-      items: [
-        { id: 1, name: "Клара Левит" },
-        { id: 2, name: "Ханна Боян" }
-      ]
-    });
-  }
-
-  if (method === "get" && url === "v1/student/list") {
-    // Генерируем mock данные для списка студентов
-    const mockStudentsList = [
-      {
-        id: 1,
-        full_name: "Иван Иванов",
-        name: "Иван Иванов",
-        phone: "+48 777 000 111",
-        email: "ivan.ivanov@gmail.com",
-        created_at: "2025-12-15",
-        start_date: "2025-12-15",
-        training_term_days: 82,
-        daysSinceContact: 2,
-        lastContact: "05.03.2026, 14:30",
-        comment: "Активный студент",
-        is_paid: true,
-        paid: true,
-        status: "Активна",
-        statusColor: "#10b981",
-        initials: "ИИ",
-        avatarColor: "#4f6ef7",
-        staffInitials: "КЛ",
-        staff: "Клара Левит",
-        groups: [
-          { school_name: "Space Memory", name: "Вт 17 Младшая", teacher_name: "Клара Левит" }
-        ],
-        enrollments: [
-          { school: "Space Memory", group: "Вт 17 Младшая", teacher: "Клара Левит" }
-        ]
-      },
-      {
-        id: 2,
-        full_name: "Мария Петрова",
-        name: "Мария Петрова",
-        phone: "+48 777 000 222",
-        email: "maria.petrova@gmail.com",
-        created_at: "2025-11-01",
-        start_date: "2025-11-01",
-        training_term_days: 127,
-        daysSinceContact: 8,
-        lastContact: "28.02.2026, 10:15",
-        comment: "Требует внимания",
-        is_paid: false,
-        paid: false,
-        status: "Требует внимания",
-        statusColor: "#f59e0b",
-        initials: "МП",
-        avatarColor: "#8b5cf6",
-        staffInitials: "ХБ",
-        staff: "Ханна Боян",
-        groups: [
-          { school_name: "Speedy Mind Indigo", name: "Ср 15 Младшая", teacher_name: "Ханна Боян" }
-        ],
-        enrollments: [
-          { school: "Speedy Mind Indigo", group: "Ср 15 Младшая", teacher: "Ханна Боян" }
-        ]
-      },
-      {
-        id: 3,
-        full_name: "Алексей Сидоров",
-        name: "Алексей Сидоров",
-        phone: "+48 777 000 333",
-        email: "alexey.sidorov@gmail.com",
-        created_at: "2025-10-20",
-        start_date: "2025-10-20",
-        training_term_days: 139,
-        daysSinceContact: 15,
-        lastContact: "20.02.2026, 16:45",
-        comment: "Без контакта 15 дней",
-        is_paid: true,
-        paid: true,
-        status: "Критично",
-        statusColor: "#ef4444",
-        initials: "АС",
-        avatarColor: "#06b6d4",
-        staffInitials: "КЛ",
-        staff: "Клара Левит",
-        groups: [
-          { school_name: "Space Memory", name: "Чт 16 Средняя", teacher_name: "Клара Левит" }
-        ],
-        enrollments: [
-          { school: "Space Memory", group: "Чт 16 Средняя", teacher: "Клара Левит" }
-        ]
-      },
-      {
-        id: 4,
-        full_name: "Елена Смирнова",
-        name: "Елена Смирнова",
-        phone: "+48 777 000 444",
-        email: "elena.smirnova@gmail.com",
-        created_at: "2025-09-10",
-        start_date: "2025-09-10",
-        training_term_days: 179,
-        daysSinceContact: 3,
-        lastContact: "04.03.2026, 19:00",
-        comment: "Успешная студентка",
-        is_paid: true,
-        paid: true,
-        status: "Активна",
-        statusColor: "#10b981",
-        initials: "ЕС",
-        avatarColor: "#f59e0b",
-        staffInitials: "ХБ",
-        staff: "Ханна Боян",
-        groups: [
-          { school_name: "Speedy Mind Indigo", name: "Сб 10 Старшая", teacher_name: "Ханна Боян" }
-        ],
-        enrollments: [
-          { school: "Speedy Mind Indigo", group: "Сб 10 Старшая", teacher: "Ханна Боян" }
-        ]
+      const row = att.items.find((x: any) => x.id === body.attendanceId);
+      if (row) {
+        row.mark = body.mark;
+        row.note = body.note ?? "";
       }
-    ];
+      return ok(config, { ok: true });
+    }
 
-    const page = Number((config.params as any)?.page) || 1;
-    const perPage = Number((config.params as any)?.per_page) || 20;
-    const total = mockStudentsList.length;
-    
-    const from = (page - 1) * perPage + 1;
-    const to = Math.min(page * perPage, total);
-    const lastPage = Math.ceil(total / perPage);
-    
-    const paginatedStudents = mockStudentsList.slice((page - 1) * perPage, page * perPage);
+    // --- STUDENT: PROGRESS ---
+    if (method === "get" && url === "student/progress") {
+      const studentId = (config.params as any)?.studentId;
+      if (!studentId) return err(config, 400, "studentId is required");
+      return ok(config, { progress: mockProgress });
+    }
 
-    return ok(config, {
-      data: paginatedStudents,
-      meta: {
-        current_page: page,
-        last_page: lastPage,
-        per_page: perPage,
-        total: total,
-        from: from,
-        to: to
+    // --- STUDENT: NOTES ---
+    if (method === "get" && url === "student/notes") {
+      const studentId = (config.params as any)?.studentId;
+      if (!studentId) return err(config, 400, "studentId is required");
+      return ok(config, { items: notes });
+    }
+
+    if (method === "post" && url === "student/notes") {
+      const body = readBody(config);
+      if (!body?.studentId || !body?.text) return err(config, 400, "studentId/text required");
+      const now = new Date();
+      const note = {
+        id: "n_" + Math.random().toString(16).slice(2),
+        type: body.type || "note",
+        status: body.status || "open",
+        category: body.category || "general",
+        who: "Demo Admin",
+        when: now.toLocaleDateString("ru-RU") + " · " + now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+        title: body.direction ? `${body.direction}` : "",
+        text: body.text,
+        tags: Array.isArray(body.tags) ? body.tags : [],
+      };
+      notes.unshift(note);
+      return ok(config, { ok: true, note });
+    }
+
+    // --- NEW GROUPS ---
+    const ng: any[] = (globalThis as any).__mock_new_groups ?? ((globalThis as any).__mock_new_groups = JSON.parse(JSON.stringify(mockNewGroups)));
+    const ngStudents: any = (globalThis as any).__mock_ng_students ?? ((globalThis as any).__mock_ng_students = JSON.parse(JSON.stringify(mockGroupStudents)));
+
+    if (method === "get" && url === "new-groups") {
+      return ok(config, { items: ng });
+    }
+
+    if (method === "get" && url === "new-groups/students") {
+      const groupId = Number((config.params as any)?.groupId);
+      if (!groupId) return err(config, 400, "groupId is required");
+      return ok(config, { items: ngStudents[groupId] ?? [] });
+    }
+
+    if (method === "get" && url === "new-groups/master-students") {
+      return ok(config, { items: mockMasterStudents });
+    }
+
+    if (method === "get" && url === "new-groups/teachers") {
+      return ok(config, { items: mockTeachers });
+    }
+
+    if (method === "post" && url === "new-groups/create") {
+      const body = readBody(config);
+      if (!body?.name || !body?.day) return err(config, 400, "name/day required");
+      const today = new Date().toISOString().slice(0, 10);
+      const newGroup = {
+        id: Date.now(),
+        name: body.name,
+        type: body.type ?? "group",
+        startDate: body.startDate || (() => { const d = new Date(); d.setDate(d.getDate() + 14); return d.toISOString().slice(0, 10); })(),
+        createdDate: today,
+        totalSlots: body.type === "individual" ? 1 : 10,
+        paid: 0,
+        manager: mockManagers[0],
+        teacher: body.teacherId ? mockTeachers.find(t => t.id === body.teacherId) ?? null : null,
+        day: body.day,
+        time: body.time ?? "16:00",
+        age: body.age ?? null,
+        students: body.studentIds ?? [],
+      };
+      ng.unshift(newGroup);
+      ngStudents[newGroup.id] = [];
+      return ok(config, { ok: true, group: newGroup });
+    }
+
+    if (method === "post" && url === "new-groups/start") {
+      const body = readBody(config);
+      if (!body?.groupId) return err(config, 400, "groupId required");
+      const idx = ng.findIndex(x => x.id === body.groupId);
+      if (idx !== -1) ng.splice(idx, 1);
+      return ok(config, { ok: true });
+    }
+
+    if (method === "post" && url === "new-groups/delete") {
+      const body = readBody(config);
+      if (!body?.groupId) return err(config, 400, "groupId required");
+      const idx = ng.findIndex(x => x.id === body.groupId);
+      if (idx !== -1) ng.splice(idx, 1);
+      return ok(config, { ok: true });
+    }
+
+    if (method === "post" && url === "new-groups/add-students") {
+      const body = readBody(config);
+      if (!body?.groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
+      const today = new Date().toISOString().slice(0, 10);
+      if (!ngStudents[body.groupId]) ngStudents[body.groupId] = [];
+      const existing = new Set(ngStudents[body.groupId].map((s: any) => s.name));
+      let added = 0;
+      for (const sid of body.studentIds) {
+        const ms = mockMasterStudents.find(s => s.id === sid);
+        if (ms && !existing.has(ms.name)) {
+          ngStudents[body.groupId].push({ id: Date.now() + Math.random(), name: ms.name, age: ms.age, contract: "pending", paymentStr: "0 zł", createdDate: today, manager: null });
+          added++;
+        }
       }
-    });
-  }
+      return ok(config, { ok: true, added });
+    }
 
-  return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
-};
+    if (method === "post" && url === "new-groups/remove-student") {
+      const body = readBody(config);
+      if (!body?.groupId || !body?.studentName) return err(config, 400, "groupId/studentName required");
+      if (ngStudents[body.groupId]) {
+        ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.name !== body.studentName);
+      }
+      return ok(config, { ok: true });
+    }
+
+    // --- STUDENTS LIST ---
+    if (method === "get" && url === "student/groups-filter") {
+      return ok(config, {
+        items: [
+          { id: 1, name: "Вт 17 Младшая" },
+          { id: 2, name: "Ср 15 Младшая" },
+          { id: 3, name: "Чт 16 Средняя" },
+          { id: 4, name: "Сб 10 Старшая" }
+        ]
+      });
+    }
+
+    if (method === "get" && url === "student/teacher-filter") {
+      return ok(config, {
+        items: [
+          { id: 1, name: "Клара Левит" },
+          { id: 2, name: "Ханна Боян" }
+        ]
+      });
+    }
+
+    if (method === "get" && url === "students") {
+      // Генерируем mock данные для списка студентов
+      const mockStudentsList = [
+        {
+          id: 1,
+          full_name: "Иван Иванов",
+          name: "Иван Иванов",
+          phone: "+48 777 000 111",
+          email: "ivan.ivanov@gmail.com",
+          created_at: "2025-12-15",
+          start_date: "2025-12-15",
+          training_term_days: 82,
+          daysSinceContact: 2,
+          lastContact: "05.03.2026, 14:30",
+          comment: "Активный студент",
+          is_paid: true,
+          paid: true,
+          status: "Активна",
+          statusColor: "#10b981",
+          initials: "ИИ",
+          avatarColor: "#4f6ef7",
+          staffInitials: "КЛ",
+          staff: "Клара Левит",
+          groups: [
+            { school_name: "Space Memory", name: "Вт 17 Младшая", teacher_name: "Клара Левит" }
+          ],
+          enrollments: [
+            { school: "Space Memory", group: "Вт 17 Младшая", teacher: "Клара Левит" }
+          ]
+        },
+        {
+          id: 2,
+          full_name: "Мария Петрова",
+          name: "Мария Петрова",
+          phone: "+48 777 000 222",
+          email: "maria.petrova@gmail.com",
+          created_at: "2025-11-01",
+          start_date: "2025-11-01",
+          training_term_days: 127,
+          daysSinceContact: 8,
+          lastContact: "28.02.2026, 10:15",
+          comment: "Требует внимания",
+          is_paid: false,
+          paid: false,
+          status: "Требует внимания",
+          statusColor: "#f59e0b",
+          initials: "МП",
+          avatarColor: "#8b5cf6",
+          staffInitials: "ХБ",
+          staff: "Ханна Боян",
+          groups: [
+            { school_name: "Speedy Mind Indigo", name: "Ср 15 Младшая", teacher_name: "Ханна Боян" }
+          ],
+          enrollments: [
+            { school: "Speedy Mind Indigo", group: "Ср 15 Младшая", teacher: "Ханна Боян" }
+          ]
+        },
+        {
+          id: 3,
+          full_name: "Алексей Сидоров",
+          name: "Алексей Сидоров",
+          phone: "+48 777 000 333",
+          email: "alexey.sidorov@gmail.com",
+          created_at: "2025-10-20",
+          start_date: "2025-10-20",
+          training_term_days: 139,
+          daysSinceContact: 15,
+          lastContact: "20.02.2026, 16:45",
+          comment: "Без контакта 15 дней",
+          is_paid: true,
+          paid: true,
+          status: "Критично",
+          statusColor: "#ef4444",
+          initials: "АС",
+          avatarColor: "#06b6d4",
+          staffInitials: "КЛ",
+          staff: "Клара Левит",
+          groups: [
+            { school_name: "Space Memory", name: "Чт 16 Средняя", teacher_name: "Клара Левит" }
+          ],
+          enrollments: [
+            { school: "Space Memory", group: "Чт 16 Средняя", teacher: "Клара Левит" }
+          ]
+        },
+        {
+          id: 4,
+          full_name: "Елена Смирнова",
+          name: "Елена Смирнова",
+          phone: "+48 777 000 444",
+          email: "elena.smirnova@gmail.com",
+          created_at: "2025-09-10",
+          start_date: "2025-09-10",
+          training_term_days: 179,
+          daysSinceContact: 3,
+          lastContact: "04.03.2026, 19:00",
+          comment: "Успешная студентка",
+          is_paid: true,
+          paid: true,
+          status: "Активна",
+          statusColor: "#10b981",
+          initials: "ЕС",
+          avatarColor: "#f59e0b",
+          staffInitials: "ХБ",
+          staff: "Ханна Боян",
+          groups: [
+            { school_name: "Speedy Mind Indigo", name: "Сб 10 Старшая", teacher_name: "Ханна Боян" }
+          ],
+          enrollments: [
+            { school: "Speedy Mind Indigo", group: "Сб 10 Старшая", teacher: "Ханна Боян" }
+          ]
+        }
+      ];
+
+      const page = Number((config.params as any)?.page) || 1;
+      const perPage = Number((config.params as any)?.per_page) || 20;
+      const total = mockStudentsList.length;
+
+      const from = (page - 1) * perPage + 1;
+      const to = Math.min(page * perPage, total);
+      const lastPage = Math.ceil(total / perPage);
+
+      const paginatedStudents = mockStudentsList.slice((page - 1) * perPage, page * perPage);
+
+      return ok(config, {
+        data: paginatedStudents,
+        meta: {
+          current_page: page,
+          last_page: lastPage,
+          per_page: perPage,
+          total: total,
+          from: from,
+          to: to
+        }
+      });
+    }
+
+    return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
+  };
