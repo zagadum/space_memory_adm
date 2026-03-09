@@ -131,6 +131,25 @@
 
       <div 
         class="nav-section" 
+        :class="{ open: openSections.analytics }" 
+        @click="toggleSection('analytics')"
+      >
+        <span class="nav-section-icon">📉</span>
+        <span class="nav-section-label">{{ t('sidebar.analytics') }}</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.analytics }">
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'performance-metrics' }" 
+          @click="navigateTo('performance-metrics', '/analytics/performance')"
+        >
+          <span class="nav-icon">⚡</span> {{ t('sidebar.performanceMetrics') }}
+        </div>
+      </div>
+
+      <div 
+        class="nav-section" 
         :class="{ open: openSections.recruitment }" 
         @click="toggleSection('recruitment')"
       >
@@ -242,6 +261,7 @@ const handleLogout = () => {
 const openSections = ref<Record<string, boolean>>({
   secretariat: true,
   finance: false,
+  analytics: false,
   recruitment: false,
 })
 
@@ -265,6 +285,9 @@ watch(() => route.path, (path) => {
   } else if (path.startsWith('/finance/salary-calculator')) {
     activeItem.value = 'salary-calculator'
     openSections.value.finance = true
+  } else if (path.startsWith('/analytics/performance')) {
+    activeItem.value = 'performance-metrics'
+    openSections.value.analytics = true
   } else if (path === '/' || path === '/dashboard') {
     activeItem.value = 'dashboard'
   }

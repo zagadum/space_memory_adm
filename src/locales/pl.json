@@ -20,7 +20,9 @@
     "projects": "Projekty i Produkty",
     "allProjects": "Wszystkie Projekty",
     "salaryDemo": "Wypłata Trenera (Demo)",
-    "salaryCalculator": "Kalkulator Wynagrodzeń (Księgowy)"
+    "salaryCalculator": "Kalkulator Wynagrodzeń (Księgowy)",
+    "performanceMetrics": "Metryki wydajności",
+    "analytics": "Analityka"
   },
   "app": {
     "title": "GLS · Płatności",
@@ -1243,6 +1245,64 @@
       "month": "Miesiąc:",
       "trainer": "Trener:",
       "status": "Status:"
+    }
+  },
+  "performanceMetrics": {
+    "title": "Metryki wydajności interfejsu",
+    "subtitle": "Analityka użycia interfejsu i czasów odpowiedzi",
+    "period": {
+      "24h": "Ostatnie 24h",
+      "7d": "Ostatnie 7 dni",
+      "30d": "Ostatnie 30 dni"
+    },
+    "kpi": {
+      "pageViews": "Łączne odsłony",
+      "uniqueSessions": "Unikalne sesje",
+      "avgLoadTime": "Śr. czas ładowania",
+      "errorRate": "Wskaźnik błędów"
+    },
+    "topPages": {
+      "title": "Popularne strony",
+      "subtitle": "Najczęściej odwiedzane sekcje",
+      "colPage": "Strona",
+      "colViews": "Odsłony",
+      "colUsers": "Użytkownicy",
+      "colDuration": "Śr. czas",
+      "colTrend": "Trend"
+    },
+    "activity": {
+      "title": "Aktywność godzinowa",
+      "subtitle": "Sesje na godzinę (dziś)"
+    },
+    "responseTime": {
+      "title": "Czasy odpowiedzi",
+      "subtitle": "Średnia i p95 wg sekcji",
+      "avg": "Śr."
+    },
+    "errors": {
+      "title": "Ostatnie błędy",
+      "subtitle": "Podsumowanie błędów HTTP"
+    },
+    "status": {
+      "good": "OK",
+      "warning": "Wolno",
+      "critical": "Krytyczny"
+    },
+    "pages": {
+      "students": "Uczniowie",
+      "dashboard": "Pulpit",
+      "leads": "Tablica Kanban",
+      "projects": "Projekty",
+      "settings": "Ustawienia",
+      "newGroups": "Nowe grupy"
+    },
+    "sections": {
+      "dashboard": "Pulpit",
+      "students": "Uczniowie",
+      "leads": "Leady",
+      "projects": "Projekty",
+      "finance": "Finanse",
+      "auth": "Uwierzytelnianie"
     }
   }
 }

@@ -88,6 +88,12 @@ export const router = createRouter({
           name: "teacher-salary",
           component: () => import("../views/teacher/TeacherSalaryPage.vue"),
           meta: { title: 'teacherSalary.pageTitle', icon: '💰' }
+        },
+        {
+          path: "analytics/performance",
+          name: "performance-metrics",
+          component: () => import("../views/analytics/PerformanceMetricsPage.vue"),
+          meta: { title: 'performanceMetrics.title', icon: '📊' }
         }
       ],
     },
