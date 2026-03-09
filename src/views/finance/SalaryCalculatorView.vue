@@ -445,7 +445,7 @@ const onMonthChange = (e: Event) => {
               </div>
             </div>
             <div class="final-actions">
-              <UiButton variant="primary" @click="store.exportToExcel()">
+            <UiButton variant="primary" @click="store.doExport(t)">
                 📥 {{ t('salaryCalc.labels.exportExcel') }}
               </UiButton>
             </div>

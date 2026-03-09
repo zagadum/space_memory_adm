@@ -120,10 +120,105 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     function updateStatus(newStatus: 'draft' | 'confirmed' | 'paid') {
         status.value = newStatus
     }
+    function doExport(t: any) {
+        const rows: any[] = []
+        const d = salaryData.value
 
-    function exportToExcel() {
-        console.log('Exporting to Excel...')
-        // Mock notification or real logic if needed
+        // Mapping logic with translations
+        rows.push({
+            category: t('salaryCalc.components.subscriptions'),
+            description: `${t('salaryCalc.labels.activeKids')}: ${d.activeKids}, ${t('salaryCalc.labels.graduation')}: ${d.graduationPct}%`,
+            rateQty: `${d.graduationPct}%`,
+            amount: d.subscriptions
+        })
+
+        if (d.substitutions > 0) {
+            rows.push({
+                category: t('salaryCalc.components.substitutions'),
+                description: '',
+                rateQty: '-',
+                amount: d.substitutions
+            })
+        }
+
+        if (d.methodical > 0) {
+            rows.push({
+                category: t('salaryCalc.components.methodical'),
+                description: '',
+                rateQty: '-',
+                amount: d.methodical
+            })
+        }
+
+        if (d.individual > 0) {
+            rows.push({
+                category: t('salaryCalc.components.individual'),
+                description: '',
+                rateQty: '-',
+                amount: d.individual
+            })
+        }
+
+        if (d.olympiad > 0) {
+            rows.push({
+                category: t('salaryCalc.components.olympiad'),
+                description: '',
+                rateQty: '-',
+                amount: d.olympiad
+            })
+        }
+
+        if (d.adminDuty > 0) {
+            rows.push({
+                category: t('salaryCalc.components.adminDuty'),
+                description: '',
+                rateQty: '3%',
+                amount: d.adminDuty
+            })
+        }
+
+        if (d.trialLessons > 0) {
+            rows.push({
+                category: t('salaryCalc.components.trial'),
+                description: '',
+                rateQty: '-',
+                amount: d.trialLessons
+            })
+        }
+
+        if (rezygnacjeBonusAmount.value > 0) {
+            rows.push({
+                category: t('salaryCalc.components.retention'),
+                description: '',
+                rateQty: '+1%',
+                amount: rezygnacjeBonusAmount.value
+            })
+        }
+
+        if (d.extraBonus > 0) {
+            rows.push({
+                category: t('salaryCalc.components.extra'),
+                description: '',
+                rateQty: '-',
+                amount: d.extraBonus
+            })
+        }
+
+        if (d.penalties > 0) {
+            rows.push({
+                category: t('salaryCalc.components.penalties') || 'Penalties',
+                description: '',
+                rateQty: '-',
+                amount: -d.penalties
+            })
+        }
+
+        const dateStr = new Date().toISOString().split('T')[0]
+        const fileName = `Salary_Export_${selectedTeacher.value.name}_${selectedMonth.value}_${dateStr}.xlsx`
+
+        import('../utils/excelExport').then(({ exportSalaryToExcel }) => {
+            exportSalaryToExcel(fileName, rows, totalPayout.value, t)
+        })
     }
 
     return {
@@ -140,6 +235,6 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         totalPayout,
         fetchTrainerData,
         updateStatus,
-        exportToExcel
+        doExport
     }
 })

@@ -622,6 +622,13 @@
       "note": "Note",
       "notePh": "Optional comment",
       "empty": "No grade"
+    },
+    "export": {
+      "category": "Category",
+      "description": "Description/Student",
+      "rateQty": "Rate/Qty",
+      "amount": "Amount",
+      "totalPayout": "TOTAL TO PAY"
     }
   },
   "groups": {
@@ -1263,5 +1270,12 @@
       "trainer": "Trainer:",
       "status": "Status:"
     }
+  },
+  "export": {
+    "category": "Category",
+    "description": "Description / Student",
+    "rateQty": "Rate / Qty",
+    "amount": "Amount",
+    "totalPayout": "TOTAL PAYOUT"
   }
 }

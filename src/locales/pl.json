@@ -621,6 +621,13 @@
       "note": "Notatka",
       "notePh": "Opcjonalny komentarz",
       "empty": "Brak oceny"
+    },
+    "export": {
+      "category": "Kategoria",
+      "description": "Opis/Uczeń",
+      "rateQty": "Stawka/Ilość",
+      "amount": "Kwota",
+      "totalPayout": "RAZEM DO WYPŁATY"
     }
   },
   "groups": {
