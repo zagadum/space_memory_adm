@@ -1102,7 +1102,8 @@
       "prev": "Back",
       "cancel": "Cancel",
       "create": "Create Project",
-      "createSuccess": "Project created successfully"
+      "createSuccess": "Project created successfully",
+      "price": "Price (fixed)"
     },
     "projectDetail": {
       "title": "Project Details",
@@ -1268,7 +1269,16 @@
       "history": "Payout History",
       "month": "Month:",
       "trainer": "Trainer:",
-      "status": "Status:"
+      "status": "Status:",
+      "graduation": "Graduation %",
+      "newTrainer": "New Trainer"
+    },
+    "export": {
+      "category": "Category",
+      "description": "Description",
+      "rateQty": "Rate / Qty",
+      "amount": "Amount",
+      "totalPayout": "TOTAL PAYOUT"
     }
   },
   "export": {

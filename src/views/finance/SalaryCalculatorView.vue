@@ -29,10 +29,6 @@ function toggleGroup(id: string) {
   openGroups.value[id] = !openGroups.value[id]
 }
 
-function expandAllGroups() {
-  // Logic to expand all groups in the list if needed
-}
-
 function collapseAllGroups() {
   openGroups.value = {}
 }

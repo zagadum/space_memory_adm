@@ -26,7 +26,6 @@ export interface SalaryData {
     trainerName: string;
     status: 'draft' | 'confirmed' | 'paid';
     confirmedAt: string | null;
-    total: number;
 
     subscriptions: {
         amount: number;
@@ -139,7 +138,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             trainerName: 'Anna Kowalska',
             status: 'draft',
             confirmedAt: null,
-            total: 4674.87,
 
             subscriptions: {
                 amount: 2847.64,
@@ -325,6 +323,8 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             this.isLoading = true;
             this.error = null;
             try {
+                // TODO: replace mock below with real API call when backend is ready:
+                // this.salaryData = await salaryApi.getSalary(month);
                 await new Promise(resolve => setTimeout(resolve, 800));
                 if (this.salaryData) {
                     this.salaryData.month = month;

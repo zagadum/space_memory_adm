@@ -1102,7 +1102,24 @@
       "prev": "Назад",
       "cancel": "Отмена",
       "create": "Создать проект",
-      "createSuccess": "Проект успешно создан"
+      "createSuccess": "Проект успешно создан",
+      "price": "Цена (фиксированная)"
+    },
+    "projectDetail": {
+      "title": "Детали проекта",
+      "back": "Назад",
+      "statusActive": "Активен",
+      "stats": {
+        "enrolledStudents": "Записанных учеников",
+        "invoicesIssued": "Выставлено счетов"
+      },
+      "tabs": {
+        "invoices": "Счета",
+        "students": "Ученики",
+        "settings": "Настройки"
+      },
+      "notFound": "Проект не найден",
+      "errorTitle": "Ошибка загрузки"
     }
   },
   "projectDetail": {
@@ -1252,7 +1269,23 @@
       "history": "История выплат",
       "month": "Месяц:",
       "trainer": "Тренер:",
-      "status": "Статус:"
+      "status": "Статус:",
+      "graduation": "% выпуска",
+      "newTrainer": "Новый тренер"
+    },
+    "export": {
+      "category": "Категория",
+      "description": "Описание",
+      "rateQty": "Ставка / Кол-во",
+      "amount": "Сумма",
+      "totalPayout": "ИТОГО К ВЫПЛАТЕ"
     }
+  },
+  "export": {
+    "category": "Категория",
+    "description": "Описание / Ученик",
+    "rateQty": "Ставка / Кол-во",
+    "amount": "Сумма",
+    "totalPayout": "ИТОГО К ВЫПЛАТЕ"
   }
 }

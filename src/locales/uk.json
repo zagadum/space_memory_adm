@@ -63,7 +63,9 @@
     "daysCount": "{n} день | {n} дні | {n} днів",
     "export": "Експорт",
     "searchHint": "Пошук за ім'ям, телефоном...",
-    "welcome": "Привіт, {name}! 👋"
+    "welcome": "Привіт, {name}! 👋",
+    "retry": "Спробувати ще раз",
+    "search": "Пошук"
   },
   "dashboard": {
     "header": {
@@ -862,7 +864,11 @@
       "modalTitle": "Новий проєкт / Редагування",
       "modalSub": "Визначте проєкт та його серію інвойсів за замовчуванням",
       "labelIcon": "Іконка",
-      "alertSaved": "Проєкт збережено (mock)"
+      "alertSaved": "Проєкт збережено (mock)",
+      "labelName": "Назва проєкту",
+      "labelInvoiceSerie": "Серія інвойсів за замовчуванням",
+      "labelAssignedFirma": "Прив'язана компанія (Продавець)",
+      "btnSave": "＋ Зберегти проєкт"
     },
     "logo": {
       "title": "Логотип компанії",
@@ -1096,7 +1102,24 @@
       "prev": "Назад",
       "cancel": "Скасувати",
       "create": "Створити проєкт",
-      "createSuccess": "Проєкт успішно створено"
+      "createSuccess": "Проєкт успішно створено",
+      "price": "Ціна (фіксована)"
+    },
+    "projectDetail": {
+      "title": "Деталі проєкту",
+      "back": "Назад",
+      "statusActive": "Активний",
+      "stats": {
+        "enrolledStudents": "Записаних учнів",
+        "invoicesIssued": "Виставлено інвойсів"
+      },
+      "tabs": {
+        "invoices": "Інвойси",
+        "students": "Учні",
+        "settings": "Налаштування"
+      },
+      "notFound": "Проєкт не знайдено",
+      "errorTitle": "Помилка завантаження"
     }
   },
   "projectDetail": {
@@ -1246,7 +1269,23 @@
       "history": "Історія виплат",
       "month": "Місяць:",
       "trainer": "Тренер:",
-      "status": "Статус:"
+      "status": "Статус:",
+      "graduation": "% випуску",
+      "newTrainer": "Новий тренер"
+    },
+    "export": {
+      "category": "Категорія",
+      "description": "Опис",
+      "rateQty": "Ставка / К-сть",
+      "amount": "Сума",
+      "totalPayout": "РАЗОМ ДО ВИПЛАТИ"
     }
+  },
+  "export": {
+    "category": "Категорія",
+    "description": "Опис / Учень",
+    "rateQty": "Ставка / К-сть",
+    "amount": "Сума",
+    "totalPayout": "РАЗОМ ДО ВИПЛАТИ"
   }
 }
