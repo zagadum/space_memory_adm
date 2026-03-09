@@ -58,6 +58,7 @@
     "expand": "Розгорнути",
     "collapse": "Згорнути",
     "themeDark": "Темна",
+    "themeLight": "Світла",
     "studentsCount": "{n} учень | {n} учні | {n} учнів",
     "daysCount": "{n} день | {n} дні | {n} днів",
     "export": "Експорт",

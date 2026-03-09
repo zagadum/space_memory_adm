@@ -115,13 +115,13 @@ const onDrop = (newStatus: LeadStatus) => {
 .page-title {
   font-size: 24px;
   font-weight: 800;
-  color: var(--white, #fff);
+  color: var(--app-text-main);
   margin: 0 0 8px 0;
 }
 
 .leads-stats {
   font-size: 13px;
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
 }
 
 .stat-item {
@@ -148,8 +148,8 @@ const onDrop = (newStatus: LeadStatus) => {
 }
 
 .kanban-column {
-  background: rgba(12, 12, 36, 0.4);
-  border: 1px solid rgba(100, 120, 255, 0.1);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -161,13 +161,13 @@ const onDrop = (newStatus: LeadStatus) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(100, 120, 255, 0.05);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .column-title {
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--app-text-main);
   margin: 0;
   display: flex;
   align-items: center;
@@ -176,16 +176,16 @@ const onDrop = (newStatus: LeadStatus) => {
 
 .column-count {
   font-size: 11px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--status-info-bg);
   padding: 2px 6px;
   border-radius: 10px;
-  color: #8892b0;
+  color: var(--blue);
 }
 
 .column-more {
   background: none;
   border: none;
-  color: #8892b0;
+  color: var(--app-text-dim);
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
@@ -205,19 +205,20 @@ const onDrop = (newStatus: LeadStatus) => {
 
 /* Lead Card */
 .lead-card {
-  background: rgba(20, 20, 50, 0.8);
-  border: 1px solid rgba(100, 120, 255, 0.15);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
   padding: 16px;
   cursor: grab;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--app-shadow);
 }
 
 .lead-card:hover {
   transform: translateY(-2px);
-  border-color: rgba(79, 110, 247, 0.4);
-  background: rgba(30, 30, 70, 0.9);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: var(--blue);
+  background: var(--app-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 .lead-card:active {
@@ -234,12 +235,12 @@ const onDrop = (newStatus: LeadStatus) => {
 .lead-name {
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--app-text-main);
 }
 
 .lead-date {
   font-size: 10px;
-  color: #8892b0;
+  color: var(--app-text-dim);
 }
 
 .card-body {
@@ -277,7 +278,7 @@ const onDrop = (newStatus: LeadStatus) => {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid rgba(100, 120, 255, 0.05);
+  border-top: 1px solid var(--app-border);
 }
 
 .lead-avatar {
@@ -299,8 +300,8 @@ const onDrop = (newStatus: LeadStatus) => {
 }
 
 .icon-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   font-size: 12px;
   padding: 4px;
   border-radius: 6px;
@@ -309,7 +310,8 @@ const onDrop = (newStatus: LeadStatus) => {
 }
 
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--status-info-bg);
+  border-color: var(--blue);
 }
 
 /* Dragging state */

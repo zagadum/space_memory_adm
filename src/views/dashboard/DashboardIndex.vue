@@ -161,11 +161,11 @@ const navigate = (path: string) => {
 .welcome-text {
   font-size: 28px;
   font-weight: 800;
-  color: var(--white, #fff);
+  color: var(--app-text-main);
   margin: 0;
 }
 .date-text {
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
   margin: 4px 0 0;
   font-size: 14px;
   text-transform: capitalize;
@@ -184,8 +184,8 @@ const navigate = (path: string) => {
   pointer-events: none;
 }
 .stat-card {
-  background: var(--card, rgba(12,12,36,0.98));
-  border: 1px solid var(--b, rgba(100,120,255,0.12));
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 16px;
   padding: 24px;
   position: relative;
@@ -194,15 +194,15 @@ const navigate = (path: string) => {
 }
 .stat-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(100,120,255,0.3);
+  border-color: var(--app-border-hi);
 }
 .stat-card::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 3px;
 }
-.stat-card.blue::before { background: linear-gradient(90deg, var(--blue, #4f6ef7), transparent); }
-.stat-card.green::before { background: linear-gradient(90deg, var(--green, #10b981), transparent); }
+.stat-card.blue::before { background: linear-gradient(90deg, #4f6ef7, transparent); }
+.stat-card.green::before { background: linear-gradient(90deg, #10b981, transparent); }
 .stat-card.amber::before { background: linear-gradient(90deg, #f59e0b, transparent); }
 .stat-card.purple::before { background: linear-gradient(90deg, #8b5cf6, transparent); }
 
@@ -213,24 +213,24 @@ const navigate = (path: string) => {
 .stat-value {
   font-size: 32px;
   font-weight: 800;
-  color: var(--white, #fff);
+  color: var(--app-text-main);
   line-height: 1;
   margin-bottom: 4px;
 }
 .stat-label {
   font-size: 13px;
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
   font-weight: 500;
 }
 .stat-trend {
   margin-top: 16px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
   opacity: 0.8;
 }
 .stat-trend.warning { color: #f59e0b; }
-.stat-trend.info { color: var(--blue, #4f6ef7); }
+.stat-trend.info { color: #4f6ef7; }
 
 /* Content Layout */
 .dashboard-content {
@@ -241,14 +241,14 @@ const navigate = (path: string) => {
 
 /* Common Card Styles */
 .scard {
-  background: var(--card, rgba(12,12,36,0.98));
-  border: 1px solid var(--b, rgba(100,120,255,0.12));
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 16px;
   overflow: hidden;
 }
 .scard-hdr {
   padding: 20px;
-  border-bottom: 1px solid var(--b, rgba(100,120,255,0.12));
+  border-bottom: 1px solid var(--app-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -256,7 +256,7 @@ const navigate = (path: string) => {
 .scard-title {
   font-size: 15px;
   font-weight: 800;
-  color: var(--white, #fff);
+  color: var(--app-text-main);
   margin: 0;
 }
 .scard-body {
@@ -275,11 +275,11 @@ const navigate = (path: string) => {
   display: flex;
   gap: 16px;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--b, rgba(100,120,255,0.05));
+  border-bottom: 1px solid var(--app-border-faint);
   transition: background 0.2s;
 }
 .activity-item:hover {
-  background: rgba(255,255,255,0.02);
+  background: var(--app-surface);
 }
 .activity-item:last-child {
   border-bottom: none;
@@ -291,8 +291,8 @@ const navigate = (path: string) => {
   flex-shrink: 0;
   background: rgba(100,120,255,0.1);
 }
-.activity-marker.success { background: var(--green, #10b981); box-shadow: 0 0 10px rgba(16,185,129,0.3); }
-.activity-marker.info { background: var(--blue, #4f6ef7); box-shadow: 0 0 10px rgba(79,110,247,0.3); }
+.activity-marker.success { background: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.3); }
+.activity-marker.info { background: #4f6ef7; box-shadow: 0 0 10px rgba(79,110,247,0.3); }
 .activity-marker.warning { background: #f59e0b; box-shadow: 0 0 10px rgba(245,158,11,0.3); }
 .activity-marker.error { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.3); }
 
@@ -308,15 +308,15 @@ const navigate = (path: string) => {
 .activity-title {
   font-size: 13.5px;
   font-weight: 700;
-  color: var(--white, #fff);
+  color: var(--app-text-main);
 }
 .activity-time {
   font-size: 11px;
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
 }
 .activity-desc {
   font-size: 12px;
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
   margin: 0;
 }
 
@@ -331,8 +331,8 @@ const navigate = (path: string) => {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--b, rgba(100,120,255,0.08));
+  background: var(--app-surface);
+  border: 1px solid var(--app-border-faint);
   border-radius: 12px;
   width: 100%;
   cursor: pointer;
@@ -340,8 +340,8 @@ const navigate = (path: string) => {
   text-align: left;
 }
 .quick-action-btn:hover {
-  background: rgba(255,255,255,0.06);
-  border-color: rgba(100,120,255,0.2);
+  background: var(--app-surface-hi);
+  border-color: var(--app-border);
   transform: translateX(4px);
 }
 .action-icon {
@@ -362,10 +362,10 @@ const navigate = (path: string) => {
   flex: 1;
   font-size: 13px;
   font-weight: 600;
-  color: var(--white, #fff);
+  color: var(--app-text-main);
 }
 .action-arrow {
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
   font-size: 18px;
   opacity: 0.5;
 }
@@ -375,7 +375,7 @@ const navigate = (path: string) => {
   align-items: center;
   gap: 8px;
   font-size: 10px;
-  color: var(--dim, #8892b0);
+  color: var(--app-text-dim);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -386,8 +386,8 @@ const navigate = (path: string) => {
   border-radius: 50%;
 }
 .status-dot.online {
-  background: var(--green, #10b981);
-  box-shadow: 0 0 6px var(--green, #10b981);
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
 }
 
 .mt-20 { margin-top: 20px; }

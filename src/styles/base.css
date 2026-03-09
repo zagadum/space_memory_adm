@@ -1,8 +1,5 @@
 :root {
-  --bg: #04040f;
-  --card: rgba(12, 12, 36, .98);
-  --b: rgba(100, 120, 255, .13);
-  --bh: rgba(120, 140, 255, .30);
+  /* Common Colors */
   --blue: #4f6ef7;
   --purple: #8b5cf6;
   --cyan: #06b6d4;
@@ -10,15 +7,89 @@
   --green: #10b981;
   --red: #ef4444;
   --orange: #f97316;
-  --gold: #fbbf24;
   --pink: #ec4899;
-  --white: #e8eeff;
-  --dim: #8892b0;
-  --faint: #1e2140;
 
-  /* aliases (for imported template css blocks) */
-  --border: var(--b);
-  --border-hi: var(--bh);
+  /* Light Theme */
+  --app-bg: #f8fafc;
+  --app-content-bg: #ffffff;
+  --app-card: #ffffff;
+  --app-surface: #f1f5f9;
+  --app-text-main: #0f172a;
+  --app-text-dim: #64748b;
+  --app-border: rgba(0, 0, 0, 0.08);
+  --app-border-hi: rgba(0, 0, 0, 0.15);
+  --app-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  --app-glow: transparent;
+
+  /* Layout */
+  --app-sidebar: #ffffff;
+  --app-topbar: rgba(255, 255, 255, 0.8);
+
+  /* Semantic Status */
+  --status-success: #10b981;
+  --status-success-bg: rgba(16, 185, 129, 0.1);
+  --status-danger: #ef4444;
+  --status-danger-bg: rgba(239, 68, 68, 0.1);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.1);
+  --status-info: #4f6ef7;
+  --status-info-bg: rgba(79, 110, 247, 0.1);
+
+  /* Glass Effects */
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(0, 0, 0, 0.08);
+
+  /* Legacy aliases */
+  --bg: var(--app-bg);
+  --card: var(--app-card);
+  --white: var(--app-text-main);
+  --dim: var(--app-text-dim);
+  --b: var(--app-border);
+  --bh: var(--app-border-hi);
+  --border: var(--app-border);
+  --border-hi: var(--app-border-hi);
+}
+
+.dark {
+  /* Dark Theme */
+  --app-bg: #04040f;
+  --app-content-bg: #04040f;
+  --app-card: rgba(12, 12, 36, .98);
+  --app-surface: #0d0d24;
+  --app-text-main: #e8eeff;
+  --app-text-dim: #8892b0;
+  --app-border: rgba(100, 120, 255, .13);
+  --app-border-hi: rgba(100, 120, 255, .30);
+  --app-shadow: 0 24px 80px rgba(0, 0, 0, .6);
+  --app-glow: 0 0 20px rgba(79, 110, 247, .3);
+
+  /* Layout */
+  --app-sidebar: rgba(7, 7, 32, 0.97);
+  --app-topbar: rgba(4, 4, 15, 0.85);
+
+  /* Semantic Status */
+  --status-success: #10b981;
+  --status-success-bg: rgba(16, 185, 129, 0.12);
+  --status-danger: #ef4444;
+  --status-danger-bg: rgba(239, 68, 68, 0.15);
+  --status-warning: #f59e0b;
+  --status-warning-bg: rgba(245, 158, 11, 0.12);
+  --status-info: #4f6ef7;
+  --status-info-bg: rgba(79, 110, 247, 0.15);
+
+  /* Glass Effects */
+  --glass-bg: rgba(4, 4, 15, 0.85);
+  --glass-border: rgba(100, 120, 255, 0.13);
+
+  /* Legacy aliases */
+  --bg: var(--app-bg);
+  --card: var(--app-card);
+  --white: var(--app-text-main);
+  --dim: var(--app-text-dim);
+  --b: var(--app-border);
+  --bh: var(--app-border-hi);
+  --border: var(--app-border);
+  --border-hi: var(--app-border-hi);
 }
 
 * {
@@ -1154,25 +1225,26 @@ body::before {
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, .05);
-  color: var(--dim);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  border: 1px solid var(--app-border);
+  transition: all 0.2s;
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, .08);
-  color: var(--white);
-  border-color: var(--bh);
+  background: var(--status-info-bg);
+  color: var(--app-text-main);
+  border-color: var(--app-border-hi);
 }
 
 .btn-amber {
-  background: rgba(245, 158, 11, .1);
-  color: var(--amber);
+  background: var(--status-warning-bg);
+  color: var(--status-warning);
   border: 1px solid rgba(245, 158, 11, .28);
 }
 
 .btn-amber:hover {
-  background: rgba(245, 158, 11, .18);
+  background: rgba(245, 158, 11, .2);
 }
 
 .btn-cyan {
@@ -1182,14 +1254,14 @@ body::before {
 }
 
 .btn-red {
-  background: rgba(239, 68, 68, .1);
-  color: var(--red);
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
   border: 1px solid rgba(239, 68, 68, .28);
 }
 
 .btn-green {
-  background: rgba(16, 185, 129, .1);
-  color: var(--green);
+  background: var(--status-success-bg);
+  color: var(--status-success);
   border: 1px solid rgba(16, 185, 129, .28);
 }
 
@@ -1240,7 +1312,7 @@ body::before {
 }
 
 .popup {
-  background: rgba(12, 12, 38, .99);
+  background: var(--app-card);
   border: 1px solid var(--bh);
   border-radius: 16px;
   width: 500px;
@@ -2214,32 +2286,31 @@ select option:hover {
   background-color: #252a4d;
   color: #e8eeff;
 }
+
 .dropdown-filter-btn[data-v-bdf021cc] {
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 12.5px;
-    font-weight: 500;
-    cursor: pointer;
-    border: 1px solid rgba(100,120,255,0.15);
-    background: rgba(255,255,255,0.04);
-    color: #8892b0;
-    transition: all 0.15s;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid rgba(100, 120, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+  color: #8892b0;
+  transition: all 0.15s;
 }
 
 /* Firefox */
 @supports (-moz-appearance: none) {
-    select.dropdown-filter-btn {
-        -moz-appearance: none;
-        appearance: none;
-        background-color: rgba(255,255,255,0.04);
-        color: #8892b0;
-    }
+  select.dropdown-filter-btn {
+    -moz-appearance: none;
+    appearance: none;
+    background-color: rgba(255, 255, 255, 0.04);
+    color: #8892b0;
+  }
 
-    select.dropdown-filter-btn option {
-        background-color: #1c1f3a; /* фон списка */
-        color: #8892b0;
-    }
+  select.dropdown-filter-btn option {
+    background-color: #1c1f3a;
+    /* фон списка */
+    color: #8892b0;
+  }
 }
-
-
-

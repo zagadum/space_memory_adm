@@ -76,34 +76,34 @@ const formatCurrency = (val: number) => {
 </template>
 
 <style scoped>
-.qa-banner { display: flex; align-items: center; justify-content: space-between; background: rgba(79, 110, 247, .06); border: 1px solid rgba(79, 110, 247, .15); padding: 18px 22px; border-radius: 16px; margin: 12px 0 20px; }
+.qa-banner { display: flex; align-items: center; justify-content: space-between; background: var(--status-info-bg); border: 1px solid var(--app-border); padding: 18px 22px; border-radius: 16px; margin: 12px 0 20px; }
 .qa-banner-ok { border-left: 4px solid var(--green); }
 .qa-banner-partial { border-left: 4px solid var(--amber); }
 .qa-pct { font-size: 26px; font-weight: 900; font-family: 'Space Mono', monospace; }
-.qa-pct-ok { color: var(--green); text-shadow: 0 0 15px rgba(34, 197, 94, .3); }
-.qa-pct-partial { color: var(--amber); text-shadow: 0 0 15px rgba(245, 158, 11, .3); }
+.qa-pct-ok { color: var(--green); text-shadow: var(--app-glow); }
+.qa-pct-partial { color: var(--amber); text-shadow: var(--app-glow); }
 
 .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .checklist-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-.checklist-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, .02); }
-.checklist-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, .04); vertical-align: top; }
+.checklist-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--app-surface); }
+.checklist-table td { padding: 14px 16px; border-bottom: 1px solid var(--app-border); vertical-align: top; }
 .td-name { font-size: 13.5px; font-weight: 600; color: var(--white); }
 
 .status-cell { display: flex; align-items: flex-start; }
 .ok-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; padding: 3px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; white-space: nowrap; border: 1px solid transparent; }
-.ok-done { background: rgba(34, 197, 94, .1); color: var(--green); border-color: rgba(34, 197, 94, .2); }
-.ok-partial { background: rgba(245, 158, 11, .1); color: var(--amber); border-color: rgba(245, 158, 11, .2); }
-.ok-fail { background: rgba(239, 68, 68, .1); color: var(--red); border-color: rgba(239, 68, 68, .2); }
+.ok-done { background: var(--status-success-bg); color: var(--green); border-color: var(--app-border); }
+.ok-partial { background: var(--status-warning-bg); color: var(--amber); border-color: var(--app-border); }
+.ok-fail { background: var(--status-danger-bg); color: var(--red); border-color: var(--app-border); }
 
 .comment-cell { min-width: 200px; }
 .qa-comment-label { font-size: 9px; font-weight: 800; color: var(--dim); text-transform: uppercase; margin-bottom: 4px; }
-.qa-comment { font-size: 11.5px; color: #94a3b8; line-height: 1.5; font-style: italic; }
-.issue-row { background: rgba(245, 158, 11, .02); }
+.qa-comment { font-size: 11.5px; color: var(--app-text-dim); line-height: 1.5; font-style: italic; }
+.issue-row { background: var(--status-warning-bg); }
 
-.formula-box { margin-top: 24px; padding: 16px 20px; background: rgba(79, 110, 247, .06); border-radius: 14px; border: 1px solid rgba(79, 110, 247, .2); }
+.formula-box { margin-top: 24px; padding: 16px 20px; background: var(--status-info-bg); border-radius: 14px; border: 1px solid var(--app-border); }
 .fline { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px; color: var(--dim); font-family: 'Space Mono', monospace; }
 .fline span:first-child { font-family: 'Outfit', sans-serif; }
-.fline.total { border-top: 1px solid rgba(79, 110, 247, .25); margin-top: 10px; padding-top: 10px; font-weight: 800; color: var(--blue); font-size: 14px; }
+.fline.total { border-top: 1px solid var(--app-border-hi); margin-top: 10px; padding-top: 10px; font-weight: 800; color: var(--blue); font-size: 14px; }
 
 .val-green { color: var(--green); }
 .val-amber { color: var(--amber); }

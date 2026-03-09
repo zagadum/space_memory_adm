@@ -150,16 +150,17 @@ const activeTab = ref('firma')
   font-size: 22px;
   font-weight: 900;
   letter-spacing: -.4px;
+  color: var(--app-text-main);
 }
 .ptitle span {
-  background: linear-gradient(90deg, #4f6ef7, #8b5cf6);
+  background: linear-gradient(90deg, var(--blue), var(--purple));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .psub {
   font-size: 11.5px;
-  color: #8892b0;
+  color: var(--app-text-dim);
   margin-top: 3px;
 }
 
@@ -178,18 +179,19 @@ const activeTab = ref('firma')
 
 /* SIDEBAR */
 .snav {
-  background: rgba(12, 12, 36, 0.98);
-  border: 1px solid rgba(100, 120, 255, 0.12);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 14px;
   overflow: hidden;
   position: sticky;
   top: 20px;
+  box-shadow: var(--app-shadow);
 }
 .snav-group {
   padding: 8px 0;
 }
 .snav-group:not(:last-child) {
-  border-bottom: 1px solid rgba(100, 120, 255, 0.12);
+  border-bottom: 1px solid var(--app-border);
 }
 .snav-label {
   padding: 8px 14px 4px;
@@ -197,7 +199,7 @@ const activeTab = ref('firma')
   font-weight: 800;
   letter-spacing: .1em;
   text-transform: uppercase;
-  color: #8892b0;
+  color: var(--app-text-dim);
 }
 .sni {
   display: flex;
@@ -206,45 +208,45 @@ const activeTab = ref('firma')
   padding: 9px 14px;
   font-size: 12.5px;
   font-weight: 600;
-  color: #8892b0;
+  color: var(--app-text-dim);
   cursor: pointer;
   transition: all .15s;
   border-left: 2px solid transparent;
 }
 .sni:hover {
-  color: #e8eeff;
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--app-text-main);
+  background: var(--status-info-bg);
 }
 .sni.act {
-  color: #4f6ef7;
-  background: rgba(79, 110, 247, 0.07);
-  border-left-color: #4f6ef7;
+  color: var(--blue);
+  background: var(--status-info-bg);
+  border-left-color: var(--blue);
 }
 
 .sni-blue.act {
-  color: #4f6ef7;
-  background: rgba(79, 110, 247, 0.07);
-  border-left-color: #4f6ef7;
+  color: var(--blue);
+  background: var(--status-info-bg);
+  border-left-color: var(--blue);
 }
 .sni-green.act {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.07);
-  border-left-color: #10b981;
+  color: var(--green);
+  background: var(--status-success-bg);
+  border-left-color: var(--green);
 }
 .sni-purple.act {
-  color: #8b5cf6;
+  color: var(--purple);
   background: rgba(139, 92, 246, 0.07);
-  border-left-color: #8b5cf6;
+  border-left-color: var(--purple);
 }
 .sni-amber.act {
-  color: #f59e0b;
-  background: rgba(245, 158, 11, 0.07);
-  border-left-color: #f59e0b;
+  color: var(--amber);
+  background: var(--status-warning-bg);
+  border-left-color: var(--amber);
 }
 .sni-cyan.act {
-  color: #06b6d4;
+  color: var(--cyan);
   background: rgba(6, 182, 212, 0.07);
-  border-left-color: #06b6d4;
+  border-left-color: var(--cyan);
 }
 
 .sni-icon {
@@ -261,52 +263,36 @@ const activeTab = ref('firma')
   border-radius: 10px;
 }
 .sb-blue {
-  background: rgba(79, 110, 247, 0.15);
-  color: #4f6ef7;
+  background: var(--status-info-bg);
+  color: var(--blue);
 }
 .sb-warn {
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  background: var(--status-warning-bg);
+  color: var(--amber);
 }
 
 .placeholder-panel {
   padding: 40px;
   text-align: center;
-  background: rgba(12, 12, 36, 0.98);
-  border: 1px solid rgba(100, 120, 255, 0.12);
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 14px;
-  color: #8892b0;
+  color: var(--app-text-dim);
 }
 </style>
 
 <style>
-.settings-wrap {
-  --bg: #04040f;
-  --card: rgba(12, 12, 36, 0.98);
-  --card2: rgba(16, 16, 46, 0.97);
-  --b: rgba(100, 120, 255, 0.12);
-  --bh: rgba(120, 140, 255, 0.28);
-  --blue: #4f6ef7;
-  --purple: #8b5cf6;
-  --cyan: #06b6d4;
-  --amber: #f59e0b;
-  --green: #10b981;
-  --red: #ef4444;
-  --white: #e8eeff;
-  --dim: #8892b0;
-  --faint: rgba(255, 255, 255, 0.035);
-}
-
+/* Global settings patterns */
 .ibox { padding: 10px 14px; border-radius: 9px; font-size: 11.5px; display: flex; gap: 9px; margin-bottom: 14px; align-items: flex-start; line-height: 1.6; }
-.ibox-blue { background: rgba(79, 110, 247, 0.07); border: 1px solid rgba(79, 110, 247, 0.2); color: rgba(180, 200, 255, 0.85); }
-.ibox-amber { background: rgba(245, 158, 11, 0.07); border: 1px solid rgba(245, 158, 11, 0.2); color: rgba(255, 220, 130, 0.85); }
-.ibox-green { background: rgba(16, 185, 129, 0.07); border: 1px solid rgba(16, 185, 129, 0.2); color: rgba(100, 230, 180, 0.85); }
-.ibox-red { background: rgba(239, 68, 68, 0.07); border: 1px solid rgba(239, 68, 68, 0.2); color: rgba(255, 150, 150, 0.85); }
+.ibox-blue { background: var(--status-info-bg); border: 1px solid var(--status-info-border, var(--app-border)); color: var(--blue); }
+.ibox-amber { background: var(--status-warning-bg); border: 1px solid var(--status-warning-border, var(--app-border)); color: var(--amber); }
+.ibox-green { background: var(--status-success-bg); border: 1px solid var(--status-success-border, var(--app-border)); color: var(--green); }
+.ibox-red { background: var(--status-danger-bg); border: 1px solid var(--status-danger-border, var(--app-border)); color: var(--red); }
 .ibox-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
 
-.scard { background: var(--card); border: 1px solid var(--b); border-radius: 14px; margin-bottom: 14px; overflow: hidden; }
-.scard-hdr { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--b); }
-.scard-title { display: flex; align-items: center; gap: 10px; }
-.scard-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
-.scard-body { padding: 18px 20px; }
+.scard { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px; margin-bottom: 14px; overflow: hidden; box-shadow: var(--app-shadow); }
+.scard-hdr { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1px solid var(--app-border); }
+.scard-title { display: flex; align-items: center; gap: 10px; color: var(--app-text-main); font-weight: 700; }
+.scard-ico { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; background: var(--app-surface); }
+.scard-body { padding: 18px 20px; color: var(--app-text-main); }
 </style>

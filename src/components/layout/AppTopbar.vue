@@ -10,9 +10,10 @@
         <input type="text" :placeholder="t('common.searchHint')" />
       </div>
       <button class="btn btn-ghost">⬇ {{ t('common.export') }}</button>
-      <button class="theme-toggle-btn">
-        <span class="theme-toggle-icon">🌙</span>
-        <span>{{ t('common.themeDark') }}</span>
+      <button class="theme-toggle-btn" @click="themeStore.toggleTheme">
+        <span class="theme-toggle-icon" v-if="themeStore.isDark">🌙</span>
+        <span class="theme-toggle-icon" v-else>🌞</span>
+        <span>{{ themeStore.isDark ? t('common.themeDark') : t('common.themeLight') }}</span>
       </button>
     </div>
   </div>
@@ -22,9 +23,11 @@
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { useThemeStore } from '../../stores/theme.store';
 
 const { t } = useI18n();
 const route = useRoute();
+const themeStore = useThemeStore();
 
 const pageTitle = computed(() => (route.meta.title as string) || 'studentList.title');
 const pageSubTitle = computed(() => (route.meta.subTitle as string) || '');

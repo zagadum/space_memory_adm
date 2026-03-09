@@ -21,7 +21,7 @@
           </div>
           <div>
             <div style="font-size:12.5px;font-weight:700;">{{ $t('financeSettings.logo.uploadTitle') }}</div>
-            <div style="font-size:11px;color:#8892b0;margin-top:2px;">
+            <div style="font-size:11px;color:var(--app-text-dim);margin-top:2px;">
               {{ $t('financeSettings.logo.uploadSub') }}
             </div>
           </div>
@@ -124,13 +124,13 @@ function saveSettings() {
 </script>
 
 <style scoped>
-.stitle { font-size: 13px; font-weight: 800; color: var(--white); }
-.ssub { font-size: 10.5px; color: var(--dim); }
+.stitle { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.ssub { font-size: 10.5px; color: var(--app-text-dim); }
 
 /* LOGO UPLOAD */
 .logo-upload {
-  background: rgba(255, 255, 255, 0.02);
-  border: 2px dashed var(--b);
+  background: var(--app-surface);
+  border: 2px dashed var(--app-border);
   border-radius: 12px;
   padding: 20px;
   display: flex;
@@ -142,12 +142,12 @@ function saveSettings() {
 }
 .logo-upload:hover {
   border-color: var(--blue);
-  background: rgba(79, 110, 247, 0.04);
+  background: var(--status-info-bg);
 }
 .logo-preview {
   width: 100px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-card);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -162,7 +162,7 @@ function saveSettings() {
 
 .div {
   height: 1px;
-  background: var(--b);
+  background: var(--app-border);
   margin: 20px 0;
 }
 
@@ -182,7 +182,7 @@ function saveSettings() {
 .fg label {
   font-size: 11px;
   font-weight: 800;
-  color: var(--dim);
+  color: var(--app-text-dim);
   text-transform: uppercase;
   letter-spacing: .05em;
 }
@@ -192,15 +192,15 @@ function saveSettings() {
   height: 36px;
   padding: 2px;
   border-radius: 7px;
-  border: 1px solid var(--b);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
   cursor: pointer;
 }
 .color-hex {
   font-family: 'Space Mono', monospace;
-  background: rgba(12, 12, 32, 0.8);
-  border: 1px solid var(--b);
-  color: var(--white);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-main);
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 13px;
@@ -208,9 +208,9 @@ function saveSettings() {
 }
 
 select {
-  background: rgba(12, 12, 32, 0.8);
-  border: 1px solid var(--b);
-  color: var(--white);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-main);
   border-radius: 8px;
   padding: 6px 10px;
   font-size: 12px;
@@ -223,10 +223,10 @@ select {
   align-items: center;
   justify-content: space-between;
   padding: 14px 0;
-  border-top: 1px solid var(--faint);
+  border-top: 1px solid var(--app-border);
 }
-.tl { font-size: 12.5px; font-weight: 600; color: var(--white); }
-.th { font-size: 10px; color: var(--dim); margin-top: 2px; }
+.tl { font-size: 12.5px; font-weight: 600; color: var(--app-text-main); }
+.th { font-size: 10px; color: var(--app-text-dim); margin-top: 2px; }
 
 /* TOGGLE */
 .tog {
@@ -240,7 +240,7 @@ select {
   position: absolute;
   cursor: pointer;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--app-surface);
   transition: .2s;
   border-radius: 18px;
 }
@@ -264,7 +264,7 @@ input:checked + .tsl:before { transform: translateX(14px); }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(255, 255, 255, 0.015);
-  border-top: 1px solid var(--b);
+  background: var(--app-surface);
+  border-top: 1px solid var(--app-border);
 }
 </style>

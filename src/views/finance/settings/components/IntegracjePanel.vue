@@ -71,32 +71,32 @@ function info(int: any) {
 </script>
 
 <style scoped>
-.stitle { font-size: 13px; font-weight: 800; color: var(--white); }
-.ssub { font-size: 10.5px; color: var(--dim); }
+.stitle { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.ssub { font-size: 10.5px; color: var(--app-text-dim); }
 
 .scard-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; }
 
 .int-card {
   display: flex; align-items: center; gap: 14px; padding: 14px;
-  background: rgba(255, 255, 255, 0.02); border: 1px solid var(--b);
+  background: var(--app-surface); border: 1px solid var(--app-border);
   border-radius: 14px; transition: all .2s;
 }
-.int-card:hover { border-color: var(--bh); background: rgba(255, 255, 255, 0.04); }
+.int-card:hover { border-color: var(--app-border-hi); background: var(--status-info-bg); }
 
 .int-logo {
   width: 44px; height: 44px; border-radius: 10px;
   display: flex; align-items: center; justify-content: center; font-size: 20px;
 }
 
-.int-name { font-size: 13.5px; font-weight: 800; color: var(--white); }
-.int-desc { font-size: 10.5px; color: var(--dim); margin-top: 2px; }
+.int-name { font-size: 13.5px; font-weight: 800; color: var(--app-text-main); }
+.int-desc { font-size: 10.5px; color: var(--app-text-dim); margin-top: 2px; }
 
 .int-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 
 .badge { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 5px; }
-.b-ok { background: rgba(16, 185, 129, 0.12); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.22); }
-.b-warn { background: rgba(245, 158, 11, 0.12); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.22); }
-.b-off { background: rgba(255, 255, 255, 0.05); color: var(--dim); border: 1px solid rgba(255, 255, 255, 0.1); }
+.b-ok { background: var(--status-success-bg); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.22); }
+.b-warn { background: var(--status-warning-bg); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.22); }
+.b-off { background: var(--app-surface); color: var(--app-text-dim); border: 1px solid var(--app-border); }
 
-.btn-amber { background: rgba(245, 158, 11, 0.1); color: var(--amber); }
+.btn-amber { background: var(--status-warning-bg); color: var(--amber); }
 </style>

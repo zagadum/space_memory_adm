@@ -294,10 +294,10 @@ const navigateTo = (item: string, path: string) => {
 <style scoped>
 .sidebar { 
   position: fixed; left: 0; top: 0; bottom: 0; width: 240px; 
-  background: rgba(7,7,32,0.97); border-right: 1px solid var(--space-border, rgba(100,120,255,0.15)); 
+  background: var(--app-sidebar); border-right: 1px solid var(--app-border); 
   z-index: 100; display: flex; flex-direction: column; backdrop-filter: blur(20px); 
 }
-.sidebar-logo { padding: 20px 16px 16px; border-bottom: 1px solid var(--space-border, rgba(100,120,255,0.15)); flex-shrink: 0; }
+.sidebar-logo { padding: 20px 16px 16px; border-bottom: 1px solid var(--app-border); flex-shrink: 0; }
 .logo-badge { display: flex; align-items: center; gap: 12px; }
 .logo-icon { 
   display: flex; align-items: center; justify-content: center; flex-shrink: 0; 
@@ -306,8 +306,8 @@ const navigateTo = (item: string, path: string) => {
   box-shadow: none !important;
   border: none !important;
 }
-.logo-text { font-size: 15px; font-weight: 800; color: #e8eeff; letter-spacing: 0.01em; }
-.logo-sub { font-size: 9.5px; color: #8892b0; font-family: 'Space Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
+.logo-text { font-size: 15px; font-weight: 800; color: var(--app-text-main); letter-spacing: 0.01em; }
+.logo-sub { font-size: 9.5px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; margin-top: 1px; }
 .brand-logo {
   height: 42px;
   width: auto;
@@ -317,28 +317,28 @@ const navigateTo = (item: string, path: string) => {
 
 .school-pill { margin-top: 10px; display: flex; align-items: center; gap: 7px; padding: 6px 9px; background: rgba(79,110,247,0.07); border: 1px solid rgba(79,110,247,0.18); border-radius: 8px; }
 .school-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
-.school-name { font-size: 11.5px; font-weight: 600; color: #e8eeff; }
-.school-city { font-size: 10px; color: #8892b0; }
+.school-name { font-size: 11.5px; font-weight: 600; color: var(--app-text-main); }
+.school-city { font-size: 10px; color: var(--app-text-dim); }
 
 .sidebar-nav { padding: 10px; flex: 1; overflow-y: auto; }
 .sidebar-nav::-webkit-scrollbar { width: 3px; }
 .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(79,110,247,0.2); border-radius: 2px; }
 
 .nav-section { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 9px; cursor: pointer; margin-top: 3px; margin-bottom: 1px; transition: all 0.18s; position: relative; user-select: none; }
-.nav-section:hover { background: rgba(79,110,247,0.07); }
-.nav-section.open { background: rgba(79,110,247,0.1); }
+.nav-section:hover { background: var(--status-info-bg); }
+.nav-section.open { background: var(--status-info-bg); }
 .nav-section-icon { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
-.nav-section-label { font-size: 12.5px; font-weight: 700; color: #e8eeff; flex: 1; }
-.nav-section-arrow { font-size: 10px; color: #8892b0; transition: transform 0.2s; flex-shrink: 0; }
+.nav-section-label { font-size: 12.5px; font-weight: 700; color: var(--app-text-main); flex: 1; }
+.nav-section-arrow { font-size: 10px; color: var(--app-text-dim); transition: transform 0.2s; flex-shrink: 0; }
 .nav-section.open .nav-section-arrow { transform: rotate(90deg); }
 
 .nav-children { overflow: hidden; max-height: 0; transition: max-height 0.28s cubic-bezier(0.4,0,0.2,1); padding-left: 12px; }
 .nav-children.open { max-height: 500px; }
 
-.nav-item, .nav-standalone { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; color: #8892b0; font-size: 12.5px; font-weight: 400; margin-bottom: 1px; position: relative; }
-.nav-item:hover, .nav-standalone:hover { background: rgba(79,110,247,0.09); color: #e8eeff; }
-.nav-item.active, .nav-standalone.active { background: linear-gradient(90deg, rgba(79,110,247,0.2), rgba(139,92,246,0.1)); color: #e8eeff; border: 1px solid rgba(79,110,247,0.28); }
-.nav-item.active::before, .nav-standalone.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: linear-gradient(180deg, #4f6ef7, #8b5cf6); border-radius: 2px; }
+.nav-item, .nav-standalone { display: flex; align-items: center; gap: 9px; padding: 7px 10px; border-radius: 7px; cursor: pointer; transition: all 0.15s; color: var(--app-text-dim); font-size: 12.5px; font-weight: 400; margin-bottom: 1px; position: relative; }
+.nav-item:hover, .nav-standalone:hover { background: var(--status-info-bg); color: var(--app-text-main); }
+.nav-item.active, .nav-standalone.active { background: linear-gradient(90deg, var(--status-info-bg), rgba(139,92,246,0.1)); color: var(--app-text-main); border: 1px solid var(--app-border-hi); }
+.nav-item.active::before, .nav-standalone.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: linear-gradient(180deg, var(--blue), var(--purple)); border-radius: 2px; }
 
 .nav-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
 .nav-badge { margin-left: auto; color: white; font-size: 9.5px; font-weight: 700; font-family: 'Space Mono', monospace; padding: 1px 5px; border-radius: 8px; }
@@ -354,9 +354,9 @@ const navigateTo = (item: string, path: string) => {
 .sidebar-lang { padding: 0 16px 10px; flex-shrink: 0; }
 .lang-select {
   width: 100%;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(100, 120, 255, 0.15);
-  color: #8892b0;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-dim);
   border-radius: 8px;
   padding: 8px 12px;
   font-size: 12px;
@@ -366,24 +366,24 @@ const navigateTo = (item: string, path: string) => {
   font-family: inherit;
 }
 .lang-select:hover {
-  background: rgba(79, 110, 247, 0.08);
-  color: #e8eeff;
-  border-color: rgba(120, 140, 255, 0.35);
+  background: var(--status-info-bg);
+  color: var(--app-text-main);
+  border-color: var(--app-border-hi);
 }
 .lang-select option {
-  background: #0d0d2b;
-  color: #e8eeff;
+  background: var(--app-surface);
+  color: var(--app-text-main);
 }
 
-.sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--space-border, rgba(100,120,255,0.15)); flex-shrink: 0; }
+.sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--app-border); flex-shrink: 0; }
 .user-card { display: flex; align-items: center; gap: 9px; padding: 7px 8px; border-radius: 8px; cursor: pointer; transition: background 0.15s; }
 .user-card:hover { background: rgba(255,255,255,0.04); }
 .user-avatar { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: white; flex-shrink: 0; }
 .user-info { flex: 1; min-width: 0; }
-.user-name { font-size: 12px; font-weight: 600; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-role { font-size: 10px; color: #8892b0; }
+.user-name { font-size: 12px; font-weight: 600; color: var(--app-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 10px; color: var(--app-text-dim); }
 
-.logout-btn { background: transparent; border: none; color: #8892b0; cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; margin-left: auto; }
+.logout-btn { background: transparent; border: none; color: var(--app-text-dim); cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; justify-content: center; margin-left: auto; }
 .logout-btn svg { transition: transform 0.2s ease; }
 .logout-btn:hover { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
 .logout-btn:hover svg { transform: translateX(2px); }

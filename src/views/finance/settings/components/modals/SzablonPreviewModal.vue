@@ -75,39 +75,40 @@ const renderedBody = computed(() => renderText(props.template.body))
   backdrop-filter: blur(6px);
 }
 .modal {
-  background: var(--card); border: 1px solid var(--bh);
-  border-radius: 18px; width: 95%; max-width: 600px;
-  display: flex; flex-direction: column; overflow: hidden;
-  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  width: 90%; max-width: 680px; max-height: 90vh;
+  background: var(--app-card); border: 1px solid var(--app-border-hi);
+  border-radius: 18px; display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
-.mhdr { padding: 18px 22px; border-bottom: 1px solid var(--b); display: flex; align-items: center; justify-content: space-between; }
-.mhl { display: flex; align-items: center; gap: 14px; }
-.mhico { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--blue); }
-.mtitle { font-size: 15px; font-weight: 800; color: var(--white); }
-.msub { font-size: 11px; color: var(--dim); margin-top: 2px; }
-.mclose { cursor: pointer; color: var(--dim); font-size: 18px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: .2s; }
-.mclose:hover { background: rgba(239,68,68,0.1); color: var(--red); }
+.mhdr { padding: 18px 22px; border-bottom: 1px solid var(--app-border); display: flex; align-items: center; justify-content: space-between; }
+.mhl { display: flex; align-items: center; gap: 15px; }
+.mhico { width: 40px; height: 40px; background: rgba(79, 110, 247, 0.1); border: 1px solid rgba(79, 110, 247, 0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.mtitle { font-size: 15px; font-weight: 800; color: var(--app-text-main); }
+.msub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
+.mclose { cursor: pointer; color: var(--app-text-dim); font-size: 18px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 8px; transition: .2s; }
+.mclose:hover { background: rgba(255,255,255,0.05); color: #fff; }
 
-.mbody { padding: 22px; }
+.mbody { padding: 22px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
 .fg { display: flex; flex-direction: column; gap: 8px; }
-.fg label { font-size: 10px; font-weight: 800; color: var(--dim); text-transform: uppercase; letter-spacing: .05em; }
+.fg label { font-size: 10px; font-weight: 800; color: var(--app-text-dim); text-transform: uppercase; letter-spacing: .05em; }
 
-.preview-subject {
-  padding: 12px 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--b);
-  border-radius: 9px; color: var(--white); font-weight: 600; font-size: 14px;
+.subject-box {
+  margin-top: 8px;
+  padding: 12px 14px; background: var(--app-surface); border: 1px solid var(--app-border);
+  border-radius: 9px; color: var(--app-text-main); font-weight: 600; font-size: 14px;
 }
-.preview-body {
-  padding: 16px; background: rgba(255,255,255,0.03); border: 1px solid var(--b);
-  border-radius: 9px; color: var(--white); font-size: 13.5px; line-height: 1.6;
+.body-box {
+  margin-top: 8px;
+  padding: 16px; background: var(--app-surface); border: 1px solid var(--app-border);
+  border-radius: 9px; color: var(--app-text-main); font-size: 13.5px; line-height: 1.6;
   white-space: pre-wrap; min-height: 150px;
 }
 
-.mfooter { padding: 16px 22px; background: rgba(0,0,0,0.15); border-top: 1px solid var(--b); display: flex; justify-content: flex-end; }
+.mfooter { padding: 16px 22px; background: var(--app-surface); border-top: 1px solid var(--app-border); display: flex; justify-content: flex-end; }
 .btn { padding: 9px 20px; border-radius: 9px; font-size: 12.5px; font-weight: 700; cursor: pointer; border: none; transition: .2s; }
 .btn-primary { background: linear-gradient(135deg, var(--blue), var(--purple)); color: #fff; }
 .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(79,110,247,0.3); }
 
-.div { height: 1px; background: var(--b); }
+.div { height: 1px; background: var(--app-border); }
 .ibox { padding: 12px 14px; border-radius: 10px; display: flex; gap: 10px; line-height: 1.5; border: 1px solid rgba(79,110,247,0.25); background: rgba(79,110,247,0.06); color: rgba(180,200,255,0.9); }
-.ibox-icon { font-size: 15px; }
 </style>

@@ -124,11 +124,11 @@ const handleEditProject = (project: Project) => {
   font-size: 24px;
   font-weight: 900;
   letter-spacing: -0.5px;
-  color: var(--white);
+  color: var(--app-text-main);
 }
 .page-sub {
   font-size: 13px;
-  color: var(--dim);
+  color: var(--app-text-dim);
   margin-top: 4px;
 }
 
@@ -161,13 +161,13 @@ const handleEditProject = (project: Project) => {
   transform: translateY(-1px);
 }
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.035);
-  color: var(--dim);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  border: 1px solid var(--app-border);
 }
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.07);
-  color: var(--white);
+  background: var(--app-surface-hi);
+  color: var(--app-text-main);
 }
 .btn-sm {
   padding: 6px 14px;
@@ -177,24 +177,24 @@ const handleEditProject = (project: Project) => {
 .tabs {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid var(--b);
+  border-bottom: 1px solid var(--app-border);
   margin-bottom: 22px;
 }
 .tab {
   padding: 10px 20px;
   font-size: 13px;
   font-weight: 600;
-  color: var(--dim);
+  color: var(--app-text-dim);
   cursor: pointer;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
   transition: all 0.2s;
   white-space: nowrap;
 }
-.tab:hover { color: var(--white); }
+.tab:hover { color: var(--app-text-main); }
 .tab.active {
-  color: var(--blue);
-  border-bottom-color: var(--blue);
+  color: #4f6ef7;
+  border-bottom-color: #4f6ef7;
   font-weight: 700;
 }
 .tab-count {
@@ -218,11 +218,11 @@ const handleEditProject = (project: Project) => {
 .search-wrap input {
   width: 100%;
   padding: 10px 14px 10px 36px;
-  background: var(--card);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
   font-size: 13px;
-  color: var(--white);
+  color: var(--app-text-main);
   font-family: 'Outfit', sans-serif;
   outline: none;
   transition: all 0.2s;
@@ -234,15 +234,15 @@ const handleEditProject = (project: Project) => {
   top: 50%;
   transform: translateY(-50%);
   font-size: 14px;
-  color: var(--dim);
+  color: var(--app-text-dim);
 }
 .fsel {
   padding: 9px 14px;
-  background: var(--card);
-  border: 1px solid var(--b);
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 10px;
   font-size: 13px;
-  color: var(--white);
+  color: var(--app-text-main);
   font-family: 'Outfit', sans-serif;
   outline: none;
   cursor: pointer;
@@ -272,29 +272,29 @@ const handleEditProject = (project: Project) => {
 }
 .add-card:hover {
   border-color: rgba(79, 110, 247, 0.6);
-  background: rgba(79, 110, 247, 0.05);
+  background: var(--app-surface);
   transform: translateY(-2px);
 }
 .add-ico {
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: rgba(79, 110, 247, 0.12);
+  background: var(--status-info-bg);
   border: 1px solid rgba(79, 110, 247, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  color: var(--blue);
+  color: #4f6ef7;
 }
 .add-lbl {
   font-size: 15px;
   font-weight: 700;
-  color: var(--blue);
+  color: #4f6ef7;
 }
 .add-sub {
   font-size: 12px;
-  color: var(--dim);
+  color: var(--app-text-dim);
   text-align: center;
   line-height: 1.6;
   max-width: 240px;

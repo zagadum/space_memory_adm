@@ -191,35 +191,35 @@ function deleteUser(u: User) {
   display: flex; align-items: center; justify-content: space-between;
   margin-bottom: 14px; flex-wrap: wrap; gap: 10px;
 }
-.panel-title { font-size: 16px; font-weight: 900; color: var(--white); }
-.panel-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.panel-title { font-size: 16px; font-weight: 900; color: var(--app-text-main); }
+.panel-sub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
 
 .subtabs-bar {
-  display: flex; gap: 0; border-bottom: 1px solid var(--b); margin-bottom: 16px;
+  display: flex; gap: 0; border-bottom: 1px solid var(--app-border); margin-bottom: 16px;
 }
 .users-tab {
-  padding: 10px 16px; font-size: 11.5px; font-weight: 700; color: var(--dim);
-  cursor: pointer; transition: all .2s; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  padding: 10px 16px; font-size: 11.5px; font-weight: 700; color: var(--app-text-dim);
+  cursor: pointer; transition: all .15s; border-bottom: 2px solid transparent; margin-bottom: -1px;
 }
-.users-tab:hover { color: var(--white); }
-.users-tab.act { color: var(--purple); border-bottom-color: var(--purple); background: rgba(139, 92, 246, 0.05); }
+.users-tab:hover { color: var(--app-text-main); }
+.users-tab.act { color: var(--blue); border-bottom-color: var(--blue); background: var(--status-info-bg); }
 
 .filters-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
 .tpl-filter-sel {
-  background: rgba(12, 12, 32, 0.8); border: 1px solid var(--b);
-  color: var(--white); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;
+  background: var(--app-surface); border: 1px solid var(--app-border);
+  color: var(--app-text-main); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 600;
 }
 
 .users-rows { display: flex; flex-direction: column; gap: 8px; }
 .user-row {
-  background: var(--card); border: 1px solid var(--b);
-  border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 14px; transition: all .2s;
+  background: var(--app-card); border: 1px solid var(--app-border);
+  border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; transition: all .15s;
 }
-.user-row:hover { border-color: var(--bh); background: rgba(12,12,36,1); }
+.user-row:hover { border-color: var(--app-border-hi); background: var(--status-info-bg); }
 
 .user-ava {
-  width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; font-weight: 800; color: #fff;
+  width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800; color: white;
 }
 .ua-blue { background: var(--blue); }
 .ua-purple { background: var(--purple); }
@@ -227,8 +227,8 @@ function deleteUser(u: User) {
 .ua-green { background: var(--green); }
 .ua-cyan { background: var(--cyan); }
 
-.user-name { font-size: 13px; font-weight: 700; color: var(--white); }
-.user-meta { font-size: 10.5px; color: var(--dim); margin-top: 1px; }
+.user-name { font-size: 13px; font-weight: 700; color: var(--app-text-main); }
+.user-meta { font-size: 10.5px; color: var(--app-text-dim); margin-top: 1px; }
 
 .badge { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 5px; }
 .b-ok { background: rgba(16, 185, 129, 0.12); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.22); }
