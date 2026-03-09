@@ -48,9 +48,16 @@ http.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   return config;
 });
 
-// Response interceptor for timeout errors
+// Response interceptor for timeout errors and API response unwrapping
 http.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    // Unwrap API response format: { success, message, data: {...} }
+    // The backend returns this format, so we extract the data part for axios compatibility
+    if (response.data && typeof response.data === 'object' && 'success' in response.data && 'data' in response.data) {
+      response.data = response.data.data;
+    }
+    return response;
+  },
   (error) => {
     if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
       error.message = 'Большая нагрузка на сервер. Пожалуйста, повторите попытку через несколько секунд.';
