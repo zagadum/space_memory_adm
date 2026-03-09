@@ -154,22 +154,24 @@ const getStatusIcon = (status: string) => {
           type="replacement"
           @toggle="toggleSection('substitutions')"
         >
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ t('teacherSalary.table.student') }}</th>
-                <th>{{ t('teacherSalary.table.group') }}</th>
-                <th>{{ t('teacherSalary.table.salary') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, idx) in salaryData.substitutions.rows" :key="idx">
-                <td>{{ row.child }}<br><span class="dim fs-11">за {{ row.forTrainer }} · {{ row.date }}</span></td>
-                <td><span class="chip chip-blue">{{ row.group }}</span></td>
-                <td class="mono val-blue">{{ formatCurrency(row.salary) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ t('teacherSalary.table.student') }}</th>
+                  <th>{{ t('teacherSalary.table.group') }}</th>
+                  <th>{{ t('teacherSalary.table.salary') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in salaryData.substitutions.rows" :key="idx">
+                  <td>{{ row.child }}<br><span class="dim fs-11">за {{ row.forTrainer }} · {{ row.date }}</span></td>
+                  <td><span class="chip chip-blue">{{ row.group }}</span></td>
+                  <td class="mono val-blue">{{ formatCurrency(row.salary) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </SalarySection>
 
         <!-- 3. Methodical -->
@@ -182,25 +184,27 @@ const getStatusIcon = (status: string) => {
           type="meetings"
           @toggle="toggleSection('methodical')"
         >
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ t('teacherSalary.admin.duty') }}</th>
-                <th>{{ t('teacherSalary.table.status') }}</th>
-                <th>{{ t('teacherSalary.table.salary') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, idx) in salaryData.methodical.rows" :key="idx">
-                <td>{{ row.name }}<br><span class="dim fs-11">{{ row.date }}</span></td>
-                <td>
-                  <span v-if="row.present" class="chip chip-green">✅ Present</span>
-                  <span v-else class="chip chip-amber">❌ Absent</span>
-                </td>
-                <td class="mono val-purple">{{ formatCurrency(row.total) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ t('teacherSalary.admin.duty') }}</th>
+                  <th>{{ t('teacherSalary.table.status') }}</th>
+                  <th>{{ t('teacherSalary.table.salary') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in salaryData.methodical.rows" :key="idx">
+                  <td>{{ row.name }}<br><span class="dim fs-11">{{ row.date }}</span></td>
+                  <td>
+                    <span v-if="row.present" class="chip chip-green">✅ Present</span>
+                    <span v-else class="chip chip-amber">❌ Absent</span>
+                  </td>
+                  <td class="mono val-purple">{{ formatCurrency(row.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </SalarySection>
 
         <!-- 4. Individual -->
@@ -213,22 +217,24 @@ const getStatusIcon = (status: string) => {
           type="individual"
           @toggle="toggleSection('individual')"
         >
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ t('teacherSalary.table.student') }}</th>
-                <th>{{ t('teacherSalary.table.lessons') }}</th>
-                <th>{{ t('teacherSalary.table.salary') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, idx) in salaryData.individual.rows" :key="idx">
-                <td>{{ row.child }}<br><span class="dim fs-11">{{ row.program }}</span></td>
-                <td class="mono">{{ row.count }}</td>
-                <td class="mono val-pink">{{ formatCurrency(row.total) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ t('teacherSalary.table.student') }}</th>
+                  <th>{{ t('teacherSalary.table.lessons') }}</th>
+                  <th>{{ t('teacherSalary.table.salary') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in salaryData.individual.rows" :key="idx">
+                  <td>{{ row.child }}<br><span class="dim fs-11">{{ row.program }}</span></td>
+                  <td class="mono">{{ row.count }}</td>
+                  <td class="mono val-pink">{{ formatCurrency(row.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </SalarySection>
 
         <!-- 5. Olympiad -->
@@ -241,22 +247,24 @@ const getStatusIcon = (status: string) => {
           type="olympiad"
           @toggle="toggleSection('olympiad')"
         >
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ t('teacherSalary.admin.duty') }}</th>
-                <th>Zoom Rec</th>
-                <th>{{ t('teacherSalary.table.salary') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, idx) in salaryData.olympiad.rows" :key="idx">
-                <td>{{ row.name }}<br><span class="dim fs-11">{{ row.date }}</span></td>
-                <td><a href="#" class="val-blue fs-11">🔗 {{ row.link }}</a></td>
-                <td class="mono val-blue">{{ formatCurrency(row.total) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ t('teacherSalary.admin.duty') }}</th>
+                  <th>Zoom Rec</th>
+                  <th>{{ t('teacherSalary.table.salary') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in salaryData.olympiad.rows" :key="idx">
+                  <td>{{ row.name }}<br><span class="dim fs-11">{{ row.date }}</span></td>
+                  <td><a href="#" class="val-blue fs-11">🔗 {{ row.link }}</a></td>
+                  <td class="mono val-blue">{{ formatCurrency(row.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </SalarySection>
 
         <!-- 7. Bonuses -->
@@ -269,22 +277,24 @@ const getStatusIcon = (status: string) => {
           type="bonus"
           @toggle="toggleSection('bonuses')"
         >
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ t('teacherSalary.admin.duty') }}</th>
-                <th>{{ t('teacherSalary.table.status') }}</th>
-                <th>{{ t('teacherSalary.table.salary') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, idx) in salaryData.bonuses.rows" :key="idx">
-                <td>{{ row.reason }}<br><span class="dim fs-11">{{ row.comment }}</span></td>
-                <td><span class="chip chip-green">✅ Approved</span></td>
-                <td class="mono val-green">{{ formatCurrency(row.total) }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ t('teacherSalary.admin.duty') }}</th>
+                  <th>{{ t('teacherSalary.table.status') }}</th>
+                  <th>{{ t('teacherSalary.table.salary') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in salaryData.bonuses.rows" :key="idx">
+                  <td>{{ row.reason }}<br><span class="dim fs-11">{{ row.comment }}</span></td>
+                  <td><span class="chip chip-green">✅ Approved</span></td>
+                  <td class="mono val-green">{{ formatCurrency(row.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </SalarySection>
 
         <!-- 6. Admin Duties -->
@@ -336,22 +346,24 @@ const getStatusIcon = (status: string) => {
           type="rezygnacje"
           @toggle="toggleSection('rezygnacje')"
         >
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>{{ t('teacherSalary.table.student') }}</th>
-                <th>{{ t('teacherSalary.table.date') }}</th>
-                <th>{{ t('teacherSalary.table.reason') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(row, idx) in salaryData.rezygnacje" :key="idx">
-                <td class="fw-700">{{ row.name }}</td>
-                <td class="mono fs-12">{{ row.date }}</td>
-                <td class="dim fs-12">{{ row.reason }}</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>{{ t('teacherSalary.table.student') }}</th>
+                  <th>{{ t('teacherSalary.table.date') }}</th>
+                  <th>{{ t('teacherSalary.table.reason') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(row, idx) in salaryData.rezygnacje" :key="idx">
+                  <td class="fw-700">{{ row.name }}</td>
+                  <td class="mono fs-12">{{ row.date }}</td>
+                  <td class="dim fs-12">{{ row.reason }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </SalarySection>
       </div>
 
@@ -487,9 +499,13 @@ const getStatusIcon = (status: string) => {
 .chip-amber { background: rgba(245,158,11,.1); color: #f59e0b; border-color: rgba(245,158,11,.25); }
 
 /* Basic Tables */
-.data-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-.data-table th { text-align: left; padding: 12px 14px; font-size: 10px; color: #4b5563; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,.05); }
-.data-table td { padding: 14px; border-bottom: 1px solid rgba(255,255,255,.03); font-size: 13px; }
+.table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; margin-top: 12px; min-width: 600px; }
+.data-table th { text-align: left; padding: 11px 16px; font-size: 10.5px; font-weight: 700; color: var(--dim); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, .02); }
+.data-table td { padding: 11px 16px; border-bottom: 1px solid rgba(255, 255, 255, .04); font-size: 13px; vertical-align: middle; }
+.data-table th:last-child, .data-table td:last-child { text-align: right; }
+.data-table td:last-child { font-family: 'Space Mono', monospace; font-weight: 700; }
+.data-table tr:hover td { background: rgba(255, 255, 255, .02); }
 
 /* Trial Lessons */
 .trial-row { cursor: pointer; transition: background .2s; }

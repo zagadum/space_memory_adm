@@ -53,6 +53,12 @@ export const router = createRouter({
           meta: { title: 'financeSettings.pageTitle', subTitle: 'financeSettings.pageSubTitle', icon: '⚙️' }
         },
         {
+          path: "finance/salary-calculator",
+          name: "salary-calculator",
+          component: () => import("../views/finance/SalaryCalculatorView.vue"),
+          meta: { title: 'sidebar.salaryCalculator', icon: '📊' }
+        },
+        {
           path: "projects",
           name: "projects-list",
           component: () => import("../views/projects/ProjectsListPage.vue"),

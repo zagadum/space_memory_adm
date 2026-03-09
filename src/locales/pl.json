@@ -19,7 +19,8 @@
     "leads": "Tablica Kanban",
     "projects": "Projekty i Produkty",
     "allProjects": "Wszystkie Projekty",
-    "salaryDemo": "Wypłata Trenera (Demo)"
+    "salaryDemo": "Wypłata Trenera (Demo)",
+    "salaryCalculator": "Kalkulator Wynagrodzeń (Księgowy)"
   },
   "app": {
     "title": "GLS · Płatności",
@@ -1213,5 +1214,34 @@
       "cancelled": "Anulowane"
     },
     "downloadInvoice": "Pobierz PDF"
+  },
+  "salaryCalc": {
+    "title": "Kalkulator Wynagrodzeń (Księgowy)",
+    "subtitle": "MODUŁ KSIĘGOWEGO · GLS © 2026",
+    "role": "Księgowy",
+    "components": {
+      "subscriptions": "% od Abonamentów",
+      "substitutions": "Zastępstwa",
+      "methodical": "Spotkania metodyczne",
+      "individual": "Indywidualne",
+      "olympiad": "Olimpijskie",
+      "adminDuty": "3% Obowiązki admin.",
+      "trial": "Lekcje próbne",
+      "retention": "Premia za retencję",
+      "extra": "Dojazd + Premie",
+      "penalties": "Kary umowne",
+      "total": "RAZEM DO WYPŁATY"
+    },
+    "labels": {
+      "activeKids": "aktywnych dzieci",
+      "rezygnacjeBonus": "0 rezygnacji → +1%",
+      "exportExcel": "Export do Excel",
+      "summary": "Rozliczenie",
+      "dossier": "Teczka osobowa",
+      "history": "Historia wypłat",
+      "month": "Miesiąc:",
+      "trainer": "Trener:",
+      "status": "Status:"
+    }
   }
 }

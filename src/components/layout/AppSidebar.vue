@@ -120,6 +120,13 @@
         >
           <span class="nav-icon">👛</span> {{ t('sidebar.salaryDemo') }}
         </div>
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'salary-calculator' }" 
+          @click="navigateTo('salary-calculator', '/finance/salary-calculator')"
+        >
+          <span class="nav-icon">📊</span> {{ t('sidebar.salaryCalculator') }}
+        </div>
       </div>
 
       <div 
@@ -254,6 +261,9 @@ watch(() => route.path, (path) => {
     activeItem.value = 'students'
   } else if (path.startsWith('/teacher/salary')) {
     activeItem.value = 'salary-demo'
+    openSections.value.finance = true
+  } else if (path.startsWith('/finance/salary-calculator')) {
+    activeItem.value = 'salary-calculator'
     openSections.value.finance = true
   } else if (path === '/' || path === '/dashboard') {
     activeItem.value = 'dashboard'

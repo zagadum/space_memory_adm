@@ -19,7 +19,8 @@
     "leads": "Leads Board",
     "projects": "Projects & Products",
     "allProjects": "All Projects",
-    "salaryDemo": "Teacher Salary (Demo)"
+    "salaryDemo": "Teacher Salary (Demo)",
+    "salaryCalculator": "Salary Calculator (Accountant)"
   },
   "app": {
     "title": "GLS · Payments",
@@ -1232,5 +1233,34 @@
       "cancelled": "Cancelled"
     },
     "downloadInvoice": "Download PDF"
+  },
+  "salaryCalc": {
+    "title": "Salary Calculator (Accountant)",
+    "subtitle": "ACCOUNTANT MODULE · GLS © 2026",
+    "role": "Accountant",
+    "components": {
+      "subscriptions": "% of Subscriptions",
+      "substitutions": "Substitutions",
+      "methodical": "Methodical Meetings",
+      "individual": "Individual Lessons",
+      "olympiad": "Olympiad Lessons",
+      "adminDuty": "3% Admin Duties",
+      "trial": "Trial Lessons",
+      "retention": "Retention Bonus",
+      "extra": "Travel + Bonuses",
+      "penalties": "Penalties",
+      "total": "TOTAL PAYOUT"
+    },
+    "labels": {
+      "activeKids": "active kids",
+      "rezygnacjeBonus": "0 cancellations → +1%",
+      "exportExcel": "Export to Excel",
+      "summary": "Calculator",
+      "dossier": "Employee Dossier",
+      "history": "Payout History",
+      "month": "Month:",
+      "trainer": "Trainer:",
+      "status": "Status:"
+    }
   }
 }

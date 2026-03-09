@@ -19,7 +19,8 @@
     "leads": "Канбан-доска",
     "projects": "Проекты & Продукты",
     "allProjects": "Все проекты",
-    "salaryDemo": "Зарплата учителя (Демо)"
+    "salaryDemo": "Зарплата учителя (Демо)",
+    "salaryCalculator": "Расчет зарплат (Бухгалтер)"
   },
   "app": {
     "title": "GLS · Платежи",
@@ -1216,5 +1217,34 @@
       "cancelled": "Отменено"
     },
     "downloadInvoice": "Скачать PDF"
+  },
+  "salaryCalc": {
+    "title": "Расчет зарплат (Бухгалтер)",
+    "subtitle": "МОДУЛЬ БУХГАЛТЕРА · GLS © 2026",
+    "role": "Бухгалтер",
+    "components": {
+      "subscriptions": "% от Абонементов",
+      "substitutions": "Замены (Zastępstwa)",
+      "methodical": "Методические встречи",
+      "individual": "Индивидуальные",
+      "olympiad": "Олимпиадные",
+      "adminDuty": "3% Админ. обязанности",
+      "trial": "Пробные уроки",
+      "retention": "Бонус за удержание",
+      "extra": "Доезд + Премии",
+      "penalties": "Штрафы",
+      "total": "ИТОГО К ВЫПЛАТЕ"
+    },
+    "labels": {
+      "activeKids": "активных детей",
+      "rezygnacjeBonus": "0 rezygnacji → +1%",
+      "exportExcel": "Экспорт в Excel",
+      "summary": "Сводка",
+      "dossier": "Личное дело",
+      "history": "История выплат",
+      "month": "Месяц:",
+      "trainer": "Тренер:",
+      "status": "Статус:"
+    }
   }
 }
