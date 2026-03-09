@@ -118,12 +118,17 @@ export interface SalaryData {
             program: string;
             attended: number;
             won: number;
-            pctWon: number;
             paid: boolean;
             salary: number;
             children: Array<{ name: string; status: 'won' | 'lost' }>;
         }>;
     };
+
+    rezygnacje: Array<{
+        name: string;
+        date: string;
+        reason: string;
+    }>;
 }
 
 export const useTeacherSalaryStore = defineStore('teacherSalary', {
@@ -237,22 +242,24 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
                 confirmedAt: '01.03.2026',
                 rows: [
                     {
-                        name: 'Пробний SM', date: '08.02.2026', program: 'Space Memory', attended: 6, won: 4, pctWon: 67, paid: true, salary: 35,
+                        name: 'Пробний SM', date: '08.02.2026', program: 'Space Memory', attended: 6, won: 4, paid: true, salary: 35,
                         children: [
                             { name: 'Górska Emilia', status: 'won' },
                             { name: 'Sobieski Tomasz', status: 'lost' }
                         ]
                     },
                     {
-                        name: 'Пробний SM', date: '15.02.2026', program: 'Space Memory', attended: 8, won: 3, pctWon: 38, paid: false, salary: 0,
+                        name: 'Пробний SM', date: '15.02.2026', program: 'Space Memory', attended: 8, won: 3, paid: false, salary: 0,
                         children: []
                     },
                     {
-                        name: 'Пробний INDIGO', date: '22.02.2026', program: 'INDIGO', attended: 5, won: 3, pctWon: 60, paid: true, salary: 35,
+                        name: 'Пробний INDIGO', date: '22.02.2026', program: 'INDIGO', attended: 5, won: 3, paid: true, salary: 35,
                         children: []
                     }
                 ]
-            }
+            },
+
+            rezygnacje: []
         } as SalaryData | null,
         isLoading: false,
         error: null as string | null
@@ -271,8 +278,45 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             if (d.olympiad.amount > 0) sections.push({ label: 'teacherSalary.sections.olympiad', amount: d.olympiad.amount, type: 'olympiad', subtext: `${d.olympiad.rows.length} lessons` });
             if (d.admin3pct.amount > 0) sections.push({ label: 'teacherSalary.sections.admin3pct', amount: d.admin3pct.amount, type: 'admin', subtext: `QA Score: ${d.admin3pct.pct}%` });
             if (d.bonuses.amount > 0) sections.push({ label: 'teacherSalary.sections.bonuses', amount: d.bonuses.amount, type: 'bonus', subtext: `${d.bonuses.rows.length} positions` });
-            if (d.trialLessons.amount > 0) sections.push({ label: 'teacherSalary.sections.trialLessons', amount: d.trialLessons.amount, type: 'trial', subtext: `${d.trialLessons.rows.filter(r => r.paid).length} paid` });
+
+            // Trial lessons with calculated amount
+            const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
+                const conversion = row.won / row.attended;
+                return sum + (conversion >= 0.51 ? 35 : 0);
+            }, 0);
+            if (trialAmount > 0) {
+                sections.push({ label: 'teacherSalary.sections.trialLessons', amount: trialAmount, type: 'trial', subtext: `${d.trialLessons.rows.filter(r => (r.won / r.attended) >= 0.51).length} qualified` });
+            }
+
+            // Retention Bonus (+1%)
+            if (d.rezygnacje.length === 0) {
+                const bonus = d.subscriptions.base * 0.01;
+                sections.push({ label: 'teacherSalary.sections.retentionBonus', amount: bonus, type: 'bonus', subtext: '0 rezygnacji (+1%)' });
+            }
+
             return sections;
+        },
+
+        totalPayout: (state) => {
+            if (!state.salaryData) return 0;
+            const d = state.salaryData;
+
+            const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
+                const conversion = row.won / row.attended;
+                return sum + (conversion >= 0.51 ? 35 : 0);
+            }, 0);
+
+            const retentionBonus = d.rezygnacje.length === 0 ? d.subscriptions.base * 0.01 : 0;
+
+            return d.subscriptions.amount +
+                d.substitutions.amount +
+                d.methodical.amount +
+                d.individual.amount +
+                d.olympiad.amount +
+                d.admin3pct.amount +
+                d.bonuses.amount +
+                trialAmount +
+                retentionBonus;
         }
     },
 

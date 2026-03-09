@@ -1139,7 +1139,9 @@
       "olympiad": "Олимпиадные занятия",
       "admin3pct": "3% — Админ. обязанности",
       "bonuses": "Премии",
-      "trialLessons": "Пробные уроки"
+      "trialLessons": "Пробные уроки",
+      "retentionBonus": "Бонус за удержание (+1%)",
+      "rezygnacje": "Отказы (резигнации)"
     },
     "admin": {
       "evaluated": "Оценено",
@@ -1172,7 +1174,9 @@
       "lessons": "Занятия",
       "status": "Статус",
       "details": "Детали",
-      "subtotal": "Итого по группе"
+      "subtotal": "Итого по группе",
+      "reason": "Причина",
+      "date": "Дата"
     },
     "actions": {
       "confirm": "Подтверждаю зарплату",
@@ -1184,5 +1188,33 @@
     },
     "history": "Предыдущие месяцы",
     "generatedAt": "Расчет сформирован"
+  },
+  "studentPayments": {
+    "title": "Абонементы и Платежи",
+    "status": "Статус абонемента",
+    "subscriptionStatus": {
+      "active": "Активен",
+      "inactive": "Неактивен",
+      "paused": "Приостановлен"
+    },
+    "startSubscription": "Старт абонемента",
+    "addDiscount": "Добавить скидку",
+    "activeDiscounts": "Активные скидки",
+    "transactions": {
+      "title": "Транзакции",
+      "month": "Месяц",
+      "basePrice": "Базовая цена",
+      "discount": "Скидка",
+      "total": "Итого к оплате",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "transactionStatus": {
+      "paid": "Оплачено",
+      "pending": "Ожидает",
+      "overpayment": "Надплата",
+      "cancelled": "Отменено"
+    },
+    "downloadInvoice": "Скачать PDF"
   }
 }

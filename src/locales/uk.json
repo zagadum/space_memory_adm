@@ -1133,7 +1133,9 @@
       "olympiad": "Олімпіадні заняття",
       "admin3pct": "3% — Адмін. обов'язки",
       "bonuses": "Премії",
-      "trialLessons": "Пробні уроки"
+      "trialLessons": "Пробні уроки",
+      "retentionBonus": "Бонус за утримання (+1%)",
+      "rezygnacje": "Відмови (резигнації)"
     },
     "admin": {
       "evaluated": "Оцінено",
@@ -1166,7 +1168,9 @@
       "lessons": "Заняття",
       "status": "Статус",
       "details": "Деталі",
-      "subtotal": "Разом по групі"
+      "subtotal": "Разом по групі",
+      "reason": "Причина",
+      "date": "Дата"
     },
     "actions": {
       "confirm": "Підтверджую зарплату",
@@ -1178,5 +1182,33 @@
     },
     "history": "Попередні місяці",
     "generatedAt": "Розрахунок сформовано"
+  },
+  "studentPayments": {
+    "title": "Абонементи та Платежі",
+    "status": "Статус абонемента",
+    "subscriptionStatus": {
+      "active": "Активний",
+      "inactive": "Неактивний",
+      "paused": "Призупинено"
+    },
+    "startSubscription": "Старт абонемента",
+    "addDiscount": "Додати знижку",
+    "activeDiscounts": "Активні знижки",
+    "transactions": {
+      "title": "Транзакції",
+      "month": "Місяць",
+      "basePrice": "Базова ціна",
+      "discount": "Знижка",
+      "total": "Разом до сплати",
+      "status": "Статус",
+      "actions": "Дії"
+    },
+    "transactionStatus": {
+      "paid": "Оплачено",
+      "pending": "Очікує",
+      "overpayment": "Надплата",
+      "cancelled": "Скасовано"
+    },
+    "downloadInvoice": "Завантажити PDF"
   }
 }

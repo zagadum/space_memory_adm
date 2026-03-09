@@ -1155,7 +1155,9 @@
       "olympiad": "Olympiad lessons",
       "admin3pct": "3% — Admin duties",
       "bonuses": "Bonuses",
-      "trialLessons": "Trial lessons"
+      "trialLessons": "Trial lessons",
+      "retentionBonus": "Retention Bonus (+1%)",
+      "rezygnacje": "Resignations"
     },
     "admin": {
       "evaluated": "Evaluated",
@@ -1188,7 +1190,9 @@
       "lessons": "Lessons",
       "status": "Status",
       "details": "Details",
-      "subtotal": "Group subtotal"
+      "subtotal": "Group subtotal",
+      "reason": "Reason",
+      "date": "Date"
     },
     "actions": {
       "confirm": "Confirm salary",
@@ -1200,5 +1204,33 @@
     },
     "history": "Previous months",
     "generatedAt": "Calculation generated"
+  },
+  "studentPayments": {
+    "title": "Subscriptions & Payments",
+    "status": "Subscription Status",
+    "subscriptionStatus": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "paused": "Paused"
+    },
+    "startSubscription": "Start Subscription",
+    "addDiscount": "Add Discount",
+    "activeDiscounts": "Active Discounts",
+    "transactions": {
+      "title": "Transactions",
+      "month": "Month",
+      "basePrice": "Base Price",
+      "discount": "Discount",
+      "total": "Total to Pay",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "transactionStatus": {
+      "paid": "Paid",
+      "pending": "Pending",
+      "overpayment": "Overpayment",
+      "cancelled": "Cancelled"
+    },
+    "downloadInvoice": "Download PDF"
   }
 }

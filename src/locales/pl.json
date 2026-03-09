@@ -1136,7 +1136,9 @@
       "olympiad": "Zajęcia olimpijskie",
       "admin3pct": "3% — Obowiązki admin.",
       "bonuses": "Premie",
-      "trialLessons": "Lekcje próbne"
+      "trialLessons": "Lekcje próbne",
+      "retentionBonus": "Premia za retencję (+1%)",
+      "rezygnacje": "Rezygnacje"
     },
     "admin": {
       "evaluated": "Oceniono",
@@ -1169,7 +1171,9 @@
       "lessons": "Zajęcia",
       "status": "Status",
       "details": "Szczegóły",
-      "subtotal": "Suma dla grupy"
+      "subtotal": "Suma dla grupy",
+      "reason": "Powód",
+      "date": "Data"
     },
     "actions": {
       "confirm": "Potwierdzam wynagrodzenie",
@@ -1181,5 +1185,33 @@
     },
     "history": "Poprzednie miesiące",
     "generatedAt": "Rozliczenie wygenerowane"
+  },
+  "studentPayments": {
+    "title": "Abonamenty i Płatności",
+    "status": "Status abonamentu",
+    "subscriptionStatus": {
+      "active": "Aktywny",
+      "inactive": "Nieaktywny",
+      "paused": "Wstrzymany"
+    },
+    "startSubscription": "Start abonamentu",
+    "addDiscount": "Dodaj zniżkę",
+    "activeDiscounts": "Aktywne zniżki",
+    "transactions": {
+      "title": "Transakcje",
+      "month": "Miesiąc",
+      "basePrice": "Cena bazowa",
+      "discount": "Zniżka",
+      "total": "Razem do zapłaty",
+      "status": "Status",
+      "actions": "Akcje"
+    },
+    "transactionStatus": {
+      "paid": "Opłacone",
+      "pending": "Oczekujące",
+      "overpayment": "Nadpłata",
+      "cancelled": "Anulowane"
+    },
+    "downloadInvoice": "Pobierz PDF"
   }
 }
