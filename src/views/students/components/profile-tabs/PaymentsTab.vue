@@ -15,6 +15,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { useRoute } from "vue-router";
 import { usePaymentsStore } from "../../../../stores/payments.store";
@@ -26,8 +27,19 @@ const { t } = useI18n();
 const route = useRoute();
 const payments = usePaymentsStore();
 
+const studentId = route.params.id as string;
+
+onMounted(() => {
+  if (studentId) {
+    // Пока бэкенд использует монолитный эндпоинт — грузим всё сразу.
+    // TODO: когда бэкенд реализует GET /students/{id}/projects —
+    //       заменить на payments.loadProjects(studentId)
+    //       Тогда calendar подгрузится по клику, tx — по клику на раздел.
+    payments.loadStudent(studentId);
+  }
+});
+
 function retryLoad() {
-  const studentId = route.params.id as string;
   if (studentId) {
     payments.loadStudent(studentId);
   }

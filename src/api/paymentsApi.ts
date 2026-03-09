@@ -1,5 +1,5 @@
 import { http } from "./http";
-import type { Program, StudentProfile, Transaction, KsefInvoice } from "./mockDb";
+import type { Program, StudentProfile, Transaction, KsefInvoice, MonthObj } from "./mockDb";
 
 export type { Transaction };
 
@@ -8,12 +8,85 @@ export interface StudentPaymentsResponse {
   programs: Program[];
 }
 
+// ─── Новые типы для разбитых запросов ────────────────────────────────────────
+
+/** Список проектов студента — лёгкий ответ без calendar/transactions */
+export interface ProjectSummary {
+  id: string;
+  name: string;
+  sub: string;
+  tariff: number;
+  balance: number;
+  balanceLabel: string;
+  barGradient: string;
+}
+
+/** Календарная сетка платежей по одному проекту */
+export interface ProjectCalendarResponse {
+  projectId: string;
+  years: Record<string, MonthObj[]>;
+  extras?: Program['extras'];
+}
+
+/** Транзакции по одному проекту */
+export interface ProjectTransactionsResponse {
+  projectId: string;
+  items: Transaction[];
+}
+
+// ─── API ──────────────────────────────────────────────────────────────────────
+
 export const paymentsApi = {
+
+  // ── Старый монолитный запрос (оставляем для обратной совместимости) ─────────
   async getStudentPayments(studentId: string) {
     const { data } = await http.get<StudentPaymentsResponse>(`payments/student/${studentId}`);
     return data;
   },
 
+  // ── НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ ───────────────────────────────────────────────────
+
+  /**
+   * 1. Список проектов — вызывается сразу при открытии вкладки.
+   *    Только мета-данные, без calendar и transactions.
+   *    GET /students/{student_id}/projects
+   */
+  async getStudentProjects(studentId: string): Promise<ProjectSummary[]> {
+    const { data } = await http.get<{ items: ProjectSummary[] }>(
+      `students/${studentId}/projects`
+    );
+    return data.items;
+  },
+
+  /**
+   * 2. Календарная сетка — вызывается по клику на проект.
+   *    GET /students/{student_id}/projects/{project_id}/calendar
+   */
+  async getProjectCalendar(
+    studentId: string,
+    projectId: string
+  ): Promise<ProjectCalendarResponse> {
+    const { data } = await http.get<ProjectCalendarResponse>(
+      `students/${studentId}/projects/${projectId}/calendar`
+    );
+    return data;
+  },
+
+  /**
+   * 3. Транзакции — вызывается по клику на раздел "Транзакции".
+   *    GET /students/{student_id}/projects/{project_id}/transactions
+   */
+  async getProjectTransactions(
+    studentId: string,
+    projectId: string
+  ): Promise<ProjectTransactionsResponse> {
+    const { data } = await http.get<ProjectTransactionsResponse>(
+      `students/${studentId}/projects/${projectId}/transactions`
+    );
+    return data;
+  },
+
+  // ── Старые методы (для совместимости) ────────────────────────────────────────
   async getTransactions(programId: string) {
     const { data } = await http.get<{ items: Transaction[] }>("payments/transactions", { params: { programId } });
     return data.items;

@@ -152,6 +152,65 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { student: data.profile, programs: data.programs });
   }
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Запрос 1: GET /students/{student_id}/projects
+   * Возвращает список проектов без calendar и transactions
+   */
+  if (method === "get" && /^students\/[^/]+\/projects$/.test(url)) {
+    const studentId = url.split("/")[1];
+    const studentData = studentId ? mockDb.students[studentId] : null;
+    const programs = studentData?.programs || [];
+
+    const items = programs.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      sub: p.sub,
+      tariff: p.tariff,
+      balance: p.balance,
+      balanceLabel: p.balanceLabel,
+      barGradient: p.barGradient,
+    }));
+
+    return ok(config, { items });
+  }
+
+  /**
+   * Запрос 2: GET /students/{student_id}/projects/{project_id}/calendar
+   * Возвращает только years (сетку платежей) для одного проекта
+   */
+  if (method === "get" && /^students\/[^/]+\/projects\/[^/]+\/calendar$/.test(url)) {
+    const parts = url.split("/");
+    const studentId = parts[1];
+    const projectId = parts[3];
+
+    const studentData = studentId ? mockDb.students[studentId] : null;
+    const program = studentData?.programs?.find((p: any) => p.id === projectId);
+
+    if (!program) return err(config, 404, "Project not found");
+
+    return ok(config, {
+      projectId,
+      years: program.years || {},
+      extras: program.extras || [],
+    });
+  }
+
+  /**
+   * Запрос 3: GET /students/{student_id}/projects/{project_id}/transactions
+   * Возвращает транзакции для одного проекта
+   */
+  if (method === "get" && /^students\/[^/]+\/projects\/[^/]+\/transactions$/.test(url)) {
+    const parts = url.split("/");
+    const projectId = parts[3];
+
+    const items = mockTransactions[projectId] || [];
+    return ok(config, { projectId, items });
+  }
+
   /*
    * [x] Research current implementation of `.mcell` and status logic in `PaymentPrograms.vue`
    * [x] Audit and fix i18n keys in `ru.json`, `en.json`, `pl.json`

@@ -12,8 +12,15 @@
     <!-- ── Body ── -->
     <div class="tx-body" v-show="isOpen">
       <div class="tx-body-inner">
+
+        <!-- Загрузка транзакций -->
+        <div v-if="txIsLoading" class="tx-loading">
+          <span class="tx-spinner">⏳</span> {{ t('common.loading') }}
+        </div>
+
         <div
           v-for="tx in txList"
+          v-else
           :key="tx.id"
           class="tx-row"
           :class="{ 'tx-extra': tx.type === 'extra' }"
@@ -127,21 +134,38 @@ function formatTxTitle(title: string): string {
   return res;
 }
 
-/** Transactions from store (loaded on expand) or from program.transactions fallback */
+/** Транзакции: новый endpoint → старый store → fallback из program.transactions */
 const txList = computed<Transaction[]>(() => {
-  const fromStore = payments.transactionsByProgram[props.prog];
-  if (fromStore?.length) return fromStore;
+  // Приоритет 1: новый разбитый запрос
+  const fromNewApi = payments.newTxByProject[props.prog];
+  if (fromNewApi?.length) return fromNewApi;
+  // Приоритет 2: старый endpoint
+  const fromOldStore = payments.transactionsByProgram[props.prog];
+  if (fromOldStore?.length) return fromOldStore;
+  // Fallback: данные из начального payload
   const p = payments.programs.find(x => x.id === props.prog);
   return (p?.transactions || []) as unknown as Transaction[];
 });
 
+const txIsLoading = computed(() =>
+  payments.newTxLoading[props.prog] || payments.txLoading[props.prog] || false
+);
+
 async function toggle() {
   isOpen.value = !isOpen.value;
   if (isOpen.value) {
-    await Promise.all([
-      payments.loadTransactions(props.prog),
-      payments.loadKsefInvoices(props.prog),
-    ]);
+    // Пробуем новый разбитый запрос, fallback на старый
+    if (payments.currentStudentId) {
+      await Promise.all([
+        payments.loadProjectTransactions(props.prog),
+        payments.loadKsefInvoices(props.prog),
+      ]);
+    } else {
+      await Promise.all([
+        payments.loadTransactions(props.prog),
+        payments.loadKsefInvoices(props.prog),
+      ]);
+    }
   }
 }
 
@@ -167,6 +191,15 @@ function onRefund(tx: Transaction) {
 </script>
 
 <style scoped>
+/* ── TX LOADING ── */
+.tx-loading {
+  padding: 16px; text-align: center;
+  font-size: 13px; color: rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.tx-spinner { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 /* ── SECTION ── */
 .tx-section {
   border-top: 1px solid var(--b);
