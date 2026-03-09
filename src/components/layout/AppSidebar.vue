@@ -113,6 +113,13 @@
         >
           <span class="nav-icon">⚙️</span> {{ t('sidebar.settings') }}
         </div>
+        <div 
+          class="nav-item" 
+          :class="{ active: activeItem === 'salary-demo' }" 
+          @click="navigateTo('salary-demo', '/teacher/salary')"
+        >
+          <span class="nav-icon">👛</span> {{ t('sidebar.salaryDemo') }}
+        </div>
       </div>
 
       <div 
@@ -245,6 +252,9 @@ watch(() => route.path, (path) => {
     openSections.value.finance = true
   } else if (path.startsWith('/students')) {
     activeItem.value = 'students'
+  } else if (path.startsWith('/teacher/salary')) {
+    activeItem.value = 'salary-demo'
+    openSections.value.finance = true
   } else if (path === '/' || path === '/dashboard') {
     activeItem.value = 'dashboard'
   }

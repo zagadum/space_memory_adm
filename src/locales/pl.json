@@ -18,7 +18,8 @@
     "salesDept": "Dział sprzedaży",
     "leads": "Tablica Kanban",
     "projects": "Projekty i Produkty",
-    "allProjects": "Wszystkie Projekty"
+    "allProjects": "Wszystkie Projekty",
+    "salaryDemo": "Wypłata Trenera (Demo)"
   },
   "app": {
     "title": "GLS · Płatności",
@@ -1091,5 +1092,94 @@
       "create": "Utwórz Projekt",
       "createSuccess": "Projekt został pomyślnie utworzony"
     }
+  },
+  "projectDetail": {
+    "title": "Szczegóły Projektu",
+    "back": "Wstecz",
+    "statusActive": "Aktywny",
+    "stats": {
+      "enrolledStudents": "Zapisani uczniowie",
+      "invoicesIssued": "Wystawione faktury"
+    },
+    "tabs": {
+      "invoices": "Faktury",
+      "students": "Uczniowie",
+      "settings": "Ustawienia"
+    },
+    "notFound": "Nie znaleziono projektu",
+    "errorTitle": "Błąd ładowania"
+  },
+  "teacherSalary": {
+    "pageTitle": "Moje wynagrodzenie",
+    "trainer": "Trener",
+    "month": "Miesiąc",
+    "downloadPdf": "Pobierz PDF",
+    "totalPayout": "RAZEM DO WYPŁATY",
+    "confirmed": "Potwierdzono",
+    "pendingConfirmation": "Oczekiwanie na potwierdzenie",
+    "confirm": "Potwierdź",
+    "dispute": "Zgłoś błąd",
+    "underDevelopment": "Sekcja w budowie",
+    "panelSubtitle": "Panel trenera · GLS",
+    "period": "Okres",
+    "status": {
+      "draft": "Oczekuje na potwierdzenie",
+      "confirmed": "Potwierdzone",
+      "paid": "Wypłacone",
+      "disputed": "Wysłano uwagi"
+    },
+    "sections": {
+      "subscriptions": "% od abonamentów",
+      "substitutions": "Zastępstwa",
+      "methodical": "Spotkania metodyczne",
+      "individual": "Zajęcia indywidualne",
+      "olympiad": "Zajęcia olimpijskie",
+      "admin3pct": "3% — Obowiązki admin.",
+      "bonuses": "Premie",
+      "trialLessons": "Lekcje próbne"
+    },
+    "admin": {
+      "evaluated": "Oceniono",
+      "by": "przez",
+      "allDone": "Wszystkie obowiązki spełnione",
+      "hasIssues": "Są uwagi z Działu Jakości",
+      "duty": "Obowiązek",
+      "score": "Ocena DJ",
+      "comment": "Komentarz DJ",
+      "basis": "Podstawa"
+    },
+    "trials": {
+      "attended": "Obecnych",
+      "won": "Sukces (WON)",
+      "rate": "Stawka",
+      "threshold": "Próg 51%",
+      "paid": "Płatne",
+      "notPaid": "Bezpłatne",
+      "qaConfirmed": "Potwierdzone przez Dział Jakości"
+    },
+    "table": {
+      "group": "Grupa",
+      "dayTime": "Dzień/godz",
+      "kids": "Dzieci",
+      "base": "Baza",
+      "salary": "Kwota",
+      "student": "Uczeń",
+      "abonament": "Abonament",
+      "discounts": "Zniżki",
+      "lessons": "Zajęcia",
+      "status": "Status",
+      "details": "Szczegóły",
+      "subtotal": "Suma dla grupy"
+    },
+    "actions": {
+      "confirm": "Potwierdzam wynagrodzenie",
+      "dispute": "Mam uwagi",
+      "sendToAccounting": "Wyślij do księgowości",
+      "cancel": "Anuluj",
+      "disputePlaceholder": "Opisz co się nie zgadza...",
+      "disputeLabel": "Opisz uwagi:"
+    },
+    "history": "Poprzednie miesiące",
+    "generatedAt": "Rozliczenie wygenerowane"
   }
 }

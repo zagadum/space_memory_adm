@@ -18,5 +18,8 @@ export const API_ENDPOINTS = {
         CHANGE_GROUP: '/v1/payments/change-group',
         CORRECT_BALANCE: '/v1/payments/correct-balance',
         EDIT_INVOICE: '/v1/payments/edit-invoice'
+    },
+    PROJECTS: {
+        DETAIL: (id: string | number) => `/v1/projects/${id}`
     }
 };

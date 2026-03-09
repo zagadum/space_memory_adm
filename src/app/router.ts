@@ -59,6 +59,12 @@ export const router = createRouter({
           meta: { title: 'projects.title', subTitle: 'projects.subTitle', icon: '📁' }
         },
         {
+          path: "projects/:id",
+          name: "project-detail",
+          component: () => import("../views/projects/ProjectDetailView.vue"),
+          meta: { title: 'projectDetail.title', icon: '📁' }
+        },
+        {
           path: "payments/:id",
           component: () => import("../views/students/StudentProfilePage.vue"),
           children: [
@@ -71,6 +77,12 @@ export const router = createRouter({
             { path: "notes", name: "student-notes", component: () => import("../views/students/components/profile-tabs/NotesTab.vue") },
           ],
         },
+        {
+          path: "teacher/salary",
+          name: "teacher-salary",
+          component: () => import("../views/teacher/TeacherSalaryPage.vue"),
+          meta: { title: 'teacherSalary.pageTitle', icon: '💰' }
+        }
       ],
     },
     { path: "/:pathMatch(.*)*", redirect: "/students" },

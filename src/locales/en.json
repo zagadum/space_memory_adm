@@ -18,7 +18,8 @@
     "salesDept": "Sales Dept",
     "leads": "Leads Board",
     "projects": "Projects & Products",
-    "allProjects": "All Projects"
+    "allProjects": "All Projects",
+    "salaryDemo": "Teacher Salary (Demo)"
   },
   "app": {
     "title": "GLS · Payments",
@@ -1093,6 +1094,111 @@
       "cancel": "Cancel",
       "create": "Create Project",
       "createSuccess": "Project created successfully"
+    },
+    "projectDetail": {
+      "title": "Project Details",
+      "back": "Back",
+      "statusActive": "Active",
+      "stats": {
+        "enrolledStudents": "Enrolled Students",
+        "invoicesIssued": "Invoices Issued"
+      },
+      "tabs": {
+        "invoices": "Invoices",
+        "students": "Students",
+        "settings": "Settings"
+      },
+      "notFound": "Project not found",
+      "errorTitle": "Loading Error"
     }
+  },
+  "projectDetail": {
+    "title": "Project Details",
+    "back": "Back",
+    "statusActive": "Active",
+    "stats": {
+      "enrolledStudents": "Enrolled Students",
+      "invoicesIssued": "Invoices Issued"
+    },
+    "tabs": {
+      "invoices": "Invoices",
+      "students": "Students",
+      "settings": "Settings"
+    },
+    "notFound": "Project not found",
+    "errorTitle": "Loading Error"
+  },
+  "teacherSalary": {
+    "pageTitle": "My Salary",
+    "trainer": "Trainer",
+    "month": "Month",
+    "downloadPdf": "Download PDF",
+    "totalPayout": "TOTAL TO PAYOUT",
+    "confirmed": "Confirmed",
+    "pendingConfirmation": "Pending confirmation",
+    "confirm": "Confirm",
+    "dispute": "Dispute",
+    "underDevelopment": "Section under development",
+    "panelSubtitle": "Trainer Cabinet · GLS",
+    "period": "Period",
+    "status": {
+      "draft": "Awaiting confirmation",
+      "confirmed": "Confirmed",
+      "paid": "Paid",
+      "disputed": "Dispute sent"
+    },
+    "sections": {
+      "subscriptions": "% from subscriptions",
+      "substitutions": "Substitutions",
+      "methodical": "Methodical meetings",
+      "individual": "Individual lessons",
+      "olympiad": "Olympiad lessons",
+      "admin3pct": "3% — Admin duties",
+      "bonuses": "Bonuses",
+      "trialLessons": "Trial lessons"
+    },
+    "admin": {
+      "evaluated": "Evaluated",
+      "by": "by",
+      "allDone": "All duties fulfilled",
+      "hasIssues": "Has issues from QA Dept",
+      "duty": "Duty",
+      "score": "Score",
+      "comment": "QA Comment",
+      "basis": "Basis"
+    },
+    "trials": {
+      "attended": "Attended",
+      "won": "Won",
+      "rate": "Rate",
+      "threshold": "Threshold 51%",
+      "paid": "Paid",
+      "notPaid": "Not paid",
+      "qaConfirmed": "Confirmed by QA Dept"
+    },
+    "table": {
+      "group": "Group",
+      "dayTime": "Day/Time",
+      "kids": "Students",
+      "base": "Base",
+      "salary": "Amount",
+      "student": "Student",
+      "abonament": "Subscription",
+      "discounts": "Discounts",
+      "lessons": "Lessons",
+      "status": "Status",
+      "details": "Details",
+      "subtotal": "Group subtotal"
+    },
+    "actions": {
+      "confirm": "Confirm salary",
+      "dispute": "Have remarks",
+      "sendToAccounting": "Send to accounting",
+      "cancel": "Cancel",
+      "disputePlaceholder": "Describe what exactly is wrong...",
+      "disputeLabel": "Describe remarks:"
+    },
+    "history": "Previous months",
+    "generatedAt": "Calculation generated"
   }
 }

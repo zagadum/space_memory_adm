@@ -76,7 +76,10 @@ export const useProjectsStore = defineStore('projects', {
                     fixedPrice: 350
                 }
             }
-        ] as Project[]
+        ] as Project[],
+        currentProject: null as Project | null,
+        isLoading: false,
+        error: null as string | null
     }),
     getters: {
         activeProjects: (state) => state.projects.filter(p => p.status === 'active'),
@@ -91,6 +94,27 @@ export const useProjectsStore = defineStore('projects', {
                 ...project,
                 id
             } as Project);
+        },
+        async fetchProject(id: string | number) {
+            this.isLoading = true;
+            this.error = null;
+
+            try {
+                // Имитация задержки API
+                await new Promise(resolve => setTimeout(resolve, 800));
+
+                const project = this.projects.find(p => p.id === id.toString());
+
+                if (project) {
+                    this.currentProject = { ...project };
+                } else {
+                    this.error = 'Project not found';
+                }
+            } catch (err: any) {
+                this.error = err.message || 'Failed to fetch project';
+            } finally {
+                this.isLoading = false;
+            }
         }
     }
 });

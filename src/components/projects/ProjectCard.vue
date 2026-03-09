@@ -1,5 +1,5 @@
 <template>
-  <div class="proj-card" @click="$emit('click')">
+  <div class="proj-card" @click="goToDetail">
     <div class="pc-stripe" :style="{ background: colorGradient }"></div>
     <div class="pc-body">
       <div class="pc-head">
@@ -51,7 +51,7 @@
 
       <div class="pc-actions">
         <button class="btn btn-ghost btn-sm" @click.stop="$emit('edit', project)">✏ {{ t('common.edit') || 'Edytuj' }}</button>
-        <button class="btn btn-sec btn-sm">📄 {{ t('finance.invoices') || 'Faktury' }}</button>
+        <button class="btn btn-sec btn-sm" @click.stop="goToDetail">📂 {{ t('common.view') || 'Szczegóły' }}</button>
       </div>
     </div>
   </div>
@@ -59,6 +59,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import type { Project } from '../../types/projects';
 
@@ -66,9 +67,15 @@ const props = defineProps<{
   project: Project;
 }>();
 
-defineEmits(['click', 'edit']);
+const emit = defineEmits(['click', 'edit']);
 
 const { t } = useI18n();
+const router = useRouter();
+
+const goToDetail = () => {
+  router.push(`/projects/${props.project.id}`);
+  emit('click', props.project);
+};
 
 const colorMap: Record<string, string> = {
   blue: '#4f6ef7',

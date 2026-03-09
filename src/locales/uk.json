@@ -18,7 +18,8 @@
     "salesDept": "Відділ продажу",
     "leads": "Канбан-дошка",
     "projects": "Проєкти та Продукти",
-    "allProjects": "Всі проєкти"
+    "allProjects": "Всі проєкти",
+    "salaryDemo": "Зарплата вчителя (Демо)"
   },
   "app": {
     "title": "GLS · Платежі",
@@ -1088,5 +1089,94 @@
       "create": "Створити проєкт",
       "createSuccess": "Проєкт успішно створено"
     }
+  },
+  "projectDetail": {
+    "title": "Деталі проєкту",
+    "back": "Назад",
+    "statusActive": "Активний",
+    "stats": {
+      "enrolledStudents": "Записано учнів",
+      "invoicesIssued": "Виставлено рахунків"
+    },
+    "tabs": {
+      "invoices": "Рахунки",
+      "students": "Учні",
+      "settings": "Налаштування"
+    },
+    "notFound": "Проєкт не знайдено",
+    "errorTitle": "Помилка завантаження"
+  },
+  "teacherSalary": {
+    "pageTitle": "Моя зарплата",
+    "trainer": "Тренер",
+    "month": "Місяць",
+    "downloadPdf": "Завантажити PDF",
+    "totalPayout": "РАЗОМ ДО ВИПЛАТИ",
+    "confirmed": "Підтверджено",
+    "pendingConfirmation": "Очікує підтвердження",
+    "confirm": "Підтвердити",
+    "dispute": "Оспорити",
+    "underDevelopment": "Розділ у розробці",
+    "panelSubtitle": "Кабінет тренера · GLS",
+    "period": "Період",
+    "status": {
+      "draft": "Очікує підтвердження",
+      "confirmed": "Підтверджено",
+      "paid": "Виплачено",
+      "disputed": "Надіслано зауваження"
+    },
+    "sections": {
+      "subscriptions": "% від абонементів",
+      "substitutions": "Заміни (Zastępstwa)",
+      "methodical": "Методичні зустрічі",
+      "individual": "Індивідуальні заняття",
+      "olympiad": "Олімпіадні заняття",
+      "admin3pct": "3% — Адмін. обов'язки",
+      "bonuses": "Премії",
+      "trialLessons": "Пробні уроки"
+    },
+    "admin": {
+      "evaluated": "Оцінено",
+      "by": "ким",
+      "allDone": "Всі обов'язки виконані",
+      "hasIssues": "Є зауваження від Відділу Якості",
+      "duty": "Обов'язок",
+      "score": "Оцінка ВЯ",
+      "comment": "Коментар ВЯ",
+      "basis": "Підстава"
+    },
+    "trials": {
+      "attended": "Прийшло",
+      "won": "Успішно",
+      "rate": "Ставка",
+      "threshold": "Поріг 51%",
+      "paid": "Оплачено",
+      "notPaid": "Не оплачено",
+      "qaConfirmed": "Підтверджено Відділом Якості"
+    },
+    "table": {
+      "group": "Група",
+      "dayTime": "День/час",
+      "kids": "Дітей",
+      "base": "База",
+      "salary": "Сума",
+      "student": "Учень",
+      "abonament": "Абонемент",
+      "discounts": "Знижки",
+      "lessons": "Заняття",
+      "status": "Статус",
+      "details": "Деталі",
+      "subtotal": "Разом по групі"
+    },
+    "actions": {
+      "confirm": "Підтверджую зарплату",
+      "dispute": "Маю зауваження",
+      "sendToAccounting": "Надіслати бухгалтеру",
+      "cancel": "Скасувати",
+      "disputePlaceholder": "Опишіть що саме не збігається...",
+      "disputeLabel": "Опишіть зауваження:"
+    },
+    "history": "Попередні місяці",
+    "generatedAt": "Розрахунок сформовано"
   }
 }
