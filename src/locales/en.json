@@ -20,7 +20,9 @@
     "projects": "Projects & Products",
     "allProjects": "All Projects",
     "salaryDemo": "Teacher Salary (Demo)",
-    "salaryCalculator": "Salary Calculator (Accountant)"
+    "salaryCalculator": "Salary Calculator (Accountant)",
+    "performanceMetrics": "Performance Metrics",
+    "analytics": "Analytics"
   },
   "app": {
     "title": "GLS · Payments",
@@ -1261,6 +1263,64 @@
       "month": "Month:",
       "trainer": "Trainer:",
       "status": "Status:"
+    }
+  },
+  "performanceMetrics": {
+    "title": "Interface Performance Metrics",
+    "subtitle": "Real-time analytics on interface usage and response times",
+    "period": {
+      "24h": "Last 24h",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days"
+    },
+    "kpi": {
+      "pageViews": "Total Page Views",
+      "uniqueSessions": "Unique Sessions",
+      "avgLoadTime": "Avg. Load Time",
+      "errorRate": "Error Rate"
+    },
+    "topPages": {
+      "title": "Top Pages",
+      "subtitle": "Most visited sections",
+      "colPage": "Page",
+      "colViews": "Views",
+      "colUsers": "Users",
+      "colDuration": "Avg. Time",
+      "colTrend": "Trend"
+    },
+    "activity": {
+      "title": "Hourly Activity",
+      "subtitle": "Sessions per hour (today)"
+    },
+    "responseTime": {
+      "title": "Response Times",
+      "subtitle": "Average & p95 by section",
+      "avg": "Avg"
+    },
+    "errors": {
+      "title": "Recent Errors",
+      "subtitle": "HTTP error summary"
+    },
+    "status": {
+      "good": "Good",
+      "warning": "Slow",
+      "critical": "Critical"
+    },
+    "pages": {
+      "students": "Students",
+      "dashboard": "Dashboard",
+      "leads": "Leads Board",
+      "projects": "Projects",
+      "settings": "Settings",
+      "newGroups": "New Groups"
+    },
+    "sections": {
+      "dashboard": "Dashboard",
+      "students": "Students",
+      "leads": "Leads",
+      "projects": "Projects",
+      "finance": "Finance",
+      "auth": "Authentication"
     }
   }
 }

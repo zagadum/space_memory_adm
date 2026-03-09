@@ -20,7 +20,9 @@
     "projects": "Проєкти та Продукти",
     "allProjects": "Всі проєкти",
     "salaryDemo": "Зарплата вчителя (Демо)",
-    "salaryCalculator": "Розрахунок зарплат (Бухгалтер)"
+    "salaryCalculator": "Розрахунок зарплат (Бухгалтер)",
+    "performanceMetrics": "Метрики продуктивності",
+    "analytics": "Аналітика"
   },
   "app": {
     "title": "GLS · Платежі",
@@ -1239,6 +1241,64 @@
       "month": "Місяць:",
       "trainer": "Тренер:",
       "status": "Статус:"
+    }
+  },
+  "performanceMetrics": {
+    "title": "Метрики продуктивності інтерфейсу",
+    "subtitle": "Аналітика використання інтерфейсу та часу відгуку",
+    "period": {
+      "24h": "Останні 24год",
+      "7d": "Останні 7 днів",
+      "30d": "Останні 30 днів"
+    },
+    "kpi": {
+      "pageViews": "Всього переглядів",
+      "uniqueSessions": "Унікальні сесії",
+      "avgLoadTime": "Сер. час завантаження",
+      "errorRate": "Частота помилок"
+    },
+    "topPages": {
+      "title": "Топ сторінок",
+      "subtitle": "Найвідвідуваніші розділи",
+      "colPage": "Сторінка",
+      "colViews": "Перегляди",
+      "colUsers": "Користувачі",
+      "colDuration": "Сер. час",
+      "colTrend": "Тренд"
+    },
+    "activity": {
+      "title": "Погодинна активність",
+      "subtitle": "Сесії по годинах (сьогодні)"
+    },
+    "responseTime": {
+      "title": "Час відгуку",
+      "subtitle": "Середнє та p95 за розділами",
+      "avg": "Сер."
+    },
+    "errors": {
+      "title": "Останні помилки",
+      "subtitle": "Зведення HTTP-помилок"
+    },
+    "status": {
+      "good": "Добре",
+      "warning": "Повільно",
+      "critical": "Критично"
+    },
+    "pages": {
+      "students": "Учні",
+      "dashboard": "Дашборд",
+      "leads": "Канбан-дошка",
+      "projects": "Проекти",
+      "settings": "Налаштування",
+      "newGroups": "Нові групи"
+    },
+    "sections": {
+      "dashboard": "Дашборд",
+      "students": "Учні",
+      "leads": "Ліди",
+      "projects": "Проекти",
+      "finance": "Фінанси",
+      "auth": "Авторизація"
     }
   }
 }
