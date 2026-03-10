@@ -423,6 +423,38 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true, note });
   }
 
+  if (method === "patch" && /^student\/notes\/[^/]+$/.test(url)) {
+    const noteId = url.split("/").pop();
+    const body = readBody(config) || {};
+    const idx = notes.findIndex((item) => String(item.id) === String(noteId));
+    if (idx === -1) return err(config, 404, "Note not found");
+
+    const oldNote = notes[idx];
+    const nextType = body.type ?? oldNote.type ?? "note";
+    const nextDirection = body.direction ?? oldNote.title ?? "";
+
+    const updatedNote = {
+      ...oldNote,
+      type: nextType,
+      status: body.status ?? oldNote.status ?? "open",
+      category: body.category ?? oldNote.category ?? "general",
+      title: nextDirection || oldNote.title || "",
+      text: body.text ?? oldNote.text,
+      tags: Array.isArray(body.tags) ? body.tags : oldNote.tags ?? [],
+    };
+
+    notes[idx] = updatedNote;
+    return ok(config, { ok: true, note: updatedNote });
+  }
+
+  if (method === "delete" && /^student\/notes\/[^/]+$/.test(url)) {
+    const noteId = url.split("/").pop();
+    const idx = notes.findIndex((item) => String(item.id) === String(noteId));
+    if (idx === -1) return err(config, 404, "Note not found");
+    notes.splice(idx, 1);
+    return ok(config, { ok: true });
+  }
+
   // --- NEW GROUPS ---
   const ng: any[] = (globalThis as any).__mock_new_groups ?? ((globalThis as any).__mock_new_groups = JSON.parse(JSON.stringify(mockNewGroups)));
   const ngStudents: any = (globalThis as any).__mock_ng_students ?? ((globalThis as any).__mock_ng_students = JSON.parse(JSON.stringify(mockGroupStudents)));

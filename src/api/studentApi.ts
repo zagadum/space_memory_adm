@@ -139,3 +139,25 @@ export async function createStudentNote(payload: {
   const res = await http.post("student/notes", payload);
   return res.data as { ok: true; note: any };
 }
+
+export async function updateStudentNote(
+  noteId: string,
+  payload: {
+    studentId?: string;
+    type?: string;
+    direction?: string;
+    category?: string;
+    status?: string;
+    tags?: string[];
+    text?: string;
+  }
+) {
+  const res = await http.patch(`student/notes/${noteId}`, payload);
+  return res.data as { ok: true; note: any };
+}
+
+export async function deleteStudentNote(noteId: string) {
+  const res = await http.delete(`student/notes/${noteId}`);
+  return res.data as { ok: true };
+}
+
