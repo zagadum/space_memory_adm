@@ -1,7 +1,7 @@
 <template>
   <!-- Programs accordion -->
   <div
-    v-for="(prog, idx) in payments.programs"
+    v-for="(prog) in payments.programs"
     :key="prog.id"
     class="prog"
     :class="{ open: prog.id === openProg }"
@@ -173,8 +173,8 @@
           :month="payments.currentMonth(prog.id)"
         />
 
-      </div><!-- /prog-inner, end calendar template -->
         </template><!-- /v-else calendar loaded -->
+      </div><!-- /prog-inner -->
 
       <!-- Actions & Transactions will be added in next steps -->
       <PaymentActions
@@ -614,7 +614,7 @@ function txsFor(p: Program) {
   border-top: 1px solid rgba(251,191,36,.5);
   font-size: 7px;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--amber);
   text-align: center;
   padding: 2px 0;
   letter-spacing: .04em;
@@ -639,7 +639,7 @@ function txsFor(p: Program) {
 .ms-pause .mc-name { color: var(--amber); }
 
 .ms-summer          { border-color: rgba(251,191,36,.2); background: rgba(251,191,36,.05); }
-.ms-summer .mc-name { color: var(--gold); }
+.ms-summer .mc-name { color: var(--amber); }
 
 .ms-partial          { border-color: rgba(6,182,212,.3); background: linear-gradient(135deg, rgba(16,185,129,.1) 50%, rgba(245,158,11,.1) 50%); }
 .ms-partial .mc-name { color: var(--cyan); }
