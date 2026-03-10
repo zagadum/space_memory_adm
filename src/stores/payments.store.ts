@@ -171,6 +171,7 @@ export const usePaymentsStore = defineStore("payments", {
      * Эндпоинт: GET /students/{student_id}/projects
      */
     async loadProjects(studentId: string) {
+        console.log('loadProjects=>', studentId);
       this.projectsLoading = true;
       this.projectsError = "";
       this.currentStudentId = studentId;

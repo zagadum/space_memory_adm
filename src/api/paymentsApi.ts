@@ -34,14 +34,23 @@ export interface ProjectTransactionsResponse {
   items: Transaction[];
 }
 
+type MaybeWrapped<T> = T | { data: T };
+
+function unwrapApiData<T>(payload: MaybeWrapped<T>): T {
+  if (payload && typeof payload === "object" && "data" in payload) {
+    return (payload as { data: T }).data;
+  }
+  return payload as T;
+}
+
 // ─── API ──────────────────────────────────────────────────────────────────────
 
 export const paymentsApi = {
 
   // ── Старый монолитный запрос (оставляем для обратной совместимости) ─────────
   async getStudentPayments(studentId: string) {
-    const { data } = await http.get<StudentPaymentsResponse>(`payments/student/${studentId}`);
-    return data;
+    const { data } = await http.get<MaybeWrapped<StudentPaymentsResponse>>(`payments/student/${studentId}`);
+    return unwrapApiData(data);
   },
 
   // ── НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ ───────────────────────────────────────────────────
@@ -52,10 +61,10 @@ export const paymentsApi = {
    *    GET /students/{student_id}/projects
    */
   async getStudentProjects(studentId: string): Promise<ProjectSummary[]> {
-    const { data } = await http.get<{ items: ProjectSummary[] }>(
+    const { data } = await http.get<MaybeWrapped<{ items: ProjectSummary[] }>>(
       `students/${studentId}/projects`
     );
-    return data.items;
+    return unwrapApiData(data).items;
   },
 
   /**
@@ -66,10 +75,10 @@ export const paymentsApi = {
     studentId: string,
     projectId: string
   ): Promise<ProjectCalendarResponse> {
-    const { data } = await http.get<ProjectCalendarResponse>(
+    const { data } = await http.get<MaybeWrapped<ProjectCalendarResponse>>(
       `students/${studentId}/projects/${projectId}/calendar`
     );
-    return data;
+    return unwrapApiData(data);
   },
 
   /**
@@ -80,75 +89,75 @@ export const paymentsApi = {
     studentId: string,
     projectId: string
   ): Promise<ProjectTransactionsResponse> {
-    const { data } = await http.get<ProjectTransactionsResponse>(
+    const { data } = await http.get<MaybeWrapped<ProjectTransactionsResponse>>(
       `students/${studentId}/projects/${projectId}/transactions`
     );
-    return data;
+    return unwrapApiData(data);
   },
 
   // ── Старые методы (для совместимости) ────────────────────────────────────────
   async getTransactions(programId: string) {
-    const { data } = await http.get<{ items: Transaction[] }>("payments/transactions", { params: { programId } });
-    return data.items;
+    const { data } = await http.get<MaybeWrapped<{ items: Transaction[] }>>("payments/transactions", { params: { programId } });
+    return unwrapApiData(data).items;
   },
 
   async getKsefInvoices(programId: string) {
-    const { data } = await http.get<{ items: KsefInvoice[] }>("payments/ksef-invoices", { params: { programId } });
-    return data.items;
+    const { data } = await http.get<MaybeWrapped<{ items: KsefInvoice[] }>>("payments/ksef-invoices", { params: { programId } });
+    return unwrapApiData(data).items;
   },
 
   async submitRefund(payload: { fvnum: string; amount?: number; reason?: string; type?: string; description?: string; method?: string; iban?: string }) {
-    const { data } = await http.post<{ id: string; status: string; createdAt: string }>("payments/refund", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ id: string; status: string; createdAt: string }>>("payments/refund", payload);
+    return unwrapApiData(data);
   },
 
   async editInvoice(payload: { programId: string; monthIndex?: number; year?: string; fvnum: string; ksef?: string; issueDate?: string; payDate?: string; amount?: number; serviceName?: string; buyerName?: string; buyerAddress?: string; buyerNip?: string }) {
-    const { data } = await http.post<{ ok: boolean; fvnum: string }>("payments/invoice", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean; fvnum: string }>>("payments/invoice", payload);
+    return unwrapApiData(data);
   },
 
   async submitCorrection(payload: { programId: string; monthIndex?: number; year?: string; amount: number; note?: string; corrDate?: string }) {
-    const { data } = await http.post<{ ok: boolean; correctionId: string }>("payments/correction", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean; correctionId: string }>>("payments/correction", payload);
+    return unwrapApiData(data);
   },
 
   async changeTariff(payload: { programId: string; value: number; fromMonthIndex: number }) {
-    const { data } = await http.post("payments/tariff", payload);
-    return data as { ok: boolean; programId: string; value: number };
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean; programId: string; value: number }>>("payments/tariff", payload);
+    return unwrapApiData(data);
   },
 
   async setPause(payload: { programId: string; from: string; to: string; reason?: string; comment?: string }) {
-    const { data } = await http.post<{ ok: boolean }>("payments/pause", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/pause", payload);
+    return unwrapApiData(data);
   },
 
   async setDiscount(payload: { programId: string; kind: string; value: number; fromMonthIndex: number }) {
-    const { data } = await http.post<{ ok: boolean }>("payments/discount", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/discount", payload);
+    return unwrapApiData(data);
   },
 
   async addExtra(payload: { programId: string; date: string; title: string; amount: number }) {
-    const { data } = await http.post<{ ok: boolean; extraId: string }>("payments/extra", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean; extraId: string }>>("payments/extra", payload);
+    return unwrapApiData(data);
   },
 
   async unlock(payload: { programId: string }) {
-    const { data } = await http.post<{ ok: boolean }>("payments/unlock", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/unlock", payload);
+    return unwrapApiData(data);
   },
 
   async archive(payload: { programId: string; reason?: string; endDate?: string; comment?: string }) {
-    const { data } = await http.post<{ ok: boolean }>("payments/archive", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/archive", payload);
+    return unwrapApiData(data);
   },
 
   async split(payload: { programId: string; fromGroup: string; toGroup: string; effectiveDate: string }) {
-    const { data } = await http.post<{ ok: boolean }>("payments/split", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/split", payload);
+    return unwrapApiData(data);
   },
 
   async resume(payload: { programId: string }) {
-    const { data } = await http.post<{ ok: boolean }>("payments/resume", payload);
-    return data;
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/resume", payload);
+    return unwrapApiData(data);
   },
 };
