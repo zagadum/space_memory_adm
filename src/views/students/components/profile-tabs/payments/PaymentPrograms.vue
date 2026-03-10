@@ -173,8 +173,8 @@
           :month="payments.currentMonth(prog.id)"
         />
 
-      </div><!-- /prog-inner, end calendar template -->
         </template><!-- /v-else calendar loaded -->
+      </div><!-- /prog-inner -->
 
       <!-- Actions & Transactions will be added in next steps -->
       <PaymentActions
