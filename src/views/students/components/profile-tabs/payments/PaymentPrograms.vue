@@ -37,6 +37,23 @@
     <div class="prog-body" v-show="prog.id === openProg">
       <div class="prog-inner">
 
+        <!-- Скелетон пока грузится календарь -->
+        <div v-if="payments.calendarLoading[prog.id]" class="calendar-skeleton">
+          <div class="skel-bar"></div>
+          <div class="skel-grid">
+            <div v-for="n in 12" :key="n" class="skel-cell"></div>
+          </div>
+        </div>
+
+        <!-- Ошибка загрузки календаря -->
+        <div v-else-if="payments.calendarError[prog.id]" class="calendar-error">
+          ⚠️ {{ payments.calendarError[prog.id] }}
+          <button class="retry-btn-sm" @click="payments.loadCalendar(prog.id)">
+            🔄 {{ t('common.retry') }}
+          </button>
+        </div>
+
+        <template v-else>
         <!-- year toggle + view toggle -->
         <div class="year-row">
           <span class="yr-label">{{ t("payments.year") }}</span>
@@ -156,7 +173,8 @@
           :month="payments.currentMonth(prog.id)"
         />
 
-      </div><!-- /prog-inner -->
+      </div><!-- /prog-inner, end calendar template -->
+        </template><!-- /v-else calendar loaded -->
 
       <!-- Actions & Transactions will be added in next steps -->
       <PaymentActions
@@ -290,7 +308,13 @@ const totalExtrasPaid = computed(() => {
 
 // ── helpers ──
 function toggleProg(id: string) {
+  const isOpening = openProg.value !== id;
   openProg.value = openProg.value === id ? "" : id;
+
+  // При открытии проекта — загружаем календарь (если ещё не загружен)
+  if (isOpening) {
+    payments.loadCalendar(id);
+  }
 }
 function balColor(b: number): string {
   return b > 0 ? "var(--green)" : b < 0 ? "var(--red)" : "var(--white)";
@@ -349,6 +373,39 @@ function txsFor(p: Program) {
 
 <!-- ══════════════════════════════════════════════════════════ -->
 <style scoped>
+/* ── CALENDAR SKELETON ── */
+.calendar-skeleton { padding: 16px 0; }
+.skel-bar {
+  height: 28px; width: 200px; border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06) 25%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.06) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+  margin-bottom: 12px;
+}
+.skel-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.skel-cell {
+  height: 52px; border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06) 25%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.06) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skel-cell:nth-child(odd) { animation-delay: .1s; }
+@keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+/* ── CALENDAR ERROR ── */
+.calendar-error {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 8px;
+  background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25);
+  font-size: 13px; color: rgba(255,255,255,.7);
+}
+.retry-btn-sm {
+  background: rgba(239,68,68,.2); border: 1px solid rgba(239,68,68,.4);
+  color: #fff; border-radius: 6px; padding: 4px 10px;
+  font-size: 12px; cursor: pointer;
+}
+.retry-btn-sm:hover { background: rgba(239,68,68,.35); }
+
 /* ── PROGRAM CARD ── */
 .prog {
   border: 1px solid var(--b);

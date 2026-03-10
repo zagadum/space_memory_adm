@@ -85,6 +85,9 @@ const getStatusIcon = (status: string) => {
           </div>
         </div>
         <div class="header-right">
+          <button class="export-btn" @click="salaryStore.exportToExcel(t)">
+            📥 {{ t('salaryCalc.labels.exportExcel') }}
+          </button>
           <div class="role-badge">
             <div class="role-dot"></div>
             <span>{{ t('teacherSalary.trainer') }}</span>
@@ -464,6 +467,25 @@ const getStatusIcon = (status: string) => {
 .page-title p { font-size: 11px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; margin-top: 2px; }
 
 .role-badge { display: flex; align-items: center; gap: 8px; background: var(--status-info-bg); border: 1px solid var(--app-border); padding: 7px 16px; border-radius: 20px; font-size: 12.5px; font-weight: 700; color: var(--blue); }
+
+.export-btn {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text-main);
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.export-btn:hover {
+  border-color: var(--blue);
+  background: var(--status-info-bg);
+}
 .role-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); box-shadow: 0 0 8px var(--blue); animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
 

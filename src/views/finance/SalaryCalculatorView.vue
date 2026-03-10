@@ -29,10 +29,6 @@ function toggleGroup(id: string) {
   openGroups.value[id] = !openGroups.value[id]
 }
 
-function expandAllGroups() {
-  // Logic to expand all groups in the list if needed
-}
-
 function collapseAllGroups() {
   openGroups.value = {}
 }
@@ -445,7 +441,7 @@ const onMonthChange = (e: Event) => {
               </div>
             </div>
             <div class="final-actions">
-              <UiButton variant="primary" @click="store.exportToExcel()">
+            <UiButton variant="primary" @click="store.doExport(t)">
                 📥 {{ t('salaryCalc.labels.exportExcel') }}
               </UiButton>
             </div>

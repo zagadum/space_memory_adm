@@ -38,10 +38,18 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         olympiad: 160.00,
         travel: 0,
         adminDuty: 660.93,
-        trialLessons: 35.00,
         rezygnacje: 0,
         extraBonus: 215.00, // Dojazd + Premie
         penalties: 0,
+
+        // Trial lessons — rows for proper conversion threshold calculation
+        // Each row: attended = total students, won = converted to paid subscribers
+        // Salary = 35 zł only if won/attended >= 51% (per business spec)
+        trialRows: [
+            { attended: 6, won: 4 },  // 66.7% → qualifies → 35 zł
+            { attended: 8, won: 3 },  // 37.5% → does NOT qualify → 0 zł
+            { attended: 5, won: 3 },  // 60.0% → qualifies → 35 zł
+        ] as Array<{ attended: number; won: number }>,
 
         // Details for Sections
         activeKids: 58,
@@ -54,10 +62,18 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     })
 
     // Calculations
+    // Trial lessons: 35 zł per lesson only if conversion rate (won/attended) >= 51%
+    const trialLessonsAmount = computed(() => {
+        return salaryData.value.trialRows.reduce((sum, row) => {
+            const conversion = row.won / row.attended;
+            return sum + (conversion >= 0.51 ? 35 : 0);
+        }, 0);
+    })
+
     const subtotalBeforeBonus = computed(() => {
         const d = salaryData.value
         return d.subscriptions + d.substitutions + d.methodical + d.individual +
-            d.olympiad + d.travel + d.adminDuty + d.trialLessons + d.extraBonus
+            d.olympiad + d.travel + d.adminDuty + trialLessonsAmount.value + d.extraBonus
     })
 
     const rezygnacjeBonusAmount = computed(() => {
@@ -80,17 +96,53 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         isLoading.value = true
         error.value = null
         try {
-            // Simulate API call
+            // TODO: replace mock below with real API call when backend is ready:
+            // const data = await salaryApi.getTrainerData(id, month);
+            // salaryData.value = mapApiResponseToSalaryData(data);
             await new Promise(resolve => setTimeout(resolve, 600))
             selectedTeacherId.value = id
             selectedMonth.value = month
 
-            // Update mock data based on teacher
+            // Update mock data based on teacher — full replacement to avoid data mixing
             if (id === 'marek') {
-                salaryData.value.subscriptions = 2100.50
-                salaryData.value.rezygnacje = 2
-                salaryData.value.adminDuty = 500
-                salaryData.value.travel = 100
+                salaryData.value = {
+                    subscriptions: 2100.50,
+                    substitutions: 80.00,
+                    methodical: 62.80,
+                    individual: 0,
+                    olympiad: 0,
+                    travel: 100,
+                    adminDuty: 500,
+                    rezygnacje: 2, // has rezygnacje → no retention bonus
+                    extraBonus: 0,
+                    penalties: 0,
+                    trialRows: [
+                        { attended: 5, won: 2 }, // 40% → does NOT qualify
+                        { attended: 4, won: 1 }, // 25% → does NOT qualify
+                    ],
+                    activeKids: 42,
+                    graduationPct: 11,
+                    rezygnacjeBonusPct: 1,
+                }
+            } else if (id === 'jan') {
+                salaryData.value = {
+                    subscriptions: 1850.00,
+                    substitutions: 0,
+                    methodical: 62.80,
+                    individual: 120.00,
+                    olympiad: 80.00,
+                    travel: 0,
+                    adminDuty: 420.00,
+                    rezygnacje: 0,
+                    extraBonus: 100.00,
+                    penalties: 0,
+                    trialRows: [
+                        { attended: 6, won: 4 }, // 66.7% → qualifies → 35 zł
+                    ],
+                    activeKids: 35,
+                    graduationPct: 11,
+                    rezygnacjeBonusPct: 1,
+                }
             } else {
                 // Reset to Anna defaults
                 salaryData.value = {
@@ -101,13 +153,17 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
                     olympiad: 160.00,
                     travel: 0,
                     adminDuty: 660.93,
-                    trialLessons: 35.00,
                     rezygnacje: 0,
                     extraBonus: 215.00,
                     penalties: 0,
+                    trialRows: [
+                        { attended: 6, won: 4 },
+                        { attended: 8, won: 3 },
+                        { attended: 5, won: 3 },
+                    ],
                     activeKids: 58,
                     graduationPct: 11,
-                    rezygnacjeBonusPct: 1
+                    rezygnacjeBonusPct: 1,
                 }
             }
         } catch (e: any) {
@@ -120,10 +176,105 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     function updateStatus(newStatus: 'draft' | 'confirmed' | 'paid') {
         status.value = newStatus
     }
+    function doExport(t: any) {
+        const rows: any[] = []
+        const d = salaryData.value
 
-    function exportToExcel() {
-        console.log('Exporting to Excel...')
-        // Mock notification or real logic if needed
+        // Mapping logic with translations
+        rows.push({
+            category: t('salaryCalc.components.subscriptions'),
+            description: `${t('salaryCalc.labels.activeKids')}: ${d.activeKids}, ${t('salaryCalc.labels.graduation')}: ${d.graduationPct}%`,
+            rateQty: `${d.graduationPct}%`,
+            amount: d.subscriptions
+        })
+
+        if (d.substitutions > 0) {
+            rows.push({
+                category: t('salaryCalc.components.substitutions'),
+                description: '',
+                rateQty: '-',
+                amount: d.substitutions
+            })
+        }
+
+        if (d.methodical > 0) {
+            rows.push({
+                category: t('salaryCalc.components.methodical'),
+                description: '',
+                rateQty: '-',
+                amount: d.methodical
+            })
+        }
+
+        if (d.individual > 0) {
+            rows.push({
+                category: t('salaryCalc.components.individual'),
+                description: '',
+                rateQty: '-',
+                amount: d.individual
+            })
+        }
+
+        if (d.olympiad > 0) {
+            rows.push({
+                category: t('salaryCalc.components.olympiad'),
+                description: '',
+                rateQty: '-',
+                amount: d.olympiad
+            })
+        }
+
+        if (d.adminDuty > 0) {
+            rows.push({
+                category: t('salaryCalc.components.adminDuty'),
+                description: '',
+                rateQty: '3%',
+                amount: d.adminDuty
+            })
+        }
+
+        if (trialLessonsAmount.value > 0) {
+            rows.push({
+                category: t('salaryCalc.components.trial'),
+                description: '',
+                rateQty: '-',
+                amount: trialLessonsAmount.value
+            })
+        }
+
+        if (rezygnacjeBonusAmount.value > 0) {
+            rows.push({
+                category: t('salaryCalc.components.retention'),
+                description: '',
+                rateQty: '+1%',
+                amount: rezygnacjeBonusAmount.value
+            })
+        }
+
+        if (d.extraBonus > 0) {
+            rows.push({
+                category: t('salaryCalc.components.extra'),
+                description: '',
+                rateQty: '-',
+                amount: d.extraBonus
+            })
+        }
+
+        if (d.penalties > 0) {
+            rows.push({
+                category: t('salaryCalc.components.penalties') || 'Penalties',
+                description: '',
+                rateQty: '-',
+                amount: -d.penalties
+            })
+        }
+
+        const dateStr = new Date().toISOString().split('T')[0]
+        const fileName = `Salary_Export_${selectedTeacher.value.name}_${selectedMonth.value}_${dateStr}.xlsx`
+
+        import('../utils/excelExport').then(({ exportSalaryToExcel }) => {
+            exportSalaryToExcel(fileName, rows, totalPayout.value, t)
+        })
     }
 
     return {
@@ -135,11 +286,12 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         selectedMonth,
         salaryData,
         selectedTeacher,
+        trialLessonsAmount,
         subtotalBeforeBonus,
         rezygnacjeBonusAmount,
         totalPayout,
         fetchTrainerData,
         updateStatus,
-        exportToExcel
+        doExport
     }
 })

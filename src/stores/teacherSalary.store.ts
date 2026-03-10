@@ -26,7 +26,6 @@ export interface SalaryData {
     trainerName: string;
     status: 'draft' | 'confirmed' | 'paid';
     confirmedAt: string | null;
-    total: number;
 
     subscriptions: {
         amount: number;
@@ -139,7 +138,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             trainerName: 'Anna Kowalska',
             status: 'draft',
             confirmedAt: null,
-            total: 4674.87,
 
             subscriptions: {
                 amount: 2847.64,
@@ -325,6 +323,8 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             this.isLoading = true;
             this.error = null;
             try {
+                // TODO: replace mock below with real API call when backend is ready:
+                // this.salaryData = await salaryApi.getSalary(month);
                 await new Promise(resolve => setTimeout(resolve, 800));
                 if (this.salaryData) {
                     this.salaryData.month = month;
@@ -351,6 +351,63 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
         async disputeSalary(reason: string) {
             console.log('Salary disputed with reason:', reason);
             // API call would go here
+        },
+
+        async exportToExcel(t: any) {
+            if (!this.salaryData) return;
+            const rows: any[] = [];
+            const d = this.salaryData;
+
+            // Simplified mapping for the teacher view based on their sections
+            const activeSections = [
+                { id: 'subscriptions', amount: d.subscriptions.amount },
+                { id: 'substitutions', amount: d.substitutions.amount },
+                { id: 'methodical', amount: d.methodical.amount },
+                { id: 'individual', amount: d.individual.amount },
+                { id: 'olympiad', amount: d.olympiad.amount },
+                { id: 'bonuses', amount: d.bonuses.amount },
+                { id: 'admin3pct', amount: d.admin3pct.amount }
+            ].filter(s => s.amount > 0);
+
+            activeSections.forEach(sec => {
+                rows.push({
+                    category: t(`teacherSalary.sections.${sec.id}`),
+                    description: '',
+                    rateQty: '-',
+                    amount: sec.amount
+                });
+            });
+
+            // Retention Bonus (+1%)
+            if (d.rezygnacje.length === 0) {
+                const bonus = d.subscriptions.base * 0.01;
+                rows.push({
+                    category: t('teacherSalary.sections.retentionBonus') || 'Bonus (Retention)',
+                    description: '0 rezygnacji (+1%)',
+                    rateQty: '+1%',
+                    amount: bonus
+                });
+            }
+
+            const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
+                const conversion = row.won / row.attended;
+                return sum + (conversion >= 0.51 ? 35 : 0);
+            }, 0);
+
+            if (trialAmount > 0) {
+                rows.push({
+                    category: t('teacherSalary.sections.trialLessons'),
+                    description: '',
+                    rateQty: '-',
+                    amount: trialAmount
+                });
+            }
+
+            const dateStr = new Date().toISOString().split('T')[0];
+            const fileName = `Salary_Export_${d.trainerName}_${d.month}_${dateStr}.xlsx`;
+
+            const { exportSalaryToExcel } = await import('../utils/excelExport');
+            exportSalaryToExcel(fileName, rows, this.totalPayout, t);
         }
     }
 });
