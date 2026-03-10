@@ -94,9 +94,9 @@
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'returns' }" 
-          @click="setActive('returns')"
+          @click="navigateTo('returns', '/finance/returns')"
         >
-          <span class="nav-icon">🔙</span> {{ t('sidebar.returns') }}
+          <span class="nav-icon">↩️</span> {{ t('sidebar.returns') }}
           <span class="nav-badge cyan">2</span>
         </div>
         <div 
@@ -143,7 +143,7 @@
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'new-students' }" 
-          @click="setActive('new-students')"
+          @click="navigateTo('new-students', '/recruitment/new-students')"
         >
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
           <span class="nav-badge green">8</span>
@@ -254,6 +254,9 @@ watch(() => route.path, (path) => {
   } else if (path.startsWith('/recruitment/new-groups')) {
     activeItem.value = 'new-groups'
     openSections.value.recruitment = true
+  } else if (path.startsWith('/finance/returns')) {
+    activeItem.value = 'returns'
+    openSections.value.finance = true
   } else if (path.startsWith('/projects')) {
     activeItem.value = 'projects'
     openSections.value.finance = true
