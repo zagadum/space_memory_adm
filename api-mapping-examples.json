@@ -1,0 +1,288 @@
+{
+  "description": "Примеры данных API для сравнения с MockDB",
+  "version": "1.0",
+  "lastUpdate": "2026-03-07",
+
+  "realApiResponse": {
+    "endpoint": "/api/v1/payments/student/40",
+    "response": {
+      "success": true,
+      "message": "OK",
+      "data": {
+        "student": {
+          "id": "40",
+          "initials": "33",
+          "name": "33 333",
+          "firstName": "333",
+          "lastName": "33",
+          "email": "olesia.les444s@gmail.com",
+          "birthDate": "2019-12-13",
+          "age": -6.231670365820586,
+          "phone": "",
+          "parentName": "4444 444",
+          "parentFirstName": "444",
+          "parentLastName": "4444",
+          "parentPhone": "050 444 4444",
+          "country": "UA",
+          "city": "",
+          "street": "",
+          "apartment": "",
+          "postalCode": "",
+          "parentRole": "родитель",
+          "parentPassport": "",
+          "status": "active",
+          "statusColor": "green",
+          "photoConsent": false,
+          "regComment": "",
+          "totalBalance": {
+            "value": "0.00",
+            "label": "active",
+            "color": "green"
+          },
+          "nextPay": {
+            "date": "",
+            "approx": ""
+          },
+          "enrollments": []
+        },
+        "programs": [{
+          "id": "prog_40",
+          "name": "📚 Основная программа",
+          "sub": "Группа1 · Пн 13:00 · Опять Тест · 1000 грн/мес · без скидки",
+          "tariff": 1000,
+          "balance": 0,
+          "balanceLabel": "active",
+          "barGradient": "linear-gradient(180deg, #10b981, #059669)",
+          "years": {
+            "2021": [
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "future", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+              { "s": "pending", "payStatus": "pending", "a": 1000, "ksef": null, "g1": 4, "g2": 0, "txDate": "2021-12-09" }
+            ]
+          },
+          "transactions": [],
+          "extras": []
+        }]
+      }
+    },
+    "note": "NEW v1.4: Программы теперь имеют иконки, градиенты и подробное описание с группой, учителем и расписанием!"
+  },
+
+  "mockDbExample": {
+    "source": "src/api/mockDb.ts",
+    "data": {
+      "profile": {
+        "id": "s_1",
+        "initials": "ИИ",
+        "name": "Иван Иванов",
+        "firstName": "Иван",
+        "lastName": "Иванов",
+        "email": "ivan.ivanov@gmail.com",
+        "birthDate": "2012-05-15",
+        "country": "Польша",
+        "city": "Варшава",
+        "street": "Aleje Jerozolimskie 100",
+        "apartment": "12",
+        "postalCode": "00-001",
+        "age": 12,
+        "parentName": "Марина Иванова",
+        "parentFirstName": "Марина",
+        "parentLastName": "Иванова",
+        "parentPhone": "+48 777 000 222",
+        "parentRole": "мама",
+        "parentPassport": "AB 1234567",
+        "phone": "+48 777 000 111",
+        "status": "Активна",
+        "statusColor": "var(--green)",
+        "photoConsent": true,
+        "regComment": "Хочет заниматься по выходным",
+        "totalBalance": {
+          "value": "+220 zł",
+          "label": "переплата",
+          "color": "var(--green)"
+        },
+        "nextPay": {
+          "date": "01.03.2026",
+          "approx": "~837 зл · с учётом скидок"
+        },
+        "enrollments": [
+          {
+            "school": "Space Memory",
+            "group": "Вт 17 Младшая",
+            "teacher": "Клара Левит",
+            "lessons": []
+          }
+        ]
+      },
+      "programs": [{
+        "id": "space",
+        "name": "🌌 Space Memory",
+        "sub": "Вт 17 Младшая · Вт 17:00 · Клара Левит · 490 зл/мес · 👦 1-й ребёнок · без скидки",
+        "tariff": 490,
+        "balance": 120,
+        "balanceLabel": "переплата",
+        "barGradient": "linear-gradient(180deg,var(--blue),var(--purple))",
+        "years": {
+          "2026": [
+            { "s": "paid", "payStatus": "paid", "a": 441, "ksef": "ok", "g1": 4, "g2": 0, "txDate": "05.01.2026", "disc": "family", "discAmt": 49, "lessons": 4, "totalLessons": 4 },
+            { "s": "paid", "payStatus": "paid", "a": 441, "ksef": "ok", "g1": 4, "g2": 0, "txDate": "08.02.2026", "disc": "family", "discAmt": 49, "lessons": 4, "totalLessons": 4 },
+            { "s": "pending", "payStatus": "pending", "a": 441, "ksef": null, "g1": 4, "g2": 0, "lessons": 2, "totalLessons": 5, "bonus": true, "bonusDate": "31.03.2026" },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "summer", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "summer", "a": 0, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 },
+            { "s": "future", "a": 441, "ksef": null, "g1": 0, "g2": 0 }
+          ]
+        },
+        "transactions": [
+          {
+            "date": "08.02.2026",
+            "title": "Абонемент февраль 2026 ✓",
+            "sub": "Space Memory · Imoje",
+            "amount": "+441 зл",
+            "paid": true,
+            "ksef": "ok",
+            "fvnum": "FV/2026/02/091"
+          }
+        ],
+        "extras": []
+      }]
+    }
+  },
+
+  "differences": {
+    "implemented": [
+      "id",
+      "initials",
+      "name",
+      "firstName",
+      "lastName",
+      "email",
+      "birthDate",
+      "age",
+      "phone",
+      "parentName",
+      "parentFirstName",
+      "parentLastName",
+      "parentPhone",
+      "country",
+      "status",
+      "statusColor",
+      "totalBalance",
+      "nextPay"
+    ],
+    "notImplemented": [
+      "city",
+      "street",
+      "apartment",
+      "postalCode",
+      "parentRole (dynamic)",
+      "parentPassport",
+      "photoConsent",
+      "regComment",
+      "enrollments",
+      "program.transactions",
+      "program.extras",
+      "month.disc",
+      "month.discAmt",
+      "month.lessons",
+      "month.totalLessons",
+      "month.bonus",
+      "month.bonusDate"
+    ],
+    "issues": [
+      {
+        "field": "age",
+        "problem": "Отрицательное значение: -6.23",
+        "reason": "Дата рождения в будущем (2019-12-13 vs 2026-03-07)",
+        "solution": "Добавить валидацию: age = max(0, now - dob)"
+      },
+      {
+        "field": "firstName/lastName",
+        "problem": "Путаница в названиях",
+        "reason": "В БД surname=фамилия, lastname=имя",
+        "solution": "Правильное сопоставление в коде"
+      },
+      {
+        "field": "totalBalance.value",
+        "problem": "Разные форматы",
+        "api": "\"0.00\"",
+        "mock": "\"+220 zł\"",
+        "solution": "Форматировать на frontend"
+      },
+      {
+        "field": "nextPay.date",
+        "problem": "Разные форматы дат",
+        "api": "\"\" или \"2026-03-01\" (ISO)",
+        "mock": "\"01.03.2026\" (DD.MM.YYYY)",
+        "solution": "Использовать ISO 8601 в API, форматировать на frontend"
+      }
+    ]
+  },
+
+  "databaseSchema": {
+    "student": {
+      "tableName": "student",
+      "primaryKey": "id",
+      "columns": {
+        "id": "integer",
+        "surname": "string (фамилия!)",
+        "lastname": "string (имя!)",
+        "email": "string",
+        "dob": "date",
+        "phone": "string",
+        "balance": "decimal",
+        "sum_aboniment": "integer",
+        "date_finish": "date",
+        "enabled": "boolean",
+        "parent1_surname": "string",
+        "parent1_lastname": "string",
+        "parent1_phone": "string",
+        "parent1_phone_country": "string"
+      }
+    },
+    "student_payment": {
+      "tableName": "student_payment",
+      "primaryKey": "id",
+      "foreignKeys": {
+        "student_id": "student.id"
+      },
+      "columns": {
+        "id": "integer",
+        "student_id": "integer",
+        "date_pay": "date",
+        "date_finish": "date",
+        "sum_aboniment": "integer",
+        "type_pay": "string",
+        "discount": "integer",
+        "enabled": "boolean (оплачен?)"
+      }
+    }
+  },
+
+  "recommendations": [
+    "Исправить отрицательный возраст в backend",
+    "Добавить поля city, street, apartment, postal_code в таблицу student",
+    "Создать таблицу student_enrollment для связи студент-группа-учитель",
+    "Реализовать систему скидок (таблица student_discount)",
+    "Добавить транзакции из student_payment",
+    "Реализовать extras (дополнительные товары/услуги)",
+    "Добавить валидацию дат на frontend и backend",
+    "Использовать единый формат дат (ISO 8601)",
+    "Добавить типизацию для статусов"
+  ]
+}
+
