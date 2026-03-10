@@ -74,7 +74,7 @@ const getStatusIcon = (status: string) => {
 </script>
 
 <template>
-  <div class="salary-container" v-if="salaryData">
+  <div class="salary-container">
     <!-- Stars Background -->
     <div class="stars-bg"></div>
 
@@ -89,7 +89,7 @@ const getStatusIcon = (status: string) => {
           </div>
         </div>
         <div class="header-right">
-          <button class="export-btn" @click="salaryStore.exportToExcel(t)">
+          <button v-if="salaryData" class="export-btn" @click="salaryStore.exportToExcel(t)">
             📥 {{ t('salaryCalc.labels.exportExcel') }}
           </button>
           <div class="role-badge">
@@ -107,13 +107,24 @@ const getStatusIcon = (status: string) => {
           <option value="2026-01">Січень 2026 / Styczeń 2026</option>
           <option value="2025-12">Грудень 2025 / Grudzień 2025</option>
         </select>
-        <span class="st-pill" :class="getStatusClass(salaryData.status)">
+        <span v-if="salaryData" class="st-pill" :class="getStatusClass(salaryData.status)">
           {{ getStatusIcon(salaryData.status) }} {{ t(`teacherSalary.status.${salaryData.status}`) }}
         </span>
       </div>
 
-      <!-- TEACHER CARD -->
-      <div class="teacher-card">
+      <div v-if="salaryStore.isLoading" class="salary-loading">
+        <div class="loading-spinner">⏳</div>
+        <div class="loading-text">Загрузка...</div>
+      </div>
+
+      <div v-else-if="salaryStore.error" class="salary-error">
+        <div class="error-icon">❌</div>
+        <div class="error-text">{{ salaryStore.error }}</div>
+      </div>
+
+      <template v-else-if="salaryData">
+        <!-- TEACHER CARD -->
+        <div class="teacher-card">
         <div class="teacher-av">АК</div>
         <div class="teacher-info">
           <div class="teacher-name">{{ salaryData.trainerName }}</div>
@@ -405,6 +416,11 @@ const getStatusIcon = (status: string) => {
       <!-- TIMESTAMP -->
       <div class="ts-bar">
         <span>{{ t('teacherSalary.generatedAt') }}: 01.03.2026 · 09:14</span>
+      </div>
+      </template>
+
+      <div v-else class="salary-loading">
+        <div class="loading-text">Выберите месяц или нет данных</div>
       </div>
 
     </div>
