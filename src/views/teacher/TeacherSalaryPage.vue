@@ -59,12 +59,14 @@ const activeSections = computed(() => salaryStore.activeSections);
 const getStatusClass = (status: string) => {
   if (status === 'confirmed') return 'st-confirmed';
   if (status === 'paid') return 'st-paid';
+  if (status === 'disputed') return 'st-draft';
   return 'st-draft';
 };
 
 const getStatusIcon = (status: string) => {
   if (status === 'confirmed') return '✓';
   if (status === 'paid') return '💰';
+  if (status === 'disputed') return '⚠️';
   return '⏳';
 };
 </script>
@@ -559,6 +561,6 @@ const getStatusIcon = (status: string) => {
 .final-amount { font-size: 36px; font-weight: 900; color: var(--app-text-main); text-shadow: 0 0 20px rgba(79,110,247,.2); line-height: 1; }
 .final-sublabel { font-size: 12px; font-weight: 700; color: var(--app-text-dim); margin-top: 8px; text-transform: uppercase; }
 
-.ts-bar { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.03); text-align: center; font-size: 10.5px; color: var(--dim2); font-family: 'Space Mono', monospace; }
+.ts-bar { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.03); text-align: center; font-size: 10.5px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
 .hint { font-size: 11.5px; color: #4b5563; margin-top: 12px; font-style: italic; }
 </style>

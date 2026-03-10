@@ -1,4 +1,8 @@
 import { defineStore } from 'pinia';
+import { salaryApi } from '../api/salaryApi';
+
+const DEFAULT_TEACHER_ID = 1;
+const DEFAULT_PROJECT_ID = 1;
 
 export interface Child {
     name: string;
@@ -24,7 +28,7 @@ export interface SalaryData {
     id: string;
     month: string;
     trainerName: string;
-    status: 'draft' | 'confirmed' | 'paid';
+    status: 'draft' | 'confirmed' | 'paid' | 'disputed';
     confirmedAt: string | null;
 
     subscriptions: {
@@ -323,12 +327,8 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             this.isLoading = true;
             this.error = null;
             try {
-                // TODO: replace mock below with real API call when backend is ready:
-                // this.salaryData = await salaryApi.getSalary(month);
-                await new Promise(resolve => setTimeout(resolve, 800));
-                if (this.salaryData) {
-                    this.salaryData.month = month;
-                }
+                const data = await salaryApi.getTeacherSalary(DEFAULT_TEACHER_ID, month, DEFAULT_PROJECT_ID);
+                this.salaryData = data;
             } catch (err: any) {
                 this.error = err.message || 'Failed to fetch salary data';
             } finally {
@@ -340,17 +340,26 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             if (!this.salaryData) return;
             this.isLoading = true;
             try {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                this.salaryData.status = 'confirmed';
-                this.salaryData.confirmedAt = new Date().toLocaleString();
+                const response = await salaryApi.confirmSalary(this.salaryData.id, DEFAULT_PROJECT_ID);
+                this.salaryData.status = response.status as 'draft' | 'confirmed' | 'paid' | 'disputed';
+                this.salaryData.confirmedAt = response.confirmedAt;
             } finally {
                 this.isLoading = false;
             }
         },
 
         async disputeSalary(reason: string) {
-            console.log('Salary disputed with reason:', reason);
-            // API call would go here
+            if (!this.salaryData) return;
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await salaryApi.disputeSalary(this.salaryData.id, DEFAULT_TEACHER_ID, reason, DEFAULT_PROJECT_ID);
+                this.salaryData.status = response.status as 'draft' | 'confirmed' | 'paid' | 'disputed';
+            } catch (err: any) {
+                this.error = err.message || 'Failed to dispute salary';
+            } finally {
+                this.isLoading = false;
+            }
         },
 
         async exportToExcel(t: any) {

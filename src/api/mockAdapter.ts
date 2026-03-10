@@ -51,18 +51,34 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   const method = (config.method || "get").toLowerCase();
 
   // --- AUTH ---
-  /*
-  if (method === "post" && url === "api/auth/sign-in") {
+  if (method === "post" && (url === "auth/sign-in" || url === "v1/auth/sign-in" || url === "api/auth/sign-in" || url === "api/v1/auth/sign-in")) {
     const body = readBody(config);
     if (!body?.email || !body?.password) return err(config, 400, "Missing credentials");
-    return ok(config, { token: "mock.jwt.token", user: mockDb.me });
+    if (body.email !== "admin@demo.local" || body.password !== "demo") {
+      return err(config, 401, "Invalid credentials");
+    }
+    return ok(config, {
+      token: "mock.jwt.token.admin",
+      user: {
+        id: "1",
+        email: "admin@demo.local",
+        name: "Demo Admin",
+        role: "admin",
+        initials: "DA",
+      },
+    });
   }
-  if (method === "get" && url === "api/auth/me") {
+  if (method === "get" && (url === "auth/me" || url === "v1/auth/me" || url === "api/auth/me" || url === "api/v1/auth/me")) {
     const auth = (config.headers as any)?.Authorization || "";
     if (!String(auth).startsWith("Bearer ")) return err(config, 401, "Unauthorized");
-    return ok(config, mockDb.me);
+    return ok(config, {
+      id: "1",
+      email: "admin@demo.local",
+      name: "Demo Admin",
+      role: "admin",
+      initials: "DA",
+    });
   }
-  */
 
   // --- PAYMENTS ---
   if (method === "get" && url.startsWith("payments/student/")) {
@@ -496,7 +512,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   // --- STUDENTS LIST ---
-  if (method === "get" && url === "student/groups-filter") {
+  if (method === "get" && (url === "students/groups-filter" || url === "student/groups-filter")) {
     return ok(config, {
       items: [
         { id: 1, name: "Вт 17 Младшая" },
@@ -507,7 +523,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  if (method === "get" && url === "student/teacher-filter") {
+  if (method === "get" && (url === "students/teacher-filter" || url === "student/teacher-filter")) {
     return ok(config, {
       items: [
         { id: 1, name: "Клара Левит" },
