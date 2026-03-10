@@ -18,13 +18,7 @@
           <span class="tx-spinner">⏳</span> {{ t('common.loading') }}
         </div>
 
-        <div
-          v-for="tx in txList"
-          v-else
-          :key="tx.id"
-          class="tx-row"
-          :class="{ 'tx-extra': tx.type === 'extra' }"
-        >
+        <div v-for="tx in txList" v-else :key="tx.id" class="tx-row" :class="{ 'tx-extra': tx.type === 'extra' }">
           <!-- date -->
           <div class="tx-date">{{ tx.date }}</div>
 

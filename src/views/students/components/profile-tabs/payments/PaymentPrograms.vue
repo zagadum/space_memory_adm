@@ -1,7 +1,7 @@
 <template>
   <!-- Programs accordion -->
   <div
-    v-for="(prog) in payments.programs"
+    v-for="(prog) in regularPrograms"
     :key="prog.id"
     class="prog"
     :class="{ open: prog.id === openProg }"
@@ -189,7 +189,7 @@
 
   <!-- ── Extras card ── -->
   <div
-    v-if="payments.programs.find(p => p.id === 'extras')"
+    v-if="showExtrasTab"
     class="prog"
     :class="{ open: openProg === 'extras' }"
   >
@@ -297,10 +297,32 @@ watch(() => payments.programs, (newPrograms) => {
   }
 }, { immediate: true });
 
+const regularPrograms = computed(() => payments.programs.filter(p => p.id !== "extras"));
+
+const MOCK_EXTRAS_FALLBACK = {
+  id: "extras" as const,
+  name: "📚 Доп. материалы и программы",
+  sub: "Разовые услуги и товары",
+  tariff: 0,
+  balance: 450,
+  balanceLabel: "оплачено",
+  barGradient: "linear-gradient(180deg,var(--amber),var(--orange))",
+  years: {},
+  transactions: [],
+  extras: [
+    { id: "ext_1", icon: "🏆", title: "Олимпиада онлайн 2026", price: 150, date: "15.01.2026", txId: "#TXN-2026-0312", ksef: "ok", status: "paid" },
+    { id: "ext_2", icon: "🧮", title: "Счёты детские", price: 180, date: "10.02.2026", txId: "#TXN-2026-0445", ksef: "ok", status: "paid" },
+    { id: "ext_3", icon: "👩‍💼", title: "1-месячный курс для родителей", price: 120, date: null, txId: null, ksef: "pending", status: "pending" },
+  ],
+};
+
 const extrasProgram = computed(() => {
-  const p = payments.programs.find(p => p.id === 'extras');
-  return p || { name: '📚 Extras', sub: '', extras: [], balance: 0, balanceLabel: '' } as any;
+  const p = payments.programs.find(p => p.id === "extras");
+  return p || MOCK_EXTRAS_FALLBACK;
 });
+
+const showExtrasTab = computed(() => (extrasProgram.value.extras?.length || 0) > 0);
+
 const totalExtrasPaid = computed(() => {
   const items = extrasProgram.value.extras || [];
   return items.filter((e: any) => e.status === 'paid').reduce((sum: number, e: any) => sum + e.price, 0);
