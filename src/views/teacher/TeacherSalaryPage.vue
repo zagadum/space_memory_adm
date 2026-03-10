@@ -12,7 +12,9 @@ import SalaryConfirmBlock from './components/SalaryConfirmBlock.vue';
 const { t } = useI18n();
 const salaryStore = useTeacherSalaryStore();
 
-const currentMonth = ref('2026-02');
+// Текущий месяц в формате YYYY-MM
+const now = new Date();
+const currentMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
 const openSections = ref<Record<string, boolean>>({
   'subscriptions': true,
   'substitutions': true,
@@ -563,4 +565,10 @@ const getStatusIcon = (status: string) => {
 
 .ts-bar { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.03); text-align: center; font-size: 10.5px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
 .hint { font-size: 11.5px; color: #4b5563; margin-top: 12px; font-style: italic; }
+.salary-loading, .salary-error {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 300px; gap: 16px; color: var(--app-text-dim);
+}
+.loading-spinner, .error-icon { font-size: 40px; }
+.loading-text, .error-text { font-size: 15px; font-weight: 500; }
 </style>

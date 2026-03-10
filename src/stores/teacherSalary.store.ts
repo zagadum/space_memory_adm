@@ -27,6 +27,8 @@ export interface Group {
 export interface SalaryData {
     id: string;
     month: string;
+    teacherId?: number;    // приходит с бэкенда, нужен для dispute
+    projectId?: number;
     trainerName: string;
     status: 'draft' | 'confirmed' | 'paid' | 'disputed';
     confirmedAt: string | null;
@@ -136,139 +138,12 @@ export interface SalaryData {
 
 export const useTeacherSalaryStore = defineStore('teacherSalary', {
     state: () => ({
-        salaryData: {
-            id: 's_1',
-            month: '2026-02',
-            trainerName: 'Anna Kowalska',
-            status: 'draft',
-            confirmedAt: null,
-
-            subscriptions: {
-                amount: 2847.64,
-                base: 25887.60,
-                rate: 11,
-                childrenCount: 58,
-                groups: [
-                    {
-                        name: 'SM-01', day: 'вт 17:00', kids: 16, base: 7840, salary: 862.40,
-                        children: [
-                            { name: 'Kowalczyk Marta', abon: 490, discounts: [], lessons: [1, 1, 1, 1], status: 'paid', conducted: 4 },
-                            { name: 'Nowak Adam', abon: 490, discounts: [], lessons: [1, 1, 1, 1], status: 'paid', conducted: 4 },
-                            { name: 'Wiśniewska Zofia', abon: 490, discounts: [], lessons: [1, 1, 0, 1], status: 'paid', conducted: 4 },
-                            { name: 'Zielińska Hanna', abon: 490, discounts: [{ type: 'family', label: '−10% родина' }], lessons: [1, 1, 1, 1], status: 'paid', conducted: 4, abonFinal: 441 },
-                            { name: 'Woźniak Lena', abon: 490, discounts: [{ type: 'promo', label: '−5% промо' }], lessons: [1, 1, 1, 1], status: 'paid', conducted: 4, abonFinal: 465.50 }
-                        ]
-                    },
-                    {
-                        name: 'SM-02', day: 'сб 10:00', kids: 14, base: 6860, salary: 754.60,
-                        children: [
-                            { name: 'Grabowski Aleks', abon: 490, discounts: [], lessons: [1, 1, 1, 1], status: 'paid', conducted: 4 },
-                            { name: 'Rutkowska Nadia', abon: 490, discounts: [{ type: 'individual', label: 'індив. 440 zł' }], lessons: [1, 1, 1, 1], status: 'paid', conducted: 4, abonFinal: 440 }
-                        ]
-                    },
-                    { name: 'SM-05', day: 'пт 18:30', kids: 12, base: 5880, salary: 646.80, children: [] },
-                    { name: 'SI-03', day: 'пн 16:00', kids: 10, base: 3900, salary: 429.00, children: [] },
-                    { name: 'SI-07', day: 'ср 15:00', kids: 6, base: 1407.60, salary: 154.84, children: [] }
-                ]
-            },
-
-            substitutions: {
-                amount: 150.70,
-                rows: [
-                    { child: 'Kowalczyk Marta', group: 'SM-05 · пт 18:30', forTrainer: 'Zofia Nowak', date: '07.02.2026', abon: 490, salary: 53.90 },
-                    { child: 'Nowak Oliwia', group: 'SM-05 · пт 18:30', forTrainer: 'Zofia Nowak', date: '07.02.2026', abon: 490, salary: 53.90 },
-                    { child: 'Wojciechowska Anna', group: 'SI-07 · ср 15:00', forTrainer: 'Marek Wójcik', date: '21.02.2026', abon: 390, salary: 42.90 }
-                ]
-            },
-
-            methodical: {
-                amount: 125.60,
-                rate: 31.40,
-                rows: [
-                    { name: 'Методична зустріч — загальна', date: '05.02.2026', present: true, hours: 2, total: 62.80 },
-                    { name: 'Методична зустріч — Space Memory', date: '19.02.2026', present: true, hours: 2, total: 62.80 },
-                    { name: 'Методична зустріч — INDIGO', date: '12.02.2026', present: false, hours: 0, total: 0 }
-                ]
-            },
-
-            individual: {
-                amount: 280.00,
-                rate: 40,
-                rows: [
-                    { child: 'Zielińska Weronika', program: 'Space Memory', count: 4, total: 160 },
-                    { child: 'Szymański Bartosz', program: 'INDIGO', count: 3, total: 120 }
-                ]
-            },
-
-            olympiad: {
-                amount: 160.00,
-                rate: 40,
-                rows: [
-                    { name: 'Тиждень 1', date: '03.02.2026', link: 'zoom.us/rec/AB12…', total: 40 },
-                    { name: 'Тиждень 2', date: '10.02.2026', link: 'zoom.us/rec/CD34…', total: 40 },
-                    { name: 'Тиждень 3', date: '17.02.2026', link: 'zoom.us/rec/EF56…', total: 40 },
-                    { name: 'Тиждень 4', date: '24.02.2026', link: 'zoom.us/rec/GH78…', total: 40 }
-                ]
-            },
-
-            admin3pct: {
-                amount: 660.93,
-                base: 25887.60,
-                pct: 85,
-                evaluatedBy: 'Magdalena Wiśniewska (DJ)',
-                evaluatedAt: '01.03.2026',
-                checklist: [
-                    { duty: '🎥 Записи уроків — всі відправлені', status: 'done', comment: null },
-                    { duty: '📋 Підсумки занять — всі заповнені', status: 'done', comment: null },
-                    { duty: '✅ Заліки проведені та завантажені', status: 'partial', comment: 'Не завантажено 2 залікових відео (SM-02, SM-03). Тренеру потрібно було завантажити до 25.02 — завантажено лише 4 з 6.' },
-                    { duty: '📚 Домашня робота завантажена вчасно', status: 'done', comment: null },
-                    { duty: '📱 WhatsApp-огляди відправлені', status: 'done', comment: null },
-                    { duty: '👨‍👩‍👧 Зв\'язок з батьками — зворотний зв\'язок', status: 'partial', comment: '3 батьки (Nowak, Kowalski, Wiśniewski) не отримали зворотного зв\'язку у лютому.' },
-                    { duty: '📄 Короткі огляди відправлені', status: 'done', comment: null }
-                ]
-            },
-
-            bonuses: {
-                amount: 500.00,
-                rows: [
-                    { reason: 'Результати учнів на олімпіаді', comment: '2 призових місця на міській олімпіаді SM', status: 'approved', total: 500 }
-                ]
-            },
-
-            trialLessons: {
-                amount: 70.00,
-                rate: 35,
-                threshold: 51,
-                confirmedByQA: true,
-                confirmedBy: 'Magdalena Wiśniewska (DJ)',
-                confirmedAt: '01.03.2026',
-                rows: [
-                    {
-                        name: 'Пробний SM', date: '08.02.2026', program: 'Space Memory', attended: 6, won: 4, paid: true, salary: 35,
-                        children: [
-                            { name: 'Górska Emilia', status: 'won' },
-                            { name: 'Sobieski Tomasz', status: 'lost' }
-                        ]
-                    },
-                    {
-                        name: 'Пробний SM', date: '15.02.2026', program: 'Space Memory', attended: 8, won: 3, paid: false, salary: 0,
-                        children: []
-                    },
-                    {
-                        name: 'Пробний INDIGO', date: '22.02.2026', program: 'INDIGO', attended: 5, won: 3, paid: true, salary: 35,
-                        children: []
-                    }
-                ]
-            },
-
-            rezygnacje: []
-        } as SalaryData | null,
+        salaryData: null as SalaryData | null,
         isLoading: false,
-        error: null as string | null
+        error: null as string | null,
     }),
 
     getters: {
-        // We might want to compute active sections for the summary grid
         activeSections: (state) => {
             if (!state.salaryData) return [];
             const d = state.salaryData;
@@ -281,7 +156,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             if (d.admin3pct.amount > 0) sections.push({ label: 'teacherSalary.sections.admin3pct', amount: d.admin3pct.amount, type: 'admin', subtext: `QA Score: ${d.admin3pct.pct}%` });
             if (d.bonuses.amount > 0) sections.push({ label: 'teacherSalary.sections.bonuses', amount: d.bonuses.amount, type: 'bonus', subtext: `${d.bonuses.rows.length} positions` });
 
-            // Trial lessons with calculated amount
             const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
                 const conversion = row.won / row.attended;
                 return sum + (conversion >= 0.51 ? 35 : 0);
@@ -290,7 +164,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
                 sections.push({ label: 'teacherSalary.sections.trialLessons', amount: trialAmount, type: 'trial', subtext: `${d.trialLessons.rows.filter(r => (r.won / r.attended) >= 0.51).length} qualified` });
             }
 
-            // Retention Bonus (+1%)
             if (d.rezygnacje.length === 0) {
                 const bonus = d.subscriptions.base * 0.01;
                 sections.push({ label: 'teacherSalary.sections.retentionBonus', amount: bonus, type: 'bonus', subtext: '0 rezygnacji (+1%)' });
@@ -324,13 +197,31 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
 
     actions: {
         async fetchSalary(month: string) {
+            // Берём teacherId из auth store, fallback = 1
+            const { useAuthStore } = await import('./auth.store');
+            const authStore = useAuthStore();
+            const teacherId = authStore.user?.teacherId ?? (Number(authStore.user?.id) || 1);
+            const projectId = 1; // TODO: брать из выбранного проекта
+
             this.isLoading = true;
             this.error = null;
             try {
-                const data = await salaryApi.getTeacherSalary(DEFAULT_TEACHER_ID, month, DEFAULT_PROJECT_ID);
+                const data = await salaryApi.getTeacherSalary(teacherId, month, projectId);
                 this.salaryData = data;
             } catch (err: any) {
-                this.error = err.message || 'Failed to fetch salary data';
+                const msg = err?.response?.data?.message || err?.message || 'Ошибка загрузки зарплаты';
+                this.error = msg;
+                // 404 — расчёт ещё не создан за этот месяц
+                if (err?.response?.status === 404) {
+                    this.error = 'Расчёт зарплаты за этот месяц ещё не создан.';
+                }
+                // 422 — некорректный формат месяца
+                if (err?.response?.status === 422) {
+                    const validationErrors = err?.response?.data?.errors;
+                    this.error = validationErrors
+                        ? Object.values(validationErrors).flat().join(' ')
+                        : 'Некорректные данные запроса.';
+                }
             } finally {
                 this.isLoading = false;
             }
@@ -338,11 +229,23 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
 
         async confirmSalary() {
             if (!this.salaryData) return;
+            const { useNotificationStore } = await import('./notification.store');
+            const notify = useNotificationStore();
+
             this.isLoading = true;
+            this.error = null;
             try {
-                const response = await salaryApi.confirmSalary(this.salaryData.id, DEFAULT_PROJECT_ID);
-                this.salaryData.status = response.status as 'draft' | 'confirmed' | 'paid' | 'disputed';
+                const response = await salaryApi.confirmSalary(this.salaryData.id);
+                this.salaryData.status = response.status as SalaryData['status'];
                 this.salaryData.confirmedAt = response.confirmedAt;
+                notify.addToast('Расчёт подтверждён ✅', 'success');
+            } catch (err: any) {
+                const msg = err?.response?.data?.message || 'Ошибка подтверждения';
+                this.error = msg;
+                notify.addToast(msg, 'error');
+                if (err?.response?.status === 404) {
+                    this.error = 'Расчёт не найден. Обновите страницу.';
+                }
             } finally {
                 this.isLoading = false;
             }
@@ -350,13 +253,39 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
 
         async disputeSalary(reason: string) {
             if (!this.salaryData) return;
+            const { useAuthStore } = await import('./auth.store');
+            const { useNotificationStore } = await import('./notification.store');
+            const authStore = useAuthStore();
+            const notify = useNotificationStore();
+
+            // teacherId обязателен для dispute endpoint
+            const teacherId = this.salaryData.teacherId
+                ?? authStore.user?.teacherId
+                ?? (Number(authStore.user?.id) || 1);
+
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await salaryApi.disputeSalary(this.salaryData.id, DEFAULT_TEACHER_ID, reason, DEFAULT_PROJECT_ID);
-                this.salaryData.status = response.status as 'draft' | 'confirmed' | 'paid' | 'disputed';
+                const response = await salaryApi.disputeSalary(
+                    this.salaryData.id,
+                    teacherId,
+                    reason
+                );
+                // response.status = 'disputed' (статус спора, не расчёта)
+                // Но бэкенд меняет статус расчёта тоже на 'disputed'
+                this.salaryData.status = 'disputed';
+                notify.addToast('Спор отправлен ⚠️', 'warning');
             } catch (err: any) {
-                this.error = err.message || 'Failed to dispute salary';
+                const msg = err?.response?.data?.message || 'Ошибка при отправке спора';
+                if (err?.response?.status === 422) {
+                    const validationErrors = err?.response?.data?.errors;
+                    this.error = validationErrors
+                        ? Object.values(validationErrors).flat().join(' ')
+                        : msg;
+                } else {
+                    this.error = msg;
+                }
+                notify.addToast(this.error || msg, 'error');
             } finally {
                 this.isLoading = false;
             }
@@ -367,7 +296,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             const rows: any[] = [];
             const d = this.salaryData;
 
-            // Simplified mapping for the teacher view based on their sections
             const activeSections = [
                 { id: 'subscriptions', amount: d.subscriptions.amount },
                 { id: 'substitutions', amount: d.substitutions.amount },
@@ -387,7 +315,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
                 });
             });
 
-            // Retention Bonus (+1%)
             if (d.rezygnacje.length === 0) {
                 const bonus = d.subscriptions.base * 0.01;
                 rows.push({

@@ -668,6 +668,117 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
+  // ══════════════════════════════════════════════════════════════════════════
+  // SALARY — mock-роуты для офлайн-разработки
+  // Соответствуют реальному API: GET /salary/teacher/{id}, POST /salary/{id}/confirm|dispute
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // GET salary/teacher/{teacherId}?month=YYYY-MM&project_id=1
+  if (method === "get" && /^salary\/teacher\/\d+$/.test(url)) {
+    const month = (config.params as any)?.month || "2026-02";
+    return ok(config, {
+      id: "1",
+      month,
+      teacherId: 1,
+      projectId: 1,
+      trainerName: "Anna Kowalska",
+      status: "draft",
+      confirmedAt: null,
+      subscriptions: {
+        amount: 2847.64, base: 25887.60, rate: 11, childrenCount: 58,
+        groups: [
+          { name: "SM-01", day: "Вт 17:00", kids: 16, base: 7840, salary: 862.40, children: [] },
+          { name: "SM-02", day: "Сб 10:00", kids: 14, base: 6860, salary: 754.60, children: [] },
+          { name: "SM-05", day: "Пт 18:30", kids: 12, base: 5880, salary: 646.80, children: [] },
+          { name: "SI-03", day: "Пн 16:00", kids: 10, base: 3900, salary: 429.00, children: [] },
+          { name: "SI-07", day: "Ср 15:00", kids: 6, base: 1407.60, salary: 154.84, children: [] }
+        ]
+      },
+      substitutions: {
+        amount: 150.70,
+        rows: [
+          { child: "Kowalczyk Marta", group: "SM-05 · Пт 18:30", forTrainer: "Zofia Nowak", date: "2026-02-07", abon: 490, salary: 53.90 },
+          { child: "Nowak Oliwia",    group: "SM-05 · Пт 18:30", forTrainer: "Zofia Nowak", date: "2026-02-07", abon: 490, salary: 53.90 },
+          { child: "Wojciechowska Anna", group: "SI-07 · Ср 15:00", forTrainer: "Marek Wójcik", date: "2026-02-21", abon: 390, salary: 42.90 }
+        ]
+      },
+      methodical: {
+        amount: 125.60, rate: 31.40,
+        rows: [
+          { name: "Methodical meeting — general",       date: "2026-02-05", present: true,  hours: 2, total: 62.80 },
+          { name: "Methodical meeting — Space Memory",  date: "2026-02-19", present: true,  hours: 2, total: 62.80 },
+          { name: "Methodical meeting — INDIGO",        date: "2026-02-12", present: false, hours: 0, total: 0 }
+        ]
+      },
+      individual: {
+        amount: 280.00, rate: 40,
+        rows: [
+          { child: "Zielinska Weronika", program: "Space Memory", count: 4, total: 160 },
+          { child: "Szymanski Bartosz",  program: "INDIGO",        count: 3, total: 120 }
+        ]
+      },
+      olympiad: {
+        amount: 160.00, rate: 40,
+        rows: [
+          { name: "Week 1", date: "2026-02-03", link: "zoom.us/rec/AB12", total: 40 },
+          { name: "Week 2", date: "2026-02-10", link: "zoom.us/rec/CD34", total: 40 },
+          { name: "Week 3", date: "2026-02-17", link: "zoom.us/rec/EF56", total: 40 },
+          { name: "Week 4", date: "2026-02-24", link: "zoom.us/rec/GH78", total: 40 }
+        ]
+      },
+      admin3pct: {
+        amount: 660.93, base: 25887.60, pct: 85,
+        evaluatedBy: "Quality Dept", evaluatedAt: "2026-03-01",
+        checklist: [
+          { duty: "Lesson records sent",         status: "done",    comment: null },
+          { duty: "Lesson summaries filled",     status: "done",    comment: null },
+          { duty: "Tests completed & uploaded",  status: "partial", comment: "2 test videos not uploaded (SM-02, SM-03)." },
+          { duty: "Homework uploaded on time",   status: "done",    comment: null },
+          { duty: "WhatsApp reviews sent",       status: "done",    comment: null },
+          { duty: "Parent feedback given",       status: "partial", comment: "3 parents did not receive feedback." },
+          { duty: "Brief reviews sent",          status: "done",    comment: null }
+        ]
+      },
+      bonuses: {
+        amount: 500.00,
+        rows: [{ reason: "Olympiad results", comment: "2 prize places", status: "approved", total: 500 }]
+      },
+      trialLessons: {
+        amount: 70.00, rate: 35, threshold: 51,
+        confirmedByQA: true, confirmedBy: "Quality Dept", confirmedAt: "2026-03-01",
+        rows: [
+          { name: "Trial SM",     date: "2026-02-08", program: "Space Memory", attended: 6, won: 4, paid: true,  salary: 35, children: [] },
+          { name: "Trial SM",     date: "2026-02-15", program: "Space Memory", attended: 8, won: 3, paid: false, salary: 0,  children: [] },
+          { name: "Trial INDIGO", date: "2026-02-22", program: "INDIGO",       attended: 5, won: 3, paid: true,  salary: 35, children: [] }
+        ]
+      },
+      rezygnacje: []
+    });
+  }
+
+  // POST salary/{id}/confirm
+  if (method === "post" && /^salary\/\d+\/confirm$/.test(url)) {
+    const id = parseInt(url.split("/")[1]);
+    return ok(config, {
+      id,
+      status: "confirmed",
+      confirmedAt: new Date().toISOString().replace("T", " ").slice(0, 19)
+    });
+  }
+
+  // POST salary/{id}/dispute  → 201
+  if (method === "post" && /^salary\/\d+\/dispute$/.test(url)) {
+    const body = readBody(config);
+    if (!body?.teacher_id) return err(config, 422, "teacher_id is required");
+    if (!body?.reason || body.reason.length < 3) return err(config, 422, "reason must be at least 3 characters");
+    const salaryId = parseInt(url.split("/")[1]);
+    return ok(config, {
+      id: Math.floor(Math.random() * 10000),
+      salary_calculation_id: salaryId,
+      status: "disputed"
+    }, 201);
+  }
+
+    return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
 };
 
