@@ -218,8 +218,21 @@ function openCreateModal() {
   showCreateModal.value = true
 }
 
-function openStartModal(g: NewGroup) {
+async function openStartModal(g: NewGroup) {
   startGroup.value = g
+  // Загружаем студентов если панель не была открыта для этой группы
+  const alreadyLoaded = panelGroup.value?.id === g.id && panelStudents.value.length > 0
+  if (!alreadyLoaded) {
+    loadingStudents.value = true
+    try {
+      const res = await getNewGroupStudents(g.id)
+      panelStudents.value = res.items
+    } catch {
+      // Не критично — модал всё равно откроется, просто списки будут пустые
+    } finally {
+      loadingStudents.value = false
+    }
+  }
 }
 
 async function openPanel(id: number) {
