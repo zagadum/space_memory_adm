@@ -162,7 +162,7 @@
       <div class="asp-search-wrap">
         <div class="asp-search-box">
           <span style="color:var(--dim);font-size:14px">🔍</span>
-          <input v-model="aspQuery" type="text" placeholder="Поиск ученика по имени..." style="flex:1;background:none;border:none;outline:none;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px" />
+          <input v-model="aspQuery" type="text" placeholder="Поиск ученика по имени..." style="flex:1;background:none;border:none;outline:none;color:var(--text-main);font-family:'Outfit',sans-serif;font-size:13px" />
         </div>
       </div>
       <div class="asp-list">
@@ -307,7 +307,7 @@ function doDelete() {
 /* OVERLAY */
 .gp-overlay {
   position: fixed; inset: 0;
-  background: rgba(4,4,15,0.55);
+  background: var(--glass-bg);
   backdrop-filter: blur(4px);
   z-index: 300;
 }
@@ -316,7 +316,7 @@ function doDelete() {
 .gp-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 820px; max-width: 100vw;
-  background: rgba(7,7,32,0.98);
+  background: var(--app-bg);
   border-left: 1px solid var(--bh);
   backdrop-filter: blur(30px);
   z-index: 400;
@@ -328,7 +328,7 @@ function doDelete() {
   padding: 22px 28px 18px;
   border-bottom: 1px solid var(--b);
   flex-shrink: 0;
-  background: rgba(13,13,43,0.8);
+  background: var(--app-surface);
 }
 
 .gp-header-top {
@@ -465,8 +465,8 @@ function doDelete() {
   content: attr(data-tip);
   position: absolute; bottom: calc(100% + 6px); left: 50%;
   transform: translateX(-50%);
-  background: rgba(13,13,43,0.97); border: 1px solid var(--bh);
-  color: var(--white); font-size: 11px; font-weight: 500;
+  background: var(--app-surface); border: 1px solid var(--bh);
+  color: var(--text-main); font-size: 11px; font-weight: 500;
   padding: 4px 9px; border-radius: 6px;
   white-space: nowrap; pointer-events: none;
   font-family: 'Outfit', sans-serif; z-index: 10;
@@ -589,5 +589,5 @@ function doDelete() {
 .btn-primary { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; box-shadow: 0 0 16px rgba(79,110,247,0.3); }
 .btn-primary:hover { box-shadow: 0 0 24px rgba(79,110,247,0.5); transform: translateY(-1px); }
 .btn-ghost { background: rgba(255,255,255,0.05); color: var(--dim); border: 1px solid var(--b) !important; }
-.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--white); border-color: var(--bh) !important; }
+.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--text-main); border-color: var(--bh) !important; }
 </style>
