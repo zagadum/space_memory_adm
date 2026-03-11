@@ -20,11 +20,45 @@
               <span class="chip chip-purple" v-else-if="n.category==='pause'" style="font-size:10px;padding:2px 7px">{{ t('notes.pause') }}</span>
             </div>
           </div>
+          <div class="note-actions">
+            <button class="note-action-btn" @click="startEdit(n)" :disabled="isBusy || deletingId === n.id">✏️ {{ t('notes.edit') }}</button>
+            <button class="note-action-btn note-action-danger" @click="removeNote(n.id)" :disabled="isBusy">{{ deletingId === n.id ? '…' : '🗑️ ' + t('notes.delete') }}</button>
+          </div>
         </div>
-        <div class="note-text">{{ n.text }}</div>
-        <div class="note-tags" v-if="n.tags?.length">
-          <span class="note-tag" v-for="(tag,idx) in n.tags" :key="idx">{{ tag }}</span>
-        </div>
+
+        <template v-if="editingId === n.id">
+          <div class="composer-row note-edit-row">
+            <select class="composer-select" v-model="editForm.type">
+              <option value="call">📞 {{ t('notes.typeCall') }}</option>
+              <option value="email">✉️ {{ t('notes.typeEmail') }}</option>
+              <option value="meet">🤝 {{ t('notes.typeMeet') }}</option>
+              <option value="note">📝 {{ t('notes.typeNote') }}</option>
+            </select>
+            <select class="composer-select" v-model="editForm.status">
+              <option value="open">🔴 {{ t('notes.open') }}</option>
+              <option value="done">✓ {{ t('notes.done') }}</option>
+            </select>
+            <select class="composer-select" v-model="editForm.category">
+              <option value="general">{{ t('notes.general') }}</option>
+              <option value="payment">{{ t('notes.payment') }}</option>
+              <option value="complaint">{{ t('notes.complaint') }}</option>
+              <option value="pause">{{ t('notes.pause') }}</option>
+            </select>
+          </div>
+          <input class="composer-input note-direction" v-model="editTags.direction" :placeholder="t('notes.direction')" />
+          <textarea class="composer-text" v-model="editForm.text" :placeholder="t('notes.placeholder')"></textarea>
+          <div class="composer-row note-edit-row">
+            <input class="composer-input" v-model="editTags.tags" :placeholder="t('notes.tags')" />
+            <button class="btn btn-primary" @click="saveEdit" :disabled="saveDisabled">{{ savingEdit ? t('common.saving') : t('common.save') }}</button>
+            <button class="note-action-btn" @click="cancelEdit" :disabled="savingEdit">{{ t('notes.cancel') }}</button>
+          </div>
+        </template>
+        <template v-else>
+          <div class="note-text">{{ n.text }}</div>
+          <div class="note-tags" v-if="n.tags?.length">
+            <span class="note-tag" v-for="(tag,idx) in n.tags" :key="idx">{{ tag }}</span>
+          </div>
+        </template>
       </div>
 
       <div class="note-composer">
@@ -60,12 +94,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, onMounted, computed } from "vue";
 import { useRoute } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import { useStudentTabsStore } from "../../../../stores/studentTabs.store";
-import { createStudentNote } from "../../../../api/studentApi";
+import { createStudentNote, updateStudentNote, deleteStudentNote } from "../../../../api/studentApi";
 
 const route = useRoute();
 const { t } = useI18n();
@@ -73,6 +107,9 @@ const st = useStudentTabsStore();
 const { notes, loading } = storeToRefs(st);
 
 const saving = ref(false);
+const savingEdit = ref(false);
+const deletingId = ref<string | null>(null);
+const editingId = ref<string | null>(null);
 const tags = ref("");
 const form = reactive({
   type: "call",
@@ -81,6 +118,19 @@ const form = reactive({
   direction: "",
   text: "",
 });
+const editForm = reactive({
+  type: "note",
+  status: "open",
+  category: "general",
+  text: "",
+});
+const editTags = reactive({
+  direction: "",
+  tags: "",
+});
+
+const isBusy = computed(() => saving.value || savingEdit.value || !!deletingId.value);
+const saveDisabled = computed(() => savingEdit.value || !editingId.value || !editForm.text.trim());
 
 function typeIcon(type: string) {
   return ({ call: "📞", email: "✉️", meet: "🤝", note: "📝" } as any)[type] ?? "📝";
@@ -121,6 +171,65 @@ async function save() {
   }
 }
 
+function startEdit(note: any) {
+  editingId.value = note.id;
+  editForm.type = note.type || "note";
+  editForm.status = note.status || "open";
+  editForm.category = note.category || "general";
+  editForm.text = note.text || "";
+  editTags.direction = note.title || "";
+  editTags.tags = Array.isArray(note.tags) ? note.tags.join(", ") : "";
+}
+
+function cancelEdit() {
+  editingId.value = null;
+  editForm.type = "note";
+  editForm.status = "open";
+  editForm.category = "general";
+  editForm.text = "";
+  editTags.direction = "";
+  editTags.tags = "";
+}
+
+async function saveEdit() {
+  const studentId = route.params.id as string;
+  if (!studentId || !editingId.value || !editForm.text.trim()) return;
+
+  savingEdit.value = true;
+  try {
+    await updateStudentNote(editingId.value, {
+      studentId,
+      type: editForm.type,
+      direction: editTags.direction,
+      category: editForm.category,
+      status: editForm.status,
+      tags: editTags.tags.split(",").map((s) => s.trim()).filter(Boolean),
+      text: editForm.text.trim(),
+    });
+    cancelEdit();
+    await st.loadNotes(studentId);
+  } finally {
+    savingEdit.value = false;
+  }
+}
+
+async function removeNote(noteId: string) {
+  const studentId = route.params.id as string;
+  if (!studentId) return;
+  if (!window.confirm(t('notes.confirmDelete'))) return;
+
+  deletingId.value = noteId;
+  try {
+    if (editingId.value === noteId) {
+      cancelEdit();
+    }
+    await deleteStudentNote(noteId);
+    await st.loadNotes(studentId);
+  } finally {
+    deletingId.value = null;
+  }
+}
+
 onMounted(() => {
   const studentId = route.params.id as string;
   if (studentId) st.loadNotes(studentId);
@@ -140,12 +249,19 @@ onMounted(() => {
 .nt-meet{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.22)}
 .nt-note{background:rgba(6,182,212,.08);border-color:rgba(6,182,212,.22)}
 .note-meta{flex:1;}
+.note-actions{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;justify-content:flex-end;}
+.note-action-btn{padding:6px 10px;border-radius:10px;border:1px solid var(--b);background:rgba(255,255,255,.02);color:var(--white);font-size:11px;cursor:pointer;transition:all .15s;}
+.note-action-btn:hover:not(:disabled){border-color:rgba(100,120,255,.35);background:rgba(255,255,255,.04)}
+.note-action-btn:disabled{opacity:.5;cursor:not-allowed}
+.note-action-danger{border-color:rgba(239,68,68,.2);color:#fca5a5}
+.note-edit-row{margin-top:10px}
 .note-who{font-size:12px;font-weight:700;}
 .note-when{margin-top:2px;font-size:11px;color:var(--dim);}
 .note-status-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px;}
 .note-text{margin-top:10px;color:var(--white);font-size:12px;line-height:1.5;}
 .note-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
 .note-tag{font-size:10.5px;color:var(--dim);padding:3px 8px;border-radius:999px;border:1px solid var(--b);background:rgba(255,255,255,.02)}
+.note-direction{width:100%;margin-top:10px;margin-bottom:10px;}
 
 .note-composer{margin-top:14px;border:1px solid var(--b);border-radius:14px;padding:12px 14px;background:rgba(255,255,255,.02)}
 .composer-title{font-weight:800;font-size:12px;margin-bottom:10px;color:var(--blue)}

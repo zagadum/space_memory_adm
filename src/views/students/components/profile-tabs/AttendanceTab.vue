@@ -69,7 +69,7 @@ const modal = useModalStore();
 const { attendance, loading } = storeToRefs(st);
 
 function openMark(row: any) {
-  modal.open("attendance-status", { row });
+  modal.open("attendance-status", { row, studentId: route.params.id as string });
 }
 
 function markIcon(mark: string) {

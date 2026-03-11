@@ -42,33 +42,16 @@ const handleDownload = (id: string) => {
       </div>
       
       <div class="actions">
-        <UiButton 
-          v-if="paymentsStore.subscriptionStatus === 'inactive'"
-          variant="primary" 
-          @click="handleStart"
-          :loading="paymentsStore.isLoading"
-        >
+        <UiButton v-if="paymentsStore.subscriptionStatus === 'inactive'" variant="primary" @click="handleStart" :loading="paymentsStore.isLoading">
           {{ t('studentPayments.startSubscription') }}
         </UiButton>
 
         <template v-else>
-          <UiButton 
-            v-if="paymentsStore.subscriptionStatus === 'active'"
-            variant="amber" 
-            size="sm" 
-            @click="paymentsStore.pauseSubscription"
-            :loading="paymentsStore.isLoading"
-          >
+          <UiButton v-if="paymentsStore.subscriptionStatus === 'active'" variant="amber" size="sm" @click="paymentsStore.pauseSubscription" :loading="paymentsStore.isLoading">
             ⏸ {{ t('studentPayments.actions.pause') }}
           </UiButton>
           
-          <UiButton 
-            v-if="paymentsStore.subscriptionStatus === 'paused'"
-            variant="primary" 
-            size="sm" 
-            @click="paymentsStore.resumeSubscription"
-            :loading="paymentsStore.isLoading"
-          >
+          <UiButton v-if="paymentsStore.subscriptionStatus === 'paused'" variant="primary" size="sm" @click="paymentsStore.resumeSubscription" :loading="paymentsStore.isLoading">
             ▶ {{ t('studentPayments.actions.resume') }}
           </UiButton>
 
