@@ -48,8 +48,11 @@ function unwrapApiData<T>(payload: MaybeWrapped<T>): T {
 export const paymentsApi = {
 
   // ── Старый монолитный запрос (оставляем для обратной совместимости) ─────────
-  async getStudentPayments(studentId: string) {
-    const { data } = await http.get<MaybeWrapped<StudentPaymentsResponse>>(`students/${studentId}/payments`);
+  async getStudentPayments(studentId: string, projectId: number = 1) {
+    const { data } = await http.get<MaybeWrapped<StudentPaymentsResponse>>(
+      `students/${studentId}/payments`,
+      { params: { project_id: projectId } }
+    );
     return unwrapApiData(data);
   },
 
