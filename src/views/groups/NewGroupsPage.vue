@@ -96,6 +96,7 @@
       v-if="startGroup"
       :group="startGroup"
       :all-students="masterStudents"
+      :panel-students="panelStudents"
       @close="startGroup = null"
       @confirmed="onGroupStarted"
     />
