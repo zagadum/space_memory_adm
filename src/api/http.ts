@@ -4,6 +4,7 @@ import { mockAdapter } from "./mockAdapter";
 const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? "false").toLowerCase();
 const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
 const API_URL = (import.meta as any).env?.VITE_API_URL || "https://memory.firm.kiev.ua/api/v1/";
+const RECRUITMENT_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_API_URL || API_URL;
 
 function parsePrefixList(value: unknown): string[] {
   return String(value ?? "")
@@ -35,17 +36,20 @@ function shouldUseMock(config: InternalAxiosRequestConfig): boolean {
   return USE_MOCK_BY_DEFAULT;
 }
 
-export const http = axios.create({
-  baseURL: API_URL,
-  timeout: 12000,
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json',
-  },
-});
+function createHttpClient(baseURL: string) {
+  return axios.create({
+    baseURL,
+    timeout: 12000,
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  });
+}
 
-// Request interceptor: attach token + start global loading indicator
-http.interceptors.request.use(
+function attachInterceptors(client: ReturnType<typeof axios.create>) {
+  // Request interceptor: attach token + start global loading indicator
+  client.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -63,10 +67,10 @@ http.interceptors.request.use(
     });
     return Promise.reject(error);
   }
-);
+  );
 
-// Response interceptor: end loading, handle 401 logout, timeout errors
-http.interceptors.response.use(
+  // Response interceptor: end loading, handle 401 logout, timeout errors
+  client.interceptors.response.use(
   (response) => {
     import('../stores/app.store').then(({ useAppStore }) => {
       useAppStore().endRequest();
@@ -98,27 +102,39 @@ http.interceptors.response.use(
 
     return Promise.reject(error);
   }
-);
-
-const axiosAny = axios as any;
-const defaultAdapter: AxiosAdapter = axiosAny.getAdapter
-  ? axiosAny.getAdapter(http.defaults.adapter)
-  : (http.defaults.adapter as AxiosAdapter);
-
-if (!defaultAdapter) {
-  throw new Error("Axios default adapter is not available");
+  );
 }
 
-// Route every request either to mock adapter or to the real backend adapter.
-(http.defaults as any).adapter = (async (config: InternalAxiosRequestConfig) => {
-  if (shouldUseMock(config)) {
-    return mockAdapter(config);
+function attachAdapterRouting(client: ReturnType<typeof axios.create>) {
+  const axiosAny = axios as any;
+  const defaultAdapter: AxiosAdapter = axiosAny.getAdapter
+    ? axiosAny.getAdapter(client.defaults.adapter)
+    : (client.defaults.adapter as AxiosAdapter);
+
+  if (!defaultAdapter) {
+    throw new Error("Axios default adapter is not available");
   }
-  return defaultAdapter(config);
-}) as AxiosAdapter;
+
+  // Route every request either to mock adapter or to the real backend adapter.
+  (client.defaults as any).adapter = (async (config: InternalAxiosRequestConfig) => {
+    if (shouldUseMock(config)) {
+      return mockAdapter(config);
+    }
+    return defaultAdapter(config);
+  }) as AxiosAdapter;
+}
+
+export const http = createHttpClient(API_URL);
+export const httpRecruitment = createHttpClient(RECRUITMENT_API_URL);
+
+attachInterceptors(http);
+attachInterceptors(httpRecruitment);
+attachAdapterRouting(http);
+attachAdapterRouting(httpRecruitment);
 
 console.log("API routing config:", {
   baseURL: API_URL,
+  recruitmentBaseURL: RECRUITMENT_API_URL,
   defaultMock: USE_MOCK_BY_DEFAULT,
   mockOnly: MOCK_ONLY_PREFIXES,
   realOnly: REAL_ONLY_PREFIXES,

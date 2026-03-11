@@ -367,7 +367,10 @@ function onDocClick(e: MouseEvent) {
   openDf.value = null
   openActions.value = null
 }
-onMounted(() => document.addEventListener('click', onDocClick))
+onMounted(() => {
+  store.fetchStudentsFromApi()
+  document.addEventListener('click', onDocClick)
+})
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
 // ─── ADD MODAL ───

@@ -62,6 +62,7 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useLeadsStore, type LeadStatus } from '../../stores/leads.store';
 
@@ -78,6 +79,10 @@ const columns = [
 const getLeadsByStatus = (status: LeadStatus) => {
   return leadsStore.leads.filter(l => l.status === status);
 };
+
+onMounted(() => {
+  leadsStore.fetchLeads();
+});
 
 // Drag & Drop Logic
 let draggedLeadId: string | null = null;

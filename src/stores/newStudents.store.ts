@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { recruitmentApi, type RecruitmentNewStudent } from '../api/recruitmentApi'
 
 export interface NewStudent {
   id: number
@@ -151,6 +152,34 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     return [...new Set(students.value.filter(s => s.manager).map(s => s.manager!))]
   })
 
+  function normalizeStudent(s: RecruitmentNewStudent): NewStudent {
+    return {
+      id: Number(s.id),
+      name: s.name,
+      age: s.age,
+      contract: s.contract,
+      payment: s.payment ?? 0,
+      paymentStr: s.paymentStr ?? `${s.payment ?? 0} zł`,
+      group: s.group ?? null,
+      groupColor: s.groupColor ?? null,
+      startDate: s.startDate ?? null,
+      createdDate: s.createdDate ?? new Date().toISOString().slice(0, 10),
+      waitDays: s.waitDays ?? 0,
+      manager: s.manager ?? null,
+    }
+  }
+
+  async function fetchStudentsFromApi() {
+    try {
+      const list = await recruitmentApi.getNewStudents()
+      if (list.length) {
+        students.value = list.map(normalizeStudent)
+      }
+    } catch {
+      // keep current local dataset if endpoint is not ready
+    }
+  }
+
   function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract'>) {
     const today = new Date().toISOString().slice(0, 10)
     const newId = Date.now()
@@ -174,6 +203,15 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     history.value[newId] = [
       { event: 'Ученик создан', date: new Date().toLocaleDateString('ru-RU'), detail: `Добавлен менеджером ${data.manager || '—'}`, color: 'var(--blue)' },
     ]
+
+    recruitmentApi.createNewStudent({
+      name: data.name,
+      age: data.age,
+      manager: data.manager,
+      startDate: data.startDate,
+    }).catch(() => {
+      // optimistic insert remains in UI even if backend is unavailable
+    })
   }
 
   function assignGroup(studentId: number, groupName: string, color: string) {
@@ -186,6 +224,9 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
   function archiveStudent(studentId: number) {
     students.value = students.value.filter(s => s.id !== studentId)
+    recruitmentApi.archiveNewStudent(studentId).catch(() => {
+      // no rollback to keep fast UI interactions
+    })
   }
 
   function saveDetails(studentId: number, data: Partial<StudentDetails>) {
@@ -222,6 +263,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   return {
     students, totalCount, signedCount, noManagerCount, avgWaitDays,
     uniqueGroups, uniqueManagers,
+    fetchStudentsFromApi,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice,
     getDetails, getHistory,
   }
