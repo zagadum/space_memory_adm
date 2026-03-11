@@ -873,7 +873,91 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       status: "disputed"
     }, 201);
   }
+  // ── EXPELLED STUDENTS ─────────────────────────────────────────────────────
 
-    return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
+  // Вспомогательная функция внутри блока (или добавить в начало файла если там уже есть похожие)
+  const _dAgo = (n: number): string => {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
+  };
+
+  // GET expelled-students
+  if (method === 'get' && url === 'expelled-students') {
+    const today = new Date();
+    const daysBetween = (dateStr: string | null): number =>
+      dateStr ? Math.floor((today.getTime() - new Date(dateStr).getTime()) / 86400000) : 9999;
+
+    const students = [
+      { id: 1, name: 'Анна Ковалевская',  phone: '+48 601 234 567', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(15), lastContact: _dAgo(8),  manager: 'Светлана',  comment: 'Обещала перезвонить' },
+      { id: 2, name: 'Дмитрий Петров',    phone: '+48 602 345 678', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(45), lastContact: _dAgo(3),  manager: 'Александр', comment: '' },
+      { id: 3, name: 'Марта Вишневска',   phone: '+48 603 456 789', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(30), lastContact: null,       manager: '',          comment: '' },
+      { id: 4, name: 'Игорь Сидоренко',   phone: '+48 604 567 890', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(20), lastContact: _dAgo(12), manager: 'Мария',     comment: 'Не берёт трубку' },
+      { id: 5, name: 'Светлана Бондарь',  phone: '+48 605 678 901', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(8),  lastContact: _dAgo(0),  manager: 'Артём',     comment: 'Заинтересована, ждёт' },
+      { id: 6, name: 'Александр Новак',   phone: '+48 606 789 012', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(60), lastContact: _dAgo(20), manager: 'Светлана',  comment: 'Рассматривает варианты' },
+      { id: 7, name: 'Наталья Романова',  phone: '+48 607 890 123', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(12), lastContact: _dAgo(5),  manager: '',          comment: '' },
+      { id: 8, name: 'Павел Мартиненко', phone: '+48 608 901 234', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(4),  lastContact: null,       manager: 'Александр', comment: 'Первый звонок провален' },
+    ];
+
+    const withHistory = students.map(s => ({
+      ...s,
+      history: [
+        { event: 'Выписан из группы',     date: s.expelled,     detail: `Группа: ${s.group}`,                                                      color: '#ef4444' },
+        { event: 'Передан отделу продаж', date: s.expelled,     detail: 'Начало работы по дозакрытию',                                             color: '#f59e0b' },
+        ...(s.lastContact ? [{ event: 'Последний контакт', date: s.lastContact, detail: `Ответственный: ${s.manager || '—'} · ${s.comment || 'без комментария'}`, color: '#4f6ef7' }] : []),
+      ],
+    }));
+
+    return ok(config, {
+      data: withHistory,
+      meta: {
+        total:  students.length,
+        hot:    students.filter(s => daysBetween(s.lastContact) > 7).length,
+        none:   students.filter(s => !s.lastContact).length,
+        unpaid: students.filter(s => !s.paid).length,
+      },
+    });
+  }
+
+  // PATCH expelled-students/:id
+  if (method === 'patch' && /^expelled-students\/\d+$/.test(url)) {
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  // POST expelled-students/:id/archive
+  if (method === 'post' && /^expelled-students\/\d+\/archive$/.test(url)) {
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      archivedAt: new Date().toISOString(),
+    });
+  }
+
+  // POST expelled-students/:id/transfer
+  if (method === 'post' && /^expelled-students\/\d+\/transfer$/.test(url)) {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      newGroup: body.group_id,
+    });
+  }
+
+  // POST expelled-students/bulk-assign
+  if (method === 'post' && url === 'expelled-students/bulk-assign') {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { updated: (body.ids || []).length });
+  }
+
+  // POST expelled-students/bulk-archive
+  if (method === 'post' && url === 'expelled-students/bulk-archive') {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { archived: (body.ids || []).length });
+  }
+
+  // ── END EXPELLED STUDENTS ──────────────────────────────────────────────────
+
+  return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
 };
 

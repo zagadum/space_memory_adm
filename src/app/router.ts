@@ -47,6 +47,12 @@ export const router = createRouter({
           meta: { title: 'sidebar.leads', icon: '📋' }
         },
         {
+          path: 'recruitment/expelled-students',
+          name: 'expelled-students',
+          component: () => import('../views/recruitment/ExpelledStudentsPage.vue'),
+          meta: { title: 'expelled.pageTitle', icon: '📤' }
+        },
+        {
           path: "recruitment/new-groups",
           name: "new-groups",
           component: () => import("../views/groups/NewGroupsPage.vue"),
