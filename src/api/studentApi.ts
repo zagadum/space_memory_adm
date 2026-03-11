@@ -34,13 +34,7 @@ export interface StudentListResponse {
 }
 
 export async function getStudents(params: StudentListParams = {}) {
-  // Map per_page to limit if backend expects 'limit', but currently store uses per_page.
-  // The request said "pagination (page, limit) and search (search, filters)".
-  const queryParams = {
-    ...params,
-    limit: params.per_page || 20,
-  };
-  const res = await http.get("students", { params: queryParams });
+  const res = await http.get("students", { params });
   return res.data as StudentListResponse;
 }
 
