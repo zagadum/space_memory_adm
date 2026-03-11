@@ -133,6 +133,35 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   const details = ref<Record<number, StudentDetails>>({ ...MOCK_DETAILS })
   const history = ref<Record<number, HistoryEvent[]>>({ ...MOCK_HISTORY })
 
+  const currentStudent = ref<any | null>(null)
+  const isLoading = ref(false)
+  const error = ref<string | null>(null)
+
+  const currentStudentDetails = computed((): StudentDetails | null => {
+    const s = currentStudent.value
+    if (!s) return null
+    return {
+      email:           s.email        ?? '',
+      password:        s.password      ?? '',
+      firstName:       s.name          ?? '',
+      lastName:        s.surname       ?? '',
+      birthDate:       s.dob           ?? '',
+      country:         s.country       ?? '',
+      city:            s.city          ?? '',
+      street:          s.address       ?? '',
+      apt:             s.apartment     ? String(s.apartment) : '',
+      postCode:        s.zip           ?? '',
+      parentFirst:     s.parent_name   ?? '',
+      parentLast:      s.parent_surname ?? '',
+      parentPhone:     s.parent_phone  ? String(s.parent_phone) : '',
+      parentPassport:  s.parent_passport ? String(s.parent_passport) : '',
+      photoConsent:    Boolean(s.photo_consent),
+      comment:         s.reg_comment   ?? '',
+      currentPrice:    '0.00',
+      currentPriceDesc: 'Не выбран',
+    }
+  })
+
   // Stats
   const totalCount = computed(() => students.value.length)
   const signedCount = computed(() => students.value.filter(s => s.contract === 'signed').length)
@@ -155,8 +184,10 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   function normalizeStudent(s: RecruitmentNewStudent): NewStudent {
     return {
       id: Number(s.id),
-      name: s.name,
-      age: s.age,
+      name: [s.name, s.surname].filter(Boolean).join(' '),
+      age: s.dob
+        ? Math.max(0, Math.floor((Date.now() - new Date(s.dob).getTime()) / 31557600000))
+        : (s.age ?? 0),
       contract: s.contract,
       payment: s.payment ?? 0,
       paymentStr: s.paymentStr ?? `${s.payment ?? 0} zł`,
@@ -177,6 +208,19 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       }
     } catch {
       // keep current local dataset if endpoint is not ready
+    }
+  }
+
+  async function fetchStudentById(id: number | string) {
+    isLoading.value = true
+    error.value = null
+    try {
+      const result = await recruitmentApi.getStudentById(id)
+      currentStudent.value = result.data
+    } catch (err: any) {
+      error.value = err?.response?.data?.message || 'Ошибка загрузки'
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -262,8 +306,8 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
   return {
     students, totalCount, signedCount, noManagerCount, avgWaitDays,
-    uniqueGroups, uniqueManagers,
-    fetchStudentsFromApi,
+    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, isLoading, error,
+    fetchStudentsFromApi, fetchStudentById,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice,
     getDetails, getHistory,
   }

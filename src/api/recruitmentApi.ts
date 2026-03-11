@@ -3,6 +3,8 @@ import { httpRecruitment } from "./http";
 export interface RecruitmentNewStudent {
   id: number;
   name: string;
+  surname?: string;
+  dob?: string;
   age: number;
   contract: "signed" | "pending";
   payment?: number;
@@ -44,6 +46,11 @@ export const recruitmentApi = {
     startDate: string | null;
   }) {
     const { data } = await httpRecruitment.post("recruitment/new-students", payload);
+    return data;
+  },
+
+  async getStudentById(id: number | string) {
+    const { data } = await httpRecruitment.get(`recruitment/new-students/${id}`);
     return data;
   },
 

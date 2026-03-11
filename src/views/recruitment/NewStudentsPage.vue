@@ -414,12 +414,17 @@ function onGroupPicked(groupName: string, color: string) {
 
 // ─── STUDENT PANEL ───
 const activeStudent = ref<NewStudent | null>(null)
-const activeDetails = computed(() => activeStudent.value ? store.getDetails(activeStudent.value.id) : null)
+const activeDetails = computed(() =>
+  activeStudent.value
+    ? (store.currentStudentDetails ?? store.getDetails(activeStudent.value.id))
+    : null
+)
 const activeHistory = computed(() => activeStudent.value ? store.getHistory(activeStudent.value.id) : [])
 
 function openPanel(s: NewStudent) {
   openActions.value = null
   activeStudent.value = s
+  store.fetchStudentById(s.id)
 }
 function onPanelSave(data: Parameters<typeof store.saveDetails>[1]) {
   if (!activeStudent.value) return
