@@ -179,11 +179,23 @@ function closeUserModal() {
   selectedUserId.value = null
 }
 
-function deleteUser(u: User) {
+async function deleteUser(u: User) {
   if (confirm(t('financeSettings.usersRoles.deleteConfirm', { name: u.name }))) {
-    alert(t('financeSettings.usersRoles.toastDeleted'))
+    try {
+      await store.deleteUser(u.id);
+      // Optional: replace alert with toast in future
+      alert(t('financeSettings.usersRoles.toastDeleted'));
+    } catch(e) {
+      alert("Error deleting user");
+    }
   }
 }
+
+import { onMounted } from 'vue';
+
+onMounted(() => {
+  store.fetchUsers();
+});
 </script>
 
 <style scoped>

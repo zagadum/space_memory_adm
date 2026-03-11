@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useAuthStore } from './auth.store';
+import { getUsers, updateUser as apiUpdateUser, deleteUser as apiDeleteUser } from '../api/settingsApi';
 
 export interface User {
     id: string;
@@ -21,68 +22,23 @@ export interface ModulePermissions {
 
 export const useSettingsUsersStore = defineStore('settingsUsers', () => {
     const authStore = useAuthStore();
-    const users = ref<User[]>([
-        {
-            id: 'u_current',
-            name: 'Artem',
-            email: 'artem@gls.edu.pl',
-            role: 'Dział rekrutacji учащихся',
-            status: 'online',
-            projects: ['space'],
-            initials: 'AR',
-            colorClass: 'ua-amber'
-        },
-        {
-            id: 'KN',
-            name: 'Karolina Nowak',
-            email: 'biuro@gls.edu.pl',
-            role: 'Super-Admin',
-            status: 'online',
-            projects: ['all'],
-            initials: 'KN',
-            colorClass: 'ua-blue'
-        },
-        {
-            id: 'MK',
-            name: 'Marta Kowalczyk',
-            email: 'marta@gls.edu.pl',
-            role: 'Admin',
-            status: 'offline',
-            projects: ['space', 'indigo'],
-            initials: 'MK',
-            colorClass: 'ua-purple'
-        },
-        {
-            id: 'PW',
-            name: 'Piotr Wiśniewski',
-            email: 'p.wisniewski@gls.edu.pl',
-            role: 'Kierownik działu rekrutacji',
-            status: 'offline',
-            projects: ['space', 'olimp'],
-            initials: 'PW',
-            colorClass: 'ua-amber'
-        },
-        {
-            id: 'AB',
-            name: 'Anna Brzozowska',
-            email: 'a.brzozowska@gls.edu.pl',
-            role: 'Kierownik Działu Jakości Space',
-            status: 'offline',
-            projects: ['space'],
-            initials: 'AB',
-            colorClass: 'ua-green'
-        },
-        {
-            id: 'ZN',
-            name: 'Zofia Nowak',
-            email: 'z.nowak@gls.edu.pl',
-            role: 'Pracownik sekretariatu',
-            status: 'offline',
-            projects: ['all'],
-            initials: 'ZN',
-            colorClass: 'ua-cyan'
+    const users = ref<User[]>([]);
+    const isLoading = ref(false);
+    const error = ref<string | null>(null);
+
+    const fetchUsers = async () => {
+        isLoading.value = true;
+        error.value = null;
+        try {
+            const result = await getUsers();
+            users.value = result.items ?? [];
+        } catch (err: any) {
+            error.value = err?.response?.data?.message || err?.message || 'Ошибка загрузки пользователей';
+            console.error('Ошибка загрузки пользователей:', err);
+        } finally {
+            isLoading.value = false;
         }
-    ]);
+    };
 
     const roles = ref<string[]>([
         "Super-Admin", "Admin", "Kierownik działu rekrutacji", "Dział rekrutacji учащихся",
@@ -105,22 +61,42 @@ export const useSettingsUsersStore = defineStore('settingsUsers', () => {
         { module: 'Użytkownicy', roles: { 'S-Admin': '✅', 'Admin': '—', 'Kier.Rekr': '—', 'Trener': '—', 'Fin/Adm': '—', 'Sekr.': '—' } }
     ]);
 
-    const updateUser = (id: string, updatedData: Partial<User>) => {
-        const index = users.value.findIndex(u => u.id === id);
-        if (index !== -1) {
-            users.value[index] = { ...users.value[index], ...updatedData };
+    const updateUser = async (id: string, updatedData: Partial<User>) => {
+        try {
+            const updatedUser = await apiUpdateUser(id, updatedData);
+            const index = users.value.findIndex(u => u.id === id);
+            if (index !== -1) {
+                users.value[index] = { ...users.value[index], ...updatedUser };
 
-            // Sync with global auth store if current user updated
-            if (id === authStore.user?.id) {
-                authStore.updateProfile(updatedData);
+                // Sync with global auth store if current user updated
+                if (id === authStore.user?.id) {
+                    authStore.updateProfile(updatedData);
+                }
             }
+        } catch (err) {
+            console.error('Failed to update user', err);
+            throw err;
+        }
+    };
+
+    const deleteUser = async (id: string) => {
+        try {
+            await apiDeleteUser(id);
+            users.value = users.value.filter(u => u.id !== id);
+        } catch (err) {
+            console.error('Failed to delete user', err);
+            throw err;
         }
     };
 
     return {
         users,
+        isLoading,
+        error,
         roles,
         permissionsMatrix,
-        updateUser
+        fetchUsers,
+        updateUser,
+        deleteUser
     };
 });

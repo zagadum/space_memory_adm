@@ -605,13 +605,32 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
+  // --- SETTINGS: USERS ---
+  if (method === "get" && url === "settings/users") {
+    return ok(config, {
+      items: [
+        { id: "u_current", email: "artem@gls.edu.pl", name: "Artem", role: "Dział rekrutacji учащихся", status: "online", lastLogin: "2026-03-06 14:30:00", projects: ['space'], initials: 'AR', colorClass: 'ua-amber' },
+        { id: "u_2", email: "biuro@gls.edu.pl", name: "Karolina Nowak", role: "Super-Admin", status: "online", lastLogin: "2026-03-05 09:00:00", projects: ['all'], initials: 'KN', colorClass: 'ua-blue' },
+        { id: "u_3", email: "marta@gls.edu.pl", name: "Marta Kowalczyk", role: "Admin", status: "offline", lastLogin: "2026-03-05 09:00:00", projects: ['space', 'indigo'], initials: 'MK', colorClass: 'ua-purple' },
+        { id: "u_4", email: "p.wisniewski@gls.edu.pl", name: "Piotr Wiśniewski", role: "Kierownik działu rekrutacji", status: "offline", lastLogin: "2026-03-05 09:00:00", projects: ['space', 'olimp'], initials: 'PW', colorClass: 'ua-amber' }
+      ]
+    });
+  }
+  if (method === "patch" && /^settings\/users\//.test(url)) {
+    return ok(config, { ...JSON.parse(config.data || "{}"), id: url.split("/")[2] });
+  }
+  if (method === "delete" && /^settings\/users\//.test(url)) {
+    return ok(config, { success: true });
+  }
+
   if (method === "get" && url === "students") {
     // Генерируем mock данные для списка студентов
     const mockStudentsList = [
       {
         id: 1,
         full_name: "Иван Иванов",
-        name: "Иван Иванов",
+        firstName: "Иван",
+        lastName: "Иванов",
         phone: "+48 777 000 111",
         email: "ivan.ivanov@gmail.com",
         created_at: "2025-12-15",
@@ -638,7 +657,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       {
         id: 2,
         full_name: "Мария Петрова",
-        name: "Мария Петрова",
+        firstName: "Мария",
+        lastName: "Петрова",
         phone: "+48 777 000 222",
         email: "maria.petrova@gmail.com",
         created_at: "2025-11-01",
@@ -665,7 +685,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       {
         id: 3,
         full_name: "Алексей Сидоров",
-        name: "Алексей Сидоров",
+        firstName: "Алексей",
+        lastName: "Сидоров",
         phone: "+48 777 000 333",
         email: "alexey.sidorov@gmail.com",
         created_at: "2025-10-20",
@@ -692,7 +713,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       {
         id: 4,
         full_name: "Елена Смирнова",
-        name: "Елена Смирнова",
+        firstName: "Елена",
+        lastName: "Смирнова",
         phone: "+48 777 000 444",
         email: "elena.smirnova@gmail.com",
         created_at: "2025-09-10",
