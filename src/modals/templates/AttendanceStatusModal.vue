@@ -29,10 +29,12 @@ import BaseModal from "../BaseModal.vue";
 import { useModalStore } from "../../stores/modal.store";
 import { setAttendanceMark } from "../../api/studentApi";
 import { useStudentTabsStore } from "../../stores/studentTabs.store";
+import { usePaymentsStore } from "../../stores/payments.store";
 
 const { t } = useI18n();
 const modal = useModalStore();
 const tabs = useStudentTabsStore();
+const paymentsStore = usePaymentsStore();
 
 const row = computed(() => (modal.payload as any)?.row);
 const rowLabel = computed(() => (row.value ? `#${row.value.num} · ${row.value.date} · ${row.value.trainer}` : ""));
@@ -49,13 +51,14 @@ async function save() {
   if (!row.value?.id) return close();
   saving.value = true;
   try {
+    const studentId = paymentsStore.currentStudentId || "s_1";
     await setAttendanceMark({
-      studentId: "s_1",
+      studentId,
       attendanceId: row.value.id,
       mark: mark.value,
       note: note.value,
     });
-    await tabs.loadAttendance("s_1");
+    await tabs.loadAttendance(studentId);
     modal.close();
   } finally {
     saving.value = false;

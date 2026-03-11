@@ -323,5 +323,12 @@ export const usePaymentsStore = defineStore("payments", {
       this.currentStudentId = "";
       this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [] };
     },
+
+    // Перезагрузка данных текущего студента (вызывается после мутаций)
+    async reloadCurrent() {
+      if (this.currentStudentId) {
+        await this.loadStudent(this.currentStudentId);
+      }
+    },
   },
 });

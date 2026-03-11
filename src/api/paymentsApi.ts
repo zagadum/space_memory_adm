@@ -49,7 +49,7 @@ export const paymentsApi = {
 
   // ── Старый монолитный запрос (оставляем для обратной совместимости) ─────────
   async getStudentPayments(studentId: string) {
-    const { data } = await http.get<MaybeWrapped<StudentPaymentsResponse>>(`payments/student/${studentId}`);
+    const { data } = await http.get<MaybeWrapped<StudentPaymentsResponse>>(`students/${studentId}/payments`);
     return unwrapApiData(data);
   },
 

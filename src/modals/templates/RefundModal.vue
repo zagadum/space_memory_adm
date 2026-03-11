@@ -138,10 +138,16 @@ async function submit() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    // Simulated API call — replace with real API in production
-    await new Promise(r => setTimeout(r, 600));
-    // Reload store data after successful mutation
-    await paymentsStore.loadStudent();
+    await paymentsApi.submitRefund({
+      fvnum: fvnum.value,
+      amount: payload?.amount,
+      reason: reasonId.value,
+      type: refundType.value,
+      description: description.value,
+      method: method.value,
+      iban: method.value === 'bank' ? iban.value : undefined,
+    });
+    await paymentsStore.reloadCurrent();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';
