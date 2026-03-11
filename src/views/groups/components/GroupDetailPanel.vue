@@ -137,10 +137,10 @@
                 </td>
                 <td>
                   <div class="row-actions">
-                    <div class="ra-btn archive" data-tip="В архив" @click="showToast('📦 ' + s.name + ' перемещён в архив')">📦</div>
+                    <div class="ra-btn archive" data-tip="В архив" @click="notify.addToast('📦 ' + s.name + ' перемещён в архив', 'warning')">📦</div>
                     <div class="ra-btn remove"  data-tip="Убрать из группы" @click="removeStudent(s.id, s.name)">✕</div>
-                    <div class="ra-btn transfer" data-tip="Перенести в группу" @click="showToast('🔀 Перенос ' + s.name + ' — выберите группу')">🔀</div>
-                    <div class="ra-btn email" data-tip="Отправить Email" @click="showToast('✉ Email отправлен: ' + s.name)">✉</div>
+                    <div class="ra-btn transfer" data-tip="Перенести в группу" @click="notify.addToast('🔀 Перенос ' + s.name + ' — выберите группу', 'warning')">🔀</div>
+                    <div class="ra-btn email" data-tip="Отправить Email" @click="notify.addToast('✉ Email отправлен: ' + s.name, 'success')">✉</div>
                   </div>
                 </td>
               </tr>
@@ -207,10 +207,7 @@
       </div>
     </div>
 
-    <!-- TOAST -->
-    <Teleport to="body">
-      <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
-    </Teleport>
+    <!-- TOAST REMOVED -->
   </div>
 </template>
 
@@ -218,6 +215,9 @@
 import { ref, computed } from 'vue'
 import type { NewGroup, NewGroupStudent, MasterStudent } from '../../../api/newGroupsApi'
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
+import { useNotificationStore } from '../../../stores/notification.store'
+
+const notify = useNotificationStore()
 
 const props = defineProps<{
   group: NewGroup
@@ -238,7 +238,6 @@ const addPanelOpen = ref(false)
 const aspQuery = ref('')
 const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
-const toastMsg = ref('')
 
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
 const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
@@ -266,19 +265,19 @@ function toggleAsp(id: number) {
 
 async function confirmAdd() {
   if (aspSelected.value.size === 0) {
-    showToast('⚠️ Выберите хотя бы одного ученика')
+    notify.addToast('⚠️ Выберите хотя бы одного ученика', 'warning')
     return
   }
   emit('students-added', { groupId: props.group.id, studentIds: [...aspSelected.value] })
   addPanelOpen.value = false
   aspSelected.value = new Set()
   aspQuery.value = ''
-  showToast('✅ Ученики добавлены')
+  notify.addToast('Ученики добавлены ✅', 'success')
 }
 
 function removeStudent(studentId: number | string, name: string) {
   emit('student-removed', { groupId: props.group.id, studentId: Number(studentId) })
-  showToast('✕ ' + name + ' убран из группы')
+  notify.addToast('✕ ' + name + ' убран из группы', 'warning')
 }
 
 function confirmDelete() {
@@ -288,13 +287,6 @@ function confirmDelete() {
 function doDelete() {
   deleteConfirm.value = false
   emit('delete', props.group.id)
-}
-
-let toastTimer: ReturnType<typeof setTimeout> | null = null
-function showToast(msg: string) {
-  toastMsg.value = msg
-  if (toastTimer) clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => toastMsg.value = '', 2500)
 }
 </script>
 
@@ -578,16 +570,6 @@ function showToast(msg: string) {
 .dc-sub   { font-size: 13px; color: var(--dim); margin-bottom: 24px; line-height: 1.5; }
 .dc-actions { display: flex; gap: 10px; justify-content: center; }
 
-/* TOAST */
-.toast {
-  position: fixed; bottom: 28px; right: 28px;
-  background: var(--card);
-  border: 1px solid rgba(16,185,129,0.4);
-  border-radius: 10px; padding: 12px 20px;
-  color: var(--green); font-weight: 600; font-size: 14px;
-  z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  font-family: 'Outfit', sans-serif;
-}
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s; border: none; }
