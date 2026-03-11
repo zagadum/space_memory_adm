@@ -577,9 +577,9 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   if (method === "post" && url === "new-groups/remove-student") {
     const body = readBody(config);
-    if (!body?.groupId || !body?.studentName) return err(config, 400, "groupId/studentName required");
+    if (!body?.groupId || !body?.studentId) return err(config, 400, "groupId/studentId required");
     if (ngStudents[body.groupId]) {
-      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.name !== body.studentName);
+      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
     }
     return ok(config, { ok: true });
   }

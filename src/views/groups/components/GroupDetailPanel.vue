@@ -138,7 +138,7 @@
                 <td>
                   <div class="row-actions">
                     <div class="ra-btn archive" data-tip="В архив" @click="showToast('📦 ' + s.name + ' перемещён в архив')">📦</div>
-                    <div class="ra-btn remove"  data-tip="Убрать из группы" @click="removeStudent(s.name)">✕</div>
+                    <div class="ra-btn remove"  data-tip="Убрать из группы" @click="removeStudent(s.id, s.name)">✕</div>
                     <div class="ra-btn transfer" data-tip="Перенести в группу" @click="showToast('🔀 Перенос ' + s.name + ' — выберите группу')">🔀</div>
                     <div class="ra-btn email" data-tip="Отправить Email" @click="showToast('✉ Email отправлен: ' + s.name)">✉</div>
                   </div>
@@ -230,7 +230,7 @@ const emit = defineEmits<{
   start: []
   delete: [id: number]
   'students-added': [payload: { groupId: number; studentIds: number[] }]
-  'student-removed': [payload: { groupId: number; studentName: string }]
+  'student-removed': [payload: { groupId: number; studentId: number }]
 }>()
 
 const addPanelOpen = ref(false)
@@ -294,8 +294,8 @@ async function confirmAdd() {
   showToast('✅ Ученики добавлены')
 }
 
-function removeStudent(name: string) {
-  emit('student-removed', { groupId: props.group.id, studentName: name })
+function removeStudent(studentId: number | string, name: string) {
+  emit('student-removed', { groupId: props.group.id, studentId: Number(studentId) })
   showToast('✕ ' + name + ' убран из группы')
 }
 

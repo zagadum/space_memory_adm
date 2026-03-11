@@ -123,8 +123,10 @@ import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '
 import CreateGroupModal from './components/CreateGroupModal.vue'
 import StartGroupModal from './components/StartGroupModal.vue'
 import GroupDetailPanel from './components/GroupDetailPanel.vue'
+import { useNotificationStore } from '../../stores/notification.store'
 
 // ── Data ──
+const notify = useNotificationStore()
 const groups = ref<NewGroup[]>([])
 const masterStudents = ref<MasterStudent[]>([])
 const teachers = ref<NewGroupTeacher[]>([])
@@ -239,45 +241,74 @@ function closePanel() {
 }
 
 async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
-  const res = await createNewGroup(payload)
-  groups.value.unshift(res.group)
-  showCreateModal.value = false
+  try {
+    const res = await createNewGroup(payload)
+    groups.value.unshift(res.group)
+    showCreateModal.value = false
+    notify.addToast('Группа создана ✅', 'success')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка создания группы', 'error')
+  }
 }
 
 async function onGroupStarted(id: number) {
-  await apiStartGroup(id)
-  groups.value = groups.value.filter(g => g.id !== id)
-  startGroup.value = null
-  if (panelGroup.value?.id === id) closePanel()
+  try {
+    await apiStartGroup(id)
+    groups.value = groups.value.filter(g => g.id !== id)
+    startGroup.value = null
+    if (panelGroup.value?.id === id) closePanel()
+    notify.addToast('Группа запущена 🚀', 'success')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка запуска группы', 'error')
+  }
 }
 
 async function onDeleteGroup(id: number) {
-  await deleteNewGroup(id)
-  groups.value = groups.value.filter(g => g.id !== id)
-  closePanel()
+  try {
+    await deleteNewGroup(id)
+    groups.value = groups.value.filter(g => g.id !== id)
+    closePanel()
+    notify.addToast('Группа удалена', 'warning')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка удаления группы', 'error')
+  }
 }
 
 async function onStudentsAdded(payload: { groupId: number; studentIds: number[] }) {
-  await addStudentsToGroup(payload)
-  const res = await getNewGroupStudents(payload.groupId)
-  panelStudents.value = res.items
+  try {
+    await addStudentsToGroup(payload)
+    const res = await getNewGroupStudents(payload.groupId)
+    panelStudents.value = res.items
+    notify.addToast('Ученики добавлены ✅', 'success')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка добавления учеников', 'error')
+  }
 }
 
-async function onStudentRemoved(payload: { groupId: number; studentName: string }) {
-  await removeStudentFromGroup(payload)
-  panelStudents.value = panelStudents.value.filter(s => s.name !== payload.studentName)
+async function onStudentRemoved(payload: { groupId: number; studentId: number }) {
+  try {
+    await removeStudentFromGroup(payload)
+    panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    notify.addToast('Ученик убран из группы', 'warning')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка удаления ученика', 'error')
+  }
 }
 
 // ── Init ──
 onMounted(async () => {
-  const [gRes, sRes, tRes] = await Promise.all([
-    getNewGroups(),
-    getMasterStudents(),
-    getTeachers(),
-  ])
-  groups.value = gRes.items
-  masterStudents.value = sRes.items
-  teachers.value = tRes.items
+  try {
+    const [gRes, sRes, tRes] = await Promise.all([
+      getNewGroups(),
+      getMasterStudents(),
+      getTeachers(),
+    ])
+    groups.value = gRes.items
+    masterStudents.value = sRes.items
+    teachers.value = tRes.items
+  } catch (err: any) {
+    notify.addToast('Ошибка загрузки данных', 'error')
+  }
 })
 </script>
 
