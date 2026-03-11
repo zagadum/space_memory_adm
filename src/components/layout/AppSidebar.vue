@@ -182,9 +182,9 @@
           <span class="nav-icon">🎓</span> {{ t('sidebar.newGroups') }}
         </div>
         <div 
-          class="nav-item nav-item--stub" 
+          class="nav-item" 
           :class="{ active: activeItem === 'expelled' }" 
-          @click="setActive('expelled')"
+          @click="navigateTo('expelled', '/recruitment/expelled-students')"
         >
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
@@ -365,6 +365,9 @@ watch(() => route.path, (path) => {
     openSections.value.recruitment = true
   } else if (path.startsWith('/recruitment/new-groups')) {
     activeItem.value = 'new-groups'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/expelled-students')) {
+    activeItem.value = 'expelled'
     openSections.value.recruitment = true
   } else if (path.startsWith('/finance/returns')) {
     activeItem.value = 'returns'

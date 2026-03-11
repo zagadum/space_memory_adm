@@ -44,6 +44,7 @@
   --bg: var(--app-bg);
   --card: var(--app-card);
   --white: var(--app-text-main);
+  --text-main: var(--app-text-main);
   --dim: var(--app-text-dim);
   --b: var(--app-border);
   --bh: var(--app-border-hi);
@@ -86,6 +87,7 @@
   --bg: var(--app-bg);
   --card: var(--app-card);
   --white: var(--app-text-main);
+  --text-main: var(--app-text-main);
   --dim: var(--app-text-dim);
   --b: var(--app-border);
   --bh: var(--app-border-hi);

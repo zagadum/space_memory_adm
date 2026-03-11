@@ -98,7 +98,7 @@ export async function addStudentsToGroup(payload: { groupId: number; studentIds:
     return res.data as { ok: true; added: number };
 }
 
-export async function removeStudentFromGroup(payload: { groupId: number; studentName: string }) {
+export async function removeStudentFromGroup(payload: { groupId: number; studentId: number }) {
     const res = await httpRecruitment.post("new-groups/remove-student", payload);
     return res.data as { ok: true };
 }
