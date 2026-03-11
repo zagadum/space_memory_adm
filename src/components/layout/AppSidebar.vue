@@ -24,7 +24,7 @@
     <nav class="sidebar-nav">
       <!-- МОЙ КАБИНЕТ -->
       <div 
-        class="nav-standalone" 
+        class="nav-standalone nav-item--stub" 
         :class="{ active: activeItem === 'my-cabinet' }" 
         @click="navigateTo('my-cabinet', '/my-cabinet')"
       >
@@ -34,7 +34,7 @@
 
       <!-- ДАШБОРД -->
       <div 
-        class="nav-standalone" 
+        class="nav-standalone nav-item--stub" 
         :class="{ active: activeItem === 'dashboard' }" 
         @click="setActive('dashboard')"
       >
@@ -61,7 +61,7 @@
           <span class="nav-badge green" v-if="listStore.totalStudents > 0">{{ listStore.totalStudents }}</span>
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'groups' }" 
           @click="setActive('groups')"
         >
@@ -69,21 +69,21 @@
           <span class="nav-badge blue">12</span>
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'teachers' }" 
           @click="setActive('teachers')"
         >
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.teachers') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'docs' }" 
           @click="setActive('docs')"
         >
           <span class="nav-icon">📄</span> {{ t('sidebar.docs') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'inpost' }" 
           @click="setActive('inpost')"
         >
@@ -102,14 +102,14 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.finance }">
-        <div class="nav-item" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
           <span class="nav-icon">💰</span> {{ t('sidebar.studentFinance') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
           <span class="nav-icon">🔴</span> {{ t('sidebar.debtors') }}
           <span class="nav-badge" v-if="debtors > 0">{{ debtors }}</span>
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
           <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
           <span class="nav-badge cyan">3</span>
         </div>
@@ -130,7 +130,7 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.accounting }">
-        <div class="nav-item" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
           <span class="nav-icon">🧾</span> {{ t('sidebar.faktury') }}
         </div>
         <div class="nav-item" :class="{ active: activeItem === 'returns' }" @click="navigateTo('returns', '/finance/returns')">
@@ -143,7 +143,7 @@
         <div class="nav-item" :class="{ active: activeItem === 'salary-calculator' }" @click="navigateTo('salary-calculator', '/finance/salary-calculator')">
           <span class="nav-icon">🧮</span> {{ t('sidebar.salaryCalculator') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia')">
           <span class="nav-icon">🔧</span> {{ t('sidebar.ustawienia') }}
         </div>
       </div>
@@ -182,14 +182,14 @@
           <span class="nav-icon">🎓</span> {{ t('sidebar.newGroups') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'expelled' }" 
           @click="setActive('expelled')"
         >
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'recruit-archive' }" 
           @click="setActive('recruit-archive')"
         >
@@ -205,46 +205,46 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.quality }">
-        <div class="nav-item" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
           <span class="nav-icon">🚪</span> {{ t('sidebar.rezygnacje') }}
           <span class="nav-badge" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'holidays-return' }" @click="navigateTo('holidays-return', '/quality/holidays-return')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'holidays-return' }" @click="navigateTo('holidays-return', '/quality/holidays-return')">
           <span class="nav-icon">🌙</span> {{ t('sidebar.holidaysReturn') }}
           <span class="nav-badge amber">4</span>
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'quality-monitoring' }" @click="navigateTo('quality-monitoring', '/quality/monitoring')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-monitoring' }" @click="navigateTo('quality-monitoring', '/quality/monitoring')">
           <span class="nav-icon">🔍</span> {{ t('sidebar.qualityMonitoring') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'quality-analytics' }" @click="navigateTo('quality-analytics', '/quality/analytics')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-analytics' }" @click="navigateTo('quality-analytics', '/quality/analytics')">
           <span class="nav-icon">📊</span> {{ t('sidebar.qualityAnalytics') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'trial-lessons-qd' }" @click="navigateTo('trial-lessons-qd', '/quality/trial-lessons')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trial-lessons-qd' }" @click="navigateTo('trial-lessons-qd', '/quality/trial-lessons')">
           <span class="nav-icon">⭐</span> {{ t('sidebar.trialLessonsQd') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'quality-zaliczenia' }" @click="navigateTo('quality-zaliczenia', '/quality/zaliczenia')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-zaliczenia' }" @click="navigateTo('quality-zaliczenia', '/quality/zaliczenia')">
           <span class="nav-icon">✔️</span> {{ t('sidebar.qualityZaliczenia') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'quality-olimpiad' }" @click="navigateTo('quality-olimpiad', '/quality/olimpiad')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-olimpiad' }" @click="navigateTo('quality-olimpiad', '/quality/olimpiad')">
           <span class="nav-icon">🏆</span> {{ t('sidebar.qualityOlimpiad') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'spotkania' }" @click="navigateTo('spotkania', '/quality/spotkania')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'spotkania' }" @click="navigateTo('spotkania', '/quality/spotkania')">
           <span class="nav-icon">🤝</span> {{ t('sidebar.spotkania') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'sciezka' }" @click="navigateTo('sciezka', '/quality/sciezka')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'sciezka' }" @click="navigateTo('sciezka', '/quality/sciezka')">
           <span class="nav-icon">🛤️</span> {{ t('sidebar.sciezka') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'quality-materials' }" @click="navigateTo('quality-materials', '/quality/materials')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-materials' }" @click="navigateTo('quality-materials', '/quality/materials')">
           <span class="nav-icon">📚</span> {{ t('sidebar.qualityMaterials') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'zaliczenia-calendar' }" @click="navigateTo('zaliczenia-calendar', '/quality/zaliczenia-calendar')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'zaliczenia-calendar' }" @click="navigateTo('zaliczenia-calendar', '/quality/zaliczenia-calendar')">
           <span class="nav-icon">📅</span> {{ t('sidebar.zaliczeniaCalendar') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'all-tasks' }" @click="navigateTo('all-tasks', '/quality/all-tasks')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'all-tasks' }" @click="navigateTo('all-tasks', '/quality/all-tasks')">
           <span class="nav-icon">📋</span> {{ t('sidebar.allTasks') }}
           <span class="nav-badge blue">8</span>
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'quality-stats' }" @click="navigateTo('quality-stats', '/quality/stats')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-stats' }" @click="navigateTo('quality-stats', '/quality/stats')">
           <span class="nav-icon">📉</span> {{ t('sidebar.qualityStats') }}
         </div>
       </div>
@@ -256,20 +256,20 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.settings }">
-        <div class="nav-item" :class="{ active: activeItem === 'indigo-techniques' }" @click="setActive('indigo-techniques')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'indigo-techniques' }" @click="setActive('indigo-techniques')">
           <span class="nav-icon">🧩</span> {{ t('sidebar.indigoTechniques') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
           <span class="nav-icon">🏫</span> {{ t('sidebar.schoolSettings') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'access-control' }" @click="setActive('access-control')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="setActive('access-control')">
           <span class="nav-icon">🔐</span> {{ t('sidebar.accessControl') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">
           <span class="nav-icon">🔌</span> {{ t('sidebar.integrations') }}
           <span class="nav-badge blue">KSeF</span>
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'reports' }" @click="setActive('reports')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'reports' }" @click="setActive('reports')">
           <span class="nav-icon">📄</span> {{ t('sidebar.reports') }}
         </div>
       </div>
@@ -543,4 +543,10 @@ const navigateTo = (item: string, path: string) => {
 .logout-btn svg { transition: transform 0.2s ease; }
 .logout-btn:hover { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
 .logout-btn:hover svg { transform: translateX(2px); }
+
+.nav-item--stub {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
 </style>

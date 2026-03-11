@@ -1,5 +1,10 @@
 <template>
-  <button class="btn" :class="variantClass" :type="type">
+  <button 
+    class="btn disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none" 
+    :class="variantClass" 
+    :type="type"
+    :disabled="disabled"
+  >
     <slot />
   </button>
 </template>
@@ -11,8 +16,9 @@ const props = withDefaults(
   defineProps<{
     variant?: "primary" | "ghost" | "amber" | "cyan" | "red" | "green" | "pink" | "archive" | "unlock";
     type?: "button" | "submit";
+    disabled?: boolean;
   }>(),
-  { variant: "ghost", type: "button" }
+  { variant: "ghost", type: "button", disabled: false }
 );
 
 const variantClass = computed(() => {
