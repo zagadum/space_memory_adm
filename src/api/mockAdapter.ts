@@ -958,6 +958,37 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // ── END EXPELLED STUDENTS ──────────────────────────────────────────────────
 
+  // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
+  // GET new-students
+  if (method === 'get' && (url === 'new-students' || url === 'recruitment/new-students')) {
+    return ok(config, { data: [] });
+  }
+
+  // GET leads
+  if (method === 'get' && (url === 'leads' || url === 'recruitment/leads')) {
+    return ok(config, {
+      data: [
+        { id: '1', name: 'Александр Иванов', phone: '+48 123 456 789', subject: 'Математика', createdAt: '2023-10-20', status: 'new' },
+        { id: '2', name: 'Мария Петрова', phone: '+48 987 654 321', subject: 'Физика', createdAt: '2023-10-21', status: 'new' },
+        { id: '3', name: 'Дмитрий Сидоров', phone: '+48 500 600 700', subject: 'Английский', createdAt: '2023-10-19', status: 'in_progress' },
+        { id: '4', name: 'Елена Смирнова', phone: '+48 111 222 333', subject: 'Химия', createdAt: '2023-10-18', status: 'trial' },
+        { id: '5', name: 'Игорь Кузнецов', phone: '+48 444 555 666', subject: 'Биология', createdAt: '2023-10-17', status: 'decision' },
+      ]
+    });
+  }
+
+  // POST leads/move (or PATCH leads/:id based on API)
+  if ((method === 'post' || method === 'patch') && (url === 'leads/move' || url.startsWith('recruitment/leads/'))) {
+    return ok(config, { ok: true });
+  }
+
+  // POST leads/add (or POST recruitment/leads)
+  if (method === 'post' && (url === 'leads/add' || url === 'recruitment/leads')) {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { id: Date.now().toString(), ...body });
+  }
+  // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
+
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
 };
 
