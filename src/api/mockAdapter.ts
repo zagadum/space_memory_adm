@@ -964,6 +964,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { data: [] });
   }
 
+  // POST new-students
+  if (method === 'post' && (url === 'new-students' || url === 'recruitment/new-students')) {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { ok: true, id: Date.now(), ...body });
+  }
+
+  // POST new-students/:id/archive
+  if (method === 'post' && /^recruitment\/new-students\/\d+\/archive$/.test(url)) {
+    return ok(config, { ok: true });
+  }
+
   // GET leads
   if (method === 'get' && (url === 'leads' || url === 'recruitment/leads')) {
     return ok(config, {
