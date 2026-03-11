@@ -43,10 +43,10 @@
         <div class="gp-start-info">
           <div>
             <div class="gp-ratio-big" :style="{ color: ratioColor, textShadow: '0 0 20px ' + ratioColor + '55' }">
-              {{ group.paid }}/{{ group.totalSlots }}
+              {{ actualPaid }}/{{ actualTotal }}
             </div>
             <div class="gp-ratio-sub">
-              <span :style="{ color: 'var(--green)' }">{{ group.paid }} активируются</span>
+              <span :style="{ color: 'var(--green)' }">{{ actualPaid }} активируются</span>
               <template v-if="notPaid > 0"> · <span :style="{ color: 'var(--amber)' }">{{ notPaid }} ожидают</span></template>
             </div>
           </div>
@@ -59,7 +59,7 @@
             <div class="gp-bar-row">
               <span class="gp-bar-label">Оплатили</span>
               <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
-              <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">{{ group.paid }}</span>
+              <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">{{ actualPaid }}</span>
             </div>
           </div>
         </div>
@@ -240,11 +240,24 @@ const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
 
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
-const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
-const notPaid = computed(() => props.group.totalSlots - props.group.paid)
+// Когда студенты загружены — считаем из них. Иначе fallback на group.paid
+const actualTotal = computed(() =>
+  props.students.length > 0 ? props.students.length : props.group.totalSlots
+)
+const actualPaid = computed(() =>
+  props.students.length > 0
+    ? props.students.filter(s => s.contract === 'signed').length
+    : props.group.paid
+)
+const pct = computed(() =>
+  actualTotal.value > 0 ? Math.round(actualPaid.value / actualTotal.value * 100) : 0
+)
+const notPaid = computed(() => actualTotal.value - actualPaid.value)
 const ratioColor = computed(() => pct.value === 100 ? 'var(--green)' : pct.value >= 50 ? 'var(--amber)' : 'var(--red)')
 const contractCount = computed(() => props.students.filter(s => s.contract === 'signed').length)
-const contractPct = computed(() => props.group.totalSlots ? Math.round(contractCount.value / props.group.totalSlots * 100) : 0)
+const contractPct = computed(() =>
+  actualTotal.value > 0 ? Math.round(contractCount.value / actualTotal.value * 100) : 0
+)
 
 const alreadyInGroup = computed(() => new Set(props.students.map(s => s.name)))
 
