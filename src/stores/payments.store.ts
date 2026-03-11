@@ -60,9 +60,11 @@ export const usePaymentsStore = defineStore("payments", {
 
     // Справочники для выпадающих списков
     dictionaries: {
-      pauseReasons: [] as Array<{ id: string; labelKey: string }>,
-      paymentMethods: [] as Array<{ id: string; labelKey: string }>,
-      discountTypes: [] as Array<{ id: string; labelKey: string }>
+      pauseReasons: [] as Array<any>,
+      paymentMethods: [] as Array<any>,
+      discountTypes: [] as Array<any>,
+      refundReasons: [] as Array<any>,
+      tariffs: [] as Array<any>
     }
   }),
 
@@ -117,22 +119,20 @@ export const usePaymentsStore = defineStore("payments", {
   actions: {
     // ── Справочники ────────────────────────────────────────────────────────────
     async fetchDictionaries() {
-      this.dictionaries = {
-        pauseReasons: [
-          { id: 'vacation', labelKey: 'modals.reasons.vacation' },
-          { id: 'illness', labelKey: 'modals.reasons.illness' },
-          { id: 'family', labelKey: 'modals.reasons.family' }
-        ],
-        paymentMethods: [
-          { id: 'card', labelKey: 'modals.methods.card' },
-          { id: 'cash', labelKey: 'modals.methods.cash' },
-          { id: 'transfer', labelKey: 'modals.methods.transfer' }
-        ],
-        discountTypes: [
-          { id: 'family', labelKey: 'modals.discounts.family' },
-          { id: 'marketing', labelKey: 'modals.discounts.marketing' }
-        ]
-      };
+      try {
+        const [pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs] =
+          await Promise.all([
+            paymentsApi.getPauseReasons(),
+            paymentsApi.getPaymentMethods(),
+            paymentsApi.getDiscountTypes(),
+            paymentsApi.getRefundReasons(),
+            paymentsApi.getTariffs(),
+          ]);
+        this.dictionaries = { pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs };
+      } catch (err: any) {
+        console.error('Ошибка загрузки словарей:', err?.message);
+        // Словари не критичны — не блокируем работу стора
+      }
     },
 
     // ── СТАРЫЙ монолитный loadStudent (оставляем, пока бэкенд не готов) ───────
@@ -321,7 +321,7 @@ export const usePaymentsStore = defineStore("payments", {
       this.newTxLoading = {};
       this.newTxError = {};
       this.currentStudentId = "";
-      this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [] };
+      this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [], refundReasons: [], tariffs: [] };
     },
 
     // Перезагрузка данных текущего студента (вызывается после мутаций)

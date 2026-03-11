@@ -257,6 +257,47 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true, programId: body.programId, value: body.value });
   }
 
+  // Dictionaries
+  if (method === "get" && url === "dictionaries/pause-reasons") {
+    return ok(config, { items: [
+      { id: "illness", label: "Болезнь", icon: "🤧" },
+      { id: "vacation", label: "Отпуск", icon: "🏖️" },
+      { id: "financial", label: "Финансовые трудности", icon: "💰" },
+      { id: "other", label: "Другое", icon: "📝" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/payment-methods") {
+    return ok(config, { items: [
+      { id: "cash", label: "Наличные", icon: "💵" },
+      { id: "bank_transfer", label: "Банковский перевод", icon: "🏦" },
+      { id: "imoje", label: "iMoje (онлайн)", icon: "💳" },
+      { id: "manual", label: "Ручной ввод", icon: "⌨️" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/discount-types") {
+    return ok(config, { items: [
+      { id: "sibling", label: "Скидка для братьев/сестёр", icon: "👨‍👩‍👧‍👦" },
+      { id: "loyalty", label: "Лояльность", icon: "❤️" },
+      { id: "promo", label: "Промокод", icon: "🎫" },
+      { id: "manual", label: "Ручная скидка", icon: "✍️" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/refund-reasons") {
+    return ok(config, { items: [
+      { id: "overpayment", label: "Переплата", icon: "📈" },
+      { id: "cancellation", label: "Отмена занятий", icon: "❌" },
+      { id: "quality", label: "Претензия к качеству", icon: "⭐" },
+      { id: "other", label: "Другое", icon: "📝" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/tariffs") {
+    return ok(config, { items: [
+      { id: 1, label: "Стандарт — 490 грн/мес", amount: 490 },
+      { id: 2, label: "Расширенный — 690 грн/мес", amount: 690 },
+      { id: 3, label: "VIP — 990 грн/мес", amount: 990 },
+    ] });
+  }
+
 
   if (method === "get" && url === "payments/transactions") {
     const programId = (config.params as any)?.programId;

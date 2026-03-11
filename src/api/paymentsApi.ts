@@ -1,4 +1,5 @@
 import { http } from "./http";
+import { API_ENDPOINTS } from "./endpoints";
 import type { Program, StudentProfile, Transaction, KsefInvoice, MonthObj } from "./mockDb";
 
 export type { Transaction };
@@ -57,6 +58,28 @@ export const paymentsApi = {
   },
 
   // ── НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ ───────────────────────────────────────────────────
+
+  // ── СЛОВАРИ ────────────────────────────────────────────────────────────
+  async getPauseReasons(): Promise<Array<{id: string|number, label: string, icon?: string}>> {
+    const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.PAUSE_REASONS);
+    return unwrapApiData(data).items || data.items || data;
+  },
+  async getPaymentMethods(): Promise<Array<{id: string|number, label: string, icon?: string}>> {
+    const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.PAYMENT_METHODS);
+    return unwrapApiData(data).items || data.items || data;
+  },
+  async getDiscountTypes(): Promise<Array<{id: string|number, label: string, icon?: string}>> {
+    const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.DISCOUNT_TYPES);
+    return unwrapApiData(data).items || data.items || data;
+  },
+  async getRefundReasons(): Promise<Array<{id: string|number, label: string, icon?: string}>> {
+    const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.REFUND_REASONS);
+    return unwrapApiData(data).items || data.items || data;
+  },
+  async getTariffs(): Promise<Array<{id: string|number, label: string, amount?: number, icon?: string}>> {
+    const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.TARIFFS);
+    return unwrapApiData(data).items || data.items || data;
+  },
 
   /**
    * 1. Список проектов — вызывается сразу при открытии вкладки.
