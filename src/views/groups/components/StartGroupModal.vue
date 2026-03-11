@@ -115,6 +115,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { NewGroup, MasterStudent, NewGroupStudent } from '../../../api/newGroupsApi'
+import { ageMap, fmtDate } from '../../../utils/newGroupsUtils'
 
 const props = defineProps<{
   group: NewGroup
@@ -129,13 +130,6 @@ defineEmits<{
 
 const showReady = ref(true)
 const showWaiting = ref(true)
-
-const ageMap: Record<string, { label: string; icon: string }> = {
-  junior: { label: '5–7',   icon: '🟢' },
-  middle: { label: '8–10',  icon: '🟡' },
-  senior: { label: '11–14', icon: '🔴' },
-  adult:  { label: '15+',   icon: '🟣' },
-}
 
 const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
 const notPaid = computed(() => props.group.totalSlots - props.group.paid)
@@ -152,12 +146,6 @@ const readyStudents = computed(() =>
 const waitingStudents = computed(() =>
   props.panelStudents.filter(s => s.contract !== 'signed')
 )
-
-function fmtDate(s: string) {
-  if (!s) return '—'
-  const [y, m, d] = s.split('-')
-  return `${d}.${m}.${y}`
-}
 
 function plural(n: number, a: string, b: string, c: string) {
   const m = n % 10, h = n % 100

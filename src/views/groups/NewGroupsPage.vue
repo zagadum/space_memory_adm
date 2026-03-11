@@ -125,6 +125,7 @@ import CreateGroupModal from './components/CreateGroupModal.vue'
 import StartGroupModal from './components/StartGroupModal.vue'
 import GroupDetailPanel from './components/GroupDetailPanel.vue'
 import { useNotificationStore } from '../../stores/notification.store'
+import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
 
 // ── Data ──
 const notify = useNotificationStore()
@@ -156,24 +157,6 @@ const sortedGroups = computed(() => {
 })
 
 // ── Helpers ──
-const ageMap: Record<string, { label: string; cls: string; icon: string }> = {
-  junior: { label: '5–7',   cls: 'age-junior', icon: '🟢' },
-  middle: { label: '8–10',  cls: 'age-middle', icon: '🟡' },
-  senior: { label: '11–14', cls: 'age-senior', icon: '🔴' },
-  adult:  { label: '15+',   cls: 'age-adult',  icon: '🟣' },
-}
-
-function daysDiff(s: string) {
-  const d = new Date(s), n = new Date()
-  n.setHours(0,0,0,0); d.setHours(0,0,0,0)
-  return Math.floor((n.getTime() - d.getTime()) / 86400000)
-}
-
-function fmtDate(s: string) {
-  if (!s) return '—'
-  const [y, m, d] = s.split('-')
-  return `${d}.${m}.${y}`
-}
 
 function pct(g: NewGroup) {
   return Math.round(g.paid / g.totalSlots * 100)

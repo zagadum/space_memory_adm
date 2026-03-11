@@ -217,6 +217,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { NewGroup, NewGroupStudent, MasterStudent } from '../../../api/newGroupsApi'
+import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 
 const props = defineProps<{
   group: NewGroup
@@ -239,13 +240,6 @@ const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
 const toastMsg = ref('')
 
-const ageMap: Record<string, { label: string; cls: string; icon: string }> = {
-  junior: { label: '5–7',   cls: 'green',  icon: '🟢' },
-  middle: { label: '8–10',  cls: 'amber',  icon: '🟡' },
-  senior: { label: '11–14', cls: 'red',    icon: '🔴' },
-  adult:  { label: '15+',   cls: 'purple', icon: '🟣' },
-}
-
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
 const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
 const notPaid = computed(() => props.group.totalSlots - props.group.paid)
@@ -259,18 +253,6 @@ const filteredMaster = computed(() => {
   const q = aspQuery.value.toLowerCase().trim()
   return q ? props.masterStudents.filter(s => s.name.toLowerCase().includes(q)) : props.masterStudents
 })
-
-function daysDiff(s: string) {
-  const d = new Date(s), n = new Date()
-  n.setHours(0,0,0,0); d.setHours(0,0,0,0)
-  return Math.floor((n.getTime() - d.getTime()) / 86400000)
-}
-
-function fmtDate(s: string) {
-  if (!s) return '—'
-  const [y, m, d] = s.split('-')
-  return `${d}.${m}.${y}`
-}
 
 function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
