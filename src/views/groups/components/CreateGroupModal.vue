@@ -243,7 +243,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 <style scoped>
 .modal-backdrop {
   position: fixed; inset: 0;
-  background: rgba(4,4,15,0.82);
+  background: var(--glass-bg);
   backdrop-filter: blur(8px);
   z-index: 500;
   display: flex; align-items: center; justify-content: center;
@@ -298,7 +298,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
   appearance: none;
 }
 .modal-input:focus { border-color: var(--bh); background: rgba(255,255,255,0.06); box-shadow: 0 0 12px rgba(79,110,247,0.1); }
-.modal-input option { background: #0d0d2b; color: var(--white); }
+.modal-input option { background: var(--app-surface); color: var(--text-main); }
 .input-error { border-color: var(--red) !important; box-shadow: 0 0 8px rgba(239,68,68,0.2) !important; }
 
 .modal-type-toggle { display: flex; gap: 8px; }
@@ -336,7 +336,7 @@ onUnmounted(() => document.removeEventListener('click', handleOutsideClick))
 .search-select-wrapper { position: relative; }
 .search-dropdown {
   position: absolute; top: calc(100% + 4px); left: 0; right: 0;
-  background: #0d0d2b;
+  background: var(--app-surface);
   border: 1px solid var(--bh);
   border-radius: 8px; max-height: 200px; overflow-y: auto;
   z-index: 700; display: none;

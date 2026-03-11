@@ -495,7 +495,7 @@ function doDelete() {
 .asp-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 420px;
-  background: rgba(9,9,35,0.99);
+  background: var(--app-bg);
   border-left: 1px solid var(--bh);
   backdrop-filter: blur(30px);
   z-index: 500;
@@ -506,7 +506,7 @@ function doDelete() {
   padding: 22px 22px 16px;
   border-bottom: 1px solid var(--b);
   display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-  flex-shrink: 0; background: rgba(13,13,43,0.7);
+  flex-shrink: 0; background: var(--app-surface);
 }
 .asp-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
 .asp-sub   { font-size: 12px; color: var(--dim); }
@@ -560,7 +560,7 @@ function doDelete() {
 .asp-footer {
   padding: 14px 22px; border-top: 1px solid var(--b);
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-  background: rgba(13,13,43,0.7); gap: 12px;
+  background: var(--app-surface); gap: 12px;
 }
 .asp-sel-info { font-size: 12.5px; color: var(--dim); flex: 1; font-family: 'Space Mono', monospace; }
 .asp-sel-info.has-sel { color: var(--blue); }
@@ -568,7 +568,7 @@ function doDelete() {
 /* DELETE CONFIRM */
 .dc-overlay {
   position: fixed; inset: 0;
-  background: rgba(4,4,15,0.75); backdrop-filter: blur(8px);
+  background: var(--glass-bg); backdrop-filter: blur(8px);
   z-index: 600; display: flex; align-items: center; justify-content: center;
 }
 .dc-box {
