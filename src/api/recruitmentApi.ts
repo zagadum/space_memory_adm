@@ -54,6 +54,11 @@ export const recruitmentApi = {
     return data;
   },
 
+  async getStudentHistory(id: number | string) {
+    const { data } = await httpRecruitment.get(`recruitment/new-students/${id}/history`);
+    return data;
+  },
+
   async archiveNewStudent(studentId: number) {
     const { data } = await httpRecruitment.post(`recruitment/new-students/${studentId}/archive`);
     return data;

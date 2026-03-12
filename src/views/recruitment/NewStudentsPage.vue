@@ -419,12 +419,19 @@ const activeDetails = computed(() =>
     ? (store.currentStudentDetails ?? store.getDetails(activeStudent.value.id))
     : null
 )
-const activeHistory = computed(() => activeStudent.value ? store.getHistory(activeStudent.value.id) : [])
+const activeHistory = computed(() =>
+  activeStudent.value
+    ? (store.currentHistory.length
+        ? store.currentHistory
+        : store.getHistory(activeStudent.value.id))
+    : []
+)
 
 function openPanel(s: NewStudent) {
   openActions.value = null
   activeStudent.value = s
   store.fetchStudentById(s.id)
+  store.fetchStudentHistory(s.id)
 }
 function onPanelSave(data: Parameters<typeof store.saveDetails>[1]) {
   if (!activeStudent.value) return

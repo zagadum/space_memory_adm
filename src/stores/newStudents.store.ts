@@ -134,6 +134,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   const history = ref<Record<number, HistoryEvent[]>>({ ...MOCK_HISTORY })
 
   const currentStudent = ref<any | null>(null)
+  const currentHistory = ref<HistoryEvent[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
@@ -224,6 +225,34 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
+  function eventColor(event: string): string {
+    if (!event) return 'var(--blue)'
+    if (event.includes('создан'))    return 'var(--blue)'
+    if (event.includes('изменен'))   return 'var(--amber)'
+    if (event.includes('архивир'))   return 'var(--red, #ef4444)'
+    if (event.includes('группу'))    return 'var(--purple)'
+    if (event.includes('оплат'))     return 'var(--green)'
+    return 'var(--blue)'
+  }
+
+  async function fetchStudentHistory(id: number | string) {
+    try {
+      const result = await recruitmentApi.getStudentHistory(id)
+      const rows = result?.data ?? []
+      currentHistory.value = rows.map((h: any) => ({
+        event:  h.event   ?? 'Событие',
+        date:   h.created_at
+          ? new Date(h.created_at).toLocaleDateString('ru-RU')
+          : '—',
+        detail: [h.detail, h.changed_by ? `(${h.changed_by})` : '']
+          .filter(Boolean).join(' '),
+        color:  eventColor(h.event),
+      }))
+    } catch {
+      currentHistory.value = []
+    }
+  }
+
   function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract'>) {
     const today = new Date().toISOString().slice(0, 10)
     const newId = Date.now()
@@ -306,8 +335,8 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
   return {
     students, totalCount, signedCount, noManagerCount, avgWaitDays,
-    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, isLoading, error,
-    fetchStudentsFromApi, fetchStudentById,
+    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, currentHistory, isLoading, error,
+    fetchStudentsFromApi, fetchStudentById, fetchStudentHistory,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice,
     getDetails, getHistory,
   }
