@@ -58,6 +58,11 @@ export const recruitmentApi = {
     const { data } = await httpRecruitment.get(`recruitment/new-students/${id}/history`);
     return data;
   },
+  
+  async updateStudent(id: number | string, payload: any) {
+    const { data } = await httpRecruitment.patch(`recruitment/new-students/${id}`, payload);
+    return data;
+  },
 
   async archiveNewStudent(studentId: number) {
     const { data } = await httpRecruitment.post(`recruitment/new-students/${studentId}/archive`);

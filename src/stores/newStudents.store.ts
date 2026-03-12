@@ -302,14 +302,42 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     })
   }
 
-  function saveDetails(studentId: number, data: Partial<StudentDetails>) {
-    if (!details.value[studentId]) return
-    details.value[studentId] = { ...details.value[studentId], ...data }
-    // Update name in the list
-    const s = students.value.find(x => x.id === studentId)
-    const d = details.value[studentId]
-    if (s && (d.firstName || d.lastName)) {
-      s.name = [d.firstName, d.lastName].filter(Boolean).join(' ')
+  async function saveDetails(studentId: number, data: Partial<StudentDetails>) {
+    // 1. Map camelCase to snake_case for backend
+    const payload: any = {}
+    if (data.firstName !== undefined) payload.name = data.firstName
+    if (data.lastName !== undefined)  payload.surname = data.lastName
+    if (data.email !== undefined)     payload.email = data.email
+    if (data.birthDate !== undefined) payload.dob = data.birthDate
+    if (data.country !== undefined)   payload.country = data.country
+    if (data.city !== undefined)      payload.city = data.city
+    if (data.street !== undefined)    payload.address = data.street
+    if (data.apt !== undefined)       payload.apartment = data.apt
+    if (data.postCode !== undefined)  payload.zip = data.postCode
+    if (data.parentFirst !== undefined) payload.parent_name = data.parentFirst
+    if (data.parentLast !== undefined)  payload.parent_surname = data.parentLast
+    if (data.parentPhone !== undefined) payload.parent_phone = data.parentPhone
+    if (data.parentPassport !== undefined) payload.parent_passport = data.parentPassport
+    if (data.photoConsent !== undefined) payload.photo_consent = data.photoConsent ? 1 : 0
+    if (data.comment !== undefined)      payload.reg_comment = data.comment
+
+    try {
+      // 2. Call API
+      await recruitmentApi.updateStudent(studentId, payload)
+
+      // 3. Update local state
+      if (!details.value[studentId]) return
+      details.value[studentId] = { ...details.value[studentId], ...data }
+      
+      // Update name in the list
+      const s = students.value.find(x => x.id === studentId)
+      const d = details.value[studentId]
+      if (s && (d.firstName || d.lastName)) {
+        s.name = [d.firstName, d.lastName].filter(Boolean).join(' ')
+      }
+    } catch (err) {
+      console.error('Failed to save student details:', err)
+      throw err
     }
   }
 
