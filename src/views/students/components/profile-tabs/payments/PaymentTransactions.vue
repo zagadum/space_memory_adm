@@ -51,7 +51,17 @@
 
           <!-- action buttons -->
           <div class="tx-btns">
-            <button v-if="tx.documentId || tx.fvnum" class="tx-btn tx-btn-pdf" :title="t('payments.tx.downloadPdf')" @click.stop="onDownload(tx)">📄</button>
+            <button 
+              v-if="tx.documentId || tx.fvnum" 
+              class="tx-btn tx-btn-pdf" 
+              :class="{ 'tx-loading': isDownloading(tx) }"
+              :disabled="isDownloading(tx)"
+              :title="isDownloading(tx) ? t('payments.tx.pdfDownloading') : t('payments.tx.downloadPdf')" 
+              @click.stop="onDownload(tx)"
+            >
+              <span v-if="isDownloading(tx)" class="tx-spinner">⏳</span>
+              <span v-else>📄</span>
+            </button>
             <button class="tx-btn" :title="t('payments.tx.edit')" @click.stop="onEdit(tx)">✏️</button>
             <button class="tx-btn" :title="t('payments.tx.correction')" @click.stop="onKorekta(tx)">📋</button>
             <button class="tx-btn" :title="t('payments.tx.refund')" @click.stop="onRefund(tx)">↩️</button>
@@ -185,15 +195,26 @@ function onRefund(tx: Transaction) {
   modal.open("refund", { tx, programId: props.prog, fvnum: tx.fvnum, amount: tx.amount, desc: tx.title });
 }
 
+const downloadingIds = ref<Set<string | number>>(new Set());
+
+function isDownloading(tx: Transaction) {
+  const docId = tx.documentId || tx.fvnum;
+  return docId ? downloadingIds.value.has(docId) : false;
+}
+
 async function onDownload(tx: Transaction) {
   const docId = tx.documentId || tx.fvnum;
-  if (!docId) return;
+  if (!docId || downloadingIds.value.has(docId)) return;
   
+  downloadingIds.value.add(docId);
   try {
     await paymentsApi.downloadInvoicePdf(docId);
   } catch (err: any) {
     console.error("Failed to download PDF:", err);
-    // Usually we would show a toast here, but for now just logging
+    // Usually we would show a toast here
+    alert(t('payments.tx.pdfError'));
+  } finally {
+    downloadingIds.value.delete(docId);
   }
 }
 </script>

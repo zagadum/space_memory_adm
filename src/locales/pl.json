@@ -192,6 +192,8 @@
       "korekta": "Korekta",
       "refund": "Zwrot",
       "downloadPdf": "Pobierz PDF",
+      "pdfDownloading": "Pobieranie...",
+      "pdfError": "Błąd pobierania PDF",
       "empty": "Brak transakcji dla tego programu"
     },
     "extras": {

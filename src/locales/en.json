@@ -192,6 +192,8 @@
       "korekta": "Correction",
       "refund": "Refund",
       "downloadPdf": "Download PDF",
+      "pdfDownloading": "Downloading...",
+      "pdfError": "Failed to download PDF",
       "empty": "No transactions for this program"
     },
     "extras": {

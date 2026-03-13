@@ -227,6 +227,23 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { projectId, items });
   }
 
+  /**
+   * Запрос 4: GET v1/payments/documents/{id}/pdf
+   * Mock PDF download
+   */
+  if (method === "get" && /^v1\/payments\/documents\/[^/]+\/pdf$/.test(url)) {
+    return {
+      data: new Blob(['%PDF-1.4 mock pdf content'], { type: 'application/pdf' }),
+      status: 200,
+      statusText: "OK",
+      headers: { 
+        "content-type": "application/pdf",
+        "content-disposition": 'attachment; filename="Faktura-MOCK.pdf"'
+      } as any,
+      config: config as any,
+    };
+  }
+
   /*
    * [x] Research current implementation of `.mcell` and status logic in `PaymentPrograms.vue`
    * [x] Audit and fix i18n keys in `ru.json`, `en.json`, `pl.json`

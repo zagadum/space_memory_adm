@@ -192,6 +192,8 @@
       "korekta": "Корректypa",
       "refund": "Возврат",
       "downloadPdf": "Скачать PDF",
+      "pdfDownloading": "Загрузка...",
+      "pdfError": "Ошибка загрузки PDF",
       "empty": "Нет транзакций для этой программы"
     },
     "extras": {
