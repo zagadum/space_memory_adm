@@ -51,6 +51,7 @@
 
           <!-- action buttons -->
           <div class="tx-btns">
+            <button v-if="tx.documentId || tx.fvnum" class="tx-btn tx-btn-pdf" :title="t('payments.tx.downloadPdf')" @click.stop="onDownload(tx)">📄</button>
             <button class="tx-btn" :title="t('payments.tx.edit')" @click.stop="onEdit(tx)">✏️</button>
             <button class="tx-btn" :title="t('payments.tx.correction')" @click.stop="onKorekta(tx)">📋</button>
             <button class="tx-btn" :title="t('payments.tx.refund')" @click.stop="onRefund(tx)">↩️</button>
@@ -71,6 +72,7 @@ import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePaymentsStore } from "../../../../../stores/payments.store";
 import { useModalStore } from "../../../../../stores/modal.store";
+import { paymentsApi } from "../../../../../api/paymentsApi";
 import type { Transaction } from "../../../../../api/paymentsApi";
 
 const { t, tm } = useI18n();
@@ -181,6 +183,18 @@ function onKorekta(tx: Transaction) {
 }
 function onRefund(tx: Transaction) {
   modal.open("refund", { tx, programId: props.prog, fvnum: tx.fvnum, amount: tx.amount, desc: tx.title });
+}
+
+async function onDownload(tx: Transaction) {
+  const docId = tx.documentId || tx.fvnum;
+  if (!docId) return;
+  
+  try {
+    await paymentsApi.downloadInvoicePdf(docId);
+  } catch (err: any) {
+    console.error("Failed to download PDF:", err);
+    // Usually we would show a toast here, but for now just logging
+  }
 }
 </script>
 
@@ -366,6 +380,10 @@ function onRefund(tx: Transaction) {
 .tx-btn:hover {
   background: rgba(79,110,247,.15);
   border-color: rgba(79,110,247,.3);
+}
+.tx-btn-pdf:hover {
+  background: rgba(16,185,129,.15);
+  border-color: rgba(16,185,129,.3);
 }
 
 /* empty */

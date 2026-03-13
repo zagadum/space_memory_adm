@@ -100,6 +100,7 @@ export interface Transaction {
   type: "month" | "extra";
   ksef?: "ok" | "pending" | "conflict" | "error" | null;
   fvnum?: string | null;
+  documentId?: number | string | null;
 }
 
 export interface Program {
