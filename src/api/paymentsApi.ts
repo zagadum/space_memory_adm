@@ -51,7 +51,7 @@ export const paymentsApi = {
   // ── Старый монолитный запрос (оставляем для обратной совместимости) ─────────
   async getStudentPayments(studentId: string, projectId: number = 1) {
     const { data } = await http.get<MaybeWrapped<StudentPaymentsResponse>>(
-      `students/${studentId}/payments`,
+      `payments/${studentId}/payments`,
       { params: { project_id: projectId } }
     );
     return unwrapApiData(data);
@@ -88,7 +88,7 @@ export const paymentsApi = {
    */
   async getStudentProjects(studentId: string): Promise<ProjectSummary[]> {
     const { data } = await http.get<MaybeWrapped<{ items: ProjectSummary[] }>>(
-      `students/${studentId}/projects`
+      `payments/${studentId}/projects`
     );
     return unwrapApiData(data).items;
   },
@@ -102,7 +102,7 @@ export const paymentsApi = {
     projectId: string
   ): Promise<ProjectCalendarResponse> {
     const { data } = await http.get<MaybeWrapped<ProjectCalendarResponse>>(
-      `students/${studentId}/projects/${projectId}/calendar`
+      `payments/${studentId}/projects/${projectId}/calendar`
     );
     return unwrapApiData(data);
   },
@@ -116,7 +116,7 @@ export const paymentsApi = {
     projectId: string
   ): Promise<ProjectTransactionsResponse> {
     const { data } = await http.get<MaybeWrapped<ProjectTransactionsResponse>>(
-      `students/${studentId}/projects/${projectId}/transactions`
+      `payments/${studentId}/projects/${projectId}/transactions`
     );
     return unwrapApiData(data);
   },

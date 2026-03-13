@@ -9,7 +9,7 @@ export const API_ENDPOINTS = {
     },
     // Эндпоинты для модалок и данных ученика
     PAYMENTS: {
-        STUDENT_DATA: (id: string | number) => `students/${id}/payments`,
+        STUDENT_DATA: (id: string | number) => `payments/${id}/payments`,
         UPDATE_TARIFF: 'payments/update-tariff',
         APPLY_PAUSE: 'payments/pause',
         APPLY_DISCOUNT: 'payments/discount',
