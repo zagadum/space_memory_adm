@@ -72,6 +72,42 @@ export const paymentsApi = {
     const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.DISCOUNT_TYPES);
     return unwrapApiData(data).items || data.items || data;
   },
+
+  /**
+   * Download invoice PDF.
+   * GET /api/v1/payments/documents/{id}/pdf
+   */
+  async downloadInvoicePdf(documentId: number | string) {
+    const url = `/v1/payments/documents/${documentId}/pdf`;
+    
+    const response = await http.get(url, {
+      responseType: 'blob'
+    });
+
+    // Extract filename from Content-Disposition header if possible
+    let filename = `invoice-${documentId}.pdf`;
+    const disposition = response.headers['content-disposition'];
+    if (disposition && disposition.indexOf('filename=') !== -1) {
+      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      const matches = filenameRegex.exec(disposition);
+      if (matches != null && matches[1]) { 
+        filename = matches[1].replace(/['"]/g, '');
+      }
+    }
+
+    // Create a blob URL and trigger download
+    const blob = new Blob([response.data], { type: 'application/pdf' });
+    const downloadUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', filename);
+    document.body.appendChild(link);
+    link.click();
+    
+    // Cleanup
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
+  },
   async getRefundReasons(): Promise<Array<{id: string|number, label: string, icon?: string}>> {
     const { data } = await http.get(API_ENDPOINTS.DICTIONARIES.REFUND_REASONS);
     return unwrapApiData(data).items || data.items || data;
