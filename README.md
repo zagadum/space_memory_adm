@@ -1,101 +1,105 @@
-# 📊 GLS CRM — Leadership School Management System
+# 📊 GLS Admin — Space Memory Platform
 
 ![Project Status](https://img.shields.io/badge/Status-Active-brightgreen)
-![Tech Stack](https://img.shields.io/badge/Stack-Vue%203%20|%20Pinia%20|%20Vite-blue)
+![Tech Stack](https://img.shields.io/badge/Stack-Vue%203%20|%20Laravel%2011%20|%20PostgreSQL-blue)
 ![Localization](https://img.shields.io/badge/Localization-PL%20|%20EN%20|%20RU%20|%20UK-orange)
 
-**GLS CRM** (Global Leaders Skills) is an innovative, enterprise-grade management platform designed for leadership schools. The system focuses on automating financial workflows, advanced salary calculations, and comprehensive student subscription management.
+**GLS Admin (Space Memory)** is a modern CRM and ERP system for a language school in Warsaw. It automates financial workflows, student management, and recruitment pipelines with a high-performance, developer-friendly architecture.
 
 ---
 
-## 🚀 Key Features
+## 🚀 Key Modules & Features
 
-### 💰 Advanced Salary Engine
-A sophisticated calculation core supporting complex piecework logic:
-- **Retention Bonuses**: Automatic calculation of bonuses for low student churn (0 cancellations).
-- **Trial Conversion Logic**: Integrated performance tracking with payout thresholds (e.g., conversion ≥ 51%).
-- **Administrative Duties**: Automatic 3% calculation based on total subscription pools and QA scores.
+### 💰 Finance & Salary Engine
+- **Salary Calculator**: Advanced piecework calculation for teachers with retention bonuses and trial conversion tracking.
+- **Returns & Refunds**: Automated management of student refunds and balance corrections.
+- **Financial Status Tracking**: Pipeline for payroll (Draft → Confirmed → Paid).
 
-### 🏦 Dual-Interface Financial Hub
-Tailored experiences for different organizational roles:
-- **Teacher View (My Salary)**: Interactive personal dashboard with detailed session breakdowns and payout transparency.
-- **Accountant View (Salary Calculator)**: A high-density "Pixel-Perfect" calculation center for precise payroll management and status tracking (Draft → Confirmed → Paid).
+### 👩‍🚀 Student Management
+- **Lifecycle Engine**: End-to-end management of subscriptions, pauses, transfers, and resignations.
+- **Student Profile**: 6-tab comprehensive view including Payments, Groups, Attendance, Progress, and Notes.
+- **Side Panel & History**: Real-time access to student event history and quick actions.
 
-### 🎓 Student Lifecycle Management
-End-to-end management of the student journey:
-- **Subscription Engine**: Handling payments, automated discounts, and 24-month planning horizons.
-- **Lifecycle Events**: Seamless management of pauses, transfers, and resignations with financial reconciliation.
+### 🌟 Recruitment Hub
+- **Leads & Pipeline**: Management of potential students through a structured recruitment funnel.
+- **New Groups Engine**: Advanced tool for assembling and launching new classes.
+- **Expelled Students**: Tracking and recovery logic for former students.
 
-### 🌍 Multi-language & Global Ready
-Full internationalization (i18n) support across **Polish**, **English**, **Russian**, and **Ukrainian**, ensuring a localized experience for diverse staff and users.
+### 🏗️ Advanced UI/UX
+- **Dynamic Themes**: Intelligent Dark/Light mode with persistence and CSS Design Tokens.
+- **Flexible Views**: Calendar Grid ↔ Table view toggle for payments and schedules.
+- **Pixel-Perfect Design**: Custom UI library (`UiButton`, `UiInput`, `UiBadge`) with "Glassmorphism" effects.
 
 ---
 
 ## 🛠 Tech Stack
 
-| Component          | Technology                                                                 |
-|--------------------|----------------------------------------------------------------------------|
-| **Frontend Framework** | [Vue 3](https://vuejs.org/) (Composition API with `<script setup lang="ts">`) |
-| **Build Tool**     | [Vite](https://vitejs.dev/)                                                |
-| **State Management** | [Pinia](https://pinia.vuejs.org/) (Setup Store pattern)                     |
-| **Styling**        | Tailwind CSS + Custom "Pixel-Perfect" CSS modules                          |
-| **Typography**     | `Outfit` (Headings & UI) & `Space Mono` (Numbers & Analytics)             |
-| **Icons & Media**  | Lucide Icons & Custom SVG assets                                           |
-| **Utilities**      | XLSX for advanced reporting and data exports                               |
+### Frontend
+- **Framework**: [Vue 3](https://vuejs.org/) (Composition API + `<script setup lang="ts">`)
+- **State**: [Pinia](https://pinia.vuejs.org/) (Setup focus)
+- **Tooling**: [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/)
+- **i18n**: Full support for PL, EN, RU, UK locales.
+
+### Backend
+- **Core**: [Laravel 11](https://laravel.com/)
+- **Database**: PostgreSQL (Primary) + Redis (Queue/Cache)
+- **Auth**: Laravel Sanctum
 
 ---
 
-## 🏗 Architecture Highlights
-
-### Atomic & Component-Oriented Design
-We transitioned from monolithic views to a modular, component-driven architecture inspired by **Atomic Design** principles. This ensures:
-- **Scalability**: Components like `SummaryCard`, `DataTable`, and `SectionHeader` are highly reusable.
-- **Maintainability**: Clear separation between layout and functional components.
-
-### Isolated Business Logic
-All business logic and data processing are strictly isolated within **Pinia Stores**. UI components remain "pure" and declarative, consuming state and invoking actions without handling complex side effects directly.
-
----
-
-## 📂 Project Structure
+## 📂 Project Structure (`src/`)
 
 ```bash
 src/
-  api/          # Axios HTTP client and centralized endpoint definitions
-  app/          # Application core: Router, i18n, and bootstrap
-  components/   # Design system: /layout (Sidebar, Header) and /ui (UiButton, etc.)
-  stores/       # Pinia state management (business logic layer)
-  views/        # Top-level pages (organized by module: /finance, /teacher, etc.)
-  locales/      # Multi-language dictionary files (JSON)
-  styles/       # Global styles and design system variables
+  api/          # Axios functions, centralized endpoints.ts, mock adapters
+  app/          # Core: Main entry, Router, i18n initialization
+  components/   # reusable design system: /layout and /ui components
+  layouts/      # AppLayout.vue, AuthLayout.vue
+  stores/       # Pinia stores (business logic and state)
+  views/        # Page components (Finance, Students, Teacher, etc.)
+  modals/       # Centralized ModalHost.vue and modal windows
+  locales/      # Multi-language JSON dictionaries
+  styles/       # Global CSS (base.css, layout.css) with Design Tokens
+  types/        # Shared TypeScript interfaces
+  utils/        # Business logic helpers (date, formatters, etc.)
 ```
 
 ---
 
 ## 🏁 Getting Started
 
-### Installation
-```bash
-npm install
-```
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-### Development
-```bash
-npm run dev
-```
+2. **Environment Setup**:
+   Copy `.env.example` to `.env` and configure your API URLs.
+   ```bash
+   VITE_API_BASE_URL=https://api.gls-admin.com/v1
+   ```
 
-### Production Build
-```bash
-npm run build
-```
+3. **Development Mode**:
+   ```bash
+   npm run dev
+   ```
+
+4. **Production Build**:
+   ```bash
+   npm run build
+   ```
 
 ---
 
-## 🗺 Roadmap
+## 📜 Core Development Rules
 
-- [ ] **Phase 4: Payment Gateways** — Integration with **Imoje** for automated online payments.
-- [ ] **Phase 5: Fiscal Integration** — Support for **KSeF** (Krajowy System e-Faktur) for electronic invoicing compliance.
-- [ ] **Advanced Analytics** — Predictive forecasting for student retention and financial growth.
+- **Strict TypeScript**: Always use interfaces for props, emits, and API responses.
+- **i18n Mandatory**: Hardcoded strings are forbidden. Add translations to all 4 locale files.
+- **API Versioning**: All endpoints must use the `/v1/` prefix via `src/api/http.ts`.
+- **Component Style**: Use `<script setup lang="ts">` and `<style scoped>`.
+
+> [!IMPORTANT]
+> Detailed coding standards are maintained in the project-wide `gls-main.md` rulebook.
 
 ---
 
