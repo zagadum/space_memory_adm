@@ -436,6 +436,48 @@
       "history": "Історія",
       "transfer": "Перенести в групу",
       "transferAny": "В будь-яку групу"
+  },
+  "auth": {
+    "title": "Вхід",
+    "email": "Email",
+    "password": "Пароль",
+    "submit": "Увійти"
+  },
+  "tabs": {
+    "payments": "Платежі",
+    "groups": "Групи",
+    "info": "Інформація",
+    "attendance": "Відвідуваність",
+    "progress": "Успішність",
+    "notes": "Нотатки"
+  },
+  "payments": {
+    "currencyPerMonth": "зл/міс.",
+    "currency": "zł",
+    "balance": "Баланс",
+    "overall": "Загальний баланс",
+    "nextPay": "Наступний платіж",
+    "activePrograms": "Активні програми",
+    "actions": "Дії",
+    "tx": {
+      "title": "Транзакції",
+      "combinedTitle": "Транзакції та рахунки KSeF",
+      "count": "{n} транзакція | {n} транзакції | {n} транзакцій",
+      "loading": "Завантаження транзакцій…",
+      "paid": "✓ Оплачено",
+      "pending": "🕐 Очікує",
+      "subscription": "Абонемент",
+      "invoice": "Рахунок",
+      "extra": "Дод. заняття",
+      "edit": "Редагувати рахунок",
+      "editInvoice": "Редагувати рахунок",
+      "correction": "Корекція",
+      "korekta": "Коректура",
+      "refund": "Повернення",
+      "downloadPdf": "Завантажити PDF",
+      "pdfDownloading": "Завантаження...",
+      "pdfError": "Помилка завантаження PDF",
+      "empty": "Немає транзакцій для цієї програми"
     },
     "archive": {
       "cancel": "Відміна",

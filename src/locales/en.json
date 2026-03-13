@@ -430,6 +430,87 @@
   "expelled": {
     "actions": {
       "apply": "Apply",
+  },
+  "auth": {
+    "title": "Sign In",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log In"
+  },
+  "tabs": {
+    "payments": "Payments",
+    "groups": "Groups",
+    "info": "Info",
+    "attendance": "Attendance",
+    "progress": "Progress",
+    "notes": "Notes"
+  },
+  "payments": {
+    "currencyPerMonth": "PLN/mo",
+    "currency": "PLN",
+    "balance": "Balance",
+    "overall": "Overall Balance",
+    "nextPay": "Next Payment",
+    "activePrograms": "Active Programs",
+    "actions": "Actions",
+    "tx": {
+      "title": "Transactions",
+      "combinedTitle": "Transactions & KSeF Invoices",
+      "count": "no transactions | {n} transaction | {n} transactions",
+      "loading": "Loading transactions…",
+      "paid": "✓ Paid",
+      "pending": "🕐 Pending",
+      "subscription": "Subscription",
+      "invoice": "Invoice",
+      "extra": "Extra class",
+      "edit": "Edit invoice",
+      "editInvoice": "Edit Invoice",
+      "correction": "Correction",
+      "korekta": "Correction",
+      "refund": "Refund",
+      "downloadPdf": "Download PDF",
+      "pdfDownloading": "Downloading...",
+      "pdfError": "Failed to download PDF",
+      "empty": "No transactions for this program"
+    },
+    "extras": {
+      "title": "Extra Materials and Programs",
+      "subtitle": "One-time services and products",
+      "items": "items",
+      "paid": "paid",
+      "awaitingPayment": "awaiting payment",
+      "afterPayment": "after payment",
+      "infoText": "One-time services — no subscription, no pauses, no tariff changes."
+    },
+    "legend": {
+      "title": "Legend:",
+      "paid": "Paid",
+      "pending": "Pending",
+      "overdue": "Overdue",
+      "pause": "Pause",
+      "summer": "Summer Break",
+      "partial": "Partial",
+      "extra": "Extra Classes"
+    },
+    "year": "Year:",
+    "view": {
+      "grid": "⬛ Grid",
+      "table": "☰ Table"
+    },
+    "month": {
+      "status": "Status",
+      "amount": "Amount",
+      "lessons": "Lessons"
+    },
+    "btn": {
+      "invoice": "Invoice",
+      "refund": "Refund",
+      "korekta": "Correction",
+      "tariff": "Tariff",
+      "discount": "Discount",
+      "pause": "Pause",
+      "extra": "Extra",
+      "unlock": "Unlock",
       "archive": "Archive",
       "archiveAll": "Archive all",
       "callToday": "Call today",
