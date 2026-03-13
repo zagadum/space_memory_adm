@@ -4,6 +4,7 @@
   --purple: #8b5cf6;
   --cyan: #06b6d4;
   --amber: #f59e0b;
+  --gold: #f59e0b;
   --green: #10b981;
   --red: #ef4444;
   --orange: #f97316;
@@ -43,6 +44,7 @@
   --bg: var(--app-bg);
   --card: var(--app-card);
   --white: var(--app-text-main);
+  --text-main: var(--app-text-main);
   --dim: var(--app-text-dim);
   --b: var(--app-border);
   --bh: var(--app-border-hi);
@@ -85,6 +87,7 @@
   --bg: var(--app-bg);
   --card: var(--app-card);
   --white: var(--app-text-main);
+  --text-main: var(--app-text-main);
   --dim: var(--app-text-dim);
   --b: var(--app-border);
   --bh: var(--app-border-hi);

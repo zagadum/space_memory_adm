@@ -100,6 +100,7 @@ export interface Transaction {
   type: "month" | "extra";
   ksef?: "ok" | "pending" | "conflict" | "error" | null;
   fvnum?: string | null;
+  documentId?: number | string | null;
 }
 
 export interface Program {
@@ -468,15 +469,15 @@ export const mockDb: { me: AdminUser; students: Record<string, { profile: Studen
 // ─────────────────────────────────────────────────────────────
 export const mockTransactions: Record<string, Transaction[]> = {
   space: [
-    { id: "tx_001", date: "08.02.2026", title: "Абонемент февраль 2026", sub: "Space Memory · Imoje · FV/2026/02/091", amount: 441, amountFmt: "+441 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/02/091" },
-    { id: "tx_002", date: "05.01.2026", title: "Абонемент январь 2026", sub: "Space Memory · Imoje · FV/2026/01/045", amount: 441, amountFmt: "+441 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/01/045" },
-    { id: "tx_003", date: "28.03.2026", title: "Счет март 2026", sub: "Space Memory · ожидает оплату", amount: 441, amountFmt: "441 zł", status: "pending", type: "month", ksef: "pending", fvnum: "FV/2026/03/009" },
+    { id: "tx_001", date: "08.02.2026", title: "Абонемент февраль 2026", sub: "Space Memory · Imoje · FV/2026/02/091", amount: 441, amountFmt: "+441 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/02/091", documentId: 101 },
+    { id: "tx_002", date: "05.01.2026", title: "Абонемент январь 2026", sub: "Space Memory · Imoje · FV/2026/01/045", amount: 441, amountFmt: "+441 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/01/045", documentId: 102 },
+    { id: "tx_003", date: "28.03.2026", title: "Счет март 2026", sub: "Space Memory · ожидает оплату", amount: 441, amountFmt: "441 zł", status: "pending", type: "month", ksef: "pending", fvnum: "FV/2026/03/009", documentId: 103 },
     { id: "tx_004", date: "20.02.2026", title: "Доп. занятие — мнемотехника", sub: "Space Memory · разовое", amount: 80, amountFmt: "+80 zł", status: "paid", type: "extra", ksef: null, fvnum: null },
   ],
   indigo: [
-    { id: "tx_101", date: "06.02.2026", title: "Абонемент февраль 2026", sub: "Indigo · Imoje · FV/2026/02/092", amount: 405, amountFmt: "+405 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/02/092" },
-    { id: "tx_102", date: "05.01.2026", title: "Абонемент январь 2026", sub: "Indigo · Imoje · FV/2026/01/055", amount: 405, amountFmt: "+405 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/01/055" },
-    { id: "tx_103", date: "01.03.2026", title: "Счет март 2026", sub: "Indigo · просрочка", amount: 405, amountFmt: "405 zł", status: "pending", type: "month", ksef: "error", fvnum: "FV/2026/03/110" },
+    { id: "tx_101", date: "06.02.2026", title: "Абонемент февраль 2026", sub: "Indigo · Imoje · FV/2026/02/092", amount: 405, amountFmt: "+405 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/02/092", documentId: 201 },
+    { id: "tx_102", date: "05.01.2026", title: "Абонемент январь 2026", sub: "Indigo · Imoje · FV/2026/01/055", amount: 405, amountFmt: "+405 zł", status: "paid", type: "month", ksef: "ok", fvnum: "FV/2026/01/055", documentId: 202 },
+    { id: "tx_103", date: "01.03.2026", title: "Счет март 2026", sub: "Indigo · просрочка", amount: 405, amountFmt: "405 zł", status: "pending", type: "month", ksef: "error", fvnum: "FV/2026/03/110", documentId: 203 },
   ],
   extras: [
     { id: "tx_201", date: "10.03.2026", title: "Доп. материалы", sub: "Extras · разовое", amount: 30, amountFmt: "+30 zł", status: "paid", type: "extra", ksef: null, fvnum: null }

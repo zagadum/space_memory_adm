@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia';
+import { recruitmentApi } from '../api/recruitmentApi';
 
 export type LeadStatus = 'new' | 'in_progress' | 'trial' | 'decision';
 
@@ -20,19 +21,44 @@ export const useLeadsStore = defineStore('leads', {
             { id: '4', name: 'Елена Смирнова', phone: '+48 111 222 333', subject: 'Химия', createdAt: '2023-10-18', status: 'trial' },
             { id: '5', name: 'Игорь Кузнецов', phone: '+48 444 555 666', subject: 'Биология', createdAt: '2023-10-17', status: 'decision' },
         ] as Lead[],
+        isLoading: false,
     }),
     actions: {
-        moveLead(leadId: string, newStatus: LeadStatus) {
+        async fetchLeads() {
+            this.isLoading = true;
+            try {
+                const list = await recruitmentApi.getLeads();
+                if (list.length) {
+                    this.leads = list;
+                }
+            } catch {
+                // keep local seed data if API is unavailable
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async moveLead(leadId: string, newStatus: LeadStatus) {
             const lead = this.leads.find(l => l.id === leadId);
             if (lead) {
                 lead.status = newStatus;
             }
+            try {
+                await recruitmentApi.updateLeadStatus(leadId, newStatus);
+            } catch {
+                // optimistic UI: do not rollback while backend endpoint is integrating
+            }
         },
-        addLead(lead: Omit<Lead, 'id'>) {
-            this.leads.push({
+        async addLead(lead: Omit<Lead, 'id'>) {
+            const localLead: Lead = {
                 ...lead,
                 id: Math.random().toString(36).substr(2, 9),
-            });
+            };
+            this.leads.push(localLead);
+            try {
+                await recruitmentApi.createLead(lead);
+            } catch {
+                // keep local record to avoid blocking UX
+            }
         }
     }
 });

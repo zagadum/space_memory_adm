@@ -32,10 +32,12 @@ import BaseModal from "../BaseModal.vue";
 import { useModalStore } from "../../stores/modal.store";
 import { setTrainerPresence } from "../../api/studentApi";
 import { useStudentTabsStore } from "../../stores/studentTabs.store";
+import { usePaymentsStore } from "../../stores/payments.store";
 
 const { t } = useI18n();
 const modal = useModalStore();
 const tabs = useStudentTabsStore();
+const paymentsStore = usePaymentsStore();
 const payload = computed(() => modal.payload as any);
 
 const group = computed(() => payload.value?.group);
@@ -51,13 +53,14 @@ async function save() {
   if (!group.value || !trainer.value) return close();
   saving.value = true;
   try {
+    const studentId = paymentsStore.currentStudentId || "s_1";
     await setTrainerPresence({
-      studentId: "s_1",
+      studentId,
       groupId: group.value.id,
       trainerId: trainer.value.id,
       presence: presence.value,
     });
-    await tabs.loadGroups("s_1");
+    await tabs.loadGroups(studentId);
     modal.close();
   } finally {
     saving.value = false;

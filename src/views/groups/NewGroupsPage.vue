@@ -29,53 +29,72 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="g in sortedGroups" :key="g.id" class="table-row">
-            <td>
-              <div class="group-name-cell" @click="openPanel(g.id)" style="cursor:pointer">
-                <div class="group-name-link">{{ g.name }}</div>
-                <div class="group-schedule">{{ g.day }}, {{ g.time }}{{ g.teacher ? ' · ' + g.teacher.name : '' }}</div>
-              </div>
-            </td>
-            <td>
-              <span :class="['type-badge', g.type === 'individual' ? 'type-individual' : 'type-group']">
-                {{ g.type === 'individual' ? '👤 Инд.' : '👥 Групп.' }}
-              </span>
-            </td>
-            <td><span class="date-mono">{{ fmtDate(g.createdDate) }}</span></td>
-            <td><span class="date-mono">{{ fmtDate(g.startDate) }}</span></td>
-            <td><span class="slots-val">{{ g.totalSlots }}</span><span class="slots-label"> чел.</span></td>
-            <td>
-              <div class="payment-ratio">
-                <span class="ratio-text" :style="{ color: ratioColor(g) }">{{ g.paid }}/{{ g.totalSlots }}</span>
-                <div class="ratio-bar"><div class="ratio-fill" :style="{ width: pct(g) + '%' }"></div></div>
-              </div>
-            </td>
-            <td>
-              <div class="timer-cell">
-                <span :class="['timer-days', timerCls(daysDiff(g.createdDate))]">{{ daysDiff(g.createdDate) }}</span>
-                <span class="timer-label">дней</span>
-              </div>
-            </td>
-            <td>
-              <div v-if="g.manager" class="person-cell">
-                <div class="person-dot" :style="{ background: g.manager.color }">{{ g.manager.initials }}</div>
-                <span class="person-name">{{ g.manager.name }}</span>
-              </div>
-              <span v-else class="empty-cell">— не назначен</span>
-            </td>
-            <td>
-              <span v-if="ageMap[g.age ?? '']" :class="['age-badge', ageMap[g.age!].cls]">
-                {{ ageMap[g.age!].icon }} {{ ageMap[g.age!].label }}
-              </span>
-              <span v-else class="empty-cell">—</span>
-            </td>
-            <td>
-              <button class="btn-start" @click.stop="openStartModal(g)">🚀 Старт</button>
-            </td>
-          </tr>
-          <tr v-if="sortedGroups.length === 0">
-            <td colspan="10" style="text-align:center;padding:40px;color:var(--dim)">Группы не найдены</td>
-          </tr>
+          <!-- Loading skeleton -->
+          <template v-if="isLoading">
+            <tr v-for="i in 5" :key="'sk-' + i" class="table-row">
+              <td><div class="skel skel-w60"></div></td>
+              <td><div class="skel skel-w40"></div></td>
+              <td><div class="skel skel-w40"></div></td>
+              <td><div class="skel skel-w40"></div></td>
+              <td><div class="skel skel-w20"></div></td>
+              <td><div class="skel skel-w40"></div></td>
+              <td><div class="skel skel-w20"></div></td>
+              <td><div class="skel skel-w50"></div></td>
+              <td><div class="skel skel-w20"></div></td>
+              <td><div class="skel skel-w30"></div></td>
+            </tr>
+          </template>
+
+          <!-- Данные -->
+          <template v-else>
+            <tr v-for="g in sortedGroups" :key="g.id" class="table-row">
+              <td>
+                <div class="group-name-cell" @click="openPanel(g.id)" style="cursor:pointer">
+                  <div class="group-name-link">{{ g.name }}</div>
+                  <div class="group-schedule">{{ g.day }}, {{ g.time }}{{ g.teacher ? ' · ' + g.teacher.name : '' }}</div>
+                </div>
+              </td>
+              <td>
+                <span :class="['type-badge', g.type === 'individual' ? 'type-individual' : 'type-group']">
+                  {{ g.type === 'individual' ? '👤 Инд.' : '👥 Групп.' }}
+                </span>
+              </td>
+              <td><span class="date-mono">{{ fmtDate(g.createdDate) }}</span></td>
+              <td><span class="date-mono">{{ fmtDate(g.startDate) }}</span></td>
+              <td><span class="slots-val">{{ g.totalSlots }}</span><span class="slots-label"> чел.</span></td>
+              <td>
+                <div class="payment-ratio">
+                  <span class="ratio-text" :style="{ color: ratioColor(g) }">{{ g.paid }}/{{ g.totalSlots }}</span>
+                  <div class="ratio-bar"><div class="ratio-fill" :style="{ width: pct(g) + '%' }"></div></div>
+                </div>
+              </td>
+              <td>
+                <div class="timer-cell">
+                  <span :class="['timer-days', timerCls(daysDiff(g.createdDate))]">{{ daysDiff(g.createdDate) }}</span>
+                  <span class="timer-label">дней</span>
+                </div>
+              </td>
+              <td>
+                <div v-if="g.manager" class="person-cell">
+                  <div class="person-dot" :style="{ background: g.manager.color }">{{ g.manager.initials }}</div>
+                  <span class="person-name">{{ g.manager.name }}</span>
+                </div>
+                <span v-else class="empty-cell">— не назначен</span>
+              </td>
+              <td>
+                <span v-if="ageMap[g.age ?? '']" :class="['age-badge', ageMap[g.age!].cls]">
+                  {{ ageMap[g.age!].icon }} {{ ageMap[g.age!].label }}
+                </span>
+                <span v-else class="empty-cell">—</span>
+              </td>
+              <td>
+                <button class="btn-start" @click.stop="openStartModal(g)">🚀 Старт</button>
+              </td>
+            </tr>
+            <tr v-if="sortedGroups.length === 0">
+              <td colspan="10" style="text-align:center;padding:40px;color:var(--dim)">Группы не найдены</td>
+            </tr>
+          </template>
         </tbody>
       </table>
       <div class="table-footer">
@@ -96,6 +115,7 @@
       v-if="startGroup"
       :group="startGroup"
       :all-students="masterStudents"
+      :panel-students="panelStudents"
       @close="startGroup = null"
       @confirmed="onGroupStarted"
     />
@@ -123,8 +143,12 @@ import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '
 import CreateGroupModal from './components/CreateGroupModal.vue'
 import StartGroupModal from './components/StartGroupModal.vue'
 import GroupDetailPanel from './components/GroupDetailPanel.vue'
+import { useNotificationStore } from '../../stores/notification.store'
+import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
 
 // ── Data ──
+const notify = useNotificationStore()
+const isLoading = ref(false)
 const groups = ref<NewGroup[]>([])
 const masterStudents = ref<MasterStudent[]>([])
 const teachers = ref<NewGroupTeacher[]>([])
@@ -153,24 +177,6 @@ const sortedGroups = computed(() => {
 })
 
 // ── Helpers ──
-const ageMap: Record<string, { label: string; cls: string; icon: string }> = {
-  junior: { label: '5–7',   cls: 'age-junior', icon: '🟢' },
-  middle: { label: '8–10',  cls: 'age-middle', icon: '🟡' },
-  senior: { label: '11–14', cls: 'age-senior', icon: '🔴' },
-  adult:  { label: '15+',   cls: 'age-adult',  icon: '🟣' },
-}
-
-function daysDiff(s: string) {
-  const d = new Date(s), n = new Date()
-  n.setHours(0,0,0,0); d.setHours(0,0,0,0)
-  return Math.floor((n.getTime() - d.getTime()) / 86400000)
-}
-
-function fmtDate(s: string) {
-  if (!s) return '—'
-  const [y, m, d] = s.split('-')
-  return `${d}.${m}.${y}`
-}
 
 function pct(g: NewGroup) {
   return Math.round(g.paid / g.totalSlots * 100)
@@ -215,8 +221,21 @@ function openCreateModal() {
   showCreateModal.value = true
 }
 
-function openStartModal(g: NewGroup) {
+async function openStartModal(g: NewGroup) {
   startGroup.value = g
+  // Загружаем студентов если панель не была открыта для этой группы
+  const alreadyLoaded = panelGroup.value?.id === g.id && panelStudents.value.length > 0
+  if (!alreadyLoaded) {
+    loadingStudents.value = true
+    try {
+      const res = await getNewGroupStudents(g.id)
+      panelStudents.value = res.items
+    } catch {
+      // Не критично — модал всё равно откроется, просто списки будут пустые
+    } finally {
+      loadingStudents.value = false
+    }
+  }
 }
 
 async function openPanel(id: number) {
@@ -239,45 +258,77 @@ function closePanel() {
 }
 
 async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
-  const res = await createNewGroup(payload)
-  groups.value.unshift(res.group)
-  showCreateModal.value = false
+  try {
+    const res = await createNewGroup(payload)
+    groups.value.unshift(res.group)
+    showCreateModal.value = false
+    notify.addToast('Группа создана ✅', 'success')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка создания группы', 'error')
+  }
 }
 
 async function onGroupStarted(id: number) {
-  await apiStartGroup(id)
-  groups.value = groups.value.filter(g => g.id !== id)
-  startGroup.value = null
-  if (panelGroup.value?.id === id) closePanel()
+  try {
+    await apiStartGroup(id)
+    groups.value = groups.value.filter(g => g.id !== id)
+    startGroup.value = null
+    if (panelGroup.value?.id === id) closePanel()
+    notify.addToast('Группа запущена 🚀', 'success')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка запуска группы', 'error')
+  }
 }
 
 async function onDeleteGroup(id: number) {
-  await deleteNewGroup(id)
-  groups.value = groups.value.filter(g => g.id !== id)
-  closePanel()
+  try {
+    await deleteNewGroup(id)
+    groups.value = groups.value.filter(g => g.id !== id)
+    closePanel()
+    notify.addToast('Группа удалена', 'warning')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка удаления группы', 'error')
+  }
 }
 
 async function onStudentsAdded(payload: { groupId: number; studentIds: number[] }) {
-  await addStudentsToGroup(payload)
-  const res = await getNewGroupStudents(payload.groupId)
-  panelStudents.value = res.items
+  try {
+    await addStudentsToGroup(payload)
+    const res = await getNewGroupStudents(payload.groupId)
+    panelStudents.value = res.items
+    notify.addToast('Ученики добавлены ✅', 'success')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка добавления учеников', 'error')
+  }
 }
 
-async function onStudentRemoved(payload: { groupId: number; studentName: string }) {
-  await removeStudentFromGroup(payload)
-  panelStudents.value = panelStudents.value.filter(s => s.name !== payload.studentName)
+async function onStudentRemoved(payload: { groupId: number; studentId: number }) {
+  try {
+    await removeStudentFromGroup(payload)
+    panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    notify.addToast('Ученик убран из группы', 'warning')
+  } catch (err: any) {
+    notify.addToast(err?.response?.data?.message || 'Ошибка удаления ученика', 'error')
+  }
 }
 
 // ── Init ──
 onMounted(async () => {
-  const [gRes, sRes, tRes] = await Promise.all([
-    getNewGroups(),
-    getMasterStudents(),
-    getTeachers(),
-  ])
-  groups.value = gRes.items
-  masterStudents.value = sRes.items
-  teachers.value = tRes.items
+  isLoading.value = true
+  try {
+    const [gRes, sRes, tRes] = await Promise.all([
+      getNewGroups(),
+      getMasterStudents(),
+      getTeachers(),
+    ])
+    groups.value = gRes.items
+    masterStudents.value = sRes.items
+    teachers.value = tRes.items
+  } catch (err: any) {
+    notify.addToast('Ошибка загрузки данных', 'error')
+  } finally {
+    isLoading.value = false
+  }
 })
 </script>
 
@@ -464,4 +515,23 @@ td { padding: 12px 13px; font-size: 13.5px; vertical-align: middle; }
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s; border: none; }
 .btn-primary { background: linear-gradient(135deg, #4f6ef7, #8b5cf6); color: white; box-shadow: 0 0 16px rgba(79,110,247,0.3); }
 .btn-primary:hover { box-shadow: 0 0 24px rgba(79,110,247,0.5); transform: translateY(-1px); }
+
+/* Skeleton */
+.skel {
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--app-border) 25%, var(--app-surface-hi) 50%, var(--app-border) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skel-w20 { width: 20%; }
+.skel-w30 { width: 30%; }
+.skel-w40 { width: 40%; }
+.skel-w50 { width: 50%; }
+.skel-w60 { width: 60%; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
 </style>

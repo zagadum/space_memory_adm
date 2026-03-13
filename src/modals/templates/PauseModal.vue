@@ -71,6 +71,7 @@ import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
 import { usePaymentsStore } from "../../stores/payments.store";
 import { useModalStore } from "../../stores/modal.store";
+import { paymentsApi } from "../../api/paymentsApi";
 
 const { t } = useI18n();
 const paymentsStore = usePaymentsStore();
@@ -234,10 +235,14 @@ async function save() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    // Simulated API call — replace with real API in production
-    await new Promise(r => setTimeout(r, 600));
-    // Reload store data after successful mutation
-    await paymentsStore.loadStudent();
+    await paymentsApi.setPause({
+      programId: modal.payload?.programId as string,
+      from: from.value,
+      to: to.value,
+      reason: reason.value,
+      comment: comment.value || undefined,
+    });
+    await paymentsStore.reloadCurrent();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';

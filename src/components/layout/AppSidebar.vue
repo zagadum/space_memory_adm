@@ -22,8 +22,19 @@
     </div>
 
     <nav class="sidebar-nav">
+      <!-- МОЙ КАБИНЕТ -->
       <div 
-        class="nav-standalone" 
+        class="nav-standalone nav-item--stub" 
+        :class="{ active: activeItem === 'my-cabinet' }" 
+        @click="navigateTo('my-cabinet', '/my-cabinet')"
+      >
+        <span class="nav-icon">🏠</span> {{ t('sidebar.myCabinet') }}
+        <span class="nav-badge blue" v-if="unreadNews > 0">{{ unreadNews }}</span>
+      </div>
+
+      <!-- ДАШБОРД -->
+      <div 
+        class="nav-standalone nav-item--stub" 
         :class="{ active: activeItem === 'dashboard' }" 
         @click="setActive('dashboard')"
       >
@@ -50,7 +61,7 @@
           <span class="nav-badge green" v-if="listStore.totalStudents > 0">{{ listStore.totalStudents }}</span>
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'groups' }" 
           @click="setActive('groups')"
         >
@@ -58,21 +69,21 @@
           <span class="nav-badge blue">12</span>
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'teachers' }" 
           @click="setActive('teachers')"
         >
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.teachers') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'docs' }" 
           @click="setActive('docs')"
         >
           <span class="nav-icon">📄</span> {{ t('sidebar.docs') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'inpost' }" 
           @click="setActive('inpost')"
         >
@@ -91,20 +102,16 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div class="nav-children" :class="{ open: openSections.finance }">
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'returns' }" 
-          @click="setActive('returns')"
-        >
-          <span class="nav-icon">🔙</span> {{ t('sidebar.returns') }}
-          <span class="nav-badge cyan">2</span>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
+          <span class="nav-icon">💰</span> {{ t('sidebar.studentFinance') }}
         </div>
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'projects' }" 
-          @click="navigateTo('projects', '/projects')"
-        >
-          <span class="nav-icon">📁</span> {{ t('sidebar.projects') }}
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
+          <span class="nav-icon">🔴</span> {{ t('sidebar.debtors') }}
+          <span class="nav-badge" v-if="debtors > 0">{{ debtors }}</span>
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
+          <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
+          <span class="nav-badge cyan">3</span>
         </div>
         <div 
           class="nav-item" 
@@ -113,19 +120,31 @@
         >
           <span class="nav-icon">⚙️</span> {{ t('sidebar.settings') }}
         </div>
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'salary-demo' }" 
-          @click="navigateTo('salary-demo', '/teacher/salary')"
-        >
-          <span class="nav-icon">👛</span> {{ t('sidebar.salaryDemo') }}
+      </div>
+
+      <!-- БУХГАЛТЕРИЯ -->
+      <div class="nav-section" :class="{ open: openSections.accounting }" @click="toggleSection('accounting')">
+        <span class="nav-section-icon">🧾</span>
+        <span class="nav-section-label">{{ t('sidebar.accounting') }}</span>
+        <span class="nav-section-badge nb-cyan" v-if="pendingReturns > 0">{{ pendingReturns }}</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.accounting }">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
+          <span class="nav-icon">🧾</span> {{ t('sidebar.faktury') }}
         </div>
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'salary-calculator' }" 
-          @click="navigateTo('salary-calculator', '/finance/salary-calculator')"
-        >
-          <span class="nav-icon">📊</span> {{ t('sidebar.salaryCalculator') }}
+        <div class="nav-item" :class="{ active: activeItem === 'returns' }" @click="navigateTo('returns', '/finance/returns')">
+          <span class="nav-icon">↩️</span> {{ t('sidebar.returns') }}
+          <span class="nav-badge cyan" v-if="pendingReturns > 0">{{ pendingReturns }}</span>
+        </div>
+        <div class="nav-item" :class="{ active: activeItem === 'projects' }" @click="navigateTo('projects', '/projects')">
+          <span class="nav-icon">📁</span> {{ t('sidebar.projects') }}
+        </div>
+        <div class="nav-item" :class="{ active: activeItem === 'salary-calculator' }" @click="navigateTo('salary-calculator', '/finance/salary-calculator')">
+          <span class="nav-icon">🧮</span> {{ t('sidebar.salaryCalculator') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia')">
+          <span class="nav-icon">🔧</span> {{ t('sidebar.ustawienia') }}
         </div>
       </div>
 
@@ -143,7 +162,7 @@
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'new-students' }" 
-          @click="setActive('new-students')"
+          @click="navigateTo('new-students', '/recruitment/new-students')"
         >
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
           <span class="nav-badge green">8</span>
@@ -165,16 +184,93 @@
         <div 
           class="nav-item" 
           :class="{ active: activeItem === 'expelled' }" 
-          @click="setActive('expelled')"
+          @click="navigateTo('expelled', '/recruitment/expelled-students')"
         >
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
         <div 
-          class="nav-item" 
+          class="nav-item nav-item--stub" 
           :class="{ active: activeItem === 'recruit-archive' }" 
           @click="setActive('recruit-archive')"
         >
           <span class="nav-icon">🗃️</span> {{ t('sidebar.archive') }}
+        </div>
+      </div>
+
+      <!-- ОТДЕЛ КАЧЕСТВА -->
+      <div class="nav-section" :class="{ open: openSections.quality }" @click="toggleSection('quality')">
+        <span class="nav-section-icon">🎯</span>
+        <span class="nav-section-label">{{ t('sidebar.quality') }}</span>
+        <span class="nav-section-badge nb-red" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.quality }">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
+          <span class="nav-icon">🚪</span> {{ t('sidebar.rezygnacje') }}
+          <span class="nav-badge" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'holidays-return' }" @click="navigateTo('holidays-return', '/quality/holidays-return')">
+          <span class="nav-icon">🌙</span> {{ t('sidebar.holidaysReturn') }}
+          <span class="nav-badge amber">4</span>
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-monitoring' }" @click="navigateTo('quality-monitoring', '/quality/monitoring')">
+          <span class="nav-icon">🔍</span> {{ t('sidebar.qualityMonitoring') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-analytics' }" @click="navigateTo('quality-analytics', '/quality/analytics')">
+          <span class="nav-icon">📊</span> {{ t('sidebar.qualityAnalytics') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trial-lessons-qd' }" @click="navigateTo('trial-lessons-qd', '/quality/trial-lessons')">
+          <span class="nav-icon">⭐</span> {{ t('sidebar.trialLessonsQd') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-zaliczenia' }" @click="navigateTo('quality-zaliczenia', '/quality/zaliczenia')">
+          <span class="nav-icon">✔️</span> {{ t('sidebar.qualityZaliczenia') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-olimpiad' }" @click="navigateTo('quality-olimpiad', '/quality/olimpiad')">
+          <span class="nav-icon">🏆</span> {{ t('sidebar.qualityOlimpiad') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'spotkania' }" @click="navigateTo('spotkania', '/quality/spotkania')">
+          <span class="nav-icon">🤝</span> {{ t('sidebar.spotkania') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'sciezka' }" @click="navigateTo('sciezka', '/quality/sciezka')">
+          <span class="nav-icon">🛤️</span> {{ t('sidebar.sciezka') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-materials' }" @click="navigateTo('quality-materials', '/quality/materials')">
+          <span class="nav-icon">📚</span> {{ t('sidebar.qualityMaterials') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'zaliczenia-calendar' }" @click="navigateTo('zaliczenia-calendar', '/quality/zaliczenia-calendar')">
+          <span class="nav-icon">📅</span> {{ t('sidebar.zaliczeniaCalendar') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'all-tasks' }" @click="navigateTo('all-tasks', '/quality/all-tasks')">
+          <span class="nav-icon">📋</span> {{ t('sidebar.allTasks') }}
+          <span class="nav-badge blue">8</span>
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-stats' }" @click="navigateTo('quality-stats', '/quality/stats')">
+          <span class="nav-icon">📉</span> {{ t('sidebar.qualityStats') }}
+        </div>
+      </div>
+
+      <!-- НАСТРОЙКИ -->
+      <div class="nav-section" :class="{ open: openSections.settings }" @click="toggleSection('settings')">
+        <span class="nav-section-icon">⚙️</span>
+        <span class="nav-section-label">{{ t('sidebar.settings') }}</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.settings }">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'indigo-techniques' }" @click="setActive('indigo-techniques')">
+          <span class="nav-icon">🧩</span> {{ t('sidebar.indigoTechniques') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
+          <span class="nav-icon">🏫</span> {{ t('sidebar.schoolSettings') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="setActive('access-control')">
+          <span class="nav-icon">🔐</span> {{ t('sidebar.accessControl') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">
+          <span class="nav-icon">🔌</span> {{ t('sidebar.integrations') }}
+          <span class="nav-badge blue">KSeF</span>
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'reports' }" @click="setActive('reports')">
+          <span class="nav-icon">📄</span> {{ t('sidebar.reports') }}
         </div>
       </div>
 
@@ -239,10 +335,23 @@ const handleLogout = () => {
   router.push('/auth/sign-in')
 }
 
+// Заглушки счетчиков
+const hrCandidates   = ref(8)
+const trainerTasks   = ref(4)
+const debtors        = ref(7)
+const pendingReturns = ref(2)
+const rezygnajeCount = ref(11)
+const unreadNews     = ref(3)
+
 const openSections = ref<Record<string, boolean>>({
   secretariat: true,
   finance: false,
   recruitment: false,
+  hr: false,
+  trainer: false,
+  accounting: false,
+  quality: false,
+  settings: false,
 })
 
 const activeItem = ref('students')
@@ -251,23 +360,73 @@ watch(() => route.path, (path) => {
   if (path.startsWith('/recruitment/leads')) {
     activeItem.value = 'leads'
     openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/new-students')) {
+    activeItem.value = 'new-students'
+    openSections.value.recruitment = true
   } else if (path.startsWith('/recruitment/new-groups')) {
     activeItem.value = 'new-groups'
     openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/expelled-students')) {
+    activeItem.value = 'expelled'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/finance/returns')) {
+    activeItem.value = 'returns'
+    openSections.value.accounting = true
   } else if (path.startsWith('/projects')) {
     activeItem.value = 'projects'
-    openSections.value.finance = true
+    openSections.value.accounting = true
   } else if (path.startsWith('/students')) {
     activeItem.value = 'students'
   } else if (path.startsWith('/teacher/salary')) {
     activeItem.value = 'salary-demo'
-    openSections.value.finance = true
+    openSections.value.trainer = true
   } else if (path.startsWith('/finance/salary-calculator')) {
     activeItem.value = 'salary-calculator'
-    openSections.value.finance = true
+    openSections.value.accounting = true
   } else if (path === '/' || path === '/dashboard') {
     activeItem.value = 'dashboard'
-  }
+
+  // HR
+  } else if (path.startsWith('/hr/active'))    { activeItem.value = 'hr-active';    openSections.value.hr = true }
+  else if (path.startsWith('/hr/training'))  { activeItem.value = 'hr-training';  openSections.value.hr = true }
+  else if (path.startsWith('/hr/pipeline'))  { activeItem.value = 'hr-pipeline';  openSections.value.hr = true }
+  else if (path.startsWith('/hr/personal'))  { activeItem.value = 'hr-personal';  openSections.value.hr = true }
+  else if (path.startsWith('/hr/analytics')) { activeItem.value = 'hr-analytics'; openSections.value.hr = true }
+  // Кабинет тренера
+  else if (path.startsWith('/trainer/dashboard'))     { activeItem.value = 'trainer-dashboard';    openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/students'))      { activeItem.value = 'trainer-students';     openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/groups'))        { activeItem.value = 'trainer-groups';       openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/lesson-tracker')){ activeItem.value = 'lesson-tracker';       openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/tasks'))         { activeItem.value = 'trainer-tasks';        openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/trial-lesson'))  { activeItem.value = 'trial-lesson';         openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/trial-month'))   { activeItem.value = 'trial-month';          openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/zaliczenia'))    { activeItem.value = 'trainer-zaliczenia';   openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/olimpiad'))      { activeItem.value = 'olimpiad';             openSections.value.trainer = true }
+  // Финансы (новые)
+  else if (path.startsWith('/finance/students'))  { activeItem.value = 'student-finance';  openSections.value.finance = true }
+  else if (path.startsWith('/finance/debtors'))   { activeItem.value = 'debtors';          openSections.value.finance = true }
+  else if (path.startsWith('/finance/nadplaty'))  { activeItem.value = 'nadplaty';         openSections.value.finance = true }
+  // Бухгалтерия
+  else if (path.startsWith('/accounting/faktury'))         { activeItem.value = 'faktury';           openSections.value.accounting = true }
+  else if (path.startsWith('/finance/settings-ustawienia')){ activeItem.value = 'settings';          openSections.value.accounting = true }
+  // Отдел качества
+  else if (path.startsWith('/quality/rezygnacje'))         { activeItem.value = 'rezygnacje';         openSections.value.quality = true }
+  else if (path.startsWith('/quality/holidays'))           { activeItem.value = 'holidays-return';    openSections.value.quality = true }
+  else if (path.startsWith('/quality/monitoring'))         { activeItem.value = 'quality-monitoring'; openSections.value.quality = true }
+  else if (path.startsWith('/quality/analytics'))          { activeItem.value = 'quality-analytics';  openSections.value.quality = true }
+  else if (path.startsWith('/quality/trial'))              { activeItem.value = 'trial-lessons-qd';   openSections.value.quality = true }
+  else if (path.startsWith('/quality/zaliczenia-calendar')){ activeItem.value = 'zaliczenia-calendar';openSections.value.quality = true }
+  else if (path.startsWith('/quality/zaliczenia'))         { activeItem.value = 'quality-zaliczenia'; openSections.value.quality = true }
+  else if (path.startsWith('/quality/olimpiad'))           { activeItem.value = 'quality-olimpiad';   openSections.value.quality = true }
+  else if (path.startsWith('/quality/spotkania'))          { activeItem.value = 'spotkania';          openSections.value.quality = true }
+  else if (path.startsWith('/quality/sciezka'))            { activeItem.value = 'sciezka';            openSections.value.quality = true }
+  else if (path.startsWith('/quality/materials'))          { activeItem.value = 'quality-materials';  openSections.value.quality = true }
+  else if (path.startsWith('/quality/all-tasks'))          { activeItem.value = 'all-tasks';          openSections.value.quality = true }
+  else if (path.startsWith('/quality/stats'))              { activeItem.value = 'quality-stats';      openSections.value.quality = true }
+  // Финансы настройки - ставится под Бухгалтерией и над Мой Кабинет/прочими 
+  else if (path.startsWith('/finance/settings'))           { activeItem.value = 'finance-settings';   openSections.value.finance = true }
+  // Мой кабинет
+  else if (path.startsWith('/my-cabinet'))  { activeItem.value = 'my-cabinet' }
 }, { immediate: true })
 
 const toggleSection = (section: string) => {
@@ -387,4 +546,10 @@ const navigateTo = (item: string, path: string) => {
 .logout-btn svg { transition: transform 0.2s ease; }
 .logout-btn:hover { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
 .logout-btn:hover svg { transform: translateX(2px); }
+
+.nav-item--stub {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
 </style>

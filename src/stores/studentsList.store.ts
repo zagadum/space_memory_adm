@@ -9,6 +9,8 @@ import {
 export interface Student {
     id: number | string;
     name: string;
+    firstName: string;
+    lastName: string;
     phone?: string;
     startDate?: string;
     daysInSystem?: number;
@@ -75,38 +77,43 @@ export const useStudentsListStore = defineStore("studentsList", {
                     orderDirection: this.sorting.orderDirection,
                 };
 
-                const data = await getStudents(params);
-                this.students = (data.data || []).map((u: any) => {
+                const result = await getStudents(params);
+                // Unwrap the standardized pagination structure: { data: [...], meta: ... }
+                const items = result.data || [];
+                
+                this.students = items.map((u: any) => {
                     // Extract group and teacher info from the new unified response
                     // Usually backend returns 'groups' as an array of objects
                     const primaryEnrollment = u.groups?.[0] || {};
 
                     return {
                         id: u.id,
-                        name: u.full_name || u.name || "Unknown Student",
-                        phone: u.phone_number || u.phone || "-",
-                        startDate: u.created_at || u.startDate || "-",
-                        daysInSystem: u.training_term_days || 0,
-                        enrollments: u.groups?.map((g: any) => ({
+                        name: u.name || "Unknown Student",
+                        firstName: u.firstName || "",
+                        lastName: u.lastName || "",
+                        phone: u.phone || u.phone_number || "-",
+                        email: u.email || "",
+                        startDate: u.startDate || u.created_at || "-",
+                        daysInSystem: u.trainingTermDays || u.training_term_days || 0,
+                        enrollments: u.enrollments?.length ? u.enrollments : u.groups?.map((g: any) => ({
                             school: g.school_name || "Space Memory",
                             group: g.name || "-",
                             teacher: g.teacher_name || "-"
                         })) || [],
-                        lastContact: u.last_contact_at || u.lastContact || null,
-                        daysSinceContact: u.days_since_last_contact ?? u.daysSinceContact ?? null,
-                        staff: u.manager_name || u.staff || "-",
-                        staffInitials: u.manager_initials || u.staffInitials || "-",
-                        comment: u.last_comment || u.comment || "",
-                        paid: !!u.is_paid
+                        lastContact: u.lastContact || u.last_contact_at || null,
+                        daysSinceContact: u.daysSinceContact || u.days_since_last_contact || null,
+                        staff: u.staff || u.manager_name || "-",
+                        staffInitials: u.staffInitials || u.manager_initials || "-",
+                        comment: u.comment || u.last_comment || "",
+                        paid: u.paid ?? !!u.is_paid
                     };
                 });
-
-                this.pagination.currentPage = data.meta?.current_page || 1;
-                this.pagination.lastPage = data.meta?.last_page || 1;
-                this.pagination.perPage = data.meta?.per_page || this.pagination.perPage;
-                this.pagination.total = data.meta?.total || 0;
-                this.pagination.from = data.meta?.from || 0;
-                this.pagination.to = data.meta?.to || 0;
+                this.pagination.currentPage = result.meta?.current_page || 1;
+                this.pagination.lastPage = result.meta?.last_page || 1;
+                this.pagination.perPage = result.meta?.per_page || this.pagination.perPage;
+                this.pagination.total = result.meta?.total || items.length;
+                this.pagination.from = result.meta?.from || 0;
+                this.pagination.to = result.meta?.to || 0;
             } catch (e: any) {
                 this.error = "Failed to fetch students";
                 console.error(e);

@@ -140,10 +140,20 @@ async function save() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    // Simulated API call — replace with real API in production
-    await new Promise(r => setTimeout(r, 600));
-    // Reload store data after successful mutation
-    await paymentsStore.loadStudent();
+    await paymentsApi.editInvoice({
+      programId,
+      fvnum: fv.value,
+      issueDate: issueDate.value,
+      payDate: payDate.value,
+      amount: Number(amount.value),
+      serviceName: serviceName.value,
+      buyerName: buyerName.value,
+      buyerAddress: buyerAddress.value,
+      buyerNip: buyerNip.value || undefined,
+      monthIndex: targetMonth.value,
+      year: String(targetYear.value),
+    });
+    await paymentsStore.reloadCurrent();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';

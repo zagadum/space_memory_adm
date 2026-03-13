@@ -12,7 +12,9 @@ import SalaryConfirmBlock from './components/SalaryConfirmBlock.vue';
 const { t } = useI18n();
 const salaryStore = useTeacherSalaryStore();
 
-const currentMonth = ref('2026-02');
+// Текущий месяц в формате YYYY-MM
+const now = new Date();
+const currentMonth = ref(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`);
 const openSections = ref<Record<string, boolean>>({
   'subscriptions': true,
   'substitutions': true,
@@ -59,18 +61,20 @@ const activeSections = computed(() => salaryStore.activeSections);
 const getStatusClass = (status: string) => {
   if (status === 'confirmed') return 'st-confirmed';
   if (status === 'paid') return 'st-paid';
+  if (status === 'disputed') return 'st-draft';
   return 'st-draft';
 };
 
 const getStatusIcon = (status: string) => {
   if (status === 'confirmed') return '✓';
   if (status === 'paid') return '💰';
+  if (status === 'disputed') return '⚠️';
   return '⏳';
 };
 </script>
 
 <template>
-  <div class="salary-container" v-if="salaryData">
+  <div class="salary-container">
     <!-- Stars Background -->
     <div class="stars-bg"></div>
 
@@ -85,7 +89,7 @@ const getStatusIcon = (status: string) => {
           </div>
         </div>
         <div class="header-right">
-          <button class="export-btn" @click="salaryStore.exportToExcel(t)">
+          <button v-if="salaryData" class="export-btn" @click="salaryStore.exportToExcel(t)">
             📥 {{ t('salaryCalc.labels.exportExcel') }}
           </button>
           <div class="role-badge">
@@ -103,13 +107,24 @@ const getStatusIcon = (status: string) => {
           <option value="2026-01">Січень 2026 / Styczeń 2026</option>
           <option value="2025-12">Грудень 2025 / Grudzień 2025</option>
         </select>
-        <span class="st-pill" :class="getStatusClass(salaryData.status)">
+        <span v-if="salaryData" class="st-pill" :class="getStatusClass(salaryData.status)">
           {{ getStatusIcon(salaryData.status) }} {{ t(`teacherSalary.status.${salaryData.status}`) }}
         </span>
       </div>
 
-      <!-- TEACHER CARD -->
-      <div class="teacher-card">
+      <div v-if="salaryStore.isLoading" class="salary-loading">
+        <div class="loading-spinner">⏳</div>
+        <div class="loading-text">Загрузка...</div>
+      </div>
+
+      <div v-else-if="salaryStore.error" class="salary-error">
+        <div class="error-icon">❌</div>
+        <div class="error-text">{{ salaryStore.error }}</div>
+      </div>
+
+      <template v-else-if="salaryData">
+        <!-- TEACHER CARD -->
+        <div class="teacher-card">
         <div class="teacher-av">АК</div>
         <div class="teacher-info">
           <div class="teacher-name">{{ salaryData.trainerName }}</div>
@@ -402,6 +417,11 @@ const getStatusIcon = (status: string) => {
       <div class="ts-bar">
         <span>{{ t('teacherSalary.generatedAt') }}: 01.03.2026 · 09:14</span>
       </div>
+      </template>
+
+      <div v-else class="salary-loading">
+        <div class="loading-text">Выберите месяц или нет данных</div>
+      </div>
 
     </div>
   </div>
@@ -559,6 +579,12 @@ const getStatusIcon = (status: string) => {
 .final-amount { font-size: 36px; font-weight: 900; color: var(--app-text-main); text-shadow: 0 0 20px rgba(79,110,247,.2); line-height: 1; }
 .final-sublabel { font-size: 12px; font-weight: 700; color: var(--app-text-dim); margin-top: 8px; text-transform: uppercase; }
 
-.ts-bar { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.03); text-align: center; font-size: 10.5px; color: var(--dim2); font-family: 'Space Mono', monospace; }
+.ts-bar { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.03); text-align: center; font-size: 10.5px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
 .hint { font-size: 11.5px; color: #4b5563; margin-top: 12px; font-style: italic; }
+.salary-loading, .salary-error {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 300px; gap: 16px; color: var(--app-text-dim);
+}
+.loading-spinner, .error-icon { font-size: 40px; }
+.loading-text, .error-text { font-size: 15px; font-weight: 500; }
 </style>

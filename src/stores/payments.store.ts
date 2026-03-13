@@ -1,10 +1,9 @@
 import { defineStore } from "pinia";
 import { paymentsApi } from "../api/paymentsApi";
 import type { Program, StudentProfile, MonthObj, KsefInvoice } from "../api/mockDb";
-import type { Transaction } from "../api/paymentsApi";
+import type { Transaction, ProjectSummary } from "../api/paymentsApi";
 
 function extractErrorMessage(e: unknown, fallback: string): string {
-  // Проверяем timeout ошибку
   if (e && typeof e === 'object') {
     const err = e as any;
     if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
@@ -40,11 +39,32 @@ export const usePaymentsStore = defineStore("payments", {
     activeMonth: {} as Record<string, number | null>,
     activeView: {} as Record<string, "grid" | "table">,
 
-    // НОВОЕ: Справочники для выпадающих списков
+    // ── НОВОЕ: Разбитые запросы ──────────────────────────────────────────────
+    // Список проектов (лёгкий, грузится сразу)
+    projectSummaries: [] as ProjectSummary[],
+    projectsLoading: false,
+    projectsError: "" as string,
+
+    // Календарь — грузится по клику на проект (per-project)
+    calendarByProject: {} as Record<string, Program['years']>,
+    calendarLoading: {} as Record<string, boolean>,
+    calendarError: {} as Record<string, string>,
+
+    // Транзакции — грузятся по клику на раздел (per-project, lazy)
+    newTxByProject: {} as Record<string, Transaction[]>,
+    newTxLoading: {} as Record<string, boolean>,
+    newTxError: {} as Record<string, string>,
+
+    // Текущий studentId (нужен для lazy запросов)
+    currentStudentId: "" as string,
+
+    // Справочники для выпадающих списков
     dictionaries: {
-      pauseReasons: [] as Array<{ id: string; labelKey: string }>,
-      paymentMethods: [] as Array<{ id: string; labelKey: string }>,
-      discountTypes: [] as Array<{ id: string; labelKey: string }>
+      pauseReasons: [] as Array<any>,
+      paymentMethods: [] as Array<any>,
+      discountTypes: [] as Array<any>,
+      refundReasons: [] as Array<any>,
+      tariffs: [] as Array<any>
     }
   }),
 
@@ -54,10 +74,11 @@ export const usePaymentsStore = defineStore("payments", {
 
     /** Возвращает массив MonthObj для данной программы и текущего года */
     monthsForProgram: (s) => (progId: string): MonthObj[] => {
-      const p = s.programs.find((x) => x.id === progId);
-      if (!p) return [];
+      // Приоритет: новый calendar → старый programs
+      const years = s.calendarByProject[progId] || s.programs.find((x) => x.id === progId)?.years;
+      if (!years) return Array.from({ length: 12 }, () => ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj));
       const year = String(s.activeYear[progId] || 2026);
-      const arr = (p.years?.[year] || []) as MonthObj[];
+      const arr = (years[year] || []) as MonthObj[];
       return Array.from({ length: 12 }, (_, i) =>
         arr[i] || ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj)
       );
@@ -67,67 +88,71 @@ export const usePaymentsStore = defineStore("payments", {
     currentMonth: (s) => (progId: string): MonthObj | null => {
       const idx = s.activeMonth[progId];
       if (idx == null) return null;
-      const p = s.programs.find((x) => x.id === progId);
-      if (!p) return null;
+      const years = s.calendarByProject[progId] || s.programs.find((x) => x.id === progId)?.years;
+      if (!years) return null;
       const year = String(s.activeYear[progId] || 2026);
-      const arr = (p.years?.[year] || []) as MonthObj[];
+      const arr = (years[year] || []) as MonthObj[];
       return arr[idx] || ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj);
     },
 
     /** Список годов для программы */
     yearsForProgram: (s) => (progId: string): number[] => {
-      const p = s.programs.find((x) => x.id === progId);
-      if (!p || !p.years) return [2026];
-      const ys = Object.keys(p.years).map(Number).sort();
+      const years = s.calendarByProject[progId] || s.programs.find((x) => x.id === progId)?.years;
+      if (!years) return [2026];
+      const ys = Object.keys(years).map(Number).sort();
       return ys.length ? ys : [2026];
+    },
+
+    /** Загружен ли календарь для проекта */
+    isCalendarLoaded: (s) => (progId: string): boolean => {
+      return !!s.calendarByProject[progId];
+    },
+
+    /** Транзакции: новый endpoint или старый fallback */
+    txForProject: (s) => (progId: string): Transaction[] => {
+      return s.newTxByProject[progId]
+        ?? s.transactionsByProgram[progId]
+        ?? [];
     },
   },
 
   actions: {
-    // НОВОЕ: Экшен для загрузки справочников
+    // ── Справочники ────────────────────────────────────────────────────────────
     async fetchDictionaries() {
-      // В будущем здесь будет реальный запрос через axios/fetch к API_ENDPOINTS.DICTIONARIES
-      // Сейчас просто имитируем ответ сервера, чтобы UI уже работал:
-      this.dictionaries = {
-        pauseReasons: [
-          { id: 'vacation', labelKey: 'modals.reasons.vacation' },
-          { id: 'illness', labelKey: 'modals.reasons.illness' },
-          { id: 'family', labelKey: 'modals.reasons.family' }
-        ],
-        paymentMethods: [
-          { id: 'card', labelKey: 'modals.methods.card' },
-          { id: 'cash', labelKey: 'modals.methods.cash' },
-          { id: 'transfer', labelKey: 'modals.methods.transfer' }
-        ],
-        discountTypes: [
-          { id: 'family', labelKey: 'modals.discounts.family' },
-          { id: 'marketing', labelKey: 'modals.discounts.marketing' }
-        ]
-      };
+      try {
+        const [pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs] =
+          await Promise.all([
+            paymentsApi.getPauseReasons(),
+            paymentsApi.getPaymentMethods(),
+            paymentsApi.getDiscountTypes(),
+            paymentsApi.getRefundReasons(),
+            paymentsApi.getTariffs(),
+          ]);
+        this.dictionaries = { pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs };
+      } catch (err: any) {
+        console.error('Ошибка загрузки словарей:', err?.message);
+        // Словари не критичны — не блокируем работу стора
+      }
     },
 
-    // ── Data loading ──
+    // ── СТАРЫЙ монолитный loadStudent (оставляем, пока бэкенд не готов) ───────
     async loadStudent(studentId = "s_1") {
       this.loading = true;
       this.error = "";
+      this.currentStudentId = studentId;
 
       try {
         const res = await paymentsApi.getStudentPayments(studentId);
         this.student = res.student || null;
         this.programs = res.programs || [];
 
-        // Инициализация UI-состояния для каждой программы
         for (const p of this.programs) {
           if (this.activeYear[p.id] == null) {
             const years = Object.keys(p.years || {}).map(Number).sort();
             this.activeYear[p.id] = years.length ? years[years.length - 1] : 2026;
           }
-          if (this.activeMonth[p.id] === undefined) {
-            this.activeMonth[p.id] = null;
-          }
-          if (this.activeView[p.id] == null) {
-            this.activeView[p.id] = "grid";
-          }
+          if (this.activeMonth[p.id] === undefined) this.activeMonth[p.id] = null;
+          if (this.activeView[p.id] == null) this.activeView[p.id] = "grid";
         }
       } catch (e: unknown) {
         this.error = extractErrorMessage(e, "Failed to load payments");
@@ -135,6 +160,94 @@ export const usePaymentsStore = defineStore("payments", {
         this.loading = false;
       }
     },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ
+    // ══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Запрос 1 — вызывается при открытии вкладки Платежи.
+     * Грузит только список проектов (имя, баланс, тариф) — без calendar и tx.
+     * Эндпоинт: GET /students/{student_id}/projects
+     */
+    async loadProjects(studentId: string) {
+        console.log('loadProjects=>', studentId);
+      this.projectsLoading = true;
+      this.projectsError = "";
+      this.currentStudentId = studentId;
+      try {
+        this.projectSummaries = await paymentsApi.getStudentProjects(studentId);
+
+        // Инициализируем UI-состояние для каждого проекта
+        for (const p of this.projectSummaries) {
+          if (this.activeYear[p.id] == null) this.activeYear[p.id] = new Date().getFullYear();
+          if (this.activeMonth[p.id] === undefined) this.activeMonth[p.id] = null;
+          if (this.activeView[p.id] == null) this.activeView[p.id] = "grid";
+        }
+      } catch (e: unknown) {
+        this.projectsError = extractErrorMessage(e, "Failed to load projects");
+      } finally {
+        this.projectsLoading = false;
+      }
+    },
+
+    /**
+     * Запрос 2 — вызывается по клику на проект в аккордеоне.
+     * Грузит календарь (years + months) только для этого проекта.
+     * Кэшируется: повторный клик не делает запрос.
+     * Эндпоинт: GET /students/{student_id}/projects/{project_id}/calendar
+     */
+    async loadCalendar(projectId: string) {
+      // Уже загружен — не делаем повторный запрос
+      if (this.calendarByProject[projectId]) return;
+
+      const studentId = this.currentStudentId;
+      if (!studentId) return;
+
+      this.calendarLoading[projectId] = true;
+      this.calendarError[projectId] = "";
+      try {
+        const res = await paymentsApi.getProjectCalendar(studentId, projectId);
+        this.calendarByProject[projectId] = res.years;
+
+        // Синхронизируем activeYear с последним годом в данных
+        const years = Object.keys(res.years).map(Number).sort();
+        if (years.length) this.activeYear[projectId] = years[years.length - 1];
+      } catch (e: unknown) {
+        this.calendarError[projectId] = extractErrorMessage(e, "Failed to load calendar");
+      } finally {
+        this.calendarLoading[projectId] = false;
+      }
+    },
+
+    /**
+     * Запрос 3 — вызывается по клику на раздел "Транзакции" внутри проекта.
+     * Грузит транзакции только для этого проекта.
+     * Кэшируется: повторный клик не делает запрос.
+     * Эндпоинт: GET /students/{student_id}/projects/{project_id}/transactions
+     */
+    async loadProjectTransactions(projectId: string) {
+      // Уже загружены — не делаем повторный запрос
+      if (this.newTxByProject[projectId]?.length) return;
+
+      const studentId = this.currentStudentId;
+      if (!studentId) return;
+
+      this.newTxLoading[projectId] = true;
+      this.newTxError[projectId] = "";
+      try {
+        const res = await paymentsApi.getProjectTransactions(studentId, projectId);
+        this.newTxByProject[projectId] = res.items;
+      } catch (e: unknown) {
+        this.newTxError[projectId] = extractErrorMessage(e, "Failed to load transactions");
+      } finally {
+        this.newTxLoading[projectId] = false;
+      }
+    },
+
+    // ══════════════════════════════════════════════════════════════════════════
+    // СТАРЫЕ методы (для совместимости пока mock работает через старый эндпоинт)
+    // ══════════════════════════════════════════════════════════════════════════
 
     async loadTransactions(programId: string) {
       if (this.transactionsByProgram[programId]?.length) return;
@@ -162,7 +275,7 @@ export const usePaymentsStore = defineStore("payments", {
       }
     },
 
-    // ── UI state actions ──
+    // ── UI state ───────────────────────────────────────────────────────────────
     setYear(prog: string, year: number) {
       this.activeYear[prog] = year;
       this.activeMonth[prog] = null;
@@ -176,7 +289,6 @@ export const usePaymentsStore = defineStore("payments", {
       this.activeView[prog] = view;
     },
 
-    // ── Data mutations ──
     updateTariff(programId: string, value: number) {
       const p = this.programs.find((x) => x.id === programId);
       if (!p) return;
@@ -198,8 +310,25 @@ export const usePaymentsStore = defineStore("payments", {
       this.activeYear = {};
       this.activeMonth = {};
       this.activeView = {};
-      // Очищаем справочники при сбросе
-      this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [] };
+      // Новые поля
+      this.projectSummaries = [];
+      this.projectsLoading = false;
+      this.projectsError = "";
+      this.calendarByProject = {};
+      this.calendarLoading = {};
+      this.calendarError = {};
+      this.newTxByProject = {};
+      this.newTxLoading = {};
+      this.newTxError = {};
+      this.currentStudentId = "";
+      this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [], refundReasons: [], tariffs: [] };
+    },
+
+    // Перезагрузка данных текущего студента (вызывается после мутаций)
+    async reloadCurrent() {
+      if (this.currentStudentId) {
+        await this.loadStudent(this.currentStudentId);
+      }
     },
   },
 });

@@ -1,7 +1,7 @@
 <template>
   <!-- Programs accordion -->
   <div
-    v-for="(prog, idx) in payments.programs"
+    v-for="(prog) in regularPrograms"
     :key="prog.id"
     class="prog"
     :class="{ open: prog.id === openProg }"
@@ -37,6 +37,23 @@
     <div class="prog-body" v-show="prog.id === openProg">
       <div class="prog-inner">
 
+        <!-- Скелетон пока грузится календарь -->
+        <div v-if="payments.calendarLoading[prog.id]" class="calendar-skeleton">
+          <div class="skel-bar"></div>
+          <div class="skel-grid">
+            <div v-for="n in 12" :key="n" class="skel-cell"></div>
+          </div>
+        </div>
+
+        <!-- Ошибка загрузки календаря -->
+        <div v-else-if="payments.calendarError[prog.id]" class="calendar-error">
+          ⚠️ {{ payments.calendarError[prog.id] }}
+          <button class="retry-btn-sm" @click="payments.loadCalendar(prog.id)">
+            🔄 {{ t('common.retry') }}
+          </button>
+        </div>
+
+        <template v-else>
         <!-- year toggle + view toggle -->
         <div class="year-row">
           <span class="yr-label">{{ t("payments.year") }}</span>
@@ -156,6 +173,7 @@
           :month="payments.currentMonth(prog.id)"
         />
 
+        </template><!-- /v-else calendar loaded -->
       </div><!-- /prog-inner -->
 
       <!-- Actions & Transactions will be added in next steps -->
@@ -171,7 +189,7 @@
 
   <!-- ── Extras card ── -->
   <div
-    v-if="payments.programs.find(p => p.id === 'extras')"
+    v-if="showExtrasTab"
     class="prog"
     :class="{ open: openProg === 'extras' }"
   >
@@ -279,10 +297,32 @@ watch(() => payments.programs, (newPrograms) => {
   }
 }, { immediate: true });
 
+const regularPrograms = computed(() => payments.programs.filter(p => p.id !== "extras"));
+
+const MOCK_EXTRAS_FALLBACK = {
+  id: "extras" as const,
+  name: "📚 Доп. материалы и программы",
+  sub: "Разовые услуги и товары",
+  tariff: 0,
+  balance: 450,
+  balanceLabel: "оплачено",
+  barGradient: "linear-gradient(180deg,var(--amber),var(--orange))",
+  years: {},
+  transactions: [],
+  extras: [
+    { id: "ext_1", icon: "🏆", title: "Олимпиада онлайн 2026", price: 150, date: "15.01.2026", txId: "#TXN-2026-0312", ksef: "ok", status: "paid" },
+    { id: "ext_2", icon: "🧮", title: "Счёты детские", price: 180, date: "10.02.2026", txId: "#TXN-2026-0445", ksef: "ok", status: "paid" },
+    { id: "ext_3", icon: "👩‍💼", title: "1-месячный курс для родителей", price: 120, date: null, txId: null, ksef: "pending", status: "pending" },
+  ],
+};
+
 const extrasProgram = computed(() => {
-  const p = payments.programs.find(p => p.id === 'extras');
-  return p || { name: '📚 Extras', sub: '', extras: [], balance: 0, balanceLabel: '' } as any;
+  const p = payments.programs.find(p => p.id === "extras");
+  return p || MOCK_EXTRAS_FALLBACK;
 });
+
+const showExtrasTab = computed(() => (extrasProgram.value.extras?.length || 0) > 0);
+
 const totalExtrasPaid = computed(() => {
   const items = extrasProgram.value.extras || [];
   return items.filter((e: any) => e.status === 'paid').reduce((sum: number, e: any) => sum + e.price, 0);
@@ -290,7 +330,13 @@ const totalExtrasPaid = computed(() => {
 
 // ── helpers ──
 function toggleProg(id: string) {
+  const isOpening = openProg.value !== id;
   openProg.value = openProg.value === id ? "" : id;
+
+  // При открытии проекта — загружаем календарь (если ещё не загружен)
+  if (isOpening) {
+    payments.loadCalendar(id);
+  }
 }
 function balColor(b: number): string {
   return b > 0 ? "var(--green)" : b < 0 ? "var(--red)" : "var(--white)";
@@ -349,6 +395,39 @@ function txsFor(p: Program) {
 
 <!-- ══════════════════════════════════════════════════════════ -->
 <style scoped>
+/* ── CALENDAR SKELETON ── */
+.calendar-skeleton { padding: 16px 0; }
+.skel-bar {
+  height: 28px; width: 200px; border-radius: 6px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06) 25%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.06) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+  margin-bottom: 12px;
+}
+.skel-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+.skel-cell {
+  height: 52px; border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,.06) 25%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.06) 75%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+}
+.skel-cell:nth-child(odd) { animation-delay: .1s; }
+@keyframes shimmer { 0%{background-position:100% 0} 100%{background-position:-100% 0} }
+
+/* ── CALENDAR ERROR ── */
+.calendar-error {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px; border-radius: 8px;
+  background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.25);
+  font-size: 13px; color: rgba(255,255,255,.7);
+}
+.retry-btn-sm {
+  background: rgba(239,68,68,.2); border: 1px solid rgba(239,68,68,.4);
+  color: #fff; border-radius: 6px; padding: 4px 10px;
+  font-size: 12px; cursor: pointer;
+}
+.retry-btn-sm:hover { background: rgba(239,68,68,.35); }
+
 /* ── PROGRAM CARD ── */
 .prog {
   border: 1px solid var(--b);
@@ -557,7 +636,7 @@ function txsFor(p: Program) {
   border-top: 1px solid rgba(251,191,36,.5);
   font-size: 7px;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--amber);
   text-align: center;
   padding: 2px 0;
   letter-spacing: .04em;
@@ -582,7 +661,7 @@ function txsFor(p: Program) {
 .ms-pause .mc-name { color: var(--amber); }
 
 .ms-summer          { border-color: rgba(251,191,36,.2); background: rgba(251,191,36,.05); }
-.ms-summer .mc-name { color: var(--gold); }
+.ms-summer .mc-name { color: var(--amber); }
 
 .ms-partial          { border-color: rgba(6,182,212,.3); background: linear-gradient(135deg, rgba(16,185,129,.1) 50%, rgba(245,158,11,.1) 50%); }
 .ms-partial .mc-name { color: var(--cyan); }

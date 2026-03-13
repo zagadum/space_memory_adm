@@ -187,7 +187,8 @@ export type KsefStatus =
 export function mapDbStudentToApiProfile(student: DbStudent): ApiStudentProfile {
   const dob = student.dob ? new Date(student.dob) : null;
   const dateFinish = student.date_finish ? new Date(student.date_finish) : null;
-  const age = dob ? Math.max(0, new Date().getFullYear() - dob.getFullYear()) : 0;
+  // Use full date diff (not just year) to avoid ±1 year error
+  const age = dob ? Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 3600 * 1000)) : 0;
 
   return {
     id: String(student.id),

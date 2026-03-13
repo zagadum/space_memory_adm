@@ -146,10 +146,12 @@ async function save() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    // Simulated API call — replace with real API in production
-    await new Promise(r => setTimeout(r, 600));
-    // Reload store data after successful mutation
-    await payments.loadStudent();
+    await paymentsApi.changeTariff({
+      programId,
+      value: newTariff.value,
+      fromMonthIndex: selectedMonth.value,
+    });
+    await payments.reloadCurrent();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';

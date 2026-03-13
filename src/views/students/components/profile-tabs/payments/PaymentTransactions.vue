@@ -12,12 +12,13 @@
     <!-- ── Body ── -->
     <div class="tx-body" v-show="isOpen">
       <div class="tx-body-inner">
-        <div
-          v-for="tx in txList"
-          :key="tx.id"
-          class="tx-row"
-          :class="{ 'tx-extra': tx.type === 'extra' }"
-        >
+
+        <!-- Загрузка транзакций -->
+        <div v-if="txIsLoading" class="tx-loading">
+          <span class="tx-spinner">⏳</span> {{ t('common.loading') }}
+        </div>
+
+        <div v-for="tx in txList" v-else :key="tx.id" class="tx-row" :class="{ 'tx-extra': tx.type === 'extra' }">
           <!-- date -->
           <div class="tx-date">{{ tx.date }}</div>
 
@@ -50,6 +51,17 @@
 
           <!-- action buttons -->
           <div class="tx-btns">
+            <button 
+              v-if="tx.documentId || tx.fvnum" 
+              class="tx-btn tx-btn-pdf" 
+              :class="{ 'tx-loading': isDownloading(tx) }"
+              :disabled="isDownloading(tx)"
+              :title="isDownloading(tx) ? t('payments.tx.pdfDownloading') : t('payments.tx.downloadPdf')" 
+              @click.stop="onDownload(tx)"
+            >
+              <span v-if="isDownloading(tx)" class="tx-spinner">⏳</span>
+              <span v-else>📄</span>
+            </button>
             <button class="tx-btn" :title="t('payments.tx.edit')" @click.stop="onEdit(tx)">✏️</button>
             <button class="tx-btn" :title="t('payments.tx.correction')" @click.stop="onKorekta(tx)">📋</button>
             <button class="tx-btn" :title="t('payments.tx.refund')" @click.stop="onRefund(tx)">↩️</button>
@@ -70,6 +82,7 @@ import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePaymentsStore } from "../../../../../stores/payments.store";
 import { useModalStore } from "../../../../../stores/modal.store";
+import { paymentsApi } from "../../../../../api/paymentsApi";
 import type { Transaction } from "../../../../../api/paymentsApi";
 
 const { t, tm } = useI18n();
@@ -127,21 +140,38 @@ function formatTxTitle(title: string): string {
   return res;
 }
 
-/** Transactions from store (loaded on expand) or from program.transactions fallback */
+/** Транзакции: новый endpoint → старый store → fallback из program.transactions */
 const txList = computed<Transaction[]>(() => {
-  const fromStore = payments.transactionsByProgram[props.prog];
-  if (fromStore?.length) return fromStore;
+  // Приоритет 1: новый разбитый запрос
+  const fromNewApi = payments.newTxByProject[props.prog];
+  if (fromNewApi?.length) return fromNewApi;
+  // Приоритет 2: старый endpoint
+  const fromOldStore = payments.transactionsByProgram[props.prog];
+  if (fromOldStore?.length) return fromOldStore;
+  // Fallback: данные из начального payload
   const p = payments.programs.find(x => x.id === props.prog);
   return (p?.transactions || []) as unknown as Transaction[];
 });
 
+const txIsLoading = computed(() =>
+  payments.newTxLoading[props.prog] || payments.txLoading[props.prog] || false
+);
+
 async function toggle() {
   isOpen.value = !isOpen.value;
   if (isOpen.value) {
-    await Promise.all([
-      payments.loadTransactions(props.prog),
-      payments.loadKsefInvoices(props.prog),
-    ]);
+    // Пробуем новый разбитый запрос, fallback на старый
+    if (payments.currentStudentId) {
+      await Promise.all([
+        payments.loadProjectTransactions(props.prog),
+        payments.loadKsefInvoices(props.prog),
+      ]);
+    } else {
+      await Promise.all([
+        payments.loadTransactions(props.prog),
+        payments.loadKsefInvoices(props.prog),
+      ]);
+    }
   }
 }
 
@@ -164,9 +194,41 @@ function onKorekta(tx: Transaction) {
 function onRefund(tx: Transaction) {
   modal.open("refund", { tx, programId: props.prog, fvnum: tx.fvnum, amount: tx.amount, desc: tx.title });
 }
+
+const downloadingIds = ref<Set<string | number>>(new Set());
+
+function isDownloading(tx: Transaction) {
+  const docId = tx.documentId || tx.fvnum;
+  return docId ? downloadingIds.value.has(docId) : false;
+}
+
+async function onDownload(tx: Transaction) {
+  const docId = tx.documentId || tx.fvnum;
+  if (!docId || downloadingIds.value.has(docId)) return;
+  
+  downloadingIds.value.add(docId);
+  try {
+    await paymentsApi.downloadInvoicePdf(docId);
+  } catch (err: any) {
+    console.error("Failed to download PDF:", err);
+    // Usually we would show a toast here
+    alert(t('payments.tx.pdfError'));
+  } finally {
+    downloadingIds.value.delete(docId);
+  }
+}
 </script>
 
 <style scoped>
+/* ── TX LOADING ── */
+.tx-loading {
+  padding: 16px; text-align: center;
+  font-size: 13px; color: rgba(255,255,255,.5);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.tx-spinner { animation: spin 1s linear infinite; display: inline-block; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 /* ── SECTION ── */
 .tx-section {
   border-top: 1px solid var(--b);
@@ -339,6 +401,10 @@ function onRefund(tx: Transaction) {
 .tx-btn:hover {
   background: rgba(79,110,247,.15);
   border-color: rgba(79,110,247,.3);
+}
+.tx-btn-pdf:hover {
+  background: rgba(16,185,129,.15);
+  border-color: rgba(16,185,129,.3);
 }
 
 /* empty */

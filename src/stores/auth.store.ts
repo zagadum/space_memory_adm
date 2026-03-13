@@ -7,6 +7,7 @@ export interface User {
   email: string;
   role: string;
   initials: string;
+  teacherId?: number;   // ID преподавателя — приходит с бэкенда для роли teacher
 }
 
 export const useAuthStore = defineStore("auth", {

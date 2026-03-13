@@ -51,18 +51,34 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   const method = (config.method || "get").toLowerCase();
 
   // --- AUTH ---
-  /*
-  if (method === "post" && url === "api/auth/sign-in") {
+  if (method === "post" && (url === "auth/sign-in" || url === "v1/auth/sign-in" || url === "api/auth/sign-in" || url === "api/v1/auth/sign-in")) {
     const body = readBody(config);
     if (!body?.email || !body?.password) return err(config, 400, "Missing credentials");
-    return ok(config, { token: "mock.jwt.token", user: mockDb.me });
+    if (body.email !== "admin@demo.local" || body.password !== "demo") {
+      return err(config, 401, "Invalid credentials");
+    }
+    return ok(config, {
+      token: "mock.jwt.token.admin",
+      user: {
+        id: "1",
+        email: "admin@demo.local",
+        name: "Demo Admin",
+        role: "admin",
+        initials: "DA",
+      },
+    });
   }
-  if (method === "get" && url === "api/auth/me") {
+  if (method === "get" && (url === "auth/me" || url === "v1/auth/me" || url === "api/auth/me" || url === "api/v1/auth/me")) {
     const auth = (config.headers as any)?.Authorization || "";
     if (!String(auth).startsWith("Bearer ")) return err(config, 401, "Unauthorized");
-    return ok(config, mockDb.me);
+    return ok(config, {
+      id: "1",
+      email: "admin@demo.local",
+      name: "Demo Admin",
+      role: "admin",
+      initials: "DA",
+    });
   }
-  */
 
   // --- PAYMENTS ---
   if (method === "get" && url.startsWith("payments/student/")) {
@@ -152,6 +168,82 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { student: data.profile, programs: data.programs });
   }
 
+  // ══════════════════════════════════════════════════════════════════════════
+  // НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ
+  // ══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Запрос 1: GET /students/{student_id}/projects
+   * Возвращает список проектов без calendar и transactions
+   */
+  if (method === "get" && /^students\/[^/]+\/projects$/.test(url)) {
+    const studentId = url.split("/")[1];
+    const studentData = studentId ? mockDb.students[studentId] : null;
+    const programs = studentData?.programs || [];
+
+    const items = programs.map((p: any) => ({
+      id: p.id,
+      name: p.name,
+      sub: p.sub,
+      tariff: p.tariff,
+      balance: p.balance,
+      balanceLabel: p.balanceLabel,
+      barGradient: p.barGradient,
+    }));
+
+    return ok(config, { items });
+  }
+
+  /**
+   * Запрос 2: GET /students/{student_id}/projects/{project_id}/calendar
+   * Возвращает только years (сетку платежей) для одного проекта
+   */
+  if (method === "get" && /^students\/[^/]+\/projects\/[^/]+\/calendar$/.test(url)) {
+    const parts = url.split("/");
+    const studentId = parts[1];
+    const projectId = parts[3];
+
+    const studentData = studentId ? mockDb.students[studentId] : null;
+    const program = studentData?.programs?.find((p: any) => p.id === projectId);
+
+    if (!program) return err(config, 404, "Project not found");
+
+    return ok(config, {
+      projectId,
+      years: program.years || {},
+      extras: program.extras || [],
+    });
+  }
+
+  /**
+   * Запрос 3: GET /students/{student_id}/projects/{project_id}/transactions
+   * Возвращает транзакции для одного проекта
+   */
+  if (method === "get" && /^students\/[^/]+\/projects\/[^/]+\/transactions$/.test(url)) {
+    const parts = url.split("/");
+    const projectId = parts[3];
+
+    const items = mockTransactions[projectId] || [];
+    return ok(config, { projectId, items });
+  }
+
+  /**
+   * Запрос 4: GET v1/payments/documents/{id}/pdf
+   * Mock PDF download
+   */
+  if (method === "get" && /^v1\/payments\/documents\/[^/]+\/pdf$/.test(url)) {
+    return {
+      data: new Blob(['%PDF-1.4 mock pdf content'], { type: 'application/pdf' }),
+      status: 200,
+      statusText: "OK",
+      headers: { 
+        "content-type": "application/pdf",
+        "content-disposition": 'attachment; filename="Faktura-MOCK.pdf"'
+      } as any,
+      config: config as any,
+    };
+  }
+
   /*
    * [x] Research current implementation of `.mcell` and status logic in `PaymentPrograms.vue`
    * [x] Audit and fix i18n keys in `ru.json`, `en.json`, `pl.json`
@@ -180,6 +272,47 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const body = readBody(config);
     if (!body?.programId || !body?.value) return err(config, 400, "programId/value required");
     return ok(config, { ok: true, programId: body.programId, value: body.value });
+  }
+
+  // Dictionaries
+  if (method === "get" && url === "dictionaries/pause-reasons") {
+    return ok(config, { items: [
+      { id: "illness", label: "Болезнь", icon: "🤧" },
+      { id: "vacation", label: "Отпуск", icon: "🏖️" },
+      { id: "financial", label: "Финансовые трудности", icon: "💰" },
+      { id: "other", label: "Другое", icon: "📝" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/payment-methods") {
+    return ok(config, { items: [
+      { id: "cash", label: "Наличные", icon: "💵" },
+      { id: "bank_transfer", label: "Банковский перевод", icon: "🏦" },
+      { id: "imoje", label: "iMoje (онлайн)", icon: "💳" },
+      { id: "manual", label: "Ручной ввод", icon: "⌨️" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/discount-types") {
+    return ok(config, { items: [
+      { id: "sibling", label: "Скидка для братьев/сестёр", icon: "👨‍👩‍👧‍👦" },
+      { id: "loyalty", label: "Лояльность", icon: "❤️" },
+      { id: "promo", label: "Промокод", icon: "🎫" },
+      { id: "manual", label: "Ручная скидка", icon: "✍️" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/refund-reasons") {
+    return ok(config, { items: [
+      { id: "overpayment", label: "Переплата", icon: "📈" },
+      { id: "cancellation", label: "Отмена занятий", icon: "❌" },
+      { id: "quality", label: "Претензия к качеству", icon: "⭐" },
+      { id: "other", label: "Другое", icon: "📝" },
+    ] });
+  }
+  if (method === "get" && url === "dictionaries/tariffs") {
+    return ok(config, { items: [
+      { id: 1, label: "Стандарт — 490 грн/мес", amount: 490 },
+      { id: 2, label: "Расширенный — 690 грн/мес", amount: 690 },
+      { id: 3, label: "VIP — 990 грн/мес", amount: 990 },
+    ] });
   }
 
 
@@ -348,6 +481,38 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true, note });
   }
 
+  if (method === "patch" && /^student\/notes\/[^/]+$/.test(url)) {
+    const noteId = url.split("/").pop();
+    const body = readBody(config) || {};
+    const idx = notes.findIndex((item) => String(item.id) === String(noteId));
+    if (idx === -1) return err(config, 404, "Note not found");
+
+    const oldNote = notes[idx];
+    const nextType = body.type ?? oldNote.type ?? "note";
+    const nextDirection = body.direction ?? oldNote.title ?? "";
+
+    const updatedNote = {
+      ...oldNote,
+      type: nextType,
+      status: body.status ?? oldNote.status ?? "open",
+      category: body.category ?? oldNote.category ?? "general",
+      title: nextDirection || oldNote.title || "",
+      text: body.text ?? oldNote.text,
+      tags: Array.isArray(body.tags) ? body.tags : oldNote.tags ?? [],
+    };
+
+    notes[idx] = updatedNote;
+    return ok(config, { ok: true, note: updatedNote });
+  }
+
+  if (method === "delete" && /^student\/notes\/[^/]+$/.test(url)) {
+    const noteId = url.split("/").pop();
+    const idx = notes.findIndex((item) => String(item.id) === String(noteId));
+    if (idx === -1) return err(config, 404, "Note not found");
+    notes.splice(idx, 1);
+    return ok(config, { ok: true });
+  }
+
   // --- NEW GROUPS ---
   const ng: any[] = (globalThis as any).__mock_new_groups ?? ((globalThis as any).__mock_new_groups = JSON.parse(JSON.stringify(mockNewGroups)));
   const ngStudents: any = (globalThis as any).__mock_ng_students ?? ((globalThis as any).__mock_ng_students = JSON.parse(JSON.stringify(mockGroupStudents)));
@@ -429,15 +594,15 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   if (method === "post" && url === "new-groups/remove-student") {
     const body = readBody(config);
-    if (!body?.groupId || !body?.studentName) return err(config, 400, "groupId/studentName required");
+    if (!body?.groupId || !body?.studentId) return err(config, 400, "groupId/studentId required");
     if (ngStudents[body.groupId]) {
-      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.name !== body.studentName);
+      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
     }
     return ok(config, { ok: true });
   }
 
   // --- STUDENTS LIST ---
-  if (method === "get" && url === "student/groups-filter") {
+  if (method === "get" && (url === "students/groups-filter" || url === "student/groups-filter")) {
     return ok(config, {
       items: [
         { id: 1, name: "Вт 17 Младшая" },
@@ -448,7 +613,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  if (method === "get" && url === "student/teacher-filter") {
+  if (method === "get" && (url === "students/teacher-filter" || url === "student/teacher-filter")) {
     return ok(config, {
       items: [
         { id: 1, name: "Клара Левит" },
@@ -457,13 +622,32 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
+  // --- SETTINGS: USERS ---
+  if (method === "get" && url === "settings/users") {
+    return ok(config, {
+      items: [
+        { id: "u_current", email: "artem@gls.edu.pl", name: "Artem", role: "Dział rekrutacji учащихся", status: "online", lastLogin: "2026-03-06 14:30:00", projects: ['space'], initials: 'AR', colorClass: 'ua-amber' },
+        { id: "u_2", email: "biuro@gls.edu.pl", name: "Karolina Nowak", role: "Super-Admin", status: "online", lastLogin: "2026-03-05 09:00:00", projects: ['all'], initials: 'KN', colorClass: 'ua-blue' },
+        { id: "u_3", email: "marta@gls.edu.pl", name: "Marta Kowalczyk", role: "Admin", status: "offline", lastLogin: "2026-03-05 09:00:00", projects: ['space', 'indigo'], initials: 'MK', colorClass: 'ua-purple' },
+        { id: "u_4", email: "p.wisniewski@gls.edu.pl", name: "Piotr Wiśniewski", role: "Kierownik działu rekrutacji", status: "offline", lastLogin: "2026-03-05 09:00:00", projects: ['space', 'olimp'], initials: 'PW', colorClass: 'ua-amber' }
+      ]
+    });
+  }
+  if (method === "patch" && /^settings\/users\//.test(url)) {
+    return ok(config, { ...JSON.parse(config.data || "{}"), id: url.split("/")[2] });
+  }
+  if (method === "delete" && /^settings\/users\//.test(url)) {
+    return ok(config, { success: true });
+  }
+
   if (method === "get" && url === "students") {
     // Генерируем mock данные для списка студентов
     const mockStudentsList = [
       {
         id: 1,
         full_name: "Иван Иванов",
-        name: "Иван Иванов",
+        firstName: "Иван",
+        lastName: "Иванов",
         phone: "+48 777 000 111",
         email: "ivan.ivanov@gmail.com",
         created_at: "2025-12-15",
@@ -490,7 +674,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       {
         id: 2,
         full_name: "Мария Петрова",
-        name: "Мария Петрова",
+        firstName: "Мария",
+        lastName: "Петрова",
         phone: "+48 777 000 222",
         email: "maria.petrova@gmail.com",
         created_at: "2025-11-01",
@@ -517,7 +702,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       {
         id: 3,
         full_name: "Алексей Сидоров",
-        name: "Алексей Сидоров",
+        firstName: "Алексей",
+        lastName: "Сидоров",
         phone: "+48 777 000 333",
         email: "alexey.sidorov@gmail.com",
         created_at: "2025-10-20",
@@ -544,7 +730,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       {
         id: 4,
         full_name: "Елена Смирнова",
-        name: "Елена Смирнова",
+        firstName: "Елена",
+        lastName: "Смирнова",
         phone: "+48 777 000 444",
         email: "elena.smirnova@gmail.com",
         created_at: "2025-09-10",
@@ -592,6 +779,243 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       }
     });
   }
+
+  // ══════════════════════════════════════════════════════════════════════════
+  // SALARY — mock-роуты для офлайн-разработки
+  // Соответствуют реальному API: GET /salary/teacher/{id}, POST /salary/{id}/confirm|dispute
+  // ══════════════════════════════════════════════════════════════════════════
+
+  // GET salary/teacher/{teacherId}?month=YYYY-MM&project_id=1
+  if (method === "get" && /^salary\/teacher\/\d+$/.test(url)) {
+    const month = (config.params as any)?.month || "2026-02";
+    return ok(config, {
+      id: "1",
+      month,
+      teacherId: 1,
+      projectId: 1,
+      trainerName: "Anna Kowalska",
+      status: "draft",
+      confirmedAt: null,
+      subscriptions: {
+        amount: 2847.64, base: 25887.60, rate: 11, childrenCount: 58,
+        groups: [
+          { name: "SM-01", day: "Вт 17:00", kids: 16, base: 7840, salary: 862.40, children: [] },
+          { name: "SM-02", day: "Сб 10:00", kids: 14, base: 6860, salary: 754.60, children: [] },
+          { name: "SM-05", day: "Пт 18:30", kids: 12, base: 5880, salary: 646.80, children: [] },
+          { name: "SI-03", day: "Пн 16:00", kids: 10, base: 3900, salary: 429.00, children: [] },
+          { name: "SI-07", day: "Ср 15:00", kids: 6, base: 1407.60, salary: 154.84, children: [] }
+        ]
+      },
+      substitutions: {
+        amount: 150.70,
+        rows: [
+          { child: "Kowalczyk Marta", group: "SM-05 · Пт 18:30", forTrainer: "Zofia Nowak", date: "2026-02-07", abon: 490, salary: 53.90 },
+          { child: "Nowak Oliwia",    group: "SM-05 · Пт 18:30", forTrainer: "Zofia Nowak", date: "2026-02-07", abon: 490, salary: 53.90 },
+          { child: "Wojciechowska Anna", group: "SI-07 · Ср 15:00", forTrainer: "Marek Wójcik", date: "2026-02-21", abon: 390, salary: 42.90 }
+        ]
+      },
+      methodical: {
+        amount: 125.60, rate: 31.40,
+        rows: [
+          { name: "Methodical meeting — general",       date: "2026-02-05", present: true,  hours: 2, total: 62.80 },
+          { name: "Methodical meeting — Space Memory",  date: "2026-02-19", present: true,  hours: 2, total: 62.80 },
+          { name: "Methodical meeting — INDIGO",        date: "2026-02-12", present: false, hours: 0, total: 0 }
+        ]
+      },
+      individual: {
+        amount: 280.00, rate: 40,
+        rows: [
+          { child: "Zielinska Weronika", program: "Space Memory", count: 4, total: 160 },
+          { child: "Szymanski Bartosz",  program: "INDIGO",        count: 3, total: 120 }
+        ]
+      },
+      olympiad: {
+        amount: 160.00, rate: 40,
+        rows: [
+          { name: "Week 1", date: "2026-02-03", link: "zoom.us/rec/AB12", total: 40 },
+          { name: "Week 2", date: "2026-02-10", link: "zoom.us/rec/CD34", total: 40 },
+          { name: "Week 3", date: "2026-02-17", link: "zoom.us/rec/EF56", total: 40 },
+          { name: "Week 4", date: "2026-02-24", link: "zoom.us/rec/GH78", total: 40 }
+        ]
+      },
+      admin3pct: {
+        amount: 660.93, base: 25887.60, pct: 85,
+        evaluatedBy: "Quality Dept", evaluatedAt: "2026-03-01",
+        checklist: [
+          { duty: "Lesson records sent",         status: "done",    comment: null },
+          { duty: "Lesson summaries filled",     status: "done",    comment: null },
+          { duty: "Tests completed & uploaded",  status: "partial", comment: "2 test videos not uploaded (SM-02, SM-03)." },
+          { duty: "Homework uploaded on time",   status: "done",    comment: null },
+          { duty: "WhatsApp reviews sent",       status: "done",    comment: null },
+          { duty: "Parent feedback given",       status: "partial", comment: "3 parents did not receive feedback." },
+          { duty: "Brief reviews sent",          status: "done",    comment: null }
+        ]
+      },
+      bonuses: {
+        amount: 500.00,
+        rows: [{ reason: "Olympiad results", comment: "2 prize places", status: "approved", total: 500 }]
+      },
+      trialLessons: {
+        amount: 70.00, rate: 35, threshold: 51,
+        confirmedByQA: true, confirmedBy: "Quality Dept", confirmedAt: "2026-03-01",
+        rows: [
+          { name: "Trial SM",     date: "2026-02-08", program: "Space Memory", attended: 6, won: 4, paid: true,  salary: 35, children: [] },
+          { name: "Trial SM",     date: "2026-02-15", program: "Space Memory", attended: 8, won: 3, paid: false, salary: 0,  children: [] },
+          { name: "Trial INDIGO", date: "2026-02-22", program: "INDIGO",       attended: 5, won: 3, paid: true,  salary: 35, children: [] }
+        ]
+      },
+      rezygnacje: []
+    });
+  }
+
+  // POST salary/{id}/confirm
+  if (method === "post" && /^salary\/\d+\/confirm$/.test(url)) {
+    const id = parseInt(url.split("/")[1]);
+    return ok(config, {
+      id,
+      status: "confirmed",
+      confirmedAt: new Date().toISOString().replace("T", " ").slice(0, 19)
+    });
+  }
+
+  // POST salary/{id}/dispute  → 201
+  if (method === "post" && /^salary\/\d+\/dispute$/.test(url)) {
+    const body = readBody(config);
+    if (!body?.teacher_id) return err(config, 422, "teacher_id is required");
+    if (!body?.reason || body.reason.length < 3) return err(config, 422, "reason must be at least 3 characters");
+    const salaryId = parseInt(url.split("/")[1]);
+    return ok(config, {
+      id: Math.floor(Math.random() * 10000),
+      salary_calculation_id: salaryId,
+      status: "disputed"
+    }, 201);
+  }
+  // ── EXPELLED STUDENTS ─────────────────────────────────────────────────────
+
+  // Вспомогательная функция внутри блока (или добавить в начало файла если там уже есть похожие)
+  const _dAgo = (n: number): string => {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    return d.toISOString().split('T')[0];
+  };
+
+  // GET expelled-students
+  if (method === 'get' && url === 'expelled-students') {
+    const today = new Date();
+    const daysBetween = (dateStr: string | null): number =>
+      dateStr ? Math.floor((today.getTime() - new Date(dateStr).getTime()) / 86400000) : 9999;
+
+    const students = [
+      { id: 1, name: 'Анна Ковалевская',  phone: '+48 601 234 567', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(15), lastContact: _dAgo(8),  manager: 'Светлана',  comment: 'Обещала перезвонить' },
+      { id: 2, name: 'Дмитрий Петров',    phone: '+48 602 345 678', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(45), lastContact: _dAgo(3),  manager: 'Александр', comment: '' },
+      { id: 3, name: 'Марта Вишневска',   phone: '+48 603 456 789', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(30), lastContact: null,       manager: '',          comment: '' },
+      { id: 4, name: 'Игорь Сидоренко',   phone: '+48 604 567 890', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(20), lastContact: _dAgo(12), manager: 'Мария',     comment: 'Не берёт трубку' },
+      { id: 5, name: 'Светлана Бондарь',  phone: '+48 605 678 901', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(8),  lastContact: _dAgo(0),  manager: 'Артём',     comment: 'Заинтересована, ждёт' },
+      { id: 6, name: 'Александр Новак',   phone: '+48 606 789 012', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(60), lastContact: _dAgo(20), manager: 'Светлана',  comment: 'Рассматривает варианты' },
+      { id: 7, name: 'Наталья Романова',  phone: '+48 607 890 123', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(12), lastContact: _dAgo(5),  manager: '',          comment: '' },
+      { id: 8, name: 'Павел Мартиненко', phone: '+48 608 901 234', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(4),  lastContact: null,       manager: 'Александр', comment: 'Первый звонок провален' },
+    ];
+
+    const withHistory = students.map(s => ({
+      ...s,
+      history: [
+        { event: 'Выписан из группы',     date: s.expelled,     detail: `Группа: ${s.group}`,                                                      color: '#ef4444' },
+        { event: 'Передан отделу продаж', date: s.expelled,     detail: 'Начало работы по дозакрытию',                                             color: '#f59e0b' },
+        ...(s.lastContact ? [{ event: 'Последний контакт', date: s.lastContact, detail: `Ответственный: ${s.manager || '—'} · ${s.comment || 'без комментария'}`, color: '#4f6ef7' }] : []),
+      ],
+    }));
+
+    return ok(config, {
+      data: withHistory,
+      meta: {
+        total:  students.length,
+        hot:    students.filter(s => daysBetween(s.lastContact) > 7).length,
+        none:   students.filter(s => !s.lastContact).length,
+        unpaid: students.filter(s => !s.paid).length,
+      },
+    });
+  }
+
+  // PATCH expelled-students/:id
+  if (method === 'patch' && /^expelled-students\/\d+$/.test(url)) {
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      updatedAt: new Date().toISOString(),
+    });
+  }
+
+  // POST expelled-students/:id/archive
+  if (method === 'post' && /^expelled-students\/\d+\/archive$/.test(url)) {
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      archivedAt: new Date().toISOString(),
+    });
+  }
+
+  // POST expelled-students/:id/transfer
+  if (method === 'post' && /^expelled-students\/\d+\/transfer$/.test(url)) {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      newGroup: body.group_id,
+    });
+  }
+
+  // POST expelled-students/bulk-assign
+  if (method === 'post' && url === 'expelled-students/bulk-assign') {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { updated: (body.ids || []).length });
+  }
+
+  // POST expelled-students/bulk-archive
+  if (method === 'post' && url === 'expelled-students/bulk-archive') {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { archived: (body.ids || []).length });
+  }
+
+  // ── END EXPELLED STUDENTS ──────────────────────────────────────────────────
+
+  // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
+  // GET new-students
+  if (method === 'get' && (url === 'new-students' || url === 'recruitment/new-students')) {
+    return ok(config, { data: [] });
+  }
+
+  // POST new-students
+  if (method === 'post' && (url === 'new-students' || url === 'recruitment/new-students')) {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { ok: true, id: Date.now(), ...body });
+  }
+
+  // POST new-students/:id/archive
+  if (method === 'post' && /^recruitment\/new-students\/\d+\/archive$/.test(url)) {
+    return ok(config, { ok: true });
+  }
+
+  // GET leads
+  if (method === 'get' && (url === 'leads' || url === 'recruitment/leads')) {
+    return ok(config, {
+      data: [
+        { id: '1', name: 'Александр Иванов', phone: '+48 123 456 789', subject: 'Математика', createdAt: '2023-10-20', status: 'new' },
+        { id: '2', name: 'Мария Петрова', phone: '+48 987 654 321', subject: 'Физика', createdAt: '2023-10-21', status: 'new' },
+        { id: '3', name: 'Дмитрий Сидоров', phone: '+48 500 600 700', subject: 'Английский', createdAt: '2023-10-19', status: 'in_progress' },
+        { id: '4', name: 'Елена Смирнова', phone: '+48 111 222 333', subject: 'Химия', createdAt: '2023-10-18', status: 'trial' },
+        { id: '5', name: 'Игорь Кузнецов', phone: '+48 444 555 666', subject: 'Биология', createdAt: '2023-10-17', status: 'decision' },
+      ]
+    });
+  }
+
+  // POST leads/move (or PATCH leads/:id based on API)
+  if ((method === 'post' || method === 'patch') && (url === 'leads/move' || url.startsWith('recruitment/leads/'))) {
+    return ok(config, { ok: true });
+  }
+
+  // POST leads/add (or POST recruitment/leads)
+  if (method === 'post' && (url === 'leads/add' || url === 'recruitment/leads')) {
+    const body = JSON.parse(config.data || '{}');
+    return ok(config, { id: Date.now().toString(), ...body });
+  }
+  // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
 
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
 };

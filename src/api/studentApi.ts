@@ -1,5 +1,9 @@
 import { http } from "./http";
 
+function isNotFoundError(error: any): boolean {
+  return Number(error?.response?.status) === 404;
+}
+
 export interface StudentTabsResponse<T> {
   data: T;
 }
@@ -30,24 +34,30 @@ export interface StudentListResponse {
 }
 
 export async function getStudents(params: StudentListParams = {}) {
-  // Map per_page to limit if backend expects 'limit', but currently store uses per_page.
-  // The request said "pagination (page, limit) and search (search, filters)".
-  const queryParams = {
-    ...params,
-    limit: params.per_page || 20,
-  };
-  const res = await http.get("students", { params: queryParams });
+  const res = await http.get("students", { params });
   return res.data as StudentListResponse;
 }
 
 export async function getStudentGroupsFilter(params: Pick<StudentListParams, "search" | "without_contact_7_plus" | "only_mine"> = {}) {
-  const res = await http.get("student/groups-filter", { params });
-  return res.data as { items: Array<{ id: number; name: string }> };
+  try {
+    const res = await http.get("students/groups-filter", { params });
+    return res.data as { items: Array<{ id: number; name: string }> };
+  } catch (error) {
+    if (!isNotFoundError(error)) throw error;
+    const fallback = await http.get("student/groups-filter", { params });
+    return fallback.data as { items: Array<{ id: number; name: string }> };
+  }
 }
 
 export async function getStudentTeacherFilter(params: Pick<StudentListParams, "search" | "without_contact_7_plus" | "only_mine"> = {}) {
-  const res = await http.get("student/teacher-filter", { params });
-  return res.data as { items: Array<{ id: number; name: string }> };
+  try {
+    const res = await http.get("students/teacher-filter", { params });
+    return res.data as { items: Array<{ id: number; name: string }> };
+  } catch (error) {
+    if (!isNotFoundError(error)) throw error;
+    const fallback = await http.get("student/teacher-filter", { params });
+    return fallback.data as { items: Array<{ id: number; name: string }> };
+  }
 }
 
 export async function getStudentGroups(studentId: string) {
@@ -123,3 +133,25 @@ export async function createStudentNote(payload: {
   const res = await http.post("student/notes", payload);
   return res.data as { ok: true; note: any };
 }
+
+export async function updateStudentNote(
+  noteId: string,
+  payload: {
+    studentId?: string;
+    type?: string;
+    direction?: string;
+    category?: string;
+    status?: string;
+    tags?: string[];
+    text?: string;
+  }
+) {
+  const res = await http.patch(`student/notes/${noteId}`, payload);
+  return res.data as { ok: true; note: any };
+}
+
+export async function deleteStudentNote(noteId: string) {
+  const res = await http.delete(`student/notes/${noteId}`);
+  return res.data as { ok: true };
+}
+

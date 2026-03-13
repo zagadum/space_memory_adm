@@ -237,6 +237,7 @@ import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
 import { useModalStore } from "../../stores/modal.store";
 import { usePaymentsStore } from "../../stores/payments.store";
+import { paymentsApi } from "../../api/paymentsApi";
 
 const { t } = useI18n();
 const modal = useModalStore();
@@ -267,7 +268,7 @@ const promoCode = ref("");
 const globalDept = ref<string>("");
 
 // ── Computed ──
-const programId = computed(() => modal.modalData?.programId || "space");
+const programId = computed(() => (modal.payload?.programId as string) || "space");
 const programLabel = computed(() => {
   const prog = payments.programs.find(p => p.id === programId.value);
   return prog?.name || "Space Memory";
@@ -308,10 +309,13 @@ async function save() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    // Simulated API call — replace with real API in production
-    await new Promise(r => setTimeout(r, 600));
-    // Reload store data after successful mutation
-    await payments.loadStudent();
+    await paymentsApi.setDiscount({
+      programId: programId.value,
+      kind: selectedReason.value,
+      value: discountValue.value,
+      fromMonthIndex: selectedMonth.value,
+    });
+    await payments.reloadCurrent();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';

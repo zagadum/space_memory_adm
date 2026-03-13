@@ -83,7 +83,7 @@
         <div v-show="showReady" class="sss-list">
           <div v-for="s in readyStudents" :key="s.id" class="sss-item">
             <div class="sss-item-name">{{ s.name }}</div>
-            <div class="sss-item-meta">{{ s.meta }}</div>
+            <div class="sss-item-meta">{{ s.age }} лет</div>
             <span class="sss-status active">Активируется</span>
           </div>
         </div>
@@ -98,7 +98,7 @@
         <div v-show="showWaiting" class="sss-list">
           <div v-for="s in waitingStudents" :key="s.id" class="sss-item">
             <div class="sss-item-name">{{ s.name }}</div>
-            <div class="sss-item-meta">{{ s.meta }}</div>
+            <div class="sss-item-meta">{{ s.age }} лет</div>
             <span class="sss-status waiting">Ожидание</span>
           </div>
         </div>
@@ -114,11 +114,13 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import type { NewGroup, MasterStudent } from '../../../api/newGroupsApi'
+import type { NewGroup, MasterStudent, NewGroupStudent } from '../../../api/newGroupsApi'
+import { ageMap, fmtDate } from '../../../utils/newGroupsUtils'
 
 const props = defineProps<{
   group: NewGroup
   allStudents: MasterStudent[]
+  panelStudents: NewGroupStudent[]
 }>()
 
 defineEmits<{
@@ -129,13 +131,6 @@ defineEmits<{
 const showReady = ref(true)
 const showWaiting = ref(true)
 
-const ageMap: Record<string, { label: string; icon: string }> = {
-  junior: { label: '5–7',   icon: '🟢' },
-  middle: { label: '8–10',  icon: '🟡' },
-  senior: { label: '11–14', icon: '🔴' },
-  adult:  { label: '15+',   icon: '🟣' },
-}
-
 const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
 const notPaid = computed(() => props.group.totalSlots - props.group.paid)
 const ageLabel = computed(() => {
@@ -145,24 +140,12 @@ const ageLabel = computed(() => {
 const ratioColor = computed(() => pct.value === 100 ? 'var(--green)' : pct.value >= 50 ? 'var(--amber)' : 'var(--red)')
 
 const readyStudents = computed(() =>
-  props.group.students
-    .slice(0, props.group.paid)
-    .map(id => props.allStudents.find(s => s.id === id))
-    .filter(Boolean) as MasterStudent[]
+  props.panelStudents.filter(s => s.contract === 'signed')
 )
 
 const waitingStudents = computed(() =>
-  props.group.students
-    .slice(props.group.paid)
-    .map(id => props.allStudents.find(s => s.id === id))
-    .filter(Boolean) as MasterStudent[]
+  props.panelStudents.filter(s => s.contract !== 'signed')
 )
-
-function fmtDate(s: string) {
-  if (!s) return '—'
-  const [y, m, d] = s.split('-')
-  return `${d}.${m}.${y}`
-}
 
 function plural(n: number, a: string, b: string, c: string) {
   const m = n % 10, h = n % 100

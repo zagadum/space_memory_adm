@@ -258,10 +258,14 @@ async function save() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    // Simulated API call — replace with real API in production
-    await new Promise(r => setTimeout(r, 600));
-    // Reload store data after successful mutation
-    await paymentsStore.loadStudent();
+    const firstRow = rows.value[0];
+    await paymentsApi.split({
+      programId: programId || '',
+      fromGroup: 'current',
+      toGroup: firstRow?.teacherId || '',
+      effectiveDate: firstRow?.dates[0] || new Date().toISOString().split('T')[0],
+    });
+    await paymentsStore.reloadCurrent();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';

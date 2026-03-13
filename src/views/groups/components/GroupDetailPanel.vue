@@ -43,10 +43,10 @@
         <div class="gp-start-info">
           <div>
             <div class="gp-ratio-big" :style="{ color: ratioColor, textShadow: '0 0 20px ' + ratioColor + '55' }">
-              {{ group.paid }}/{{ group.totalSlots }}
+              {{ actualPaid }}/{{ actualTotal }}
             </div>
             <div class="gp-ratio-sub">
-              <span :style="{ color: 'var(--green)' }">{{ group.paid }} активируются</span>
+              <span :style="{ color: 'var(--green)' }">{{ actualPaid }} активируются</span>
               <template v-if="notPaid > 0"> · <span :style="{ color: 'var(--amber)' }">{{ notPaid }} ожидают</span></template>
             </div>
           </div>
@@ -59,7 +59,7 @@
             <div class="gp-bar-row">
               <span class="gp-bar-label">Оплатили</span>
               <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
-              <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">{{ group.paid }}</span>
+              <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">{{ actualPaid }}</span>
             </div>
           </div>
         </div>
@@ -137,10 +137,10 @@
                 </td>
                 <td>
                   <div class="row-actions">
-                    <div class="ra-btn archive" data-tip="В архив" @click="showToast('📦 ' + s.name + ' перемещён в архив')">📦</div>
-                    <div class="ra-btn remove"  data-tip="Убрать из группы" @click="removeStudent(s.name)">✕</div>
-                    <div class="ra-btn transfer" data-tip="Перенести в группу" @click="showToast('🔀 Перенос ' + s.name + ' — выберите группу')">🔀</div>
-                    <div class="ra-btn email" data-tip="Отправить Email" @click="showToast('✉ Email отправлен: ' + s.name)">✉</div>
+                    <div class="ra-btn archive" data-tip="В архив" @click="notify.addToast('📦 ' + s.name + ' перемещён в архив', 'warning')">📦</div>
+                    <div class="ra-btn remove"  data-tip="Убрать из группы" @click="removeStudent(s.id, s.name)">✕</div>
+                    <div class="ra-btn transfer" data-tip="Перенести в группу" @click="notify.addToast('🔀 Перенос ' + s.name + ' — выберите группу', 'warning')">🔀</div>
+                    <div class="ra-btn email" data-tip="Отправить Email" @click="notify.addToast('✉ Email отправлен: ' + s.name, 'success')">✉</div>
                   </div>
                 </td>
               </tr>
@@ -162,7 +162,7 @@
       <div class="asp-search-wrap">
         <div class="asp-search-box">
           <span style="color:var(--dim);font-size:14px">🔍</span>
-          <input v-model="aspQuery" type="text" placeholder="Поиск ученика по имени..." style="flex:1;background:none;border:none;outline:none;color:var(--white);font-family:'Outfit',sans-serif;font-size:13px" />
+          <input v-model="aspQuery" type="text" placeholder="Поиск ученика по имени..." style="flex:1;background:none;border:none;outline:none;color:var(--text-main);font-family:'Outfit',sans-serif;font-size:13px" />
         </div>
       </div>
       <div class="asp-list">
@@ -207,16 +207,17 @@
       </div>
     </div>
 
-    <!-- TOAST -->
-    <Teleport to="body">
-      <div v-if="toastMsg" class="toast">{{ toastMsg }}</div>
-    </Teleport>
+    <!-- TOAST REMOVED -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import type { NewGroup, NewGroupStudent, MasterStudent } from '../../../api/newGroupsApi'
+import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
+import { useNotificationStore } from '../../../stores/notification.store'
+
+const notify = useNotificationStore()
 
 const props = defineProps<{
   group: NewGroup
@@ -230,28 +231,33 @@ const emit = defineEmits<{
   start: []
   delete: [id: number]
   'students-added': [payload: { groupId: number; studentIds: number[] }]
-  'student-removed': [payload: { groupId: number; studentName: string }]
+  'student-removed': [payload: { groupId: number; studentId: number }]
 }>()
 
 const addPanelOpen = ref(false)
 const aspQuery = ref('')
 const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
-const toastMsg = ref('')
-
-const ageMap: Record<string, { label: string; cls: string; icon: string }> = {
-  junior: { label: '5–7',   cls: 'green',  icon: '🟢' },
-  middle: { label: '8–10',  cls: 'amber',  icon: '🟡' },
-  senior: { label: '11–14', cls: 'red',    icon: '🔴' },
-  adult:  { label: '15+',   cls: 'purple', icon: '🟣' },
-}
 
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
-const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
-const notPaid = computed(() => props.group.totalSlots - props.group.paid)
+// Когда студенты загружены — считаем из них. Иначе fallback на group.paid
+const actualTotal = computed(() =>
+  props.students.length > 0 ? props.students.length : props.group.totalSlots
+)
+const actualPaid = computed(() =>
+  props.students.length > 0
+    ? props.students.filter(s => s.contract === 'signed').length
+    : props.group.paid
+)
+const pct = computed(() =>
+  actualTotal.value > 0 ? Math.round(actualPaid.value / actualTotal.value * 100) : 0
+)
+const notPaid = computed(() => actualTotal.value - actualPaid.value)
 const ratioColor = computed(() => pct.value === 100 ? 'var(--green)' : pct.value >= 50 ? 'var(--amber)' : 'var(--red)')
 const contractCount = computed(() => props.students.filter(s => s.contract === 'signed').length)
-const contractPct = computed(() => props.group.totalSlots ? Math.round(contractCount.value / props.group.totalSlots * 100) : 0)
+const contractPct = computed(() =>
+  actualTotal.value > 0 ? Math.round(contractCount.value / actualTotal.value * 100) : 0
+)
 
 const alreadyInGroup = computed(() => new Set(props.students.map(s => s.name)))
 
@@ -259,18 +265,6 @@ const filteredMaster = computed(() => {
   const q = aspQuery.value.toLowerCase().trim()
   return q ? props.masterStudents.filter(s => s.name.toLowerCase().includes(q)) : props.masterStudents
 })
-
-function daysDiff(s: string) {
-  const d = new Date(s), n = new Date()
-  n.setHours(0,0,0,0); d.setHours(0,0,0,0)
-  return Math.floor((n.getTime() - d.getTime()) / 86400000)
-}
-
-function fmtDate(s: string) {
-  if (!s) return '—'
-  const [y, m, d] = s.split('-')
-  return `${d}.${m}.${y}`
-}
 
 function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
@@ -284,19 +278,19 @@ function toggleAsp(id: number) {
 
 async function confirmAdd() {
   if (aspSelected.value.size === 0) {
-    showToast('⚠️ Выберите хотя бы одного ученика')
+    notify.addToast('⚠️ Выберите хотя бы одного ученика', 'warning')
     return
   }
   emit('students-added', { groupId: props.group.id, studentIds: [...aspSelected.value] })
   addPanelOpen.value = false
   aspSelected.value = new Set()
   aspQuery.value = ''
-  showToast('✅ Ученики добавлены')
+  notify.addToast('Ученики добавлены ✅', 'success')
 }
 
-function removeStudent(name: string) {
-  emit('student-removed', { groupId: props.group.id, studentName: name })
-  showToast('✕ ' + name + ' убран из группы')
+function removeStudent(studentId: number | string, name: string) {
+  emit('student-removed', { groupId: props.group.id, studentId: Number(studentId) })
+  notify.addToast('✕ ' + name + ' убран из группы', 'warning')
 }
 
 function confirmDelete() {
@@ -307,20 +301,13 @@ function doDelete() {
   deleteConfirm.value = false
   emit('delete', props.group.id)
 }
-
-let toastTimer: ReturnType<typeof setTimeout> | null = null
-function showToast(msg: string) {
-  toastMsg.value = msg
-  if (toastTimer) clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => toastMsg.value = '', 2500)
-}
 </script>
 
 <style scoped>
 /* OVERLAY */
 .gp-overlay {
   position: fixed; inset: 0;
-  background: rgba(4,4,15,0.55);
+  background: var(--glass-bg);
   backdrop-filter: blur(4px);
   z-index: 300;
 }
@@ -329,7 +316,7 @@ function showToast(msg: string) {
 .gp-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 820px; max-width: 100vw;
-  background: rgba(7,7,32,0.98);
+  background: var(--app-bg);
   border-left: 1px solid var(--bh);
   backdrop-filter: blur(30px);
   z-index: 400;
@@ -341,7 +328,7 @@ function showToast(msg: string) {
   padding: 22px 28px 18px;
   border-bottom: 1px solid var(--b);
   flex-shrink: 0;
-  background: rgba(13,13,43,0.8);
+  background: var(--app-surface);
 }
 
 .gp-header-top {
@@ -478,8 +465,8 @@ function showToast(msg: string) {
   content: attr(data-tip);
   position: absolute; bottom: calc(100% + 6px); left: 50%;
   transform: translateX(-50%);
-  background: rgba(13,13,43,0.97); border: 1px solid var(--bh);
-  color: var(--white); font-size: 11px; font-weight: 500;
+  background: var(--app-surface); border: 1px solid var(--bh);
+  color: var(--text-main); font-size: 11px; font-weight: 500;
   padding: 4px 9px; border-radius: 6px;
   white-space: nowrap; pointer-events: none;
   font-family: 'Outfit', sans-serif; z-index: 10;
@@ -508,7 +495,7 @@ function showToast(msg: string) {
 .asp-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 420px;
-  background: rgba(9,9,35,0.99);
+  background: var(--app-bg);
   border-left: 1px solid var(--bh);
   backdrop-filter: blur(30px);
   z-index: 500;
@@ -519,7 +506,7 @@ function showToast(msg: string) {
   padding: 22px 22px 16px;
   border-bottom: 1px solid var(--b);
   display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
-  flex-shrink: 0; background: rgba(13,13,43,0.7);
+  flex-shrink: 0; background: var(--app-surface);
 }
 .asp-title { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
 .asp-sub   { font-size: 12px; color: var(--dim); }
@@ -573,7 +560,7 @@ function showToast(msg: string) {
 .asp-footer {
   padding: 14px 22px; border-top: 1px solid var(--b);
   flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
-  background: rgba(13,13,43,0.7); gap: 12px;
+  background: var(--app-surface); gap: 12px;
 }
 .asp-sel-info { font-size: 12.5px; color: var(--dim); flex: 1; font-family: 'Space Mono', monospace; }
 .asp-sel-info.has-sel { color: var(--blue); }
@@ -581,7 +568,7 @@ function showToast(msg: string) {
 /* DELETE CONFIRM */
 .dc-overlay {
   position: fixed; inset: 0;
-  background: rgba(4,4,15,0.75); backdrop-filter: blur(8px);
+  background: var(--glass-bg); backdrop-filter: blur(8px);
   z-index: 600; display: flex; align-items: center; justify-content: center;
 }
 .dc-box {
@@ -596,21 +583,11 @@ function showToast(msg: string) {
 .dc-sub   { font-size: 13px; color: var(--dim); margin-bottom: 24px; line-height: 1.5; }
 .dc-actions { display: flex; gap: 10px; justify-content: center; }
 
-/* TOAST */
-.toast {
-  position: fixed; bottom: 28px; right: 28px;
-  background: var(--card);
-  border: 1px solid rgba(16,185,129,0.4);
-  border-radius: 10px; padding: 12px 20px;
-  color: var(--green); font-weight: 600; font-size: 14px;
-  z-index: 9999; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  font-family: 'Outfit', sans-serif;
-}
 
 /* Buttons */
 .btn { display: inline-flex; align-items: center; gap: 6px; padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s; border: none; }
 .btn-primary { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; box-shadow: 0 0 16px rgba(79,110,247,0.3); }
 .btn-primary:hover { box-shadow: 0 0 24px rgba(79,110,247,0.5); transform: translateY(-1px); }
 .btn-ghost { background: rgba(255,255,255,0.05); color: var(--dim); border: 1px solid var(--b) !important; }
-.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--white); border-color: var(--bh) !important; }
+.btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--text-main); border-color: var(--bh) !important; }
 </style>
