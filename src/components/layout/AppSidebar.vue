@@ -33,12 +33,12 @@
       </div>
 
       <!-- ДАШБОРД -->
-      <div 
-        class="nav-standalone nav-item--stub" 
-        :class="{ active: activeItem === 'dashboard' }" 
+      <div
+        class="nav-standalone nav-item--stub"
+        :class="{ active: activeItem === 'dashboard' }"
         @click="setActive('dashboard')"
       >
-        <span class="nav-icon">🏠</span> {{ t('sidebar.dashboard') }}
+        <span class="nav-icon">📊</span> {{ t('sidebar.dashboard') }}
       </div>
 
       <div 
@@ -68,32 +68,100 @@
           <span class="nav-icon">🎓</span> {{ t('sidebar.groups') }}
           <span class="nav-badge blue" v-if="groupsListStore.totalGroups > 0">{{ groupsListStore.totalGroups }}</span>
         </div>
-        <div 
-          class="nav-item nav-item--stub" 
-          :class="{ active: activeItem === 'teachers' }" 
+        <div
+          class="nav-item nav-item--stub"
+          :class="{ active: activeItem === 'teachers' }"
           @click="setActive('teachers')"
         >
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.teachers') }}
         </div>
-        <div 
-          class="nav-item nav-item--stub" 
-          :class="{ active: activeItem === 'docs' }" 
-          @click="setActive('docs')"
-        >
-          <span class="nav-icon">📄</span> {{ t('sidebar.docs') }}
-        </div>
-        <div 
-          class="nav-item nav-item--stub" 
-          :class="{ active: activeItem === 'inpost' }" 
+        <div
+          class="nav-item nav-item--stub"
+          :class="{ active: activeItem === 'inpost' }"
           @click="setActive('inpost')"
         >
           <span class="nav-icon">📦</span> {{ t('sidebar.inpost') }}
         </div>
+        <div
+          class="nav-item nav-item--stub"
+          :class="{ active: activeItem === 'course-endings' }"
+          @click="navigateTo('course-endings', '/secretariat/course-endings')"
+        >
+          <span class="nav-icon">🏅</span> {{ t('sidebar.courseEndings') }}
+        </div>
       </div>
 
-      <div 
-        class="nav-section" 
-        :class="{ open: openSections.finance }" 
+      <!-- HR -->
+      <div
+        class="nav-section"
+        :class="{ open: openSections.hr }"
+        @click="toggleSection('hr')"
+      >
+        <span class="nav-section-icon">👥</span>
+        <span class="nav-section-label">{{ t('sidebar.hr') }}</span>
+        <span class="nav-section-badge nb-green">8</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.hr }">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-active' }" @click="navigateTo('hr-active', '/hr/active')">
+          <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.hrActive') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-training' }" @click="navigateTo('hr-training', '/hr/training')">
+          <span class="nav-icon">📚</span> {{ t('sidebar.hrTraining') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-pipeline' }" @click="navigateTo('hr-pipeline', '/hr/pipeline')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.hrPipeline') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-personal' }" @click="navigateTo('hr-personal', '/hr/personal')">
+          <span class="nav-icon">📋</span> {{ t('sidebar.hrPersonal') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-analytics' }" @click="navigateTo('hr-analytics', '/hr/analytics')">
+          <span class="nav-icon">📊</span> {{ t('sidebar.hrAnalytics') }}
+        </div>
+      </div>
+
+      <!-- PANEL TRENERA -->
+      <div
+        class="nav-section"
+        :class="{ open: openSections.trainer }"
+        @click="toggleSection('trainer')"
+      >
+        <span class="nav-section-icon">🧑‍🏫</span>
+        <span class="nav-section-label">{{ t('sidebar.trainerCabinet') }}</span>
+        <span class="nav-section-badge nb-red">4</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.trainer }">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-dashboard' }" @click="navigateTo('trainer-dashboard', '/trainer/dashboard')">
+          <span class="nav-icon">📊</span> {{ t('sidebar.trainerDashboard') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-students' }" @click="navigateTo('trainer-students', '/trainer/students')">
+          <span class="nav-icon">👩‍🎓</span> {{ t('sidebar.trainerStudents') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-groups' }" @click="navigateTo('trainer-groups', '/trainer/groups')">
+          <span class="nav-icon">🎓</span> {{ t('sidebar.trainerGroups') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'lesson-tracker' }" @click="navigateTo('lesson-tracker', '/trainer/lesson-tracker')">
+          <span class="nav-icon">📝</span> {{ t('sidebar.trainerLessonTracker') }}
+        </div>
+        <div class="nav-item" :class="{ active: activeItem === 'salary-demo' }" @click="navigateTo('salary-demo', '/teacher/salary')">
+          <span class="nav-icon">💰</span> {{ t('sidebar.trainerSalary') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-materials' }" @click="navigateTo('trainer-materials', '/trainer/materials')">
+          <span class="nav-icon">📚</span> {{ t('sidebar.trainerMaterials') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-exam' }" @click="navigateTo('trainer-exam', '/trainer/exam')">
+          <span class="nav-icon">📜</span> {{ t('sidebar.trainerExam') }}
+        </div>
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-mail' }" @click="navigateTo('trainer-mail', '/trainer/mail')">
+          <span class="nav-icon">✉️</span> {{ t('sidebar.trainerMail') }}
+          <span class="nav-badge blue">7</span>
+        </div>
+      </div>
+
+      <div
+        class="nav-section"
+        :class="{ open: openSections.finance }"
         @click="toggleSection('finance')"
       >
         <span class="nav-section-icon">💫</span>
@@ -145,55 +213,6 @@
         </div>
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia')">
           <span class="nav-icon">🔧</span> {{ t('sidebar.ustawienia') }}
-        </div>
-      </div>
-
-      <div 
-        class="nav-section" 
-        :class="{ open: openSections.recruitment }" 
-        @click="toggleSection('recruitment')"
-      >
-        <span class="nav-section-icon">🚀</span>
-        <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
-        <span class="nav-section-badge nb-green">8</span>
-        <span class="nav-section-arrow">›</span>
-      </div>
-      <div class="nav-children" :class="{ open: openSections.recruitment }">
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'new-students' }" 
-          @click="navigateTo('new-students', '/recruitment/new-students')"
-        >
-          <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
-          <span class="nav-badge green">8</span>
-        </div>
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'leads' }" 
-          @click="navigateTo('leads', '/recruitment/leads')"
-        >
-          <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
-        </div>
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'new-groups' }" 
-          @click="navigateTo('new-groups', '/recruitment/new-groups')"
-        >
-          <span class="nav-icon">🎓</span> {{ t('sidebar.newGroups') }}
-        </div>
-        <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'expelled' }" 
-          @click="navigateTo('expelled', '/recruitment/expelled-students')"
-        >
-          <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
-        </div>
-        <div 
-          class="nav-item nav-item--stub" 
-          :class="{ active: activeItem === 'recruit-archive' }" 
-          @click="setActive('recruit-archive')"
-        >
-          <span class="nav-icon">🗃️</span> {{ t('sidebar.archive') }}
         </div>
       </div>
 
@@ -429,6 +448,12 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/finance/settings'))           { activeItem.value = 'finance-settings';   openSections.value.finance = true }
   // Группы
   else if (path.startsWith('/groups')) { activeItem.value = 'groups'; openSections.value.secretariat = true }
+  // Секретариат - новые пункты
+  else if (path.startsWith('/secretariat/course-endings')) { activeItem.value = 'course-endings'; openSections.value.secretariat = true }
+  // Тренер - новые пункты
+  else if (path.startsWith('/trainer/materials')) { activeItem.value = 'trainer-materials'; openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/exam'))     { activeItem.value = 'trainer-exam';      openSections.value.trainer = true }
+  else if (path.startsWith('/trainer/mail'))     { activeItem.value = 'trainer-mail';      openSections.value.trainer = true }
   // Мой кабинет
   else if (path.startsWith('/my-cabinet'))  { activeItem.value = 'my-cabinet' }
 }, { immediate: true })
