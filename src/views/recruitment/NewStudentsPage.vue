@@ -177,44 +177,46 @@
 
     <!-- ADD STUDENT MODAL -->
     <Teleport to="body">
-      <div class="modal-backdrop" :class="{ active: addModalOpen }" @click.self="addModalOpen = false">
-        <div class="modal">
-          <div class="modal-close-btn" @click="addModalOpen = false">✕</div>
-          <div class="modal-title">✦ {{ t('newStudents.modal.title') }}</div>
-          <div class="modal-sub">{{ t('newStudents.modal.subtitle') }}</div>
-          <div class="modal-grid">
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.firstName') }}</div>
-              <input class="modal-input" v-model="newForm.firstName" :placeholder="t('newStudents.modal.firstNamePh')" />
+      <Transition name="modal">
+        <div class="modal-backdrop" v-if="addModalOpen" @click.self="addModalOpen = false">
+          <div class="modal">
+            <div class="modal-close-btn" @click="addModalOpen = false">✕</div>
+            <div class="modal-title">✦ {{ t('newStudents.modal.title') }}</div>
+            <div class="modal-sub">{{ t('newStudents.modal.subtitle') }}</div>
+            <div class="modal-grid">
+              <div class="modal-field">
+                <div class="modal-label">{{ t('newStudents.modal.firstName') }}</div>
+                <input class="modal-input" v-model="newForm.firstName" :placeholder="t('newStudents.modal.firstNamePh')" />
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">{{ t('newStudents.modal.lastName') }}</div>
+                <input class="modal-input" v-model="newForm.lastName" :placeholder="t('newStudents.modal.lastNamePh')" />
+              </div>
+            </div>
+            <div class="modal-grid">
+              <div class="modal-field">
+                <div class="modal-label">{{ t('newStudents.modal.age') }}</div>
+                <input class="modal-input" v-model.number="newForm.age" type="number" min="3" max="99" />
+              </div>
+              <div class="modal-field">
+                <div class="modal-label">{{ t('newStudents.modal.manager') }}</div>
+                <select class="modal-input" v-model="newForm.manager">
+                  <option value="">— {{ t('newStudents.modal.notAssigned') }}</option>
+                  <option v-for="m in ['Светлана','Александр','Мария','Артём']" :key="m">{{ m }}</option>
+                </select>
+              </div>
             </div>
             <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.lastName') }}</div>
-              <input class="modal-input" v-model="newForm.lastName" :placeholder="t('newStudents.modal.lastNamePh')" />
+              <div class="modal-label">{{ t('newStudents.modal.startDate') }}</div>
+              <input class="modal-input" v-model="newForm.startDate" type="date" />
             </div>
-          </div>
-          <div class="modal-grid">
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.age') }}</div>
-              <input class="modal-input" v-model.number="newForm.age" type="number" min="3" max="99" />
+            <div class="modal-actions">
+              <button class="btn btn-ghost" @click="addModalOpen = false">{{ t('common.cancel') }}</button>
+              <button class="btn btn-primary" @click="submitAdd">✦ {{ t('newStudents.modal.submit') }}</button>
             </div>
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.manager') }}</div>
-              <select class="modal-input" v-model="newForm.manager">
-                <option value="">— {{ t('newStudents.modal.notAssigned') }}</option>
-                <option v-for="m in ['Светлана','Александр','Мария','Артём']" :key="m">{{ m }}</option>
-              </select>
-            </div>
-          </div>
-          <div class="modal-field">
-            <div class="modal-label">{{ t('newStudents.modal.startDate') }}</div>
-            <input class="modal-input" v-model="newForm.startDate" type="date" />
-          </div>
-          <div class="modal-actions">
-            <button class="btn btn-ghost" @click="addModalOpen = false">{{ t('common.cancel') }}</button>
-            <button class="btn btn-primary" @click="submitAdd">✦ {{ t('newStudents.modal.submit') }}</button>
           </div>
         </div>
-      </div>
+      </Transition>
     </Teleport>
 
     <!-- GROUP PICKER -->
@@ -608,9 +610,13 @@ td { padding: 12px 14px; font-size: 13.5px; vertical-align: middle; white-space:
 .table-info { color: var(--app-text-dim); font-size: 12.5px; }
 
 /* ADD MODAL */
-.modal-backdrop { position: fixed; inset: 0; background: rgba(4,4,15,0.82); backdrop-filter: blur(8px); z-index: 500; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
-.modal-backdrop.active { opacity: 1; pointer-events: all; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(4,4,15,0.82); backdrop-filter: blur(8px); z-index: 500; display: flex; align-items: center; justify-content: center; }
 .modal { background: var(--app-surface); border: 1px solid var(--app-border-hi); border-radius: 16px; padding: 28px; width: 500px; max-width: calc(100vw - 40px); max-height: calc(100vh - 40px); overflow-y: auto; position: relative; box-shadow: 0 24px 80px rgba(0,0,0,0.3); }
+
+.modal-enter-active, .modal-leave-active { transition: opacity 0.25s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-active .modal { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal-enter-from .modal { transform: scale(0.9) translateY(20px); }
 .modal-close-btn { position: absolute; top: 16px; right: 16px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 6px; cursor: pointer; background: var(--app-card); border: 1px solid var(--app-border); color: var(--app-text-dim); font-size: 14px; transition: all 0.15s; }
 .modal-close-btn:hover { background: rgba(239,68,68,0.15); color: #ef4444; }
 .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: var(--app-text-main); padding-right: 36px; }

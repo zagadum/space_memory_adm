@@ -250,9 +250,8 @@ function onDelete() { emit('delete') }
   background: var(--app-bg); border-left: 1px solid var(--app-border-hi);
   backdrop-filter: blur(30px); z-index: 400; display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform 0.38s cubic-bezier(0.4,0,0.2,1); overflow: hidden;
-  box-shadow: -12px 0 40px rgba(0,0,0,0.15);
 }
-.sp-panel.open { transform: translateX(0); }
+.sp-panel.open { transform: translateX(0); box-shadow: -12px 0 40px rgba(0,0,0,0.15); }
 
 .sp-header {
   padding: 22px 24px 0; border-bottom: 1px solid var(--app-border); flex-shrink: 0;

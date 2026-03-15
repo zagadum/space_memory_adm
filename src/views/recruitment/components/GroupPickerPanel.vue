@@ -124,9 +124,8 @@ function pick(g: typeof ALL_GROUPS[0]) {
   background: var(--app-sidebar); border-left: 1px solid var(--app-border-hi);
   backdrop-filter: blur(30px); z-index: 500; display: flex; flex-direction: column;
   transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-  box-shadow: -12px 0 40px rgba(0,0,0,0.5);
 }
-.gp-panel.open { transform: translateX(0); }
+.gp-panel.open { transform: translateX(0); box-shadow: -12px 0 40px rgba(0,0,0,0.5); }
 
 .gpp-header {
   padding: 22px 22px 0; border-bottom: 1px solid var(--app-border); flex-shrink: 0;

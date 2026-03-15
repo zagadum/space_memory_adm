@@ -416,21 +416,23 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
 
     <!-- MODAL: RETURN -->
     <Teleport to="body">
-      <div class="modal-backdrop" :class="{ active: returnModalOpen }" @click.self="returnModalOpen = false">
-        <div class="modal sm">
-          <div class="modal-close" @click="returnModalOpen = false">✕</div>
-          <div class="modal-title">🌟 {{ t('archived.actions.return') }}</div>
-          <div class="modal-sub">{{ t('archived.archive.returnSub') }}</div>
-          <div class="modal-field">
-            <div class="modal-label">{{ t('archived.archive.commentLabel') }}</div>
-            <UiInput v-model="returnComment" :placeholder="t('archived.archive.commentPlaceholder')" />
-          </div>
-          <div class="modal-actions">
-            <UiButton variant="ghost" @click="returnModalOpen = false">{{ t('common.cancel') }}</UiButton>
-            <UiButton variant="primary" @click="handleReturn">🌟 {{ t('archived.actions.return') }}</UiButton>
+      <Transition name="modal">
+        <div class="modal-backdrop" v-if="returnModalOpen" @click.self="returnModalOpen = false">
+          <div class="modal sm">
+            <div class="modal-close" @click="returnModalOpen = false">✕</div>
+            <div class="modal-title">🌟 {{ t('archived.actions.return') }}</div>
+            <div class="modal-sub">{{ t('archived.archive.returnSub') }}</div>
+            <div class="modal-field">
+              <div class="modal-label">{{ t('archived.archive.commentLabel') }}</div>
+              <UiInput v-model="returnComment" :placeholder="t('archived.archive.commentPlaceholder')" />
+            </div>
+            <div class="modal-actions">
+              <UiButton variant="ghost" @click="returnModalOpen = false">{{ t('common.cancel') }}</UiButton>
+              <UiButton variant="primary" @click="handleReturn">🌟 {{ t('archived.actions.return') }}</UiButton>
+            </div>
           </div>
         </div>
-      </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
@@ -555,8 +557,8 @@ td { padding: 12px 16px; font-size: 13.5px; vertical-align: middle; }
 
 /* SIDE PANEL */
 .sp-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 500; transition: opacity 0.3s; }
-.side-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 440px; background: var(--app-surface); border-left: 1px solid var(--app-border-hi); z-index: 600; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; box-shadow: -10px 0 40px rgba(0,0,0,0.2); }
-.side-panel.open { transform: translateX(0); }
+.side-panel { position: fixed; top: 0; right: 0; bottom: 0; width: 440px; background: var(--app-surface); border-left: 1px solid var(--app-border-hi); z-index: 600; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; }
+.side-panel.open { transform: translateX(0); box-shadow: -10px 0 40px rgba(0,0,0,0.2); }
 .sp-head { padding: 24px; border-bottom: 1px solid var(--app-border); position: relative; }
 .sp-title { font-size: 17px; font-weight: 700; color: var(--app-text-main); }
 .sp-sub { font-size: 13px; color: var(--app-text-dim); margin-top: 4px; }
@@ -589,9 +591,13 @@ td { padding: 12px 16px; font-size: 13.5px; vertical-align: middle; }
 .g-slots.full { color: #ef4444; }
 
 /* MODAL */
-.modal-backdrop { position: fixed; inset: 0; background: rgba(4,4,15,0.8); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
-.modal-backdrop.active { opacity: 1; pointer-events: all; }
+.modal-backdrop { position: fixed; inset: 0; background: rgba(4,4,15,0.8); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; }
 .modal { background: var(--app-surface); border: 1px solid var(--app-border-hi); border-radius: 16px; padding: 28px; width: 420px; position: relative; box-shadow: 0 24px 60px rgba(0,0,0,0.4); }
+
+.modal-enter-active, .modal-leave-active { transition: opacity 0.25s ease; }
+.modal-enter-from, .modal-leave-to { opacity: 0; }
+.modal-enter-active .modal { transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.modal-enter-from .modal { transform: scale(0.9) translateY(20px); }
 .modal-close { position: absolute; top: 16px; right: 16px; cursor: pointer; color: var(--app-text-dim); font-size: 14px; }
 .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: var(--app-text-main); }
 .modal-sub { font-size: 13px; color: var(--app-text-dim); margin-bottom: 20px; line-height: 1.4; }
