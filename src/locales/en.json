@@ -1465,6 +1465,105 @@
       "priceSet": "Price updated"
     }
   },
+  "expelled": {
+    "pageTitle": "Expelled Students",
+    "pageSubTitle": "resale tool · closing",
+    "loading": "Loading...",
+    "saved": "💾 Saved",
+    "callMarked": "📞 Contact marked today",
+    "archived": "🗃️ Student archived",
+    "transferred": "✅ Student transferred to group",
+    "info": {
+      "title": "Business Logic · Closing Rules",
+      "rule1": "Only students <strong>enrolled in a group but who haven't started classes</strong> are listed here. The sales department works with them.",
+      "rule2": "<strong>Red strip on the left</strong> — no contact for more than 7 days. Requires an urgent call.",
+      "rule3": "Contact date, manager, and comment can be <strong>edited directly in the row</strong> — changes are saved immediately.",
+      "rule4": "After <strong>archiving with a reason</strong>, the student disappears from the tab and moves to the <strong>«Archive»</strong> section.",
+      "rule5": "Role <strong>Manager</strong> — full access. <strong>Quality</strong> — view and restore. <strong>Sales</strong> — edit and move."
+    },
+    "stats": {
+      "total": "Total in work",
+      "totalSub": "active contacts",
+      "hot": "No contact for long",
+      "hotSub": "more than 7 days ago",
+      "none": "Never called",
+      "noneSub": "priority 1",
+      "unpaid": "Unpaid",
+      "unpaidSub": "possible debts"
+    },
+    "bulk": {
+      "selected": "0 selected | {n} selected | {n} selected",
+      "assign": "Assign manager",
+      "archive": "Archive selected",
+      "deselect": "Deselect",
+      "forStudents": "For {count} students"
+    },
+    "filter": {
+      "search": "Search by name...",
+      "allManagers": "All staff",
+      "noManager": "No manager",
+      "allGroups": "All groups",
+      "contactAny": "Any",
+      "contactNone": "No contact",
+      "contactHot": "More than 7 days",
+      "contactWeek": "Last 7 days",
+      "contactToday": "Today"
+    },
+    "sort": {
+      "conAsc": "Oldest contacts ↑",
+      "conDesc": "Newest contacts ↓",
+      "expAsc": "By expulsion date ↑",
+      "expDesc": "By expulsion date ↓"
+    },
+    "tableToolbar": {
+      "title": "STUDENT LIST"
+    },
+    "table": {
+      "name": "Student name",
+      "group": "Previous group",
+      "type": "Type",
+      "paid": "Payment",
+      "expelled": "Expulsion date",
+      "lastContact": "Last contact",
+      "manager": "Manager",
+      "comment": "Comment",
+      "typeGroup": "Grp.",
+      "typeIndividual": "Ind."
+    },
+    "empty": {
+      "title": "List is empty",
+      "sub": "No expelled students found for the selected filters"
+    },
+    "actions": {
+      "transferAny": "To any group",
+      "transfer": "Transfer to group",
+      "callToday": "Call today",
+      "history": "History",
+      "archive": "Archive",
+      "apply": "Apply",
+      "archiveAll": "Archive all"
+    },
+    "contact": {
+      "none": "No contact",
+      "today": "Today",
+      "daysAgo": "{days} days ago"
+    },
+    "archive": {
+      "title": "Archive Student",
+      "sub": "The student will be moved to the system's general archive",
+      "reason": "Archiving reason",
+      "specify": "Specify reason",
+      "notRelevant": "Not relevant",
+      "noAnswer": "No answer 3 times",
+      "moved": "Relocated",
+      "otherSchool": "Chose another school",
+      "other": "Other",
+      "otherPlaceholder": "Write a reason...",
+      "confirm": "Confirm archiving",
+      "cancel": "Cancel"
+    },
+    "showing": "Showing {shown} of {total} students"
+  },
   "groupsList": {
     "pageTitle": "Groups",
     "pageSubTitle": "Secretariat — active groups",

@@ -1465,6 +1465,105 @@
       "priceSet": "Cena zaktualizowana"
     }
   },
+  "expelled": {
+    "pageTitle": "Wypisani uczniowie",
+    "pageSubTitle": "narzędzie ponownej sprzedaży · domykanie",
+    "loading": "Ładowanie...",
+    "saved": "💾 Zapisano",
+    "callMarked": "📞 Kontakt zaznaczony dzisiaj",
+    "archived": "🗃️ Uczeń zarchiwizowany",
+    "transferred": "✅ Uczeń przeniesiony do grupy",
+    "info": {
+      "title": "Logika pracy · zasady domykania",
+      "rule1": "Tutaj są tylko uczniowie <strong>zapisani do grupy, którzy nie rozpoczęli nauki</strong>. Z nimi pracuje dział sprzedaży.",
+      "rule2": "<strong>Czerwony pasek po lewej</strong> — brak kontaktu od ponad 7 dni. Wymaga pilnego telefonu.",
+      "rule3": "Datę kontaktu, opiekuna i komentarz można <strong>edytować bezpośrednio w wierszu</strong> — zmiany są zapisywane od razu.",
+      "rule4": "Po <strong>archiwizacji z powodem</strong> uczeń znika z zakładki i trafia do sekcji <strong>«Archiwum»</strong>.",
+      "rule5": "Rola <strong>Manager</strong> — pełny dostęp. <strong>Quality</strong> — podgląd i przywracanie. <strong>Sales</strong> — edycja i przenoszenie."
+    },
+    "stats": {
+      "total": "Razem w pracy",
+      "totalSub": "aktywnych kontaktów",
+      "hot": "Dawno bez kontaktu",
+      "hotSub": "ponad 7 dni temu",
+      "none": "Nigdy nie dzwoniono",
+      "noneSub": "priorytet 1",
+      "unpaid": "Nieopłacone",
+      "unpaidSub": "możliwe długi"
+    },
+    "bulk": {
+      "selected": "0 wybranych | {n} wybrany | {n} wybranych | {n} wybranych",
+      "assign": "Przypisz opiekuna",
+      "archive": "Archiwizuj wybranych",
+      "deselect": "Odznacz",
+      "forStudents": "Dla {count} uczniów"
+    },
+    "filter": {
+      "search": "Szukaj po imieniu...",
+      "allManagers": "Wszyscy pracownicy",
+      "noManager": "Bez opiekuna",
+      "allGroups": "Wszystkie grupy",
+      "contactAny": "Dowolny",
+      "contactNone": "Brak kontaktu",
+      "contactHot": "Ponad 7 dni",
+      "contactWeek": "Ostatnie 7 dni",
+      "contactToday": "Dzisiaj"
+    },
+    "sort": {
+      "conAsc": "Stare kontakty ↑",
+      "conDesc": "Nowe kontakty ↓",
+      "expAsc": "Po dacie wypisu ↑",
+      "expDesc": "Po dacie wypisu ↓"
+    },
+    "tableToolbar": {
+      "title": "LISTA UCZNIÓW"
+    },
+    "table": {
+      "name": "Imię ucznia",
+      "group": "Poprzednia grupa",
+      "type": "Typ",
+      "paid": "Płatność",
+      "expelled": "Data wypisu",
+      "lastContact": "Ostatni kontakt",
+      "manager": "Opiekun",
+      "comment": "Komentarz",
+      "typeGroup": "Grup.",
+      "typeIndividual": "Ind."
+    },
+    "empty": {
+      "title": "Lista jest pusta",
+      "sub": "Nie znaleziono wypisanych uczniów dla wybranych filtrów"
+    },
+    "actions": {
+      "transferAny": "Do dowolnej grupy",
+      "transfer": "Przenieś do grupy",
+      "callToday": "Telefon dzisiaj",
+      "history": "Historia",
+      "archive": "Archiwizuj",
+      "apply": "Zastosuj",
+      "archiveAll": "Zarchiwizuj wszystkich"
+    },
+    "contact": {
+      "none": "Brak kontaktu",
+      "today": "Dzisiaj",
+      "daysAgo": "{days} dni temu"
+    },
+    "archive": {
+      "title": "Archiwizuj ucznia",
+      "sub": "Uczeń zostanie przeniesiony do ogólnego archiwum systemu",
+      "reason": "Powód archiwizacji",
+      "specify": "Określ powód",
+      "notRelevant": "Nieaktualne",
+      "noAnswer": "Nie odebrano 3 razy",
+      "moved": "Przeprowadzka",
+      "otherSchool": "Wybrano inną szkołę",
+      "other": "Inne",
+      "otherPlaceholder": "Wpisz powód...",
+      "confirm": "Potwierdź archiwizację",
+      "cancel": "Anuluj"
+    },
+    "showing": "Pokazano {shown} z {total} uczniów"
+  },
   "groupsList": {
     "pageTitle": "Grupy",
     "pageSubTitle": "Sekretariat — aktywne grupy",
