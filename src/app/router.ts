@@ -59,6 +59,12 @@ export const router = createRouter({
           meta: { title: 'sidebar.newGroups', icon: '🚀' }
         },
         {
+          path: 'recruitment/archived-students',
+          name: 'archived-students',
+          component: () => import('../views/recruitment/ArchivedStudentsPage.vue'),
+          meta: { title: 'archived.pageTitle', icon: '🗃️' }
+        },
+        {
           path: "finance/returns",
           name: "finance-returns",
           component: () => import("../views/finance/ZwrotyView.vue"),

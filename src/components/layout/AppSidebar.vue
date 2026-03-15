@@ -183,6 +183,9 @@
         <div class="nav-item" :class="{ active: activeItem === 'new-groups' }" @click="navigateTo('new-groups', '/recruitment/new-groups')">
           <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
         </div>
+        <div class="nav-item" :class="{ active: activeItem === 'archived' }" @click="navigateTo('archived', '/recruitment/archived-students')">
+          <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
+        </div>
       </div>
 
       <div
@@ -417,6 +420,9 @@ watch(() => route.path, (path) => {
     openSections.value.recruitment = true
   } else if (path.startsWith('/recruitment/expelled-students')) {
     activeItem.value = 'expelled'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/archived-students')) {
+    activeItem.value = 'archived'
     openSections.value.recruitment = true
   } else if (path.startsWith('/finance/returns')) {
     activeItem.value = 'returns'

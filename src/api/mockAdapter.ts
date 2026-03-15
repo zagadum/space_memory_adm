@@ -1092,6 +1092,57 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // ── END EXPELLED STUDENTS ──────────────────────────────────────────────────
 
+  // ── ARCHIVED STUDENTS ──────────────────────────────────────────────────────
+
+  // GET archived-students
+  if (method === 'get' && url === 'archived-students') {
+    const students = [
+      { id: 1, name: 'Анна Ковалевская',    phone: '+48 601 234 567', registered: _dAgo(90),  expelled: _dAgo(45), lastContact: _dAgo(8),  manager: 'Светлана',  comment: 'Обещала перезвонить',         archReason: 'Не актуально',       archComment: 'Сама попросила убрать из списка', hist: [] },
+      { id: 2, name: 'Дмитрий Петров',      phone: '+48 602 345 678', registered: _dAgo(120), expelled: _dAgo(60), lastContact: _dAgo(22), manager: 'Александр', comment: 'Не отвечает',                  archReason: 'Не дозвонились 3 раза', archComment: '', hist: [] },
+      { id: 3, name: 'Марта Вишневска',     phone: '+48 603 456 789', registered: _dAgo(75),  expelled: _dAgo(40), lastContact: null,       manager: '',          comment: '',                             archReason: 'Переехал',           archComment: 'Переехала в Краков',         hist: [] },
+      { id: 4, name: 'Игорь Сидоренко',     phone: '+48 604 567 890', registered: _dAgo(55),  expelled: _dAgo(20), lastContact: _dAgo(12), manager: 'Мария',     comment: 'Не берёт трубку',             archReason: 'Выбрал другую школу', archComment: 'Пошёл в British School',      hist: [] },
+      { id: 5, name: 'Светлана Бондарь',    phone: '+48 605 678 901', registered: _dAgo(200), expelled: _dAgo(5),  lastContact: _dAgo(3),  manager: 'Артём',     comment: 'Заинтересована была',         archReason: 'Не актуально',       archComment: 'Ребёнок заболел, пауза на год', hist: [] },
+    ];
+
+    const withHistory = students.map(s => ({
+      ...s,
+      history: [
+        { event: 'Регистрация',           date: s.registered, detail: 'Ученик зарегистрирован в системе',                            color: '#4f6ef7' },
+        { event: 'Выписан из группы',     date: _dAgo(50),    detail: 'Передан в отдел работы с выписанными',                     color: '#ef4444' },
+        ...(s.lastContact ? [{ event: 'Последний контакт', date: s.lastContact, detail: `Ответственный: ${s.manager || '—'} · ${s.comment || 'без комментария'}`, color: '#4f6ef7' }] : []),
+        { event: 'Архивирован',           date: s.expelled,   detail: `Причина: ${s.archReason}${s.archComment ? ' · ' + s.archComment : ''}`, color: '#8b5cf6' },
+      ],
+    }));
+
+    return ok(config, {
+      data: withHistory,
+      meta: {
+        total:  students.length,
+        month:  students.filter(s => s.expelled >= _dAgo(30)).length,
+        none:   students.filter(s => !s.lastContact).length,
+        return: students.filter(s => s.archReason === 'Не актуально').length,
+      },
+    });
+  }
+
+  // POST archived-students/:id/return-to-new
+  if (method === 'post' && /^archived-students\/\d+\/return-to-new$/.test(url)) {
+    console.log(`[MOCK] POST /archived-students/${url.split('/')[1]}/return-to-new`);
+    return ok(config, { id: parseInt(url.split('/')[1]) });
+  }
+
+  // POST archived-students/:id/transfer
+  if (method === 'post' && /^archived-students\/\d+\/transfer$/.test(url)) {
+    const body = JSON.parse(config.data || '{}');
+    console.log(`[MOCK] POST /archived-students/${url.split('/')[1]}/transfer, newGroup: ${body.group_id}`);
+    return ok(config, {
+      id: parseInt(url.split('/')[1]),
+      newGroup: body.group_id,
+    });
+  }
+
+  // ── END ARCHIVED STUDENTS ──────────────────────────────────────────────────
+
   // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
   // GET new-students
   if (method === 'get' && (url === 'new-students' || url === 'recruitment/new-students')) {

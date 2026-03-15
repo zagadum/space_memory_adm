@@ -1465,6 +1465,76 @@
       "priceSet": "Cena zaktualizowana"
     }
   },
+  "archived": {
+    "pageTitle": "Archiwum uczniów",
+    "pageSubTitle": "uczniowie, którzy nie będą się uczyć",
+    "loading": "Ładowanie...",
+    "stats": {
+      "total": "Razem w archiwum",
+      "totalSub": "uczniów zarchiwizowano",
+      "month": "W tym miesiącu",
+      "monthSub": "zarchiwizowano w bieżącym miesiącu",
+      "none": "Brak kontaktu",
+      "noneSub": "ostatni kontakt nie był odnotowany",
+      "return": "Potencjalne powroty",
+      "returnSub": "powód — „{reason}”"
+    },
+    "info": {
+      "title": "Logika archiwum · zasady pracy z zarchiwizowanymi uczniami",
+      "rule1": "Tutaj są uczniowie, którzy <strong>z jakiegoś powodu nie będą się uczyć</strong>. Nie są usunięci — ich dane są zachowane.",
+      "rule2": "Powód archiwizacji jest odnotowywany przy przenoszeniu i widoczny w kolumnie <strong>„Komentarz archiwizacji”</strong>.",
+      "rule3": "Ucznia można <strong>przywrócić do listy nowych uczniów</strong> lub <strong>przenieść do grupy</strong> przez menu „···”.",
+      "rule4": "Data ostatniego kontaktu i opiekun są <strong>zachowywane z poprzednich etapów</strong> i dostępne do wglądu.",
+      "rule5": "Rola <strong>Manager</strong> — pełny dostęp. <strong>Quality</strong> — podgląd historii. <strong>Sales</strong> — przenoszenie i przywracanie."
+    },
+    "tableToolbar": {
+      "title": "Archiwum"
+    },
+    "filter": {
+      "search": "Szukaj po imieniu...",
+      "allManagers": "Wszyscy pracownicy",
+      "noManager": "Bez opiekuna",
+      "allReasons": "Wszystkie powody"
+    },
+    "sort": {
+      "archDesc": "Nowe archiwizacje ↓",
+      "archAsc": "Stare archiwizacje ↑",
+      "regDesc": "Według daty rejestracji ↓",
+      "regAsc": "Według daty rejestracji ↑"
+    },
+    "table": {
+      "name": "Imię Nazwisko (Telefon)",
+      "registered": "Data rejestracji",
+      "expelled": "Data wypisania",
+      "lastContact": "Ostatni kontakt",
+      "manager": "Opiekun",
+      "comment": "Komentarz",
+      "archReason": "Komentarz archiwizacji"
+    },
+    "contact": {
+      "none": "Brak kontaktu",
+      "today": "Dzisiaj",
+      "daysAgo": "{days} dni temu"
+    },
+    "actions": {
+      "return": "Przywróć do nowych",
+      "transfer": "Przenieś do grupy",
+      "history": "Historia",
+      "transferBtn": "Przenieś"
+    },
+    "empty": {
+      "title": "Archiwum jest puste",
+      "sub": "Zarchiwizowani uczniowie pojawią się tutaj"
+    },
+    "showing": "Pokazano {shown} z {total} uczniów",
+    "archive": {
+      "selectGroup": "Wybierz aktywną grupę",
+      "returnSub": "Uczeń zostanie przeniesiony na listę nowych uczniów",
+      "commentLabel": "Komentarz (opcjonalnie)",
+      "commentPlaceholder": "Powód przywrócenia...",
+      "notRelevant": "Nieaktualne"
+    }
+  },
   "expelled": {
     "pageTitle": "Wypisani uczniowie",
     "pageSubTitle": "narzędzie ponownej sprzedaży · domykanie",

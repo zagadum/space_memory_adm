@@ -1465,6 +1465,76 @@
       "priceSet": "Price updated"
     }
   },
+  "archived": {
+    "pageTitle": "Students Archive",
+    "pageSubTitle": "students who will not be studying",
+    "loading": "Loading...",
+    "stats": {
+      "total": "Total in archive",
+      "totalSub": "students archived",
+      "month": "This month",
+      "monthSub": "archived in the current month",
+      "none": "No contact",
+      "noneSub": "last contact was not recorded",
+      "return": "Potentially returnable",
+      "returnSub": "reason — \"{reason}\""
+    },
+    "info": {
+      "title": "Archive Logic · rules for working with archived students",
+      "rule1": "Here are students who <strong>for some reason will not be studying</strong>. They are not deleted — their data is saved.",
+      "rule2": "The reason for archiving is recorded during the transfer and is visible in the <strong>\"Archive Comment\"</strong> column.",
+      "rule3": "A student can be <strong>returned to the new students list</strong> or <strong>transferred to a group</strong> via the \"···\" menu.",
+      "rule4": "The last contact date and manager are <strong>saved from previous stages</strong> and are available for viewing.",
+      "rule5": "Role <strong>Manager</strong> — full access. <strong>Quality</strong> — view history. <strong>Sales</strong> — transfer and return."
+    },
+    "tableToolbar": {
+      "title": "Archive"
+    },
+    "filter": {
+      "search": "Search by name...",
+      "allManagers": "All employees",
+      "noManager": "No manager",
+      "allReasons": "All reasons"
+    },
+    "sort": {
+      "archDesc": "New archives ↓",
+      "archAsc": "Old archives ↑",
+      "regDesc": "By registration date ↓",
+      "regAsc": "By registration date ↑"
+    },
+    "table": {
+      "name": "First Last (Phone)",
+      "registered": "Registration date",
+      "expelled": "Expulsion date",
+      "lastContact": "Last contact",
+      "manager": "Manager",
+      "comment": "Comment",
+      "archReason": "Archive comment"
+    },
+    "contact": {
+      "none": "No contact",
+      "today": "Today",
+      "daysAgo": "{days} days ago"
+    },
+    "actions": {
+      "return": "Return to new",
+      "transfer": "Transfer to group",
+      "history": "History",
+      "transferBtn": "Transfer"
+    },
+    "empty": {
+      "title": "Archive is empty",
+      "sub": "Archived students will appear here"
+    },
+    "showing": "Showing {shown} of {total} students",
+    "archive": {
+      "selectGroup": "Select an active group",
+      "returnSub": "The student will be moved to the new students list",
+      "commentLabel": "Comment (optional)",
+      "commentPlaceholder": "Reason for return...",
+      "notRelevant": "Not relevant"
+    }
+  },
   "expelled": {
     "pageTitle": "Expelled Students",
     "pageSubTitle": "resale tool · closing",
