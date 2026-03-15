@@ -14,7 +14,7 @@
 
     <div class="sp-body">
       <div v-if="!student || !student.history.length" style="color: var(--dim); padding: 20px 0;">
-        История пуста
+        {{ t('expelled.history.empty') }}
       </div>
       <div v-else>
         <div v-for="(item, idx) in [...student.history].reverse()" :key="idx" style="display: flex; gap: 16px; margin-bottom: 20px;">
@@ -35,7 +35,10 @@
 
 <script setup lang="ts">
 import { onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExpelledStudent } from '../../../../api/expelledStudentsApi'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   modelValue: boolean

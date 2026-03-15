@@ -121,7 +121,9 @@
     "export": "Экспорт",
     "searchHint": "Поиск по имени, телефону...",
     "welcome": "Привет, {name}! 👋",
-    "search": "Поиск"
+    "search": "Поиск",
+    "none": "— Нет —",
+    "select": "— Выберите —"
   },
   "dashboard": {
     "header": {
@@ -1540,10 +1542,20 @@
       "title": "Перенести в группу",
       "confirm": "Перенести",
       "slotsNone": "Мест нет",
-      "slots": "мест"
+      "slots": "мест",
+      "selectGroup": "Выберите активную группу",
+      "button": "Перенести",
+      "noSlots": "Мест нет",
+      "slots": "{count} мест"
     },
     "history": {
-      "title": "История"
+      "title": "История",
+      "empty": "История пуста"
+    },
+    "contact": {
+      "none": "Нет контакта",
+      "today": "Сегодня",
+      "daysAgo": "{days} дн. назад"
     },
     "bulk": {
       "selected": "выбрано",
@@ -1553,7 +1565,8 @@
       "deselect": "Снять выбор",
       "assignTitle": "Назначить ответственного",
       "archiveTitle": "Массовая архивация",
-      "selectEmployee": "— Выберите —"
+      "selectEmployee": "— Выберите —",
+      "forStudents": "Для {count} учеников"
     },
     "empty": {
       "title": "Нет учеников в списке",

@@ -13,7 +13,7 @@
     </div>
 
     <div class="sp-body">
-      <div class="popup-label" style="margin-bottom: 16px;">Выберите активную группу</div>
+      <div class="popup-label" style="margin-bottom: 16px;">{{ t('expelled.transfer.selectGroup') }}</div>
       
       <div class="enrollment-list" style="gap: 12px;">
         <div v-for="g in MOCK_GROUPS" :key="g.id" 
@@ -39,7 +39,7 @@
 
     <div style="padding: 20px 24px; border-top: 1px solid var(--border); background: rgba(13, 13, 43, 0.6);">
       <button class="btn" :class="selectedGroupId ? 'btn-primary' : ''" style="width: 100%; justify-content: center; padding: 12px;" :disabled="!selectedGroupId" @click="onConfirm">
-        ✦ Перенести
+        ✦ {{ t('expelled.transfer.button') }}
       </button>
     </div>
   </div>
@@ -47,7 +47,10 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ExpelledStudent } from '../../../../api/expelledStudentsApi'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   modelValue: boolean
@@ -89,8 +92,8 @@ function slotsClass(slots: number): string {
 }
 
 function slotsLabel(slots: number): string {
-  if (slots === 0) return 'Мест нет'
-  return `${slots} мест`
+  if (slots === 0) return t('expelled.transfer.noSlots')
+  return t('expelled.transfer.slots', { count: slots })
 }
 
 function onConfirm() {

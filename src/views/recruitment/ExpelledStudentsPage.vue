@@ -6,7 +6,7 @@
       <div class="toolbar-left">
         <div class="section-title">
           📤 {{ t('expelled.pageTitle') }}
-          <span class="section-count">инструмент повторных продаж · дозакрытие</span>
+          <span class="section-count">{{ t('expelled.pageSubTitle') }}</span>
         </div>
       </div>
     </div>
@@ -190,7 +190,7 @@
                 class="dropdown-filter-btn"
                 style="max-width: 120px; padding: 4px 8px;"
                 @change="onFieldChange(s.id, 'manager', ($event.target as HTMLSelectElement).value)">
-                <option value="">— Нет —</option>
+                <option value="">{{ t('common.none') }}</option>
                 <option v-for="m in MANAGERS" :key="m" :value="m">{{ m }}</option>
               </select>
             </td>
@@ -198,7 +198,7 @@
             <td style="padding: 10px 11px; vertical-align: middle;">
               <input type="text"
                 :value="s.comment"
-                placeholder="Добавить..."
+                :placeholder="t('common.add')"
                 class="dropdown-filter-btn"
                 style="width: 140px; padding: 4px 8px;"
                 @change="onFieldChange(s.id, 'comment', ($event.target as HTMLInputElement).value)" />
@@ -239,11 +239,11 @@
       <div class="modal-backdrop" :class="{ active: showBulkAssignModal }" @click.self="showBulkAssignModal = false">
         <div class="modal" style="width: 400px;">
           <div class="popup-title">👤 {{ t('expelled.bulk.assign') }}</div>
-          <div class="popup-sub">Для {{ store.selectedIds.length }} учеников</div>
+          <div class="popup-sub">{{ t('expelled.bulk.forStudents', { count: store.selectedIds.length }) }}</div>
           
           <label class="popup-label">{{ t('expelled.table.manager') }}</label>
           <select v-model="bulkManager" class="modal-input">
-            <option value="">— Выберите —</option>
+            <option value="">{{ t('common.select') }}</option>
             <option v-for="m in MANAGERS" :key="m" :value="m">{{ m }}</option>
           </select>
           
@@ -264,7 +264,7 @@
           
           <label class="popup-label">{{ t('expelled.archiveReason') }}</label>
           <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-            <label v-for="r in ARCHIVE_REASONS" :key="r" class="chip" style="justify-content: flex-start; padding: 10px 14px;" :class="{ active: archiveReason === r }">
+            <label v-for="r in ARCHIVE_REASONS.value" :key="r" class="chip" style="justify-content: flex-start; padding: 10px 14px;" :class="{ active: archiveReason === r }">
               <input type="radio" v-model="archiveReason" :value="r" style="margin-right: 8px;" />
               {{ r }}
             </label>
@@ -288,11 +288,11 @@
       <div class="modal-backdrop" :class="{ active: showArchiveModal && archiveMode === 'bulk' }" @click.self="showArchiveModal = false">
         <div class="modal" style="width: 500px;">
           <div class="popup-title">🗃️ {{ t('expelled.bulk.archive') }}</div>
-          <div class="popup-sub">Для {{ store.selectedIds.length }} учеников</div>
+          <div class="popup-sub">{{ t('expelled.bulk.forStudents', { count: store.selectedIds.length }) }}</div>
           
           <label class="popup-label">{{ t('expelled.archiveReason') }}</label>
           <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-            <label v-for="r in ARCHIVE_REASONS" :key="r" class="chip" style="justify-content: flex-start; padding: 10px 14px;" :class="{ active: archiveReason === r }">
+            <label v-for="r in ARCHIVE_REASONS.value" :key="r" class="chip" style="justify-content: flex-start; padding: 10px 14px;" :class="{ active: archiveReason === r }">
               <input type="radio" v-model="archiveReason" :value="r" style="margin-right: 8px;" />
               {{ r }}
             </label>
@@ -327,13 +327,13 @@ const isManager = computed(() => authStore.user?.role === 'manager')
 
 // ── КОНСТАНТЫ ───────────────────────────────────────────
 const MANAGERS = ['Светлана', 'Александр', 'Мария', 'Артём']
-const ARCHIVE_REASONS = [
+const ARCHIVE_REASONS = computed(() => [
   t('expelled.archive.notRelevant'),
   t('expelled.archive.noAnswer'),
   t('expelled.archive.moved'),
   t('expelled.archive.otherSchool'),
   t('expelled.archive.other'),
-]
+])
 
 // ── ФИЛЬТРЫ ─────────────────────────────────────────────
 const search = ref('')
@@ -539,10 +539,10 @@ function contactTagClass(d: string | null): string {
 
 function contactTagText(d: string | null): string {
   const days = daysAgo(d)
-  if (!d)         return '📵 Нет контакта'
-  if (days === 0) return '✓ Сегодня'
-  if (days <= 3)  return `${days} дн. назад`
-  if (days <= 7)  return `${days} дн. назад`
-  return `${days} дн. назад ⚠️`
+  if (!d)         return `📵 ${t('expelled.contact.none')}`
+  if (days === 0) return `✓ ${t('expelled.contact.today')}`
+  if (days <= 3)  return t('expelled.contact.daysAgo', { days })
+  if (days <= 7)  return t('expelled.contact.daysAgo', { days })
+  return `${t('expelled.contact.daysAgo', { days })} ⚠️`
 }
 </script>
