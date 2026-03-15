@@ -50,6 +50,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   const url = (config.url || "").replace(/^\//, "");
   const method = (config.method || "get").toLowerCase();
 
+  console.log('[MOCK] incoming:', method.toUpperCase(), url);
+
   // --- AUTH ---
   if (method === "post" && (url === "auth/sign-in" || url === "v1/auth/sign-in" || url === "api/auth/sign-in" || url === "api/v1/auth/sign-in")) {
     const body = readBody(config);
@@ -623,6 +625,133 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { success: true });
   }
 
+
+  // ── GROUPS LIST (Secretariat) ──
+  if (method === 'get' && url === 'groups') {
+    console.log('[MOCK] HIT groups, url:', url);
+    const mockGroupsList = [
+      { id: 1, name: 'SM-A / Пн 16:00', type: 'group', studentsCount: 8, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-14', lastComment: 'Ученики подготовлены к зачёту', durationDays: 180, startDate: '2025-09-15' },
+      { id: 2, name: 'SM-B / Ср 17:30', type: 'group', studentsCount: 6, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-10', lastComment: 'Нужна замена на следующей неделе', durationDays: 120, startDate: '2025-11-15' },
+      { id: 3, name: 'IND-C / Пт 15:00', type: 'mini', studentsCount: 3, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-12', lastComment: 'Прогресс отличный, переход на следующий уровень', durationDays: 90, startDate: '2025-12-15' },
+      { id: 4, name: 'SM-D / Вт 18:00', type: 'group', studentsCount: 10, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-08', lastComment: 'Двое учеников пропускают регулярно', durationDays: 365, startDate: '2025-03-15' },
+      { id: 5, name: 'INDIGO-A / Чт 16:30', type: 'group', studentsCount: 7, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-13', lastComment: 'Олимпиада в апреле — идёт подготовка', durationDays: 240, startDate: '2025-07-20' },
+      { id: 6, name: 'IND-1 / Пн 10:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-02-28', lastComment: 'Родители просят усилить математику', durationDays: 60, startDate: '2026-01-15' },
+      { id: 7, name: 'SM-E / Сб 11:00', type: 'group', studentsCount: 9, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-01', lastComment: 'Субботняя группа — высокая посещаемость', durationDays: 300, startDate: '2025-05-20' },
+      { id: 8, name: 'MINI-B / Ср 14:00', type: 'mini', studentsCount: 4, teacherName: 'Maria Nowak', lastCommentDate: null, lastComment: null, durationDays: 30, startDate: '2026-02-13' },
+      { id: 9, name: 'SM-F / Пт 18:30', type: 'group', studentsCount: 5, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-11', lastComment: 'Группа готовится к выступлению', durationDays: 150, startDate: '2025-10-15' },
+      { id: 10, name: 'IND-2 / Вт 09:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-14', lastComment: 'Ребёнок делает быстрый прогресс', durationDays: 45, startDate: '2026-01-30' },
+      { id: 11, name: 'SM-G / Чт 17:00', type: 'group', studentsCount: 8, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-09', lastComment: 'Запланирован открытый урок для родителей', durationDays: 200, startDate: '2025-08-28' },
+      { id: 12, name: 'INDIGO-B / Пн 15:00', type: 'group', studentsCount: 6, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-07', lastComment: 'Нужны дополнительные материалы', durationDays: 100, startDate: '2025-12-05' },
+    ]
+
+    // Фильтрация
+    let items = [...mockGroupsList]
+    const p = config.params as any || {}
+
+    if (p.search) {
+      const s = String(p.search).toLowerCase()
+      items = items.filter(g => g.name.toLowerCase().includes(s) || g.teacherName.toLowerCase().includes(s))
+    }
+    if (p.type) {
+      items = items.filter(g => g.type === p.type)
+    }
+    if (p.teacher_id) {
+      // Простая фильтрация по имени для mock
+      const teacherMap: Record<number, string> = { 1: 'Anna Kowalska', 2: 'Ewa Lewandowska', 3: 'Tomasz Wiśniewski', 4: 'Maria Nowak' }
+      const tName = teacherMap[Number(p.teacher_id)]
+      if (tName) items = items.filter(g => g.teacherName === tName)
+    }
+
+    // Сортировка
+    const ob = p.orderBy || 'name'
+    const od = p.orderDirection === 'desc' ? -1 : 1
+    items.sort((a: any, b: any) => {
+      const va = a[ob] ?? ''
+      const vb = b[ob] ?? ''
+      if (typeof va === 'number') return (va - vb) * od
+      return String(va).localeCompare(String(vb)) * od
+    })
+
+    // Пагинация
+    const page = Number(p.page) || 1
+    const perPage = Number(p.per_page) || 20
+    const total = items.length
+    const from = (page - 1) * perPage
+    const sliced = items.slice(from, from + perPage)
+
+    return ok(config, {
+      data: sliced,
+      meta: {
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
+        total,
+        from: sliced.length ? from + 1 : null,
+        to: sliced.length ? from + sliced.length : null,
+      }
+    })
+  }
+
+  // ── TEACHERS LIST (Secretariat) ──
+  if (method === 'get' && url === 'teachers') {
+    console.log('[MOCK] HIT teachers, url:', url);
+    const mockTeachersList = [
+      { id: 1, firstName: 'Anna', lastName: 'Kowalska', phone: '+48 601 111 222', email: 'anna.kowalska@gls.pl', groupLessonsCount: 5, individualLessonsCount: 2, city: 'Warszawa', comment: 'Doświadczony trener Space Memory' },
+      { id: 2, firstName: 'Ewa', lastName: 'Lewandowska', phone: '+48 602 333 444', email: 'ewa.lewandowska@gls.pl', groupLessonsCount: 4, individualLessonsCount: 0, city: 'Warszawa', comment: 'Specjalizacja: INDIGO' },
+      { id: 3, firstName: 'Tomasz', lastName: 'Wiśniewski', phone: '+48 603 555 666', email: 'tomasz.w@gls.pl', groupLessonsCount: 2, individualLessonsCount: 3, city: 'Kraków', comment: null },
+      { id: 4, firstName: 'Maria', lastName: 'Nowak', phone: '+48 604 777 888', email: 'maria.nowak@gls.pl', groupLessonsCount: 3, individualLessonsCount: 1, city: 'Warszawa', comment: 'Przygotowuje uczniów do olimpiad' },
+      { id: 5, firstName: 'Katarzyna', lastName: 'Zielińska', phone: '+48 605 999 000', email: 'k.zielinska@gls.pl', groupLessonsCount: 6, individualLessonsCount: 0, city: 'Gdańsk', comment: 'Nowa w zespole — в trakcie szkolenia' },
+      { id: 6, firstName: 'Piotr', lastName: 'Kamiński', phone: '+48 606 111 333', email: 'piotr.k@gls.pl', groupLessonsCount: 3, individualLessonsCount: 2, city: 'Wrocław', comment: 'Prowadzi grupy weekendowe' },
+      { id: 7, firstName: 'Aleksandra', lastName: 'Wójcik', phone: '+48 607 222 444', email: 'a.wojcik@gls.pl', groupLessonsCount: 4, individualLessonsCount: 4, city: 'Warszawa', comment: null },
+      { id: 8, firstName: 'Michał', lastName: 'Szymański', phone: '+48 608 333 555', email: 'michal.sz@gls.pl', groupLessonsCount: 2, individualLessonsCount: 1, city: 'Poznań', comment: 'Urlop do końca marca' },
+      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, city: 'Kraków', comment: 'Najwyższy wynik QA w lutym' },
+      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indywidualne' },
+    ]
+
+    let items = [...mockTeachersList]
+    const p = config.params as any || {}
+
+    if (p.search) {
+      const s = String(p.search).toLowerCase()
+      items = items.filter(t =>
+        t.firstName.toLowerCase().includes(s) ||
+        t.lastName.toLowerCase().includes(s) ||
+        t.email.toLowerCase().includes(s) ||
+        t.phone.includes(s)
+      )
+    }
+    if (p.city) {
+      items = items.filter(t => t.city === p.city)
+    }
+
+    const ob = p.orderBy || 'lastName'
+    const od = p.orderDirection === 'desc' ? -1 : 1
+    items.sort((a: any, b: any) => {
+      const va = a[ob] ?? ''
+      const vb = b[ob] ?? ''
+      if (typeof va === 'number') return (va - vb) * od
+      return String(va).localeCompare(String(vb)) * od
+    })
+
+    const page = Number(p.page) || 1
+    const perPage = Number(p.per_page) || 20
+    const total = items.length
+    const from = (page - 1) * perPage
+    const sliced = items.slice(from, from + perPage)
+
+    return ok(config, {
+      data: sliced,
+      meta: {
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
+        total,
+        from: sliced.length ? from + 1 : null,
+        to: sliced.length ? from + sliced.length : null,
+      }
+    })
+  }
+
   if (method === "get" && url === "students") {
     // Генерируем mock данные для списка студентов
     const mockStudentsList = [
@@ -921,6 +1050,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // PATCH expelled-students/:id
   if (method === 'patch' && /^expelled-students\/\d+$/.test(url)) {
+    console.log(`[MOCK] PATCH /expelled-students/${url.split('/')[1]}`);
     return ok(config, {
       id: parseInt(url.split('/')[1]),
       updatedAt: new Date().toISOString(),
@@ -929,6 +1059,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // POST expelled-students/:id/archive
   if (method === 'post' && /^expelled-students\/\d+\/archive$/.test(url)) {
+    console.log(`[MOCK] POST /expelled-students/${url.split('/')[1]}/archive`);
     return ok(config, {
       id: parseInt(url.split('/')[1]),
       archivedAt: new Date().toISOString(),
@@ -938,6 +1069,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // POST expelled-students/:id/transfer
   if (method === 'post' && /^expelled-students\/\d+\/transfer$/.test(url)) {
     const body = JSON.parse(config.data || '{}');
+    console.log(`[MOCK] POST /expelled-students/${url.split('/')[1]}/transfer, newGroup: ${body.group_id}`);
     return ok(config, {
       id: parseInt(url.split('/')[1]),
       newGroup: body.group_id,
@@ -947,12 +1079,14 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // POST expelled-students/bulk-assign
   if (method === 'post' && url === 'expelled-students/bulk-assign') {
     const body = JSON.parse(config.data || '{}');
+    console.log(`[MOCK] POST /expelled-students/bulk-assign, ids: ${body.ids?.length}`);
     return ok(config, { updated: (body.ids || []).length });
   }
 
   // POST expelled-students/bulk-archive
   if (method === 'post' && url === 'expelled-students/bulk-archive') {
     const body = JSON.parse(config.data || '{}');
+    console.log(`[MOCK] POST /expelled-students/bulk-archive, ids: ${body.ids?.length}`);
     return ok(config, { archived: (body.ids || []).length });
   }
 
@@ -961,22 +1095,26 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
   // GET new-students
   if (method === 'get' && (url === 'new-students' || url === 'recruitment/new-students')) {
+    console.log(`[MOCK] GET ${url}`);
     return ok(config, { data: [] });
   }
 
   // POST new-students
   if (method === 'post' && (url === 'new-students' || url === 'recruitment/new-students')) {
     const body = JSON.parse(config.data || '{}');
+    console.log(`[MOCK] POST ${url}, body: ${JSON.stringify(body)}`);
     return ok(config, { ok: true, id: Date.now(), ...body });
   }
 
   // POST new-students/:id/archive
   if (method === 'post' && /^recruitment\/new-students\/\d+\/archive$/.test(url)) {
+    console.log(`[MOCK] POST ${url}`);
     return ok(config, { ok: true });
   }
 
   // GET leads
   if (method === 'get' && (url === 'leads' || url === 'recruitment/leads')) {
+    console.log(`[MOCK] GET ${url}`);
     return ok(config, {
       data: [
         { id: '1', name: 'Александр Иванов', phone: '+48 123 456 789', subject: 'Математика', createdAt: '2023-10-20', status: 'new' },
@@ -990,137 +1128,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // POST leads/move (or PATCH leads/:id based on API)
   if ((method === 'post' || method === 'patch') && (url === 'leads/move' || url.startsWith('recruitment/leads/'))) {
+    console.log(`[MOCK] ${method.toUpperCase()} ${url}`);
     return ok(config, { ok: true });
   }
 
   // POST leads/add (or POST recruitment/leads)
   if (method === 'post' && (url === 'leads/add' || url === 'recruitment/leads')) {
     const body = JSON.parse(config.data || '{}');
+    console.log(`[MOCK] POST ${url}, body: ${JSON.stringify(body)}`);
     return ok(config, { id: Date.now().toString(), ...body });
   }
-  // ── GROUPS LIST (Secretariat) ──
-  if (method === 'get' && url === 'groups') {
-    const mockGroupsList = [
-      { id: 1, name: 'SM-A / Пн 16:00', type: 'group', studentsCount: 8, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-14', lastComment: 'Ученики подготовлены к зачёту', durationDays: 180, startDate: '2025-09-15' },
-      { id: 2, name: 'SM-B / Ср 17:30', type: 'group', studentsCount: 6, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-10', lastComment: 'Нужна замена на следующей неделе', durationDays: 120, startDate: '2025-11-15' },
-      { id: 3, name: 'IND-C / Пт 15:00', type: 'mini', studentsCount: 3, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-12', lastComment: 'Прогресс отличный, переход на следующий уровень', durationDays: 90, startDate: '2025-12-15' },
-      { id: 4, name: 'SM-D / Вт 18:00', type: 'group', studentsCount: 10, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-08', lastComment: 'Двое учеников пропускают регулярно', durationDays: 365, startDate: '2025-03-15' },
-      { id: 5, name: 'INDIGO-A / Чт 16:30', type: 'group', studentsCount: 7, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-13', lastComment: 'Олимпиада в апреле — идёт подготовка', durationDays: 240, startDate: '2025-07-20' },
-      { id: 6, name: 'IND-1 / Пн 10:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-02-28', lastComment: 'Родители просят усилить математику', durationDays: 60, startDate: '2026-01-15' },
-      { id: 7, name: 'SM-E / Сб 11:00', type: 'group', studentsCount: 9, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-01', lastComment: 'Субботняя группа — высокая посещаемость', durationDays: 300, startDate: '2025-05-20' },
-      { id: 8, name: 'MINI-B / Ср 14:00', type: 'mini', studentsCount: 4, teacherName: 'Maria Nowak', lastCommentDate: null, lastComment: null, durationDays: 30, startDate: '2026-02-13' },
-      { id: 9, name: 'SM-F / Пт 18:30', type: 'group', studentsCount: 5, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-11', lastComment: 'Группа готовится к выступлению', durationDays: 150, startDate: '2025-10-15' },
-      { id: 10, name: 'IND-2 / Вт 09:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-14', lastComment: 'Ребёнок делает быстрый прогресс', durationDays: 45, startDate: '2026-01-30' },
-      { id: 11, name: 'SM-G / Чт 17:00', type: 'group', studentsCount: 8, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-09', lastComment: 'Запланирован открытый урок для родителей', durationDays: 200, startDate: '2025-08-28' },
-      { id: 12, name: 'INDIGO-B / Пн 15:00', type: 'group', studentsCount: 6, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-07', lastComment: 'Нужны дополнительные материалы', durationDays: 100, startDate: '2025-12-05' },
-    ]
 
-    // Фильтрация
-    let items = [...mockGroupsList]
-    const p = config.params as any || {}
-
-    if (p.search) {
-      const s = String(p.search).toLowerCase()
-      items = items.filter(g => g.name.toLowerCase().includes(s) || g.teacherName.toLowerCase().includes(s))
-    }
-    if (p.type) {
-      items = items.filter(g => g.type === p.type)
-    }
-    if (p.teacher_id) {
-      // Простая фильтрация по имени для mock
-      const teacherMap: Record<number, string> = { 1: 'Anna Kowalska', 2: 'Ewa Lewandowska', 3: 'Tomasz Wiśniewski', 4: 'Maria Nowak' }
-      const tName = teacherMap[Number(p.teacher_id)]
-      if (tName) items = items.filter(g => g.teacherName === tName)
-    }
-
-    // Сортировка
-    const ob = p.orderBy || 'name'
-    const od = p.orderDirection === 'desc' ? -1 : 1
-    items.sort((a: any, b: any) => {
-      const va = a[ob] ?? ''
-      const vb = b[ob] ?? ''
-      if (typeof va === 'number') return (va - vb) * od
-      return String(va).localeCompare(String(vb)) * od
-    })
-
-    // Пагинация
-    const page = Number(p.page) || 1
-    const perPage = Number(p.per_page) || 20
-    const total = items.length
-    const from = (page - 1) * perPage
-    const sliced = items.slice(from, from + perPage)
-
-    return ok(config, {
-      data: sliced,
-      meta: {
-        current_page: page,
-        last_page: Math.ceil(total / perPage) || 1,
-        per_page: perPage,
-        total,
-        from: sliced.length ? from + 1 : null,
-        to: sliced.length ? from + sliced.length : null,
-      }
-    })
-  }
-
-  // ── TEACHERS LIST (Secretariat) ──
-  if (method === 'get' && url === 'teachers') {
-    const mockTeachersList = [
-      { id: 1, firstName: 'Anna', lastName: 'Kowalska', phone: '+48 601 111 222', email: 'anna.kowalska@gls.pl', groupLessonsCount: 5, individualLessonsCount: 2, city: 'Warszawa', comment: 'Doświadczony trener Space Memory' },
-      { id: 2, firstName: 'Ewa', lastName: 'Lewandowska', phone: '+48 602 333 444', email: 'ewa.lewandowska@gls.pl', groupLessonsCount: 4, individualLessonsCount: 0, city: 'Warszawa', comment: 'Specjalizacja: INDIGO' },
-      { id: 3, firstName: 'Tomasz', lastName: 'Wiśniewski', phone: '+48 603 555 666', email: 'tomasz.w@gls.pl', groupLessonsCount: 2, individualLessonsCount: 3, city: 'Kraków', comment: null },
-      { id: 4, firstName: 'Maria', lastName: 'Nowak', phone: '+48 604 777 888', email: 'maria.nowak@gls.pl', groupLessonsCount: 3, individualLessonsCount: 1, city: 'Warszawa', comment: 'Przygotowuje uczniów do olimpiad' },
-      { id: 5, firstName: 'Katarzyna', lastName: 'Zielińska', phone: '+48 605 999 000', email: 'k.zielinska@gls.pl', groupLessonsCount: 6, individualLessonsCount: 0, city: 'Gdańsk', comment: 'Nowa w zespole — w trakcie szkolenia' },
-      { id: 6, firstName: 'Piotr', lastName: 'Kamiński', phone: '+48 606 111 333', email: 'piotr.k@gls.pl', groupLessonsCount: 3, individualLessonsCount: 2, city: 'Wrocław', comment: 'Prowadzi grupy weekendowe' },
-      { id: 7, firstName: 'Aleksandra', lastName: 'Wójcik', phone: '+48 607 222 444', email: 'a.wojcik@gls.pl', groupLessonsCount: 4, individualLessonsCount: 4, city: 'Warszawa', comment: null },
-      { id: 8, firstName: 'Michał', lastName: 'Szymański', phone: '+48 608 333 555', email: 'michal.sz@gls.pl', groupLessonsCount: 2, individualLessonsCount: 1, city: 'Poznań', comment: 'Urlop do końca marca' },
-      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, city: 'Kraków', comment: 'Najwyższy wynik QA w lutym' },
-      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indywidualne' },
-    ]
-
-    let items = [...mockTeachersList]
-    const p = config.params as any || {}
-
-    if (p.search) {
-      const s = String(p.search).toLowerCase()
-      items = items.filter(t =>
-        t.firstName.toLowerCase().includes(s) ||
-        t.lastName.toLowerCase().includes(s) ||
-        t.email.toLowerCase().includes(s) ||
-        t.phone.includes(s)
-      )
-    }
-    if (p.city) {
-      items = items.filter(t => t.city === p.city)
-    }
-
-    const ob = p.orderBy || 'lastName'
-    const od = p.orderDirection === 'desc' ? -1 : 1
-    items.sort((a: any, b: any) => {
-      const va = a[ob] ?? ''
-      const vb = b[ob] ?? ''
-      if (typeof va === 'number') return (va - vb) * od
-      return String(va).localeCompare(String(vb)) * od
-    })
-
-    const page = Number(p.page) || 1
-    const perPage = Number(p.per_page) || 20
-    const total = items.length
-    const from = (page - 1) * perPage
-    const sliced = items.slice(from, from + perPage)
-
-    return ok(config, {
-      data: sliced,
-      meta: {
-        current_page: page,
-        last_page: Math.ceil(total / perPage) || 1,
-        per_page: perPage,
-        total,
-        from: sliced.length ? from + 1 : null,
-        to: sliced.length ? from + sliced.length : null,
-      }
-    })
-  }
 
   // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
 
