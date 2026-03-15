@@ -160,6 +160,31 @@
         </div>
       </div>
 
+      <!-- RECRUITMENT -->
+      <div
+        class="nav-section"
+        :class="{ open: openSections.recruitment }"
+        @click="toggleSection('recruitment')"
+      >
+        <span class="nav-section-icon">🎯</span>
+        <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div class="nav-children" :class="{ open: openSections.recruitment }">
+        <div class="nav-item" :class="{ active: activeItem === 'new-students' }" @click="navigateTo('new-students', '/recruitment/new-students')">
+          <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
+        </div>
+        <div class="nav-item" :class="{ active: activeItem === 'leads' }" @click="navigateTo('leads', '/recruitment/leads')">
+          <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div class="nav-item" :class="{ active: activeItem === 'expelled' }" @click="navigateTo('expelled', '/recruitment/expelled-students')">
+          <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
+        </div>
+        <div class="nav-item" :class="{ active: activeItem === 'new-groups' }" @click="navigateTo('new-groups', '/recruitment/new-groups')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+        </div>
+      </div>
+
       <div
         class="nav-section"
         :class="{ open: openSections.finance }"
