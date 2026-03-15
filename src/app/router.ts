@@ -115,6 +115,12 @@ export const router = createRouter({
           component: () => import('../views/groups/GroupsListPage.vue'),
           meta: { title: 'groupsList.pageTitle', subTitle: 'groupsList.pageSubTitle', icon: '🎓' }
         },
+        {
+          path: 'teachers',
+          name: 'teachers-list',
+          component: () => import('../views/teachers/TeachersListPage.vue'),
+          meta: { title: 'teachersList.pageTitle', subTitle: 'teachersList.pageSubTitle', icon: '👨‍🏫' }
+        },
         { path: 'hr/active', name: 'hr-active', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'hr/training', name: 'hr-training', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'hr/pipeline', name: 'hr-pipeline', component: () => import('../views/dashboard/DashboardIndex.vue') },

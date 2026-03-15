@@ -1063,6 +1063,65 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     })
   }
 
+  // ── TEACHERS LIST (Secretariat) ──
+  if (method === 'get' && url === 'teachers') {
+    const mockTeachersList = [
+      { id: 1, firstName: 'Anna', lastName: 'Kowalska', phone: '+48 601 111 222', email: 'anna.kowalska@gls.pl', groupLessonsCount: 5, individualLessonsCount: 2, city: 'Warszawa', comment: 'Doświadczony trener Space Memory' },
+      { id: 2, firstName: 'Ewa', lastName: 'Lewandowska', phone: '+48 602 333 444', email: 'ewa.lewandowska@gls.pl', groupLessonsCount: 4, individualLessonsCount: 0, city: 'Warszawa', comment: 'Specjalizacja: INDIGO' },
+      { id: 3, firstName: 'Tomasz', lastName: 'Wiśniewski', phone: '+48 603 555 666', email: 'tomasz.w@gls.pl', groupLessonsCount: 2, individualLessonsCount: 3, city: 'Kraków', comment: null },
+      { id: 4, firstName: 'Maria', lastName: 'Nowak', phone: '+48 604 777 888', email: 'maria.nowak@gls.pl', groupLessonsCount: 3, individualLessonsCount: 1, city: 'Warszawa', comment: 'Przygotowuje uczniów do olimpiad' },
+      { id: 5, firstName: 'Katarzyna', lastName: 'Zielińska', phone: '+48 605 999 000', email: 'k.zielinska@gls.pl', groupLessonsCount: 6, individualLessonsCount: 0, city: 'Gdańsk', comment: 'Nowa w zespole — w trakcie szkolenia' },
+      { id: 6, firstName: 'Piotr', lastName: 'Kamiński', phone: '+48 606 111 333', email: 'piotr.k@gls.pl', groupLessonsCount: 3, individualLessonsCount: 2, city: 'Wrocław', comment: 'Prowadzi grupy weekendowe' },
+      { id: 7, firstName: 'Aleksandra', lastName: 'Wójcik', phone: '+48 607 222 444', email: 'a.wojcik@gls.pl', groupLessonsCount: 4, individualLessonsCount: 4, city: 'Warszawa', comment: null },
+      { id: 8, firstName: 'Michał', lastName: 'Szymański', phone: '+48 608 333 555', email: 'michal.sz@gls.pl', groupLessonsCount: 2, individualLessonsCount: 1, city: 'Poznań', comment: 'Urlop do końca marca' },
+      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, city: 'Kraków', comment: 'Najwyższy wynik QA w lutym' },
+      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indywidualne' },
+    ]
+
+    let items = [...mockTeachersList]
+    const p = config.params as any || {}
+
+    if (p.search) {
+      const s = String(p.search).toLowerCase()
+      items = items.filter(t =>
+        t.firstName.toLowerCase().includes(s) ||
+        t.lastName.toLowerCase().includes(s) ||
+        t.email.toLowerCase().includes(s) ||
+        t.phone.includes(s)
+      )
+    }
+    if (p.city) {
+      items = items.filter(t => t.city === p.city)
+    }
+
+    const ob = p.orderBy || 'lastName'
+    const od = p.orderDirection === 'desc' ? -1 : 1
+    items.sort((a: any, b: any) => {
+      const va = a[ob] ?? ''
+      const vb = b[ob] ?? ''
+      if (typeof va === 'number') return (va - vb) * od
+      return String(va).localeCompare(String(vb)) * od
+    })
+
+    const page = Number(p.page) || 1
+    const perPage = Number(p.per_page) || 20
+    const total = items.length
+    const from = (page - 1) * perPage
+    const sliced = items.slice(from, from + perPage)
+
+    return ok(config, {
+      data: sliced,
+      meta: {
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
+        total,
+        from: sliced.length ? from + 1 : null,
+        to: sliced.length ? from + sliced.length : null,
+      }
+    })
+  }
+
   // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
 
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);

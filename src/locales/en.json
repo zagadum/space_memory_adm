@@ -1494,5 +1494,23 @@
     "duration": "{n} d.",
     "noComment": "—",
     "noGroups": "No groups match the current filters"
+  },
+  "teachersList": {
+    "pageTitle": "Teachers",
+    "pageSubTitle": "Secretariat — teachers list",
+    "toolbar": {
+      "listTitle": "TEACHERS LIST",
+      "allCities": "All cities"
+    },
+    "table": {
+      "name": "Name",
+      "phone": "Phone",
+      "email": "Email",
+      "groupLessons": "Group",
+      "individualLessons": "Individual",
+      "city": "City",
+      "comment": "Comment"
+    },
+    "noTeachers": "No teachers match the current filters"
   }
 }

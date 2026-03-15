@@ -1494,5 +1494,23 @@
     "duration": "{n} дн.",
     "noComment": "—",
     "noGroups": "Немає груп за обраними фільтрами"
+  },
+  "teachersList": {
+    "pageTitle": "Вчителі",
+    "pageSubTitle": "Секретаріат — список вчителів",
+    "toolbar": {
+      "listTitle": "СПИСОК ВЧИТЕЛІВ",
+      "allCities": "Всі міста"
+    },
+    "table": {
+      "name": "Ім'я Прізвище",
+      "phone": "Телефон",
+      "email": "Email",
+      "groupLessons": "Групові",
+      "individualLessons": "Індив.",
+      "city": "Місто",
+      "comment": "Коментар"
+    },
+    "noTeachers": "Немає вчителів за обраними фільтрами"
   }
 }

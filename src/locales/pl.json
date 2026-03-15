@@ -1494,5 +1494,23 @@
     "duration": "{n} dn.",
     "noComment": "—",
     "noGroups": "Brak grup dla wybranych filtrów"
+  },
+  "teachersList": {
+    "pageTitle": "Nauczyciele",
+    "pageSubTitle": "Sekretariat — lista nauczycieli",
+    "toolbar": {
+      "listTitle": "LISTA NAUCZYCIELI",
+      "allCities": "Wszystkie miasta"
+    },
+    "table": {
+      "name": "Imię Nazwisko",
+      "phone": "Telefon",
+      "email": "Email",
+      "groupLessons": "Grupowe",
+      "individualLessons": "Indyw.",
+      "city": "Miasto",
+      "comment": "Komentarz"
+    },
+    "noTeachers": "Brak nauczycieli dla wybranych filtrów"
   }
 }

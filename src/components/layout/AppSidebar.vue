@@ -69,11 +69,12 @@
           <span class="nav-badge blue" v-if="groupsListStore.totalGroups > 0">{{ groupsListStore.totalGroups }}</span>
         </div>
         <div
-          class="nav-item nav-item--stub"
+          class="nav-item"
           :class="{ active: activeItem === 'teachers' }"
-          @click="setActive('teachers')"
+          @click="navigateTo('teachers', '/teachers')"
         >
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.teachers') }}
+          <span class="nav-badge blue" v-if="teachersListStore.totalTeachers > 0">{{ teachersListStore.totalTeachers }}</span>
         </div>
         <div
           class="nav-item nav-item--stub"
@@ -332,6 +333,7 @@ import { setLocale } from '../../app/i18n'
 // Подключаем сторы
 import { useStudentsListStore } from '../../stores/studentsList.store'
 import { useGroupsListStore } from '../../stores/groupsList.store'
+import { useTeachersListStore } from '../../stores/teachersList.store'
 import { useAuthStore } from '../../stores/auth.store'
 
 const router = useRouter()
@@ -341,6 +343,7 @@ const { locale, t } = useI18n()
 // Инициализируем сторы
 const listStore = useStudentsListStore()
 const groupsListStore = useGroupsListStore()
+const teachersListStore = useTeachersListStore()
 const authStore = useAuthStore()
 
 // Логика смены языка
@@ -448,6 +451,8 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/finance/settings'))           { activeItem.value = 'finance-settings';   openSections.value.finance = true }
   // Группы
   else if (path.startsWith('/groups')) { activeItem.value = 'groups'; openSections.value.secretariat = true }
+  // Преподаватели
+  else if (path.startsWith('/teachers')) { activeItem.value = 'teachers'; openSections.value.secretariat = true }
   // Секретариат - новые пункты
   else if (path.startsWith('/secretariat/course-endings')) { activeItem.value = 'course-endings'; openSections.value.secretariat = true }
   // Тренер - новые пункты
