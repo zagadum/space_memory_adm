@@ -1465,5 +1465,35 @@
       "notPaid": "Не оплачено",
       "priceSet": "Ціну змінено"
     }
+  },
+  "groupsList": {
+    "pageTitle": "Групи",
+    "pageSubTitle": "Секретаріат — активні групи",
+    "toolbar": {
+      "listTitle": "СПИСОК ГРУП",
+      "allTypes": "Всі",
+      "typeGroup": "Група",
+      "typeIndividual": "Індив.",
+      "typeMini": "Міні",
+      "teacher": "Вчитель"
+    },
+    "table": {
+      "name": "Назва групи",
+      "type": "Тип",
+      "studentsCount": "Учнів",
+      "teacher": "Вчитель",
+      "lastCommentDate": "Дата ком.",
+      "lastComment": "Останній коментар",
+      "duration": "Тривалість",
+      "startDate": "Дата старту"
+    },
+    "types": {
+      "group": "Група",
+      "individual": "Індив.",
+      "mini": "Міні"
+    },
+    "duration": "{n} дн.",
+    "noComment": "—",
+    "noGroups": "Немає груп за обраними фільтрами"
   }
 }

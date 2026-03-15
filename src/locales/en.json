@@ -1465,5 +1465,35 @@
       "notPaid": "Not paid",
       "priceSet": "Price updated"
     }
+  },
+  "groupsList": {
+    "pageTitle": "Groups",
+    "pageSubTitle": "Secretariat — active groups",
+    "toolbar": {
+      "listTitle": "GROUPS LIST",
+      "allTypes": "All",
+      "typeGroup": "Group",
+      "typeIndividual": "Individual",
+      "typeMini": "Mini",
+      "teacher": "Teacher"
+    },
+    "table": {
+      "name": "Group name",
+      "type": "Type",
+      "studentsCount": "Students",
+      "teacher": "Teacher",
+      "lastCommentDate": "Comment date",
+      "lastComment": "Last comment",
+      "duration": "Duration",
+      "startDate": "Start date"
+    },
+    "types": {
+      "group": "Group",
+      "individual": "Individual",
+      "mini": "Mini"
+    },
+    "duration": "{n} d.",
+    "noComment": "—",
+    "noGroups": "No groups match the current filters"
   }
 }

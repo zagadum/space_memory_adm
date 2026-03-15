@@ -1565,5 +1565,35 @@
     "archiveReason": "Причина",
     "archiveSpecify": "Уточните причину",
     "showing": "Показано {shown} из {total}"
+  },
+  "groupsList": {
+    "pageTitle": "Группы",
+    "pageSubTitle": "Секретариат — активные группы",
+    "toolbar": {
+      "listTitle": "СПИСОК ГРУПП",
+      "allTypes": "Все",
+      "typeGroup": "Группа",
+      "typeIndividual": "Индив.",
+      "typeMini": "Мини",
+      "teacher": "Учитель"
+    },
+    "table": {
+      "name": "Название группы",
+      "type": "Тип",
+      "studentsCount": "Учеников",
+      "teacher": "Учитель",
+      "lastCommentDate": "Дата комм.",
+      "lastComment": "Последний комментарий",
+      "duration": "Длительность",
+      "startDate": "Дата старта"
+    },
+    "types": {
+      "group": "Группа",
+      "individual": "Индив.",
+      "mini": "Мини"
+    },
+    "duration": "{n} дн.",
+    "noComment": "—",
+    "noGroups": "Нет групп по заданным фильтрам"
   }
 }

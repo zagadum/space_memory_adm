@@ -1465,5 +1465,35 @@
       "notPaid": "Nieopłacone",
       "priceSet": "Cena zaktualizowana"
     }
+  },
+  "groupsList": {
+    "pageTitle": "Grupy",
+    "pageSubTitle": "Sekretariat — aktywne grupy",
+    "toolbar": {
+      "listTitle": "LISTA GRUP",
+      "allTypes": "Wszystkie",
+      "typeGroup": "Grupa",
+      "typeIndividual": "Indyw.",
+      "typeMini": "Mini",
+      "teacher": "Nauczyciel"
+    },
+    "table": {
+      "name": "Nazwa grupy",
+      "type": "Typ",
+      "studentsCount": "Uczniów",
+      "teacher": "Nauczyciel",
+      "lastCommentDate": "Data kom.",
+      "lastComment": "Ostatni komentarz",
+      "duration": "Czas trwania",
+      "startDate": "Data startu"
+    },
+    "types": {
+      "group": "Grupa",
+      "individual": "Indyw.",
+      "mini": "Mini"
+    },
+    "duration": "{n} dn.",
+    "noComment": "—",
+    "noGroups": "Brak grup dla wybranych filtrów"
   }
 }

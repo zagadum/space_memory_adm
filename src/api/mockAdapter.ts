@@ -998,6 +998,71 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const body = JSON.parse(config.data || '{}');
     return ok(config, { id: Date.now().toString(), ...body });
   }
+  // ── GROUPS LIST (Secretariat) ──
+  if (method === 'get' && url === 'groups') {
+    const mockGroupsList = [
+      { id: 1, name: 'SM-A / Пн 16:00', type: 'group', studentsCount: 8, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-14', lastComment: 'Ученики подготовлены к зачёту', durationDays: 180, startDate: '2025-09-15' },
+      { id: 2, name: 'SM-B / Ср 17:30', type: 'group', studentsCount: 6, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-10', lastComment: 'Нужна замена на следующей неделе', durationDays: 120, startDate: '2025-11-15' },
+      { id: 3, name: 'IND-C / Пт 15:00', type: 'mini', studentsCount: 3, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-12', lastComment: 'Прогресс отличный, переход на следующий уровень', durationDays: 90, startDate: '2025-12-15' },
+      { id: 4, name: 'SM-D / Вт 18:00', type: 'group', studentsCount: 10, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-08', lastComment: 'Двое учеников пропускают регулярно', durationDays: 365, startDate: '2025-03-15' },
+      { id: 5, name: 'INDIGO-A / Чт 16:30', type: 'group', studentsCount: 7, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-13', lastComment: 'Олимпиада в апреле — идёт подготовка', durationDays: 240, startDate: '2025-07-20' },
+      { id: 6, name: 'IND-1 / Пн 10:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-02-28', lastComment: 'Родители просят усилить математику', durationDays: 60, startDate: '2026-01-15' },
+      { id: 7, name: 'SM-E / Сб 11:00', type: 'group', studentsCount: 9, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-01', lastComment: 'Субботняя группа — высокая посещаемость', durationDays: 300, startDate: '2025-05-20' },
+      { id: 8, name: 'MINI-B / Ср 14:00', type: 'mini', studentsCount: 4, teacherName: 'Maria Nowak', lastCommentDate: null, lastComment: null, durationDays: 30, startDate: '2026-02-13' },
+      { id: 9, name: 'SM-F / Пт 18:30', type: 'group', studentsCount: 5, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-11', lastComment: 'Группа готовится к выступлению', durationDays: 150, startDate: '2025-10-15' },
+      { id: 10, name: 'IND-2 / Вт 09:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-14', lastComment: 'Ребёнок делает быстрый прогресс', durationDays: 45, startDate: '2026-01-30' },
+      { id: 11, name: 'SM-G / Чт 17:00', type: 'group', studentsCount: 8, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-09', lastComment: 'Запланирован открытый урок для родителей', durationDays: 200, startDate: '2025-08-28' },
+      { id: 12, name: 'INDIGO-B / Пн 15:00', type: 'group', studentsCount: 6, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-07', lastComment: 'Нужны дополнительные материалы', durationDays: 100, startDate: '2025-12-05' },
+    ]
+
+    // Фильтрация
+    let items = [...mockGroupsList]
+    const p = config.params as any || {}
+
+    if (p.search) {
+      const s = String(p.search).toLowerCase()
+      items = items.filter(g => g.name.toLowerCase().includes(s) || g.teacherName.toLowerCase().includes(s))
+    }
+    if (p.type) {
+      items = items.filter(g => g.type === p.type)
+    }
+    if (p.teacher_id) {
+      // Простая фильтрация по имени для mock
+      const teacherMap: Record<number, string> = { 1: 'Anna Kowalska', 2: 'Ewa Lewandowska', 3: 'Tomasz Wiśniewski', 4: 'Maria Nowak' }
+      const tName = teacherMap[Number(p.teacher_id)]
+      if (tName) items = items.filter(g => g.teacherName === tName)
+    }
+
+    // Сортировка
+    const ob = p.orderBy || 'name'
+    const od = p.orderDirection === 'desc' ? -1 : 1
+    items.sort((a: any, b: any) => {
+      const va = a[ob] ?? ''
+      const vb = b[ob] ?? ''
+      if (typeof va === 'number') return (va - vb) * od
+      return String(va).localeCompare(String(vb)) * od
+    })
+
+    // Пагинация
+    const page = Number(p.page) || 1
+    const perPage = Number(p.per_page) || 20
+    const total = items.length
+    const from = (page - 1) * perPage
+    const sliced = items.slice(from, from + perPage)
+
+    return ok(config, {
+      data: sliced,
+      meta: {
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
+        total,
+        from: sliced.length ? from + 1 : null,
+        to: sliced.length ? from + sliced.length : null,
+      }
+    })
+  }
+
   // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
 
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);

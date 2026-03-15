@@ -109,7 +109,12 @@ export const router = createRouter({
         },
         // ─── Stub routes for new sidebar sections ───
         { path: 'my-cabinet', name: 'my-cabinet', component: () => import('../views/dashboard/DashboardIndex.vue') },
-        { path: 'groups', name: 'groups-list', component: () => import('../views/dashboard/DashboardIndex.vue') },
+        {
+          path: 'groups',
+          name: 'groups-list',
+          component: () => import('../views/groups/GroupsListPage.vue'),
+          meta: { title: 'groupsList.pageTitle', subTitle: 'groupsList.pageSubTitle', icon: '🎓' }
+        },
         { path: 'hr/active', name: 'hr-active', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'hr/training', name: 'hr-training', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'hr/pipeline', name: 'hr-pipeline', component: () => import('../views/dashboard/DashboardIndex.vue') },

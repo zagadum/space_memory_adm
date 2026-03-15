@@ -60,13 +60,13 @@
           <span class="nav-icon">👩‍🚀</span> {{ t('sidebar.students') }}
           <span class="nav-badge green" v-if="listStore.totalStudents > 0">{{ listStore.totalStudents }}</span>
         </div>
-        <div 
-          class="nav-item nav-item--stub" 
-          :class="{ active: activeItem === 'groups' }" 
-          @click="setActive('groups')"
+        <div
+          class="nav-item"
+          :class="{ active: activeItem === 'groups' }"
+          @click="navigateTo('groups', '/groups')"
         >
           <span class="nav-icon">🎓</span> {{ t('sidebar.groups') }}
-          <span class="nav-badge blue">12</span>
+          <span class="nav-badge blue" v-if="groupsListStore.totalGroups > 0">{{ groupsListStore.totalGroups }}</span>
         </div>
         <div 
           class="nav-item nav-item--stub" 
@@ -312,6 +312,7 @@ import { setLocale } from '../../app/i18n'
 
 // Подключаем сторы
 import { useStudentsListStore } from '../../stores/studentsList.store'
+import { useGroupsListStore } from '../../stores/groupsList.store'
 import { useAuthStore } from '../../stores/auth.store'
 
 const router = useRouter()
@@ -320,6 +321,7 @@ const { locale, t } = useI18n()
 
 // Инициализируем сторы
 const listStore = useStudentsListStore()
+const groupsListStore = useGroupsListStore()
 const authStore = useAuthStore()
 
 // Логика смены языка
@@ -425,6 +427,8 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/quality/stats'))              { activeItem.value = 'quality-stats';      openSections.value.quality = true }
   // Финансы настройки - ставится под Бухгалтерией и над Мой Кабинет/прочими 
   else if (path.startsWith('/finance/settings'))           { activeItem.value = 'finance-settings';   openSections.value.finance = true }
+  // Группы
+  else if (path.startsWith('/groups')) { activeItem.value = 'groups'; openSections.value.secretariat = true }
   // Мой кабинет
   else if (path.startsWith('/my-cabinet'))  { activeItem.value = 'my-cabinet' }
 }, { immediate: true })
