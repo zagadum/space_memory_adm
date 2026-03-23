@@ -26,9 +26,9 @@ export const MENU_ACCESS_CONFIG: MenuAccessMap = {
   recruitment: { mode: "active" },
       "new-students": { mode: "active" },
       "leads": { mode: "active" },
-      "expelled": { mode: "blocked" },
+      "expelled": { mode: "active" },
       "new-groups": { mode: "blocked" },
-      "archived": { mode: "blocked" },
+      "archived": { mode: "active" },
 
   // Finance / accounting
   finance: { mode: "blocked" },
