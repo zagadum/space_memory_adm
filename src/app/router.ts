@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuthStore } from "../stores/auth.store";
+import { useNotificationStore } from "../stores/notification.store";
+import { getFirstAllowedFallbackPath, getMenuAccessReason, getMenuKeyByRouteName, isMenuAllowed } from "../utils/menuAccess";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -171,7 +173,21 @@ export const router = createRouter({
 
 router.beforeEach((to) => {
   if (to.meta.public) return true;
+
   const auth = useAuthStore();
   if (!auth.isAuthenticated) return { name: "sign-in" };
+
+  const menuKey = getMenuKeyByRouteName(String(to.name || ""));
+  if (menuKey && !isMenuAllowed(menuKey)) {
+    const reason = getMenuAccessReason(menuKey);
+    try {
+      const notification = useNotificationStore();
+      notification.addToast(reason || "Раздел недоступен по текущим правам", "warning");
+    } catch {
+      // Router guard should still work even if notification store is not ready.
+    }
+    return getFirstAllowedFallbackPath();
+  }
+
   return true;
 });

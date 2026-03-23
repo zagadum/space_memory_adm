@@ -3,6 +3,7 @@ import { mockAdapter } from "./mockAdapter";
 
 const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? "false").toLowerCase();
 const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
+
 const API_URL = (import.meta as any).env?.VITE_API_URL || "https://memory.firm.kiev.ua/api/v1/";
 const RECRUITMENT_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_API_URL || API_URL;
 
@@ -43,6 +44,10 @@ function createHttpClient(baseURL: string) {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
+      // Отключаем кеширование HTTP запросов в браузере
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
     },
   });
 }
@@ -55,6 +60,13 @@ function attachInterceptors(client: ReturnType<typeof axios.create>) {
     if (token) {
       config.headers.set("Authorization", `Bearer ${token}`);
     }
+    
+    // Добавляем timestamp к GET запросам для отключения кеширования
+    if (config.method?.toLowerCase() === 'get') {
+      if (!config.params) config.params = {};
+      config.params._t = Date.now();
+    }
+    
     // Global loading: lazy import to avoid circular deps
     import('../stores/app.store').then(({ useAppStore }) => {
       useAppStore().startRequest();

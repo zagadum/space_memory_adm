@@ -1372,6 +1372,12 @@
     "deleted": "usunięty",
     "studentAdded": "Uczeń dodany!",
     "showing": "Pokazano {shown} z {total} uczniów",
+    "loading": "Ładowanie listy uczniów...",
+    "errorTitle": "Nie udało się załadować listy",
+    "emptyTitle": "Lista jest pusta",
+    "emptyText": "API zwróciło pustą tablicę: brak nowych uczniów.",
+    "emptyFiltered": "Brak wyników dla bieżących filtrów.",
+    "pageOf": "Strona {page} z {total}",
     "stats": {
       "total": "Wszyscy uczniowie",
       "totalSub": "w realizacji",

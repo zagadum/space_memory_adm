@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { recruitmentApi, type RecruitmentNewStudent } from '../api/recruitmentApi'
+import { recruitmentApi, type RecruitmentNewStudent, type RecruitmentPagination } from '../api/recruitmentApi'
 
 export interface NewStudent {
   id: number
@@ -83,16 +83,6 @@ export const ALL_GROUPS: Group[] = [
   { name: 'Сб 14 ПЗе Старшая',  color: '#ef4444', age: '11-14', teacher: 'Пётр Зелинский',     day: 'Сб', time: '14:00', slots: 12, taken: 3  },
 ]
 
-const MOCK_STUDENTS: NewStudent[] = [
-  { id: 1, name: 'Артем Волков',    age: 12, contract: 'signed',  payment: 489, paymentStr: '489 zł', group: 'Вт 17 КЛе Младшая', groupColor: '#4f6ef7', startDate: '2024-02-20', createdDate: '2024-02-15', waitDays: 16, manager: 'Светлана'  },
-  { id: 2, name: 'Кирилл Морозов', age: 9,  contract: 'pending', payment: 0,   paymentStr: '0 zł',   group: 'Ср 15 ПИе Младшая', groupColor: '#8b5cf6', startDate: '2024-03-05', createdDate: '2024-03-01', waitDays: 2,  manager: 'Александр' },
-  { id: 3, name: 'Даниил Глебов',  age: 14, contract: 'signed',  payment: 440, paymentStr: '440 zł', group: 'Пт 19 АНа Старшая', groupColor: '#06b6d4', startDate: '2024-02-22', createdDate: '2024-02-17', waitDays: 1,  manager: 'Артём'     },
-  { id: 4, name: 'Никита Иванов',  age: 7,  contract: 'pending', payment: 0,   paymentStr: '0 zł',   group: null,                 groupColor: null,      startDate: null,         createdDate: '2024-02-10', waitDays: 7,  manager: null         },
-  { id: 5, name: 'Полина Синяк',   age: 10, contract: 'pending', payment: 0,   paymentStr: '0 zł',   group: null,                 groupColor: null,      startDate: null,         createdDate: '2024-03-03', waitDays: 3,  manager: 'Мария'     },
-  { id: 6, name: 'Аня Белова',     age: 8,  contract: 'signed',  payment: 464, paymentStr: '464 zł', group: 'Сб 12 ЕЛа Средняя', groupColor: '#f59e0b', startDate: '2024-03-07', createdDate: '2024-03-01', waitDays: 5,  manager: 'Мария'     },
-  { id: 7, name: 'Саша Попов',     age: 11, contract: 'pending', payment: 0,   paymentStr: '0 zł',   group: null,                 groupColor: null,      startDate: null,         createdDate: '2024-02-28', waitDays: 14, manager: null         },
-  { id: 8, name: 'Ева Коваль',     age: 6,  contract: 'pending', payment: 0,   paymentStr: '0 zł',   group: 'Чт 16 СКо Младшая', groupColor: '#06b6d4', startDate: '2024-03-10', createdDate: '2024-03-05', waitDays: 4,  manager: 'Александр' },
-]
 
 const MOCK_DETAILS: Record<number, StudentDetails> = {
   1: { email: 'artem.volkov@gmail.com', password: 'Qwerty123!', firstName: 'Артем',  lastName: 'Волков',  birthDate: '2012-05-14', country: 'Польша', city: 'Варшава', street: 'ул. Маршалковска 10', apt: 'кв. 3', postCode: '00-001', parentFirst: 'Сергей', parentLast: 'Волков',  parentPhone: '+48 601 111 222', parentPassport: 'ABC 123456', photoConsent: true,  comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.', currentPrice: '489.00', currentPriceDesc: 'Group lessons' },
@@ -129,7 +119,7 @@ const MOCK_HISTORY: Record<number, HistoryEvent[]> = {
 }
 
 export const useNewStudentsStore = defineStore('newStudents', () => {
-  const students = ref<NewStudent[]>([...MOCK_STUDENTS])
+  const students = ref<NewStudent[]>([])
   const details = ref<Record<number, StudentDetails>>({ ...MOCK_DETAILS })
   const history = ref<Record<number, HistoryEvent[]>>({ ...MOCK_HISTORY })
 
@@ -137,6 +127,16 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   const currentHistory = ref<HistoryEvent[]>([])
   const isLoading = ref(false)
   const error = ref<string | null>(null)
+  const isListLoading = ref(false)
+  const listError = ref<string | null>(null)
+  const pagination = ref<RecruitmentPagination>({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 10,
+    total: 0,
+    from: 0,
+    to: 0,
+  })
 
   const currentStudentDetails = computed((): StudentDetails | null => {
     const s = currentStudent.value
@@ -164,7 +164,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   })
 
   // Stats
-  const totalCount = computed(() => students.value.length)
+  const totalCount = computed(() => pagination.value.total)
   const signedCount = computed(() => students.value.filter(s => s.contract === 'signed').length)
   const noManagerCount = computed(() => students.value.filter(s => !s.manager).length)
   const avgWaitDays = computed(() => {
@@ -182,33 +182,87 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     return [...new Set(students.value.filter(s => s.manager).map(s => s.manager!))]
   })
 
+  function toIsoDate(value: unknown): string | null {
+    if (!value) return null
+    const text = String(value)
+    const match = text.match(/^(\d{4}-\d{2}-\d{2})/)
+    if (match) return match[1]
+    const date = new Date(text)
+    if (Number.isNaN(date.getTime())) return null
+    return date.toISOString().slice(0, 10)
+  }
+
+  function diffDaysFrom(dateText: string | null): number {
+    if (!dateText) return 0
+    const date = new Date(dateText)
+    if (Number.isNaN(date.getTime())) return 0
+    return Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000))
+  }
+
   function normalizeStudent(s: RecruitmentNewStudent): NewStudent {
+    const row = s as RecruitmentNewStudent & Record<string, any>
+    const createdDate = toIsoDate(row.createdDate ?? row.created_at ?? row.createdAt ?? row.date_create)
+    const startDate = toIsoDate(row.startDate ?? row.start_date ?? row.startAt)
+    const dob = row.dob ?? row.birth_date ?? row.birthDate ?? null
+    const payment = Number(row.payment ?? row.amount ?? row.price ?? 0) || 0
+    const rawGroup = row.group as unknown
+    const rawManager = row.manager as unknown
+    const groupObj = rawGroup && typeof rawGroup === 'object' ? (rawGroup as Record<string, any>) : null
+    const managerObj = rawManager && typeof rawManager === 'object' ? (rawManager as Record<string, any>) : null
+    const groupNameFromObj = groupObj ? groupObj['name'] : null
+    const groupColorFromObj = groupObj ? groupObj['color'] : null
+    const managerNameFromObj = managerObj ? managerObj['name'] : null
+    const groupName = typeof row.group === 'string'
+      ? row.group
+      : (row.group_name ?? row.groupName ?? groupNameFromObj ?? null)
+    const groupColor = row.groupColor ?? row.group_color ?? groupColorFromObj ?? null
+    const manager = typeof row.manager === 'string'
+      ? row.manager
+      : (row.manager_name ?? row.managerName ?? managerNameFromObj ?? null)
+    const contract = row.contract === 'signed' || row.contract === 'pending'
+      ? row.contract
+      : (row.contract_signed || row.is_signed || row.signed_at ? 'signed' : 'pending')
+
     return {
-      id: Number(s.id),
-      name: [s.name, s.surname].filter(Boolean).join(' '),
-      age: s.dob
-        ? Math.max(0, Math.floor((Date.now() - new Date(s.dob).getTime()) / 31557600000))
-        : (s.age ?? 0),
-      contract: s.contract,
-      payment: s.payment ?? 0,
-      paymentStr: s.paymentStr ?? `${s.payment ?? 0} zł`,
-      group: s.group ?? null,
-      groupColor: s.groupColor ?? null,
-      startDate: s.startDate ?? null,
-      createdDate: s.createdDate ?? new Date().toISOString().slice(0, 10),
-      waitDays: s.waitDays ?? 0,
-      manager: s.manager ?? null,
+      id: Number(row.id),
+      name: [row.name ?? row.first_name ?? row.firstName, row.surname ?? row.last_name ?? row.lastName].filter(Boolean).join(' ').trim() || `#${row.id}`,
+      age: dob
+        ? Math.max(0, Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000))
+        : Number(row.age ?? 0),
+      contract,
+      payment,
+      paymentStr: row.paymentStr ?? row.payment_str ?? `${payment} zł`,
+      group: groupName,
+      groupColor,
+      startDate,
+      createdDate: createdDate ?? new Date().toISOString().slice(0, 10),
+      waitDays: Number(row.waitDays ?? row.wait_days ?? diffDaysFrom(createdDate)) || 0,
+      manager,
     }
   }
 
-  async function fetchStudentsFromApi() {
+  async function fetchStudentsFromApi(page = pagination.value.currentPage) {
+    isListLoading.value = true
+    listError.value = null
     try {
-      const list = await recruitmentApi.getNewStudents()
-      if (list.length) {
-        students.value = list.map(normalizeStudent)
+      const response = await recruitmentApi.getNewStudents({
+        page,
+        perPage: pagination.value.perPage,
+      })
+      students.value = response.items.map(normalizeStudent)
+      pagination.value = response.pagination
+    } catch (err: any) {
+      students.value = []
+      pagination.value = {
+        ...pagination.value,
+        currentPage: page,
+        total: 0,
+        from: 0,
+        to: 0,
       }
-    } catch {
-      // keep current local dataset if endpoint is not ready
+      listError.value = err?.response?.data?.message || err?.message || 'Ошибка загрузки списка'
+    } finally {
+      isListLoading.value = false
     }
   }
 
@@ -267,6 +321,12 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       waitDays: 0,
       ...data,
     })
+    pagination.value = {
+      ...pagination.value,
+      total: pagination.value.total + 1,
+      from: 1,
+      to: Math.min(pagination.value.total + 1, Math.max(students.value.length, pagination.value.perPage || students.value.length)),
+    }
     details.value[newId] = {
       email: '', password: '', firstName: data.name.split(' ')[0] || '', lastName: data.name.split(' ')[1] || '',
       birthDate: '', country: 'Польша', city: 'Варшава', street: '', apt: '', postCode: '',
@@ -297,6 +357,11 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
   function archiveStudent(studentId: number) {
     students.value = students.value.filter(s => s.id !== studentId)
+    pagination.value = {
+      ...pagination.value,
+      total: Math.max(0, pagination.value.total - 1),
+      to: Math.max(0, Math.min(pagination.value.total - 1, students.value.length ? pagination.value.from + students.value.length - 1 : 0)),
+    }
     recruitmentApi.archiveNewStudent(studentId).catch(() => {
       // no rollback to keep fast UI interactions
     })
@@ -364,6 +429,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   return {
     students, totalCount, signedCount, noManagerCount, avgWaitDays,
     uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, currentHistory, isLoading, error,
+    isListLoading, listError, pagination,
     fetchStudentsFromApi, fetchStudentById, fetchStudentHistory,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice,
     getDetails, getHistory,

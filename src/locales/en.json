@@ -1372,6 +1372,12 @@
     "deleted": "deleted",
     "studentAdded": "Student added!",
     "showing": "Showing {shown} of {total} students",
+    "loading": "Loading students list...",
+    "errorTitle": "Failed to load students",
+    "emptyTitle": "No students",
+    "emptyText": "API returned an empty array: there are no new students yet.",
+    "emptyFiltered": "No students match current filters.",
+    "pageOf": "Page {page} of {total}",
     "stats": {
       "total": "Total students",
       "totalSub": "in progress",

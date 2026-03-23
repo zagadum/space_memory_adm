@@ -24,8 +24,9 @@
     <nav class="sidebar-nav">
       <!-- МОЙ КАБИНЕТ -->
       <div 
-        class="nav-standalone nav-item--stub" 
-        :class="{ active: activeItem === 'my-cabinet' }" 
+        v-if="isVisible('my-cabinet')"
+        class="nav-standalone nav-item--stub"
+        :class="[{ active: activeItem === 'my-cabinet' }, accessClass('my-cabinet')]"
         @click="navigateTo('my-cabinet', '/my-cabinet')"
       >
         <span class="nav-icon">🏠</span> {{ t('sidebar.myCabinet') }}
@@ -34,15 +35,17 @@
 
       <!-- ДАШБОРД -->
       <div
+        v-if="isVisible('dashboard')"
         class="nav-standalone nav-item--stub"
-        :class="{ active: activeItem === 'dashboard' }"
+        :class="[{ active: activeItem === 'dashboard' }, accessClass('dashboard')]"
         @click="setActive('dashboard')"
       >
         <span class="nav-icon">📊</span> {{ t('sidebar.dashboard') }}
       </div>
 
       <div 
-        class="nav-section" 
+        v-if="isSectionAllowed('secretariat')"
+        class="nav-section"
         :class="{ open: openSections.secretariat }" 
         @click="toggleSection('secretariat')"
       >
@@ -50,27 +53,30 @@
         <span class="nav-section-label">{{ t('sidebar.secretariat') }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.secretariat }">
-        
+      <div v-if="isSectionAllowed('secretariat')" class="nav-children" :class="{ open: openSections.secretariat }">
+
         <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'students' }" 
+          v-if="isVisible('students')"
+          class="nav-item"
+          :class="[{ active: activeItem === 'students' }, accessClass('students')]"
           @click="setActive('students')"
         >
           <span class="nav-icon">👩‍🚀</span> {{ t('sidebar.students') }}
           <span class="nav-badge green" v-if="listStore.totalStudents > 0">{{ listStore.totalStudents }}</span>
         </div>
         <div
+          v-if="isVisible('groups')"
           class="nav-item"
-          :class="{ active: activeItem === 'groups' }"
+          :class="[{ active: activeItem === 'groups' }, accessClass('groups')]"
           @click="navigateTo('groups', '/groups')"
         >
           <span class="nav-icon">🎓</span> {{ t('sidebar.groups') }}
           <span class="nav-badge blue" v-if="groupsListStore.totalGroups > 0">{{ groupsListStore.totalGroups }}</span>
         </div>
         <div
+          v-if="isVisible('teachers')"
           class="nav-item"
-          :class="{ active: activeItem === 'teachers' }"
+          :class="[{ active: activeItem === 'teachers' }, accessClass('teachers')]"
           @click="navigateTo('teachers', '/teachers')"
         >
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.teachers') }}
@@ -84,8 +90,9 @@
           <span class="nav-icon">📦</span> {{ t('sidebar.inpost') }}
         </div>
         <div
+          v-if="isVisible('course-endings')"
           class="nav-item nav-item--stub"
-          :class="{ active: activeItem === 'course-endings' }"
+          :class="[{ active: activeItem === 'course-endings' }, accessClass('course-endings')]"
           @click="navigateTo('course-endings', '/secretariat/course-endings')"
         >
           <span class="nav-icon">🏅</span> {{ t('sidebar.courseEndings') }}
@@ -94,6 +101,7 @@
 
       <!-- HR -->
       <div
+        v-if="isSectionAllowed('hr')"
         class="nav-section"
         :class="{ open: openSections.hr }"
         @click="toggleSection('hr')"
@@ -103,7 +111,7 @@
         <span class="nav-section-badge nb-green">8</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.hr }">
+      <div v-if="isSectionAllowed('hr')" class="nav-children" :class="{ open: openSections.hr }">
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-active' }" @click="navigateTo('hr-active', '/hr/active')">
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.hrActive') }}
         </div>
@@ -123,6 +131,7 @@
 
       <!-- PANEL TRENERA -->
       <div
+        v-if="isSectionAllowed('trainer')"
         class="nav-section"
         :class="{ open: openSections.trainer }"
         @click="toggleSection('trainer')"
@@ -132,7 +141,7 @@
         <span class="nav-section-badge nb-red">4</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.trainer }">
+      <div v-if="isSectionAllowed('trainer')" class="nav-children" :class="{ open: openSections.trainer }">
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-dashboard' }" @click="navigateTo('trainer-dashboard', '/trainer/dashboard')">
           <span class="nav-icon">📊</span> {{ t('sidebar.trainerDashboard') }}
         </div>
@@ -145,7 +154,7 @@
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'lesson-tracker' }" @click="navigateTo('lesson-tracker', '/trainer/lesson-tracker')">
           <span class="nav-icon">📝</span> {{ t('sidebar.trainerLessonTracker') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'salary-demo' }" @click="navigateTo('salary-demo', '/teacher/salary')">
+        <div v-if="isVisible('salary-demo')" class="nav-item" :class="[{ active: activeItem === 'salary-demo' }, accessClass('salary-demo')]" @click="navigateTo('salary-demo', '/teacher/salary')">
           <span class="nav-icon">💰</span> {{ t('sidebar.trainerSalary') }}
         </div>
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-materials' }" @click="navigateTo('trainer-materials', '/trainer/materials')">
@@ -162,6 +171,7 @@
 
       <!-- RECRUITMENT -->
       <div
+        v-if="isSectionAllowed('recruitment')"
         class="nav-section"
         :class="{ open: openSections.recruitment }"
         @click="toggleSection('recruitment')"
@@ -170,25 +180,26 @@
         <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.recruitment }">
-        <div class="nav-item" :class="{ active: activeItem === 'new-students' }" @click="navigateTo('new-students', '/recruitment/new-students')">
+      <div v-if="isSectionAllowed('recruitment')" class="nav-children" :class="{ open: openSections.recruitment }">
+        <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students' }, accessClass('new-students')]" @click="navigateTo('new-students', '/recruitment/new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'leads' }" @click="navigateTo('leads', '/recruitment/leads')">
+        <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads' }, accessClass('leads')]" @click="navigateTo('leads', '/recruitment/leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'expelled' }" @click="navigateTo('expelled', '/recruitment/expelled-students')">
+        <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled' }, accessClass('expelled')]" @click="navigateTo('expelled', '/recruitment/expelled-students')">
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'new-groups' }" @click="navigateTo('new-groups', '/recruitment/new-groups')">
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/new-groups')">
           <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'archived' }" @click="navigateTo('archived', '/recruitment/archived-students')">
+        <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived' }, accessClass('archived')]" @click="navigateTo('archived', '/recruitment/archived-students')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
         </div>
       </div>
 
       <div
+        v-if="isSectionAllowed('finance')"
         class="nav-section"
         :class="{ open: openSections.finance }"
         @click="toggleSection('finance')"
@@ -198,7 +209,7 @@
         <span class="nav-section-badge nb-red">7</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.finance }">
+      <div v-if="isSectionAllowed('finance')" class="nav-children" :class="{ open: openSections.finance }">
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
           <span class="nav-icon">💰</span> {{ t('sidebar.studentFinance') }}
         </div>
@@ -211,8 +222,9 @@
           <span class="nav-badge cyan">3</span>
         </div>
         <div 
-          class="nav-item" 
-          :class="{ active: activeItem === 'settings' }" 
+          v-if="isVisible('settings')"
+          class="nav-item"
+          :class="[{ active: activeItem === 'settings' }, accessClass('settings')]"
           @click="setActive('settings')"
         >
           <span class="nav-icon">⚙️</span> {{ t('sidebar.settings') }}
@@ -220,24 +232,24 @@
       </div>
 
       <!-- БУХГАЛТЕРИЯ -->
-      <div class="nav-section" :class="{ open: openSections.accounting }" @click="toggleSection('accounting')">
+      <div v-if="isSectionAllowed('accounting')" class="nav-section" :class="{ open: openSections.accounting }" @click="toggleSection('accounting')">
         <span class="nav-section-icon">🧾</span>
         <span class="nav-section-label">{{ t('sidebar.accounting') }}</span>
         <span class="nav-section-badge nb-cyan" v-if="pendingReturns > 0">{{ pendingReturns }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.accounting }">
+      <div v-if="isSectionAllowed('accounting')" class="nav-children" :class="{ open: openSections.accounting }">
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
           <span class="nav-icon">🧾</span> {{ t('sidebar.faktury') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'returns' }" @click="navigateTo('returns', '/finance/returns')">
+        <div v-if="isVisible('returns')" class="nav-item" :class="[{ active: activeItem === 'returns' }, accessClass('returns')]" @click="navigateTo('returns', '/finance/returns')">
           <span class="nav-icon">↩️</span> {{ t('sidebar.returns') }}
           <span class="nav-badge cyan" v-if="pendingReturns > 0">{{ pendingReturns }}</span>
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'projects' }" @click="navigateTo('projects', '/projects')">
+        <div v-if="isVisible('projects')" class="nav-item" :class="[{ active: activeItem === 'projects' }, accessClass('projects')]" @click="navigateTo('projects', '/projects')">
           <span class="nav-icon">📁</span> {{ t('sidebar.projects') }}
         </div>
-        <div class="nav-item" :class="{ active: activeItem === 'salary-calculator' }" @click="navigateTo('salary-calculator', '/finance/salary-calculator')">
+        <div v-if="isVisible('salary-calculator')" class="nav-item" :class="[{ active: activeItem === 'salary-calculator' }, accessClass('salary-calculator')]" @click="navigateTo('salary-calculator', '/finance/salary-calculator')">
           <span class="nav-icon">🧮</span> {{ t('sidebar.salaryCalculator') }}
         </div>
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia')">
@@ -246,13 +258,13 @@
       </div>
 
       <!-- ОТДЕЛ КАЧЕСТВА -->
-      <div class="nav-section" :class="{ open: openSections.quality }" @click="toggleSection('quality')">
+      <div v-if="isSectionAllowed('quality')" class="nav-section" :class="{ open: openSections.quality }" @click="toggleSection('quality')">
         <span class="nav-section-icon">🎯</span>
         <span class="nav-section-label">{{ t('sidebar.quality') }}</span>
         <span class="nav-section-badge nb-red" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.quality }">
+      <div v-if="isSectionAllowed('quality')" class="nav-children" :class="{ open: openSections.quality }">
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
           <span class="nav-icon">🚪</span> {{ t('sidebar.rezygnacje') }}
           <span class="nav-badge" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
@@ -298,12 +310,12 @@
       </div>
 
       <!-- НАСТРОЙКИ -->
-      <div class="nav-section" :class="{ open: openSections.settings }" @click="toggleSection('settings')">
+      <div v-if="isSectionAllowed('settings-section')" class="nav-section" :class="{ open: openSections.settings }" @click="toggleSection('settings')">
         <span class="nav-section-icon">⚙️</span>
         <span class="nav-section-label">{{ t('sidebar.settings') }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div class="nav-children" :class="{ open: openSections.settings }">
+      <div v-if="isSectionAllowed('settings-section')" class="nav-children" :class="{ open: openSections.settings }">
         <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'indigo-techniques' }" @click="setActive('indigo-techniques')">
           <span class="nav-icon">🧩</span> {{ t('sidebar.indigoTechniques') }}
         </div>
@@ -357,6 +369,8 @@ import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '../../app/i18n'
+import { useNotificationStore } from '../../stores/notification.store'
+import { getMenuAccessReason, isMenuBlocked, isMenuVisible, isSectionVisible } from '../../utils/menuAccess'
 
 // Подключаем сторы
 import { useStudentsListStore } from '../../stores/studentsList.store'
@@ -373,6 +387,7 @@ const listStore = useStudentsListStore()
 const groupsListStore = useGroupsListStore()
 const teachersListStore = useTeachersListStore()
 const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
 
 // Логика смены языка
 function onLocale(l: string) {
@@ -494,11 +509,41 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/my-cabinet'))  { activeItem.value = 'my-cabinet' }
 }, { immediate: true })
 
+function isVisible(menuKey: string) {
+  return isMenuVisible(menuKey)
+}
+
+function isSectionAllowed(sectionKey: string) {
+  return isSectionVisible(sectionKey)
+}
+
+function accessClass(menuKey: string) {
+  return {
+    'nav-item--blocked': isMenuBlocked(menuKey),
+  }
+}
+
+function notifyBlocked(menuKey: string) {
+  const reason = getMenuAccessReason(menuKey)
+  notificationStore.addToast(reason || 'Раздел заблокирован для вашей роли', 'warning')
+}
+
+function canOpen(menuKey: string): boolean {
+  if (!isVisible(menuKey)) return false
+  if (isMenuBlocked(menuKey)) {
+    notifyBlocked(menuKey)
+    return false
+  }
+  return true
+}
+
 const toggleSection = (section: string) => {
+  if (!isSectionAllowed(section)) return
   openSections.value[section] = !openSections.value[section]
 }
 
 const setActive = (item: string) => {
+  if (!canOpen(item)) return
   activeItem.value = item
   if (item === 'dashboard') {
     router.push('/')
@@ -510,6 +555,7 @@ const setActive = (item: string) => {
 }
 
 const navigateTo = (item: string, path: string) => {
+  if (!canOpen(item)) return
   activeItem.value = item
   router.push(path)
 }
@@ -563,6 +609,12 @@ const navigateTo = (item: string, path: string) => {
 .nav-item:hover, .nav-standalone:hover { background: var(--status-info-bg); color: var(--app-text-main); }
 .nav-item.active, .nav-standalone.active { background: linear-gradient(90deg, var(--status-info-bg), rgba(139,92,246,0.1)); color: var(--app-text-main); border: 1px solid var(--app-border-hi); }
 .nav-item.active::before, .nav-standalone.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; background: linear-gradient(180deg, var(--blue), var(--purple)); border-radius: 2px; }
+.nav-item--blocked, .nav-standalone.nav-item--blocked { opacity: 0.6; }
+.nav-item--blocked::after, .nav-standalone.nav-item--blocked::after {
+  content: '🔒';
+  margin-left: auto;
+  font-size: 11px;
+}
 
 .nav-icon { font-size: 13px; width: 16px; text-align: center; flex-shrink: 0; }
 .nav-badge { margin-left: auto; color: white; font-size: 9.5px; font-weight: 700; font-family: 'Space Mono', monospace; padding: 1px 5px; border-radius: 8px; }

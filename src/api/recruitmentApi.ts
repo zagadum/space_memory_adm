@@ -26,17 +26,63 @@ export interface RecruitmentLead {
   status: "new" | "in_progress" | "trial" | "decision";
 }
 
+export interface RecruitmentPagination {
+  currentPage: number;
+  lastPage: number;
+  perPage: number;
+  total: number;
+  from: number;
+  to: number;
+}
+
+export interface RecruitmentListResponse<T> {
+  items: T[];
+  pagination: RecruitmentPagination;
+}
+
 function pickItems<T>(payload: any): T[] {
   if (Array.isArray(payload)) return payload as T[];
   if (Array.isArray(payload?.items)) return payload.items as T[];
   if (Array.isArray(payload?.data)) return payload.data as T[];
+  if (Array.isArray(payload?.data?.data)) return payload.data.data as T[];
   return [];
 }
 
+function pickPagination(payload: any, itemCount: number): RecruitmentPagination {
+  const source = payload?.data?.data && !Array.isArray(payload?.data)
+    ? payload.data
+    : payload;
+
+  const currentPage = Number(source?.current_page ?? source?.currentPage ?? 1) || 1;
+  const lastPage = Number(source?.last_page ?? source?.lastPage ?? currentPage) || currentPage;
+  const perPage = Number(source?.per_page ?? source?.perPage ?? itemCount ?? 0) || itemCount || 0;
+  const total = Number(source?.total ?? itemCount ?? 0) || 0;
+  const from = Number(source?.from ?? (itemCount ? (currentPage - 1) * (perPage || itemCount) + 1 : 0)) || 0;
+  const to = Number(source?.to ?? (itemCount ? from + itemCount - 1 : 0)) || 0;
+
+  return {
+    currentPage,
+    lastPage,
+    perPage,
+    total,
+    from,
+    to,
+  };
+}
+
 export const recruitmentApi = {
-  async getNewStudents(): Promise<RecruitmentNewStudent[]> {
-    const { data } = await httpRecruitment.get("recruitment/new-students");
-    return pickItems<RecruitmentNewStudent>(data);
+  async getNewStudents(params: { page?: number; perPage?: number } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
+    const { data } = await httpRecruitment.get("recruitment/new-students", {
+      params: {
+        page: params.page ?? 1,
+        per_page: params.perPage ?? 10,
+      },
+    });
+    const items = pickItems<RecruitmentNewStudent>(data);
+    return {
+      items,
+      pagination: pickPagination(data, items.length),
+    };
   },
 
   async createNewStudent(payload: {

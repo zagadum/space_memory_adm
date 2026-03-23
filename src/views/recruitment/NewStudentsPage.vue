@@ -90,7 +90,25 @@
 
       <!-- TABLE -->
       <div class="table-container">
-        <table>
+        <div v-if="store.isListLoading" class="list-state loading">
+          <div class="list-state-icon">⏳</div>
+          <div class="list-state-title">{{ t('newStudents.loading') }}</div>
+        </div>
+
+        <div v-else-if="store.listError" class="list-state error">
+          <div class="list-state-icon">⚠️</div>
+          <div class="list-state-title">{{ t('newStudents.errorTitle') }}</div>
+          <div class="list-state-text">{{ store.listError }}</div>
+          <button class="btn btn-ghost" @click="reloadCurrentPage">🔄 {{ t('common.retry') }}</button>
+        </div>
+
+        <div v-else-if="!sortedStudents.length" class="list-state empty">
+          <div class="list-state-icon">📭</div>
+          <div class="list-state-title">{{ t('newStudents.emptyTitle') }}</div>
+          <div class="list-state-text">{{ store.totalCount > 0 ? t('newStudents.emptyFiltered') : t('newStudents.emptyText') }}</div>
+        </div>
+
+        <table v-else>
           <thead>
             <tr>
               <th @click="setSort('name')">{{ t('newStudents.table.name') }} <span class="sort-icon">{{ sortIcon('name') }}</span></th>
@@ -170,6 +188,25 @@
         </table>
         <div class="table-footer">
           <span class="table-info">{{ t('newStudents.showing', { shown: sortedStudents.length, total: store.totalCount }) }}</span>
+          <div v-if="store.pagination.lastPage > 1" class="pagination-wrap">
+            <span class="pagination-summary">{{ t('newStudents.pageOf', { page: store.pagination.currentPage, total: store.pagination.lastPage }) }}</span>
+            <div class="pagination-controls">
+              <button class="page-btn nav" :disabled="store.pagination.currentPage <= 1 || store.isListLoading" @click="goToPage(store.pagination.currentPage - 1)">‹</button>
+              <template v-for="(page, index) in visiblePages" :key="`${page}-${index}`">
+                <span v-if="page === '…'" class="page-ellipsis">{{ page }}</span>
+                <button
+                  v-else
+                  class="page-btn"
+                  :class="{ active: page === store.pagination.currentPage }"
+                  :disabled="store.isListLoading"
+                  @click="goToPage(Number(page))"
+                >
+                  {{ page }}
+                </button>
+              </template>
+              <button class="page-btn nav" :disabled="store.pagination.currentPage >= store.pagination.lastPage || store.isListLoading" @click="goToPage(store.pagination.currentPage + 1)">›</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -337,6 +374,26 @@ const sortedStudents = computed(() => {
   return list
 })
 
+const visiblePages = computed<(number | string)[]>(() => {
+  const current = store.pagination.currentPage
+  const last = store.pagination.lastPage
+
+  if (last <= 7) {
+    return Array.from({ length: last }, (_, index) => index + 1)
+  }
+
+  const pages: (number | string)[] = [1]
+  const start = Math.max(2, current - 1)
+  const end = Math.min(last - 1, current + 1)
+
+  if (start > 2) pages.push('…')
+  for (let page = start; page <= end; page += 1) pages.push(page)
+  if (end < last - 1) pages.push('…')
+  pages.push(last)
+
+  return pages
+})
+
 // ─── HELPERS ───
 function fmtDate(s: string | null) {
   if (!s) return '—'
@@ -350,7 +407,7 @@ function managerColor(name: string) { return MANAGER_COLORS[name] || 'linear-gra
 function toggleActions(id: number) {
   openActions.value = openActions.value === id ? null : id
 }
-function onEmail(id: number) {
+function onEmail(_id: number) {
   openActions.value = null
   notif.addToast(`✉️ Email — ${t('newStudents.inDev')}`, 'info')
 }
@@ -364,8 +421,17 @@ function onExport() {
   notif.addToast(`⬇ ${t('newStudents.inDev')}`, 'info')
 }
 
+function goToPage(page: number) {
+  if (page < 1 || page > store.pagination.lastPage || page === store.pagination.currentPage) return
+  store.fetchStudentsFromApi(page)
+}
+
+function reloadCurrentPage() {
+  store.fetchStudentsFromApi(store.pagination.currentPage)
+}
+
 // Close dropdowns on outside click
-function onDocClick(e: MouseEvent) {
+function onDocClick(_e: MouseEvent) {
   openDf.value = null
   openActions.value = null
 }
@@ -479,6 +545,16 @@ function onPanelSetPrice(amount: string, desc: string) {
 .ns-content { padding: 24px 28px; flex: 1; overflow-y: auto; }
 .ns-content::-webkit-scrollbar { width: 4px; }
 .ns-content::-webkit-scrollbar-thumb { background: rgba(79,110,247,0.2); border-radius: 2px; }
+
+.list-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  min-height: 240px; padding: 32px 20px; text-align: center;
+}
+.list-state-icon { font-size: 32px; opacity: 0.9; }
+.list-state-title { font-size: 18px; font-weight: 700; color: var(--app-text-main); }
+.list-state-text { max-width: 560px; font-size: 13px; color: var(--app-text-dim); line-height: 1.5; }
+.list-state.error .list-state-title { color: #ef4444; }
+.list-state.loading .list-state-title { color: #4f6ef7; }
 
 /* STATS */
 .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
@@ -608,6 +684,19 @@ td { padding: 12px 14px; font-size: 13.5px; vertical-align: middle; white-space:
 
 .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--app-border); }
 .table-info { color: var(--app-text-dim); font-size: 12.5px; }
+.pagination-wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+.pagination-summary { color: var(--app-text-dim); font-size: 12.5px; }
+.pagination-controls { display: flex; align-items: center; gap: 6px; }
+.page-btn {
+  min-width: 34px; height: 34px; padding: 0 10px; border-radius: 10px;
+  border: 1px solid var(--app-border); background: var(--app-surface); color: var(--app-text-main);
+  cursor: pointer; transition: all .2s ease; font-family: 'Outfit', sans-serif; font-weight: 600;
+}
+.page-btn:hover:not(:disabled) { border-color: var(--app-border-hi); transform: translateY(-1px); }
+.page-btn.active { background: linear-gradient(135deg,#4f6ef7,#8b5cf6); color: #fff; border-color: transparent; }
+.page-btn.nav { font-size: 18px; line-height: 1; }
+.page-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.page-ellipsis { padding: 0 2px; color: var(--app-text-dim); }
 
 /* ADD MODAL */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(4,4,15,0.82); backdrop-filter: blur(8px); z-index: 500; display: flex; align-items: center; justify-content: center; }

@@ -1144,21 +1144,115 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // ── END ARCHIVED STUDENTS ──────────────────────────────────────────────────
 
   // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
+  const newStudentsDb: any[] = (globalThis as any).__mock_new_students ?? ((globalThis as any).__mock_new_students = [
+    { id: 1, name: 'Артем', surname: 'Волков', dob: '2012-05-14', contract: 'signed', payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана' },
+    { id: 2, name: 'Кирилл', surname: 'Морозов', dob: '2015-09-22', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Ср 15 ПИе Младшая', group_color: '#8b5cf6', start_date: '2024-03-05', created_at: '2024-03-01', wait_days: 2, manager_name: 'Александр' },
+    { id: 3, name: 'Даниил', surname: 'Глебов', dob: '2010-11-03', contract: 'signed', payment: 440, payment_str: '440 zł', group_name: 'Пт 19 АНа Старшая', group_color: '#06b6d4', start_date: '2024-02-22', created_at: '2024-02-17', wait_days: 1, manager_name: 'Артём' },
+    { id: 4, name: 'Никита', surname: 'Иванов', dob: '2017-03-19', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-10', wait_days: 7, manager_name: null },
+    { id: 5, name: 'Полина', surname: 'Синяк', dob: '2014-07-08', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-03', wait_days: 3, manager_name: 'Мария' },
+    { id: 6, name: 'Аня', surname: 'Белова', dob: '2016-02-14', contract: 'signed', payment: 464, payment_str: '464 zł', group_name: 'Сб 12 ЕЛа Средняя', group_color: '#f59e0b', start_date: '2024-03-07', created_at: '2024-03-01', wait_days: 5, manager_name: 'Мария' },
+    { id: 7, name: 'Саша', surname: 'Попов', dob: '2013-11-25', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-28', wait_days: 14, manager_name: null },
+    { id: 8, name: 'Ева', surname: 'Коваль', dob: '2018-06-30', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-10', created_at: '2024-03-05', wait_days: 4, manager_name: 'Александр' },
+    { id: 9, name: 'Марк', surname: 'Левин', dob: '2012-01-12', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-12', wait_days: 6, manager_name: 'Светлана' },
+    { id: 10, name: 'Олег', surname: 'Бойко', dob: '2011-04-19', contract: 'signed', payment: 530, payment_str: '530 zł', group_name: 'Пн 18 ЕЛа Старшая', group_color: '#ef4444', start_date: '2024-03-14', created_at: '2024-03-10', wait_days: 2, manager_name: 'Артём' },
+    { id: 11, name: 'Лера', surname: 'Сокол', dob: '2015-12-03', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-13', wait_days: 9, manager_name: null },
+    { id: 12, name: 'Мия', surname: 'Янович', dob: '2016-10-10', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-18', created_at: '2024-03-15', wait_days: 1, manager_name: 'Мария' },
+  ]);
+
   // GET new-students
   if (method === 'get' && (url === 'new-students' || url === 'recruitment/new-students')) {
-    console.log(`[MOCK] GET ${url}`);
-    return ok(config, { data: [] });
+    const params = (config.params || {}) as Record<string, unknown>;
+    const page = Math.max(1, Number(params.page ?? 1) || 1);
+    const perPage = Math.max(1, Number(params.per_page ?? params.perPage ?? 10) || 10);
+    const forceError = String(params.fail ?? '') === '1';
+    const forceEmpty = String(params.empty ?? '') === '1';
+
+    if (forceError) {
+      return err(config, 500, 'Mock recruitment new-students error');
+    }
+
+    const source = forceEmpty ? [] : newStudentsDb;
+    const total = source.length;
+    const lastPage = Math.max(1, Math.ceil(total / perPage));
+    const currentPage = Math.min(page, lastPage);
+    const start = (currentPage - 1) * perPage;
+    const rows = source.slice(start, start + perPage);
+    const from = rows.length ? start + 1 : 0;
+    const to = rows.length ? start + rows.length : 0;
+
+    console.log(`[MOCK] GET ${url}, page=${currentPage}, perPage=${perPage}, total=${total}`);
+    return ok(config, {
+      data: {
+        current_page: currentPage,
+        last_page: lastPage,
+        per_page: perPage,
+        total,
+        from,
+        to,
+        data: rows,
+      },
+    });
   }
 
   // POST new-students
   if (method === 'post' && (url === 'new-students' || url === 'recruitment/new-students')) {
-    const body = JSON.parse(config.data || '{}');
+    const body = readBody(config) || {};
+    const maxId = newStudentsDb.reduce((max, s) => Math.max(max, Number(s.id) || 0), 0);
+    const created = {
+      id: maxId + 1,
+      name: String(body.name || '').split(' ')[0] || 'Новый',
+      surname: String(body.name || '').split(' ').slice(1).join(' ') || 'Ученик',
+      dob: null,
+      contract: 'pending',
+      payment: 0,
+      payment_str: '0 zł',
+      group_name: null,
+      group_color: null,
+      start_date: body.startDate ?? null,
+      created_at: new Date().toISOString().slice(0, 10),
+      wait_days: 0,
+      manager_name: body.manager ?? null,
+    };
+    newStudentsDb.unshift(created);
     console.log(`[MOCK] POST ${url}, body: ${JSON.stringify(body)}`);
-    return ok(config, { ok: true, id: Date.now(), ...body });
+    return ok(config, { ok: true, data: created });
+  }
+
+  // GET new-students/:id
+  if (method === 'get' && /^recruitment\/new-students\/\d+$/.test(url)) {
+    const id = Number(url.split('/').pop());
+    const found = newStudentsDb.find((s) => Number(s.id) === id);
+    if (!found) return err(config, 404, 'Student not found');
+    return ok(config, { data: found });
+  }
+
+  // GET new-students/:id/history
+  if (method === 'get' && /^recruitment\/new-students\/\d+\/history$/.test(url)) {
+    const id = Number(url.split('/')[2]);
+    const found = newStudentsDb.find((s) => Number(s.id) === id);
+    if (!found) return err(config, 404, 'Student not found');
+    return ok(config, {
+      data: [
+        { event: 'Ученик создан', created_at: `${found.created_at}T09:00:00Z`, detail: 'Добавлен в рекрутинг', changed_by: found.manager_name || 'Система' },
+      ],
+    });
+  }
+
+  // PATCH new-students/:id
+  if (method === 'patch' && /^recruitment\/new-students\/\d+$/.test(url)) {
+    const id = Number(url.split('/').pop());
+    const body = readBody(config) || {};
+    const found = newStudentsDb.find((s) => Number(s.id) === id);
+    if (!found) return err(config, 404, 'Student not found');
+    Object.assign(found, body);
+    return ok(config, { ok: true, data: found });
   }
 
   // POST new-students/:id/archive
   if (method === 'post' && /^recruitment\/new-students\/\d+\/archive$/.test(url)) {
+    const id = Number(url.split('/')[2]);
+    const index = newStudentsDb.findIndex((s) => Number(s.id) === id);
+    if (index >= 0) newStudentsDb.splice(index, 1);
     console.log(`[MOCK] POST ${url}`);
     return ok(config, { ok: true });
   }
