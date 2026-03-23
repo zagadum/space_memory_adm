@@ -128,13 +128,13 @@
               </div>
             </div>
 
-            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.paymentStatus') }}</div>
-            <div class="sp-status-row">
-              <div class="sp-status-label">{{ t('newStudents.panel.contract') }}</div>
-              <span class="contract-badge" :class="student.contract === 'signed' ? 'contract-signed' : 'contract-pending'">
-                {{ student.contract === 'signed' ? `✓ ${t('newStudents.table.signed')}` : `⏳ ${t('newStudents.table.pending')}` }}
-              </span>
-            </div>
+<!--            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.paymentStatus') }}</div>-->
+<!--            <div class="sp-status-row">-->
+<!--              <div class="sp-status-label">{{ t('newStudents.panel.contract') }}</div>-->
+<!--              <span class="contract-badge" :class="student.contract === 'signed' ? 'contract-signed' : 'contract-pending'">-->
+<!--                {{ student.contract === 'signed' ? `✓ ${t('newStudents.table.signed')}` : `⏳ ${t('newStudents.table.pending')}` }}-->
+<!--              </span>-->
+<!--            </div>-->
             <div class="sp-status-row">
               <div class="sp-status-label">{{ t('newStudents.panel.payment') }}</div>
               <span v-if="student.payment > 0" class="payment-value">{{ student.paymentStr }}</span>
