@@ -1470,7 +1470,15 @@
       "contract": "Договор",
       "payment": "Оплата",
       "notPaid": "Не оплачено",
-      "priceSet": "Цена изменена"
+      "priceSet": "Цена изменена",
+      "deleteConfirmMessage": "Удалить ученика? Это действие нельзя отменить.",
+      "documentsTitle": "Договора",
+      "documentSigned": "Подписан",
+      "documentPending": "Не подписан",
+      "documentsEmpty": "Договоры не найдены",
+      "transactionsTitle": "Оплаты",
+      "transactionStatus": "Статус",
+      "transactionsEmpty": "Транзакции не найдены"
     }
   },
   "archived": {

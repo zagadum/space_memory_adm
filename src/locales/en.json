@@ -1468,7 +1468,15 @@
       "contract": "Contract",
       "payment": "Payment",
       "notPaid": "Not paid",
-      "priceSet": "Price updated"
+      "priceSet": "Price updated",
+      "deleteConfirmMessage": "Delete this student? This action cannot be undone.",
+      "documentsTitle": "Contracts",
+      "documentSigned": "Signed",
+      "documentPending": "Not signed",
+      "documentsEmpty": "No contracts found",
+      "transactionsTitle": "Payments",
+      "transactionStatus": "Status",
+      "transactionsEmpty": "No transactions found"
     }
   },
   "archived": {

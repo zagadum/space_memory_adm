@@ -108,8 +108,8 @@
             <div class="sp-price-box">
               <div>
                 <div class="sp-price-label">{{ t('newStudents.panel.currentPrice') }}</div>
-                <div class="sp-price-value">{{ details.currentPrice }} zł</div>
-                <div class="sp-price-desc">{{ details.currentPriceDesc }}</div>
+                <div class="sp-price-value">{{ (payments?.currentPrice || details.currentPrice) }} zł</div>
+                <div class="sp-price-desc">{{ payments?.currentPriceDesc || details.currentPriceDesc }}</div>
               </div>
               <button class="sp-change-price-btn" @click="priceListOpen = !priceListOpen">🏷 {{ t('newStudents.panel.changePrice') }}</button>
             </div>
@@ -138,8 +138,31 @@
             <div class="sp-status-row">
               <div class="sp-status-label">{{ t('newStudents.panel.payment') }}</div>
               <span v-if="student.payment > 0" class="payment-value">{{ student.paymentStr }}</span>
-              <span v-else class="payment-zero">.....{{ t('newStudents.panel.notPaid') }}</span>
+              <span v-else class="payment-zero">{{ t('newStudents.panel.notPaid') }}</span>
             </div>
+
+            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.documentsTitle') }}</div>
+            <div v-if="payments?.documentList?.length" class="sp-list-wrap">
+              <div v-for="doc in payments.documentList" :key="doc.id" class="sp-row-item">
+                <div class="sp-row-main">{{ doc.name }}</div>
+                <span class="contract-badge" :class="doc.signed ? 'contract-signed' : 'contract-pending'">
+                  {{ doc.signed ? t('newStudents.panel.documentSigned') : t('newStudents.panel.documentPending') }}
+                </span>
+              </div>
+            </div>
+            <div v-else class="sp-empty-state">{{ t('newStudents.panel.documentsEmpty') }}</div>
+
+            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.transactionsTitle') }}</div>
+            <div v-if="payments?.transactionList?.length" class="sp-list-wrap">
+              <div v-for="tx in payments.transactionList" :key="tx.id" class="sp-row-item sp-row-item-col">
+                <div class="sp-row-top">
+                  <span class="sp-row-main">{{ formatTxDate(tx.date) }}</span>
+                  <span class="payment-value">{{ tx.amount.toFixed(2) }} {{ tx.currency }}</span>
+                </div>
+                <div class="sp-row-sub">{{ t('newStudents.panel.transactionStatus') }}: {{ tx.status }}</div>
+              </div>
+            </div>
+            <div v-else class="sp-empty-state">{{ t('newStudents.panel.transactionsEmpty') }}</div>
           </div>
 
         </div>
@@ -151,11 +174,12 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { NewStudent, StudentDetails, HistoryEvent } from '../../../stores/newStudents.store'
+import type { NewStudent, StudentDetails, HistoryEvent, StudentPayments } from '../../../stores/newStudents.store'
 
 const props = defineProps<{
   student: NewStudent | null
   details: StudentDetails | null
+  payments: StudentPayments | null
   historyList: HistoryEvent[]
 }>()
 
@@ -165,6 +189,7 @@ const emit = defineEmits<{
   delete: []
   email: []
   setPrice: [amount: string, desc: string]
+  loadPayments: []
 }>()
 
 const { t } = useI18n()
@@ -212,6 +237,12 @@ watch(() => props.student, () => {
   priceListOpen.value = false
 })
 
+watch(activeTab, (tab) => {
+  if (tab === 'payments' && props.student) {
+    emit('loadPayments')
+  }
+})
+
 const groupPrices = [
   { amount: '489.00', name: 'Group lessons',                      tag: 'Стандарт', tagColor: 'var(--app-text-dim)' },
   { amount: '440.10', name: 'Group lessons Family 2nd child −10%', tag: '−10%',    tagColor: '#f59e0b'              },
@@ -247,7 +278,17 @@ function initials(name: string) {
 
 function onSave() { emit('save', { ...form.value }) }
 function onEmail() { emit('email') }
-function onDelete() { emit('delete') }
+function onDelete() {
+  if (!confirm(t('newStudents.panel.deleteConfirmMessage'))) return
+  emit('delete')
+}
+
+function formatTxDate(dateText: string) {
+  if (!dateText) return '—'
+  const parsed = new Date(dateText)
+  if (Number.isNaN(parsed.getTime())) return dateText
+  return parsed.toLocaleDateString('ru-RU')
+}
 </script>
 
 <style scoped>
@@ -395,6 +436,23 @@ function onDelete() { emit('delete') }
   background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; margin-bottom: 10px;
 }
 .sp-status-label { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
+
+.sp-list-wrap {
+  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden;
+}
+.sp-row-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 14px; border-bottom: 1px solid rgba(100,120,255,0.06);
+}
+.sp-row-item:last-child { border-bottom: none; }
+.sp-row-item-col { display: flex; flex-direction: column; align-items: stretch; }
+.sp-row-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.sp-row-main { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
+.sp-row-sub { font-size: 11.5px; color: var(--app-text-dim); }
+.sp-empty-state {
+  padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--app-border);
+  color: var(--app-text-dim); font-size: 12px;
+}
 
 .contract-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .contract-signed  { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }

@@ -1219,6 +1219,37 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   // GET new-students/:id
+  if (method === 'get' && /^recruitment\/new-students\/\d+\/payments$/.test(url)) {
+    const id = Number(url.split('/')[2]);
+    const found = newStudentsDb.find((s) => Number(s.id) === id);
+    if (!found) return err(config, 404, 'Student not found');
+
+    const amount = Number(found.payment ?? 0);
+    const signed = String(found.contract || '') === 'signed';
+    return ok(config, {
+      data: {
+        current_price: amount > 0 ? amount.toFixed(2) : '0.00',
+        current_price_desc: amount > 0 ? 'Group lessons' : 'Не выбран',
+        document_list: [
+          { id: `${id}-contract`, name: 'Umowa edukacyjna', signed },
+          { id: `${id}-rodo`, name: 'Zgoda RODO', signed: true },
+        ],
+        transaction_list: amount > 0
+          ? [
+              {
+                id: `${id}-tx-1`,
+                date: `${found.created_at}T10:00:00Z`,
+                amount,
+                currency: 'PLN',
+                status: 'paid',
+              },
+            ]
+          : [],
+      },
+    });
+  }
+
+  // GET new-students/:id
   if (method === 'get' && /^recruitment\/new-students\/\d+$/.test(url)) {
     const id = Number(url.split('/').pop());
     const found = newStudentsDb.find((s) => Number(s.id) === id);

@@ -1468,7 +1468,15 @@
       "contract": "Umowa",
       "payment": "Płatność",
       "notPaid": "Nieopłacone",
-      "priceSet": "Cena zaktualizowana"
+      "priceSet": "Cena zaktualizowana",
+      "deleteConfirmMessage": "Usunąć tego ucznia? Ta akcja nie może być cofnięta.",
+      "documentsTitle": "Umowy",
+      "documentSigned": "Podpisana",
+      "documentPending": "Niepodpisana",
+      "documentsEmpty": "Nie znaleziono umów",
+      "transactionsTitle": "Płatności",
+      "transactionStatus": "Status",
+      "transactionsEmpty": "Nie znaleziono transakcji"
     }
   },
   "archived": {

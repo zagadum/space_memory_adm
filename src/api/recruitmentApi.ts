@@ -40,6 +40,63 @@ export interface RecruitmentListResponse<T> {
   pagination: RecruitmentPagination;
 }
 
+export interface RecruitmentDocumentItem {
+  id: number | string;
+  name: string;
+  signed: boolean;
+}
+
+export interface RecruitmentTransactionItem {
+  id: number | string;
+  date: string;
+  amount: number;
+  currency: string;
+  status: string;
+}
+
+export interface RecruitmentStudentPayments {
+  currentPrice: string;
+  currentPriceDesc: string;
+  documentList: RecruitmentDocumentItem[];
+  transactionList: RecruitmentTransactionItem[];
+}
+
+function pickStudentPayments(payload: any): RecruitmentStudentPayments {
+  const source = payload?.data?.data && !Array.isArray(payload?.data)
+    ? payload.data
+    : (payload?.data ?? payload ?? {});
+
+  const currentPriceRaw = source?.currentPrice ?? source?.current_price ?? source?.price ?? '0.00';
+  const currentPriceDesc = String(source?.currentPriceDesc ?? source?.current_price_desc ?? source?.price_desc ?? 'Не выбран');
+  const documentListRaw = source?.documentList ?? source?.document_list ?? [];
+  const transactionListRaw = source?.transactionList ?? source?.transaction_list ?? [];
+
+  const documentList: RecruitmentDocumentItem[] = Array.isArray(documentListRaw)
+    ? documentListRaw.map((d: any, idx: number) => ({
+        id: d?.id ?? idx,
+        name: String(d?.name ?? d?.title ?? d?.document_name ?? 'Документ'),
+        signed: Boolean(d?.signed ?? d?.is_signed ?? d?.status === 'signed'),
+      }))
+    : [];
+
+  const transactionList: RecruitmentTransactionItem[] = Array.isArray(transactionListRaw)
+    ? transactionListRaw.map((tx: any, idx: number) => ({
+        id: tx?.id ?? idx,
+        date: String(tx?.date ?? tx?.created_at ?? tx?.transaction_date ?? ''),
+        amount: Number(tx?.amount ?? tx?.value ?? 0) || 0,
+        currency: String(tx?.currency ?? 'PLN'),
+        status: String(tx?.status ?? 'pending'),
+      }))
+    : [];
+
+  return {
+    currentPrice: String(currentPriceRaw),
+    currentPriceDesc,
+    documentList,
+    transactionList,
+  };
+}
+
 function pickItems<T>(payload: any): T[] {
   if (Array.isArray(payload)) return payload as T[];
   if (Array.isArray(payload?.items)) return payload.items as T[];
@@ -103,6 +160,11 @@ export const recruitmentApi = {
   async getStudentHistory(id: number | string) {
     const { data } = await httpRecruitment.get(`recruitment/new-students/${id}/history`);
     return data;
+  },
+
+  async getStudentPayments(id: number | string): Promise<RecruitmentStudentPayments> {
+    const { data } = await httpRecruitment.get(`recruitment/new-students/${id}/payments`);
+    return pickStudentPayments(data);
   },
   
   async updateStudent(id: number | string, payload: any) {

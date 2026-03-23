@@ -1468,7 +1468,15 @@
       "contract": "Договір",
       "payment": "Оплата",
       "notPaid": "Не оплачено",
-      "priceSet": "Ціну змінено"
+      "priceSet": "Ціну змінено",
+      "deleteConfirmMessage": "Видалити цього учня? Цю дію неможливо скасувати.",
+      "documentsTitle": "Договори",
+      "documentSigned": "Підписаний",
+      "documentPending": "Не підписаний",
+      "documentsEmpty": "Договори не знайдені",
+      "transactionsTitle": "Оплати",
+      "transactionStatus": "Статус",
+      "transactionsEmpty": "Транзакції не знайдені"
     }
   },
   "archived": {

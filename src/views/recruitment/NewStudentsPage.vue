@@ -267,12 +267,14 @@
     <StudentSidePanel
       :student="activeStudent"
       :details="activeDetails"
+      :payments="activePayments"
       :history-list="activeHistory"
       @close="activeStudent = null"
       @save="onPanelSave"
       @delete="onPanelDelete"
       @email="onPanelEmail"
       @set-price="onPanelSetPrice"
+      @load-payments="onPanelLoadPayments"
     />
 
   </div>
@@ -281,7 +283,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useNewStudentsStore, type NewStudent, MANAGER_COLORS } from '../../stores/newStudents.store'
+import { useNewStudentsStore, type NewStudent, type StudentPayments, MANAGER_COLORS } from '../../stores/newStudents.store'
 import { useNotificationStore } from '../../stores/notification.store'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
@@ -494,6 +496,20 @@ const activeHistory = computed(() =>
         : store.getHistory(activeStudent.value.id))
     : []
 )
+const activePayments = computed<StudentPayments | null>(() => {
+  if (!activeStudent.value) return null
+  if (store.currentStudentPayments?.studentId === activeStudent.value.id) {
+    return store.currentStudentPayments
+  }
+
+  return {
+    studentId: activeStudent.value.id,
+    currentPrice: activeDetails.value?.currentPrice || '0.00',
+    currentPriceDesc: activeDetails.value?.currentPriceDesc || 'Не выбран',
+    documentList: [],
+    transactionList: [],
+  }
+})
 
 function openPanel(s: NewStudent) {
   openActions.value = null
@@ -520,6 +536,10 @@ function onPanelSetPrice(amount: string, desc: string) {
   if (!activeStudent.value) return
   store.setPrice(activeStudent.value.id, amount, desc)
   notif.addToast(`💰 ${t('newStudents.panel.priceSet')}: ${amount} zł`, 'success')
+}
+function onPanelLoadPayments() {
+  if (!activeStudent.value) return
+  store.fetchStudentPayments(activeStudent.value.id)
 }
 </script>
 

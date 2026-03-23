@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { recruitmentApi, type RecruitmentNewStudent, type RecruitmentPagination } from '../api/recruitmentApi'
+import {
+  recruitmentApi,
+  type RecruitmentNewStudent,
+  type RecruitmentPagination,
+  type RecruitmentStudentPayments,
+} from '../api/recruitmentApi'
 
 export interface NewStudent {
   id: number
@@ -43,6 +48,28 @@ export interface HistoryEvent {
   date: string
   detail: string
   color: string
+}
+
+export interface StudentDocumentItem {
+  id: number | string
+  name: string
+  signed: boolean
+}
+
+export interface StudentTransactionItem {
+  id: number | string
+  date: string
+  amount: number
+  currency: string
+  status: string
+}
+
+export interface StudentPayments {
+  studentId: number
+  currentPrice: string
+  currentPriceDesc: string
+  documentList: StudentDocumentItem[]
+  transactionList: StudentTransactionItem[]
 }
 
 export interface Group {
@@ -128,6 +155,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
   const currentStudent = ref<any | null>(null)
   const currentHistory = ref<HistoryEvent[]>([])
+  const currentStudentPayments = ref<StudentPayments | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
   const isListLoading = ref(false)
@@ -272,6 +300,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
   async function fetchStudentById(id: number | string) {
     isLoading.value = true
     error.value = null
+    currentStudent.value = null
     try {
       const result = await recruitmentApi.getStudentById(id)
       currentStudent.value = result.data
@@ -307,6 +336,38 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       }))
     } catch {
       currentHistory.value = []
+    }
+  }
+
+  function mapStudentPayments(studentId: number, payload: RecruitmentStudentPayments): StudentPayments {
+    return {
+      studentId,
+      currentPrice: payload.currentPrice || '0.00',
+      currentPriceDesc: payload.currentPriceDesc || 'Не выбран',
+      documentList: Array.isArray(payload.documentList) ? payload.documentList : [],
+      transactionList: Array.isArray(payload.transactionList) ? payload.transactionList : [],
+    }
+  }
+
+  async function fetchStudentPayments(id: number | string) {
+    const studentId = Number(id)
+    if (!studentId) {
+      currentStudentPayments.value = null
+      return
+    }
+
+    currentStudentPayments.value = null
+    try {
+      const result = await recruitmentApi.getStudentPayments(id)
+      currentStudentPayments.value = mapStudentPayments(studentId, result)
+    } catch {
+      currentStudentPayments.value = {
+        studentId,
+        currentPrice: details.value[studentId]?.currentPrice || '0.00',
+        currentPriceDesc: details.value[studentId]?.currentPriceDesc || 'Не выбран',
+        documentList: [],
+        transactionList: [],
+      }
     }
   }
 
@@ -418,6 +479,10 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       details.value[studentId].currentPrice = amount
       details.value[studentId].currentPriceDesc = desc
     }
+    if (currentStudentPayments.value?.studentId === studentId) {
+      currentStudentPayments.value.currentPrice = amount
+      currentStudentPayments.value.currentPriceDesc = desc
+    }
     if (history.value[studentId]) {
       history.value[studentId].push({ event: 'Цена изменена', date: new Date().toLocaleDateString('ru-RU'), detail: `${amount} zł — ${desc}`, color: 'var(--amber)' })
     }
@@ -433,9 +498,9 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
   return {
     students, totalCount, signedCount, noManagerCount, avgWaitDays,
-    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, currentHistory, isLoading, error,
+    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, currentHistory, currentStudentPayments, isLoading, error,
     isListLoading, listError, pagination,
-    fetchStudentsFromApi, fetchStudentById, fetchStudentHistory,
+    fetchStudentsFromApi, fetchStudentById, fetchStudentHistory, fetchStudentPayments,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice,
     getDetails, getHistory,
   }
