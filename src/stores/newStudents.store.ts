@@ -118,9 +118,12 @@ const MOCK_HISTORY: Record<number, HistoryEvent[]> = {
   ],
 }
 
+const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? 'false').toLowerCase()
+const USE_MOCK_BY_DEFAULT = rawUseMock !== 'false'
+
 export const useNewStudentsStore = defineStore('newStudents', () => {
   const students = ref<NewStudent[]>([])
-  const details = ref<Record<number, StudentDetails>>({ ...MOCK_DETAILS })
+  const details = ref<Record<number, StudentDetails>>(USE_MOCK_BY_DEFAULT ? { ...MOCK_DETAILS } : {})
   const history = ref<Record<number, HistoryEvent[]>>({ ...MOCK_HISTORY })
 
   const currentStudent = ref<any | null>(null)
@@ -391,8 +394,10 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       await recruitmentApi.updateStudent(studentId, payload)
 
       // 3. Update local state
-      if (!details.value[studentId]) return
-      details.value[studentId] = { ...details.value[studentId], ...data }
+      details.value[studentId] = {
+        ...(details.value[studentId] ?? currentStudentDetails.value ?? {} as StudentDetails),
+        ...data,
+      }
       
       // Update name in the list
       const s = students.value.find(x => x.id === studentId)

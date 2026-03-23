@@ -138,7 +138,7 @@
             <div class="sp-status-row">
               <div class="sp-status-label">{{ t('newStudents.panel.payment') }}</div>
               <span v-if="student.payment > 0" class="payment-value">{{ student.paymentStr }}</span>
-              <span v-else class="payment-zero">{{ t('newStudents.panel.notPaid') }}</span>
+              <span v-else class="payment-zero">.....{{ t('newStudents.panel.notPaid') }}</span>
             </div>
           </div>
 
@@ -179,21 +179,35 @@ const tabs = computed(() => [
   { key: 'payments' as const, icon: '💳', label: t('newStudents.panel.tabPayments') },
 ])
 
-const form = ref({
+const defaultForm = {
   email: '', password: '', firstName: '', lastName: '', birthDate: '',
   country: '', city: '', street: '', apt: '', postCode: '',
   parentFirst: '', parentLast: '', parentPhone: '', parentPassport: '',
   photoConsent: false, comment: '',
-})
+}
+
+const form = ref({ ...defaultForm })
+
+function resetForm() {
+  form.value = { ...defaultForm }
+}
 
 watch(() => props.details, (d) => {
-  if (!d) return
-  form.value = { ...form.value, ...d }
-  selectedPrice.value = d.currentPrice
+  if (!d) {
+    resetForm()
+    selectedPrice.value = null
+    priceListOpen.value = false
+    return
+  }
+
+  form.value = { ...defaultForm, ...d }
+  selectedPrice.value = d.currentPrice || null
   priceListOpen.value = false
 }, { immediate: true })
 
 watch(() => props.student, () => {
+  resetForm()
+  selectedPrice.value = null
   activeTab.value = 'info'
   priceListOpen.value = false
 })
