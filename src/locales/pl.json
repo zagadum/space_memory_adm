@@ -135,7 +135,9 @@
       "pendingInvoices": "Nieopłacone faktury",
       "invoicesTrend": "Wymaga uwagi",
       "newLeads": "Nowe zgłoszenia",
-      "leadsTrend": "Oczekują na kontakt"
+      "leadsTrend": "Oczekują na kontakt",
+      "newStudents": "Nowi uczniowie",
+      "newStudentsTrend": "Oczekują na wdrożenie"
     },
     "activity": {
       "title": "Ostatnia aktywność",

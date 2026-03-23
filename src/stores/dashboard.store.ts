@@ -6,6 +6,7 @@ export interface DashboardStats {
     activeGroups: number
     pendingInvoices: number
     newLeads: number
+    newStudents: number
 }
 
 export interface ActivityEvent {
@@ -32,7 +33,8 @@ export const useDashboardStore = defineStore('dashboard', {
             totalStudents: 0,
             activeGroups: 0,
             pendingInvoices: 0,
-            newLeads: 0
+            newLeads: 0,
+            newStudents: 0
         } as DashboardStats,
 
         recentActivity: [
@@ -99,7 +101,8 @@ export const useDashboardStore = defineStore('dashboard', {
                     totalStudents: 0,
                     activeGroups: 0,
                     pendingInvoices: 0,
-                    newLeads: 0
+                    newLeads: 0,
+                    newStudents: 0
                 }
             } finally {
                 this.isLoadingStats = false

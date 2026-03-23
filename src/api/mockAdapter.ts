@@ -52,6 +52,41 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   console.log('[MOCK] incoming:', method.toUpperCase(), url);
 
+  // --- DASHBOARD STATS ---
+  if (method === 'get' && (url === 'dashboard/stats' || url === 'api/v1/dashboard/stats')) {
+    // ensure recruitment db is initialized so count is correct even before visiting /new-students
+    if (!(globalThis as any).__mock_new_students) {
+      (globalThis as any).__mock_new_students = [
+        { id: 1, contract: 'signed' },
+        { id: 2, contract: 'pending' },
+        { id: 3, contract: 'signed' },
+        { id: 4, contract: 'pending' },
+        { id: 5, contract: 'pending' },
+        { id: 6, contract: 'signed' },
+        { id: 7, contract: 'pending' },
+        { id: 8, contract: 'pending' },
+        { id: 9, contract: 'pending' },
+        { id: 10, contract: 'signed' },
+        { id: 11, contract: 'pending' },
+        { id: 12, contract: 'pending' },
+      ];
+    }
+    const nsDb: any[] = (globalThis as any).__mock_new_students;
+    // "новые" = pending/registered/new (не signed и не active)
+    const newStudentsCount = nsDb.filter((s: any) => {
+      const st = String(s.status ?? s.contract ?? '').toLowerCase();
+      return st !== 'signed' && st !== 'active';
+    }).length;
+
+    return ok(config, {
+      totalStudents: nsDb.length,
+      activeGroups: 12,
+      pendingInvoices: 3,
+      newLeads: 5,
+      newStudents: newStudentsCount,
+    });
+  }
+
   // --- AUTH ---
   if (method === "post" && (url === "auth/sign-in" || url === "v1/auth/sign-in" || url === "api/auth/sign-in" || url === "api/v1/auth/sign-in")) {
     const body = readBody(config);
@@ -704,8 +739,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       { id: 6, firstName: 'Piotr', lastName: 'Kamiński', phone: '+48 606 111 333', email: 'piotr.k@gls.pl', groupLessonsCount: 3, individualLessonsCount: 2, city: 'Wrocław', comment: 'Prowadzi grupy weekendowe' },
       { id: 7, firstName: 'Aleksandra', lastName: 'Wójcik', phone: '+48 607 222 444', email: 'a.wojcik@gls.pl', groupLessonsCount: 4, individualLessonsCount: 4, city: 'Warszawa', comment: null },
       { id: 8, firstName: 'Michał', lastName: 'Szymański', phone: '+48 608 333 555', email: 'michal.sz@gls.pl', groupLessonsCount: 2, individualLessonsCount: 1, city: 'Poznań', comment: 'Urlop do końca marca' },
-      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, city: 'Kraków', comment: 'Najwyższy wynik QA w lutym' },
-      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indywidualne' },
+      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, city: 'Kraków', comment: 'Najwyższy wynik QA w lutом' },
+      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indyвидualne' },
     ]
 
     let items = [...mockTeachersList]
@@ -1141,7 +1176,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  // ── END ARCHIVED STUDENTS ──────────────────────────────────────────────────
+  // ── END ARCHIVED STUDENTS ─────────────────────────────────────────────────
 
   // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
   const newStudentsDb: any[] = (globalThis as any).__mock_new_students ?? ((globalThis as any).__mock_new_students = [

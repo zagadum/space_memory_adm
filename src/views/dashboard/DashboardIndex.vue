@@ -50,6 +50,15 @@
         </div>
         <div class="stat-trend info">{{ $t('dashboard.stats.leadsTrend') }}</div>
       </div>
+
+      <div class="stat-card teal">
+        <div class="stat-icon">🆕</div>
+        <div class="stat-info">
+          <div class="stat-value">{{ store.stats.newStudents }}</div>
+          <div class="stat-label">{{ $t('dashboard.stats.newStudents') }}</div>
+        </div>
+        <div class="stat-trend info">{{ $t('dashboard.stats.newStudentsTrend') }}</div>
+      </div>
     </section>
 
     <!-- Main Content Area -->
@@ -205,6 +214,7 @@ const navigate = (path: string) => {
 .stat-card.green::before { background: linear-gradient(90deg, #10b981, transparent); }
 .stat-card.amber::before { background: linear-gradient(90deg, #f59e0b, transparent); }
 .stat-card.purple::before { background: linear-gradient(90deg, #8b5cf6, transparent); }
+.stat-card.teal::before { background: linear-gradient(90deg, #14b8a6, transparent); }
 
 .stat-icon {
   font-size: 24px;

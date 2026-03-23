@@ -135,7 +135,9 @@
       "pendingInvoices": "Unpaid Invoices",
       "invoicesTrend": "Requires attention",
       "newLeads": "New Leads",
-      "leadsTrend": "Awaiting contact"
+      "leadsTrend": "Awaiting contact",
+      "newStudents": "New Students",
+      "newStudentsTrend": "Pending enrollment"
     },
     "activity": {
       "title": "Recent Activity",

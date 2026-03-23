@@ -135,7 +135,9 @@
       "pendingInvoices": "Неоплачені рахунки",
       "invoicesTrend": "Потребує уваги",
       "newLeads": "Нові заявки",
-      "leadsTrend": "Очікують контакту"
+      "leadsTrend": "Очікують контакту",
+      "newStudents": "Нові учні",
+      "newStudentsTrend": "Очікують оформлення"
     },
     "activity": {
       "title": "Остання активність",

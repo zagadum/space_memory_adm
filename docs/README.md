@@ -30,6 +30,7 @@
 | [`API.md`](./API.md) | Детальная документация API (1587 строк) | 60 мин |
 | [`API_CONFIGURATION.md`](./API_CONFIGURATION.md) | Настройка Mock/Real API режима | 10 мин |
 | [`DOCUMENTATION_MAP.md`](./DOCUMENTATION_MAP.md) | Карта навигации по документации | 5 мин |
+| [`RECRUITMENT_PAYMENTS_API.md`](./RECRUITMENT_PAYMENTS_API.md) | 🆕 Payments API для Laravel (вкладка Оплаты) | 15 мин |
 
 ---
 
@@ -135,6 +136,15 @@
 - Запуск группы
 
 **→** Подробнее: [`API_ALL.md#new-groups-recruitment-api`](./API_ALL.md#-new-groups-recruitment-api)
+
+---
+
+### 💳 Recruitment Payments (1 метод)
+- Текущая цена ученика
+- Список договоров с статусом подписи
+- История платежей и транзакций
+
+**→** Подробнее: [`RECRUITMENT_PAYMENTS_API.md`](./RECRUITMENT_PAYMENTS_API.md) — полная документация для Laravel
 
 ---
 
