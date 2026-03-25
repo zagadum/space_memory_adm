@@ -1,4 +1,4 @@
-import { httpRecruitment } from "./http";
+import { getRecruitmentHttpClient, type RecruitmentBackend } from "./http";
 
 export interface RecruitmentNewStudent {
   id: number;
@@ -127,9 +127,12 @@ function pickPagination(payload: any, itemCount: number): RecruitmentPagination 
   };
 }
 
-export const recruitmentApi = {
+function createRecruitmentApi(backend: RecruitmentBackend = "default") {
+  const client = getRecruitmentHttpClient(backend);
+
+  return {
   async getNewStudents(params: { page?: number; perPage?: number } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
-    const { data } = await httpRecruitment.get("recruitment/new-students", {
+    const { data } = await client.get("recruitment/new-students", {
       params: {
         page: params.page ?? 1,
         per_page: params.perPage ?? 10,
@@ -148,48 +151,55 @@ export const recruitmentApi = {
     manager: string | null;
     startDate: string | null;
   }) {
-    const { data } = await httpRecruitment.post("recruitment/new-students", payload);
+    const { data } = await client.post("recruitment/new-students", payload);
     return data;
   },
 
   async getStudentById(id: number | string) {
-    const { data } = await httpRecruitment.get(`recruitment/new-students/${id}`);
+    const { data } = await client.get(`recruitment/new-students/${id}`);
     return data;
   },
 
   async getStudentHistory(id: number | string) {
-    const { data } = await httpRecruitment.get(`recruitment/new-students/${id}/history`);
+    const { data } = await client.get(`recruitment/new-students/${id}/history`);
     return data;
   },
 
   async getStudentPayments(id: number | string): Promise<RecruitmentStudentPayments> {
-    const { data } = await httpRecruitment.get(`recruitment/new-students/${id}/payments`);
+    const { data } = await client.get(`recruitment/new-students/${id}/payments`);
     return pickStudentPayments(data);
   },
   
   async updateStudent(id: number | string, payload: any) {
-    const { data } = await httpRecruitment.patch(`recruitment/new-students/${id}`, payload);
+    const { data } = await client.patch(`recruitment/new-students/${id}`, payload);
     return data;
   },
 
   async archiveNewStudent(studentId: number) {
-    const { data } = await httpRecruitment.post(`recruitment/new-students/${studentId}/archive`);
+    const { data } = await client.post(`recruitment/new-students/${studentId}/archive`);
     return data;
   },
 
   async getLeads(): Promise<RecruitmentLead[]> {
-    const { data } = await httpRecruitment.get("recruitment/leads");
+    const { data } = await client.get("recruitment/leads");
     return pickItems<RecruitmentLead>(data);
   },
 
   async updateLeadStatus(leadId: string, status: RecruitmentLead["status"]) {
-    const { data } = await httpRecruitment.patch(`recruitment/leads/${leadId}`, { status });
+    const { data } = await client.patch(`recruitment/leads/${leadId}`, { status });
     return data;
   },
 
   async createLead(payload: Omit<RecruitmentLead, "id">) {
-    const { data } = await httpRecruitment.post("recruitment/leads", payload);
+    const { data } = await client.post("recruitment/leads", payload);
     return data;
   },
-};
+  };
+}
+
+export const recruitmentApi = createRecruitmentApi();
+
+export function getRecruitmentApi(backend: RecruitmentBackend = "default") {
+  return createRecruitmentApi(backend);
+}
 

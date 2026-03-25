@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
-import { recruitmentApi } from '../api/recruitmentApi';
+import { getRecruitmentApi } from '../api/recruitmentApi';
+import type { RecruitmentBackend } from '../api/http';
 
 export type LeadStatus = 'new' | 'in_progress' | 'trial' | 'decision';
 
@@ -22,12 +23,17 @@ export const useLeadsStore = defineStore('leads', {
             { id: '5', name: 'Игорь Кузнецов', phone: '+48 444 555 666', subject: 'Биология', createdAt: '2023-10-17', status: 'decision' },
         ] as Lead[],
         isLoading: false,
+        currentBackend: 'default' as RecruitmentBackend,
     }),
     actions: {
-        async fetchLeads() {
+        resolveApi(backend?: RecruitmentBackend) {
+            this.currentBackend = backend ?? this.currentBackend;
+            return getRecruitmentApi(this.currentBackend);
+        },
+        async fetchLeads(backend?: RecruitmentBackend) {
             this.isLoading = true;
             try {
-                const list = await recruitmentApi.getLeads();
+                const list = await this.resolveApi(backend).getLeads();
                 if (list.length) {
                     this.leads = list;
                 }
@@ -37,25 +43,25 @@ export const useLeadsStore = defineStore('leads', {
                 this.isLoading = false;
             }
         },
-        async moveLead(leadId: string, newStatus: LeadStatus) {
+        async moveLead(leadId: string, newStatus: LeadStatus, backend?: RecruitmentBackend) {
             const lead = this.leads.find(l => l.id === leadId);
             if (lead) {
                 lead.status = newStatus;
             }
             try {
-                await recruitmentApi.updateLeadStatus(leadId, newStatus);
+                await this.resolveApi(backend).updateLeadStatus(leadId, newStatus);
             } catch {
                 // optimistic UI: do not rollback while backend endpoint is integrating
             }
         },
-        async addLead(lead: Omit<Lead, 'id'>) {
+        async addLead(lead: Omit<Lead, 'id'>, backend?: RecruitmentBackend) {
             const localLead: Lead = {
                 ...lead,
                 id: Math.random().toString(36).substr(2, 9),
             };
             this.leads.push(localLead);
             try {
-                await recruitmentApi.createLead(lead);
+                await this.resolveApi(backend).createLead(lead);
             } catch {
                 // keep local record to avoid blocking UX
             }

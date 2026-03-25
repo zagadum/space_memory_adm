@@ -85,7 +85,7 @@
       <div class="toolbar-right">
         <!-- Поиск -->
         <div class="search-box">
-          <span style="color:var(--clr-dim);font-size:13px">🔍</span>
+          <span style="color:var(--app-text-dim);font-size:13px">🔍</span>
           <input v-model="search" type="text"
             :placeholder="t('expelled.filter.search')" />
         </div>
@@ -134,11 +134,11 @@
     <!-- Таблица -->
     <div class="table-wrap">
       <div v-if="store.isLoading" class="loading-state">
-        <span class="section-title" style="color: var(--clr-dim);">{{ t('expelled.loading') }}</span>
+        <span class="section-title" style="color: var(--app-text-dim);">{{ t('expelled.loading') }}</span>
       </div>
 
       <div v-else-if="store.error" class="error-state">
-        <span class="section-title" style="color: var(--debt-red);">{{ store.error }}</span>
+        <span class="section-title" style="color: #ef4444;">{{ store.error }}</span>
       </div>
 
       <div v-else-if="!filtered.length" class="empty-state">
@@ -186,7 +186,7 @@
 
             <td>
               <div class="group-cell">
-                <span class="g-dot" style="background: var(--nebula-blue);"></span>
+                <span class="g-dot" style="background: #4f6ef7;"></span>
                 <span>{{ s.group }}</span>
               </div>
             </td>
@@ -318,17 +318,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import { useExpelledStudentsStore } from '../../stores/expelledStudents.store'
 import { useAuthStore } from '../../stores/auth.store'
 import type { ExpelledStudent } from '../../api/expelledStudentsApi'
+import type { RecruitmentBackend } from '../../api/http'
 import ExpelledHistoryPanel from './components/expelled/ExpelledHistoryPanel.vue'
 import ExpelledTransferPanel from './components/expelled/ExpelledTransferPanel.vue'
 
 const { t } = useI18n()
+const route = useRoute()
 const store = useExpelledStudentsStore()
 const authStore = useAuthStore()
+const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 
 // ── РОЛЬ ────────────────────────────────────────────────
 const isManager = computed(() => authStore.user?.role === 'manager')
@@ -351,14 +355,16 @@ const filterGroup = ref('all')
 const filterContact = ref('all')
 const sortBy = ref('con_asc')
 
+const safeList = computed<ExpelledStudent[]>(() => Array.isArray(store.list) ? store.list : [])
+
 // Уникальные менеджеры из списка
 const managerOptions = computed(() =>
-  [...new Set(store.list.map(s => s.manager).filter(Boolean))]
+  [...new Set(safeList.value.map(s => s.manager).filter(Boolean))]
 )
 
 // Уникальные группы из списка
 const groupOptions = computed(() =>
-  [...new Set(store.list.map(s => s.group))]
+  [...new Set(safeList.value.map(s => s.group))]
 )
 
 // Вычисление "дней назад"
@@ -367,7 +373,7 @@ const daysAgo = (d: string | null): number =>
 
 // Основной computed с фильтрацией и сортировкой
 const filtered = computed(() => {
-  let list = store.list
+  let list = safeList.value
 
   if (search.value) {
     const q = search.value.toLowerCase()
@@ -415,12 +421,12 @@ function toggleAll(e: Event) {
 
 // ── INLINE РЕДАКТИРОВАНИЕ ────────────────────────────────
 function onFieldChange(id: number, field: 'lastContact' | 'manager' | 'comment', value: string) {
-  store.updateStudent(id, { [field]: value || (field === 'lastContact' ? null : '') })
+  store.updateStudent(id, { [field]: value || (field === 'lastContact' ? null : '') }, recruitmentBackend.value)
 }
 
 function markToday(id: number) {
   const today = new Date().toISOString().split('T')[0]
-  store.updateStudent(id, { lastContact: today })
+  store.updateStudent(id, { lastContact: today }, recruitmentBackend.value)
   actMenuId.value = null
 }
 
@@ -438,7 +444,6 @@ function onDocClick(e: MouseEvent) {
   }
 }
 onMounted(() => {
-  store.fetchList()
   document.addEventListener('click', onDocClick)
 })
 onUnmounted(() => {
@@ -449,6 +454,16 @@ onUnmounted(() => {
 const activeStudent = ref<ExpelledStudent | null>(null)
 const showHistory = ref(false)
 const showTransfer = ref(false)
+
+watch(recruitmentBackend, () => {
+  activeStudent.value = null
+  showHistory.value = false
+  showTransfer.value = false
+  actMenuId.value = null
+  store.clearSelection()
+  store.fetchList(recruitmentBackend.value)
+}, { immediate: true })
+
 
 function openHistory(s: ExpelledStudent) {
   activeStudent.value = s
@@ -464,7 +479,7 @@ function openTransfer(s: ExpelledStudent) {
 
 async function onTransfer(groupId: number) {
   if (!activeStudent.value) return
-  await store.transferStudent(activeStudent.value.id, groupId)
+  await store.transferStudent(activeStudent.value.id, groupId, recruitmentBackend.value)
 }
 
 // ── АРХИВАЦИЯ ────────────────────────────────────────────
@@ -497,9 +512,9 @@ async function confirmArchive() {
   if (!reasonId) return
 
   if (archiveMode.value === 'single' && activeStudent.value) {
-    await store.archiveStudent(activeStudent.value.id, finalReasonLabel)
+    await store.archiveStudent(activeStudent.value.id, finalReasonLabel, recruitmentBackend.value)
   } else {
-    await store.bulkArchive(store.selectedIds, finalReasonLabel)
+    await store.bulkArchive(store.selectedIds, finalReasonLabel, recruitmentBackend.value)
   }
   showArchiveModal.value = false
 }
@@ -510,7 +525,7 @@ const bulkManager = ref('')
 
 async function confirmBulkAssign() {
   if (!bulkManager.value) return
-  await store.bulkAssign(store.selectedIds, bulkManager.value)
+  await store.bulkAssign(store.selectedIds, bulkManager.value, recruitmentBackend.value)
   showBulkAssignModal.value = false
   bulkManager.value = ''
 }
@@ -563,6 +578,20 @@ function contactTagText(d: string | null): string {
 </script>
 
 <style scoped>
+:global(:root){
+  --surface: var(--app-card);
+  --border: var(--app-border);
+  --text: var(--app-text-main);
+  --dim: var(--app-text-dim);
+  --hover: rgba(79,110,247,0.08);
+  --input-bg: var(--app-surface);
+  --clr-dim: var(--app-text-dim);
+  --debt-red: #ef4444;
+  --nebula-blue: #4f6ef7;
+  --blue: #4f6ef7;
+  --purple: #8b5cf6;
+}
+
 /* ═══ STATS ═══ */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
 .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;transition:all 0.3s;}

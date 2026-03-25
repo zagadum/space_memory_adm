@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import {
-  recruitmentApi,
+  getRecruitmentApi,
   type RecruitmentNewStudent,
   type RecruitmentPagination,
   type RecruitmentStudentPayments,
 } from '../api/recruitmentApi'
+import type { RecruitmentBackend } from '../api/http'
 
 export interface NewStudent {
   id: number
@@ -149,6 +150,7 @@ const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? 'false').to
 const USE_MOCK_BY_DEFAULT = rawUseMock !== 'false'
 
 export const useNewStudentsStore = defineStore('newStudents', () => {
+  const currentBackend = ref<RecruitmentBackend>('default')
   const students = ref<NewStudent[]>([])
   const details = ref<Record<number, StudentDetails>>(USE_MOCK_BY_DEFAULT ? { ...MOCK_DETAILS } : {})
   const history = ref<Record<number, HistoryEvent[]>>({ ...MOCK_HISTORY })
@@ -272,11 +274,16 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  async function fetchStudentsFromApi(page = pagination.value.currentPage) {
+  function resolveApi(backend?: RecruitmentBackend) {
+    currentBackend.value = backend ?? currentBackend.value
+    return getRecruitmentApi(currentBackend.value)
+  }
+
+  async function fetchStudentsFromApi(page = pagination.value.currentPage, backend?: RecruitmentBackend) {
     isListLoading.value = true
     listError.value = null
     try {
-      const response = await recruitmentApi.getNewStudents({
+      const response = await resolveApi(backend).getNewStudents({
         page,
         perPage: pagination.value.perPage,
       })
@@ -297,12 +304,12 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  async function fetchStudentById(id: number | string) {
+  async function fetchStudentById(id: number | string, backend?: RecruitmentBackend) {
     isLoading.value = true
     error.value = null
     currentStudent.value = null
     try {
-      const result = await recruitmentApi.getStudentById(id)
+      const result = await resolveApi(backend).getStudentById(id)
       currentStudent.value = result.data
     } catch (err: any) {
       error.value = err?.response?.data?.message || 'Ошибка загрузки'
@@ -321,9 +328,9 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     return 'var(--blue)'
   }
 
-  async function fetchStudentHistory(id: number | string) {
+  async function fetchStudentHistory(id: number | string, backend?: RecruitmentBackend) {
     try {
-      const result = await recruitmentApi.getStudentHistory(id)
+      const result = await resolveApi(backend).getStudentHistory(id)
       const rows = result?.data ?? []
       currentHistory.value = rows.map((h: any) => ({
         event:  h.event   ?? 'Событие',
@@ -349,7 +356,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  async function fetchStudentPayments(id: number | string) {
+  async function fetchStudentPayments(id: number | string, backend?: RecruitmentBackend) {
     const studentId = Number(id)
     if (!studentId) {
       currentStudentPayments.value = null
@@ -358,7 +365,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
     currentStudentPayments.value = null
     try {
-      const result = await recruitmentApi.getStudentPayments(id)
+      const result = await resolveApi(backend).getStudentPayments(id)
       currentStudentPayments.value = mapStudentPayments(studentId, result)
     } catch {
       currentStudentPayments.value = {
@@ -371,7 +378,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract'>) {
+  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract'>, backend?: RecruitmentBackend) {
     const today = new Date().toISOString().slice(0, 10)
     const newId = Date.now()
     students.value.unshift({
@@ -401,7 +408,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       { event: 'Ученик создан', date: new Date().toLocaleDateString('ru-RU'), detail: `Добавлен менеджером ${data.manager || '—'}`, color: 'var(--blue)' },
     ]
 
-    recruitmentApi.createNewStudent({
+    resolveApi(backend).createNewStudent({
       name: data.name,
       age: data.age,
       manager: data.manager,
@@ -419,19 +426,19 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  function archiveStudent(studentId: number) {
+  function archiveStudent(studentId: number, backend?: RecruitmentBackend) {
     students.value = students.value.filter(s => s.id !== studentId)
     pagination.value = {
       ...pagination.value,
       total: Math.max(0, pagination.value.total - 1),
       to: Math.max(0, Math.min(pagination.value.total - 1, students.value.length ? pagination.value.from + students.value.length - 1 : 0)),
     }
-    recruitmentApi.archiveNewStudent(studentId).catch(() => {
+    resolveApi(backend).archiveNewStudent(studentId).catch(() => {
       // no rollback to keep fast UI interactions
     })
   }
 
-  async function saveDetails(studentId: number, data: Partial<StudentDetails>) {
+  async function saveDetails(studentId: number, data: Partial<StudentDetails>, backend?: RecruitmentBackend) {
     // 1. Map camelCase to snake_case for backend
     const payload: any = {}
     if (data.firstName !== undefined) payload.name = data.firstName
@@ -452,7 +459,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
     try {
       // 2. Call API
-      await recruitmentApi.updateStudent(studentId, payload)
+      await resolveApi(backend).updateStudent(studentId, payload)
 
       // 3. Update local state
       details.value[studentId] = {

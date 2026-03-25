@@ -1,4 +1,4 @@
-import { httpRecruitment } from "./http";
+import { getRecruitmentHttpClient, type RecruitmentBackend } from "./http";
 
 export interface ArchivedHistoryItem {
   event: string;
@@ -11,21 +11,21 @@ export interface ArchivedStudent {
   id: number;
   name: string;
   phone: string;
-  registered: string;         // YYYY-MM-DD
-  expelled: string;           // YYYY-MM-DD (Archive date)
+  registered: string;
+  expelled: string;
   lastContact: string | null;
   manager: string;
-  comment: string;            // Previous comment
-  archReason: string;         // Reason from archive modal
-  archComment: string;        // Extra comment from archive modal
+  comment: string;
+  archReason: string;
+  archComment: string;
   history: ArchivedHistoryItem[];
 }
 
 export interface ArchivedStats {
   total: number;
-  month: number;    // archived this month
-  none: number;     // lastContact === null
-  return: number;   // potentially returnable (reason: "Not relevant")
+  month: number;
+  none: number;
+  return: number;
 }
 
 export interface ArchivedListResponse {
@@ -33,27 +33,37 @@ export interface ArchivedListResponse {
   meta: ArchivedStats;
 }
 
-export const archivedStudentsApi = {
-  async getList(projectId = 1): Promise<ArchivedListResponse> {
-    const { data } = await httpRecruitment.get<ArchivedListResponse>('archived-students', {
-      params: { project_id: projectId },
-    });
-    return data;
-  },
+function createArchivedStudentsApi(backend: RecruitmentBackend = "default") {
+  const client = getRecruitmentHttpClient(backend);
 
-  async returnToNew(id: number, comment?: string): Promise<{ id: number }> {
-    const { data } = await httpRecruitment.post<{ id: number }>(
-      `archived-students/${id}/return-to-new`,
-      { comment }
-    );
-    return data;
-  },
+  return {
+    async getList(projectId = 1): Promise<ArchivedListResponse> {
+      const { data } = await client.get<ArchivedListResponse>("archived-students", {
+        params: { project_id: projectId },
+      });
+      return data;
+    },
 
-  async transfer(id: number, groupId: number): Promise<{ id: number; newGroup: string }> {
-    const { data } = await httpRecruitment.post<{ id: number; newGroup: string }>(
-      `archived-students/${id}/transfer`,
-      { group_id: groupId }
-    );
-    return data;
-  },
-};
+    async returnToNew(id: number, comment?: string): Promise<{ id: number }> {
+      const { data } = await client.post<{ id: number }>(
+        `archived-students/${id}/return-to-new`,
+        { comment }
+      );
+      return data;
+    },
+
+    async transfer(id: number, groupId: number): Promise<{ id: number; newGroup: string }> {
+      const { data } = await client.post<{ id: number; newGroup: string }>(
+        `archived-students/${id}/transfer`,
+        { group_id: groupId }
+      );
+      return data;
+    },
+  };
+}
+
+export const archivedStudentsApi = createArchivedStudentsApi();
+
+export function getArchivedStudentsApi(backend: RecruitmentBackend = "default") {
+  return createArchivedStudentsApi(backend);
+}

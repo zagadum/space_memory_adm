@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { http, httpRecruitmentIndigo, type RecruitmentBackend } from "./http";
 
 export interface NewGroupTeacher {
     id: number;
@@ -49,23 +49,27 @@ export interface MasterStudent {
     color: string;
 }
 
-export async function getNewGroups() {
-    const res = await http.get("new-groups");
+function getClient(backend: RecruitmentBackend = "default") {
+    return backend === "indigo" ? httpRecruitmentIndigo : http;
+}
+
+export async function getNewGroups(backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).get("new-groups");
     return res.data as { items: NewGroup[] };
 }
 
-export async function getNewGroupStudents(groupId: number) {
-    const res = await http.get("new-groups/students", { params: { groupId } });
+export async function getNewGroupStudents(groupId: number, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).get("new-groups/students", { params: { groupId } });
     return res.data as { items: NewGroupStudent[] };
 }
 
-export async function getMasterStudents() {
-    const res = await http.get("new-groups/master-students");
+export async function getMasterStudents(backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).get("new-groups/master-students");
     return res.data as { items: MasterStudent[] };
 }
 
-export async function getTeachers() {
-    const res = await http.get("new-groups/teachers");
+export async function getTeachers(backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).get("new-groups/teachers");
     return res.data as { items: NewGroupTeacher[] };
 }
 
@@ -78,27 +82,27 @@ export async function createNewGroup(payload: {
     age: string | null;
     teacherId: number | null;
     studentIds: number[];
-}) {
-    const res = await http.post("new-groups/create", payload);
+}, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post("new-groups/create", payload);
     return res.data as { ok: true; group: NewGroup };
 }
 
-export async function startGroup(groupId: number) {
-    const res = await http.post("new-groups/start", { groupId });
+export async function startGroup(groupId: number, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post("new-groups/start", { groupId });
     return res.data as { ok: true };
 }
 
-export async function deleteNewGroup(groupId: number) {
-    const res = await http.post("new-groups/delete", { groupId });
+export async function deleteNewGroup(groupId: number, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post("new-groups/delete", { groupId });
     return res.data as { ok: true };
 }
 
-export async function addStudentsToGroup(payload: { groupId: number; studentIds: number[] }) {
-    const res = await http.post("new-groups/add-students", payload);
+export async function addStudentsToGroup(payload: { groupId: number; studentIds: number[] }, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post("new-groups/add-students", payload);
     return res.data as { ok: true; added: number };
 }
 
-export async function removeStudentFromGroup(payload: { groupId: number; studentId: number }) {
-    const res = await http.post("new-groups/remove-student", payload);
+export async function removeStudentFromGroup(payload: { groupId: number; studentId: number }, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post("new-groups/remove-student", payload);
     return res.data as { ok: true };
 }

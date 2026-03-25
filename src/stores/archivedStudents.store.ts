@@ -1,8 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { archivedStudentsApi, type ArchivedStudent, type ArchivedStats } from '../api/archivedStudents.api';
+import { getArchivedStudentsApi, type ArchivedStudent, type ArchivedStats } from '../api/archivedStudents.api';
+import type { RecruitmentBackend } from '../api/http';
 
 export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
+  const currentBackend = ref<RecruitmentBackend>('default');
   const students = ref<ArchivedStudent[]>([]);
   const stats = ref<ArchivedStats>({
     total: 0,
@@ -13,11 +15,16 @@ export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
 
-  const fetchStudents = async () => {
+  function resolveApi(backend?: RecruitmentBackend) {
+    currentBackend.value = backend ?? currentBackend.value;
+    return getArchivedStudentsApi(currentBackend.value);
+  }
+
+  const fetchStudents = async (backend?: RecruitmentBackend) => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await archivedStudentsApi.getList();
+      const response = await resolveApi(backend).getList();
       students.value = response.data;
       stats.value = response.meta;
     } catch (err: any) {
@@ -27,9 +34,9 @@ export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
     }
   };
 
-  const returnToNew = async (id: number, comment?: string) => {
+  const returnToNew = async (id: number, comment?: string, backend?: RecruitmentBackend) => {
     try {
-      await archivedStudentsApi.returnToNew(id, comment);
+      await resolveApi(backend).returnToNew(id, comment);
       students.value = students.value.filter((s: ArchivedStudent) => s.id !== id);
       stats.value.total--;
     } catch (err: any) {
@@ -38,9 +45,9 @@ export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
     }
   };
 
-  const transferToGroup = async (id: number, groupId: number) => {
+  const transferToGroup = async (id: number, groupId: number, backend?: RecruitmentBackend) => {
     try {
-      await archivedStudentsApi.transfer(id, groupId);
+      await resolveApi(backend).transfer(id, groupId);
       students.value = students.value.filter((s: ArchivedStudent) => s.id !== id);
       stats.value.total--;
     } catch (err: any) {

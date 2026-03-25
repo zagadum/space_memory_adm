@@ -6,6 +6,9 @@ const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
 
 const API_URL = (import.meta as any).env?.VITE_API_URL || "https://memory.firm.kiev.ua/api/v1/";
 const RECRUITMENT_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_API_URL || API_URL;
+const RECRUITMENT_INDIGO_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_INDIGO_API_URL || RECRUITMENT_API_URL;
+
+export type RecruitmentBackend = "default" | "indigo";
 
 function parsePrefixList(value: unknown): string[] {
   return String(value ?? "")
@@ -138,15 +141,23 @@ function attachAdapterRouting(client: ReturnType<typeof axios.create>) {
 
 export const http = createHttpClient(API_URL);
 export const httpRecruitment = createHttpClient(RECRUITMENT_API_URL);
+export const httpRecruitmentIndigo = createHttpClient(RECRUITMENT_INDIGO_API_URL);
 
 attachInterceptors(http);
 attachInterceptors(httpRecruitment);
+attachInterceptors(httpRecruitmentIndigo);
 attachAdapterRouting(http);
 attachAdapterRouting(httpRecruitment);
+attachAdapterRouting(httpRecruitmentIndigo);
+
+export function getRecruitmentHttpClient(backend: RecruitmentBackend = "default") {
+  return backend === "indigo" ? httpRecruitmentIndigo : httpRecruitment;
+}
 
 console.log("API routing config:", {
   baseURL: API_URL,
   recruitmentBaseURL: RECRUITMENT_API_URL,
+  recruitmentIndigoBaseURL: RECRUITMENT_INDIGO_API_URL,
   defaultMock: USE_MOCK_BY_DEFAULT,
   mockOnly: MOCK_ONLY_PREFIXES,
   realOnly: REAL_ONLY_PREFIXES,

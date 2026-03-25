@@ -12,38 +12,38 @@ export type MenuAccessMap = Record<string, MenuAccessEntry>;
 // blocked -> shown but navigation is denied
 // hidden  -> not shown and navigation is denied
 export const MENU_ACCESS_CONFIG: MenuAccessMap = {
-  "my-cabinet": { mode: "hidden" },
+  "my-cabinet": { mode: "active" },
   "dashboard": { mode: "active" },
 
   // Secretariat
-  "secretariat": { mode: "hidden" },
-      "students": { mode: "hidden" },
-      "groups": { mode: "hidden" },
-      "teachers": { mode: "hidden" },
-      "course-endings": { mode: "hidden" },
+  "secretariat": { mode: "active" },
+      "students": { mode: "active" },
+      "groups": { mode: "active" },
+      "teachers": { mode: "active" },
+      "course-endings": { mode: "active" },
 
   // Recruitment
   recruitment: { mode: "active" },
       "new-students": { mode: "active" },
       "leads": { mode: "active" },
       "expelled": { mode: "active" },
-      "new-groups": { mode: "blocked" },
+      "new-groups": { mode: "active" },
       "archived": { mode: "active" },
 
   // Finance / accounting
-  finance: { mode: "blocked" },
-      "accounting": { mode: "blocked" },
-      "returns": { mode: "blocked" },
-      "projects": { mode: "blocked" },
-      "salary-calculator": { mode: "blocked" },
-      "salary-demo": { mode: "blocked" },
-      "settings": { mode: "blocked" },
+  finance: { mode: "active" },
+      "accounting": { mode: "active" },
+      "returns": { mode: "active" },
+      "projects": { mode: "active" },
+      "salary-calculator": { mode: "active" },
+      "salary-demo": { mode: "active" },
+      "settings": { mode: "active" },
 
   // Other sections
-  hr: { mode: "hidden" },
-  "trainer": { mode: "hidden" },
-  "quality": { mode: "blocked" },
-  "settings-section": { mode: "blocked" },
+  hr: { mode: "active" },
+  "trainer": { mode: "active" },
+  "quality": { mode: "active" },
+  "settings-section": { mode: "active" },
 };
 
 export const MENU_SECTION_ITEMS: Record<string, string[]> = {
@@ -66,10 +66,15 @@ export const MENU_ROUTE_KEY_MAP: Record<string, string> = {
   "course-endings": "course-endings",
 
   "new-students": "new-students",
+  "new-students-indigo": "new-students",
   leads: "leads",
+  "leads-indigo": "leads",
   "expelled-students": "expelled",
+  "expelled-students-indigo": "expelled",
   "new-groups": "new-groups",
+  "new-groups-indigo": "new-groups",
   "archived-students": "archived",
+  "archived-students-indigo": "archived",
 
   "finance-returns": "returns",
   "projects-list": "projects",

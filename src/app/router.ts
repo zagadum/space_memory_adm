@@ -37,35 +37,72 @@ export const router = createRouter({
           meta: { title: 'studentList.title', subTitle: 'studentList.secretariat', icon: '👩‍🚀' }
         },
         {
-          path: "recruitment/new-students",
+          path: "recruitment/space/new-students",
           name: "new-students",
           component: () => import("../views/recruitment/NewStudentsPage.vue"),
-          meta: { title: 'newStudents.pageTitle', icon: '🌟' }
+          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'default' }
         },
         {
-          path: "recruitment/leads",
+          path: "recruitment/space/leads",
           name: "leads",
           component: () => import("../views/recruitment/LeadsPage.vue"),
-          meta: { title: 'sidebar.leads', icon: '📋' }
+          meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'default' }
         },
         {
-          path: 'recruitment/expelled-students',
+          path: 'recruitment/space/expelled-students',
           name: 'expelled-students',
           component: () => import('../views/recruitment/ExpelledStudentsPage.vue'),
-          meta: { title: 'expelled.pageTitle', icon: '📤' }
+          meta: { title: 'expelled.pageTitle', icon: '📤', recruitmentBackend: 'default' }
         },
         {
-          path: "recruitment/new-groups",
+          path: "recruitment/space/new-groups",
           name: "new-groups",
           component: () => import("../views/groups/NewGroupsPage.vue"),
-          meta: { title: 'sidebar.newGroups', icon: '🚀' }
+          meta: { title: 'sidebar.newGroups', icon: '🚀', recruitmentBackend: 'default' }
         },
         {
-          path: 'recruitment/archived-students',
+          path: 'recruitment/space/archived-students',
           name: 'archived-students',
           component: () => import('../views/recruitment/ArchivedStudentsPage.vue'),
-          meta: { title: 'archived.pageTitle', icon: '🗃️' }
+          meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'default' }
         },
+        { path: 'recruitment/space', redirect: { name: 'new-students' } },
+        { path: 'recruitment/new-students', redirect: { name: 'new-students' } },
+        { path: 'recruitment/leads', redirect: { name: 'leads' } },
+        { path: 'recruitment/expelled-students', redirect: { name: 'expelled-students' } },
+        { path: 'recruitment/new-groups', redirect: { name: 'new-groups' } },
+        { path: 'recruitment/archived-students', redirect: { name: 'archived-students' } },
+        {
+          path: "recruitment/indigo/new-students",
+          name: "new-students-indigo",
+          component: () => import("../views/recruitment/NewStudentsPage.vue"),
+          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'indigo' }
+        },
+        {
+          path: "recruitment/indigo/leads",
+          name: "leads-indigo",
+          component: () => import("../views/recruitment/LeadsPage.vue"),
+          meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'indigo' }
+        },
+        {
+          path: 'recruitment/indigo/expelled-students',
+          name: 'expelled-students-indigo',
+          component: () => import('../views/recruitment/ExpelledStudentsPage.vue'),
+          meta: { title: 'expelled.pageTitle', icon: '📤', recruitmentBackend: 'indigo' }
+        },
+        {
+          path: "recruitment/indigo/new-groups",
+          name: "new-groups-indigo",
+          component: () => import("../views/groups/NewGroupsPage.vue"),
+          meta: { title: 'sidebar.newGroups', icon: '🚀', recruitmentBackend: 'indigo' }
+        },
+        {
+          path: 'recruitment/indigo/archived-students',
+          name: 'archived-students-indigo',
+          component: () => import('../views/recruitment/ArchivedStudentsPage.vue'),
+          meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'indigo' }
+        },
+        { path: 'recruitment/indigo', redirect: { name: 'new-students-indigo' } },
         {
           path: "finance/returns",
           name: "finance-returns",

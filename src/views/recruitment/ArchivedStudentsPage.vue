@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+  import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+  import { useRoute } from 'vue-router';
 import { useArchivedStudentsStore } from '../../stores/archivedStudents.store';
 import { type ArchivedStudent } from '../../api/archivedStudents.api';
+  import type { RecruitmentBackend } from '../../api/http';
 import UiButton from '../../components/ui/UiButton.vue';
 import UiInput from '../../components/ui/UiInput.vue';
 import UiBadge from '../../components/ui/UiBadge.vue';
-import { useAuthStore } from '../../stores/auth.store';
 import { useNotificationStore } from '../../stores/notification.store';
 
 const { t } = useI18n();
+  const route = useRoute();
 const archivedStore = useArchivedStudentsStore();
-const authStore = useAuthStore();
 const notif = useNotificationStore();
+  const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default');
 
 // --- CONSTANTS ---
 const MANAGER_COLORS: Record<string, string> = {
@@ -144,7 +146,7 @@ const openReturn = (student: ArchivedStudent) => {
 const handleReturn = async () => {
   if (!selectedStudent.value) return;
   try {
-    await archivedStore.returnToNew(selectedStudent.value.id, returnComment.value);
+      await archivedStore.returnToNew(selectedStudent.value.id, returnComment.value, recruitmentBackend.value);
     notif.addToast(`✅ ${selectedStudent.value.name} — ${t('newStudents.added')}`, 'success');
     returnModalOpen.value = false;
     selectedStudent.value = null;
@@ -157,7 +159,7 @@ const handleTransfer = async () => {
   if (!selectedStudent.value || !selectedGroupId.value) return;
   try {
     const group = GROUPS.find(g => g.id === selectedGroupId.value);
-    await archivedStore.transferToGroup(selectedStudent.value.id, selectedGroupId.value);
+      await archivedStore.transferToGroup(selectedStudent.value.id, selectedGroupId.value, recruitmentBackend.value);
     notif.addToast(`✅ ${selectedStudent.value.name} → «${group?.name}»`, 'success');
     transferPanelOpen.value = false;
     selectedStudent.value = null;
@@ -173,11 +175,19 @@ const onDocClick = () => {
 };
 
 onMounted(() => {
-  archivedStore.fetchStudents();
   document.addEventListener('click', onDocClick);
 });
 
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
+
+  watch(recruitmentBackend, () => {
+    selectedStudent.value = null;
+    historyPanelOpen.value = false;
+    transferPanelOpen.value = false;
+    returnModalOpen.value = false;
+    openActions.value = null;
+    archivedStore.fetchStudents(recruitmentBackend.value);
+  }, { immediate: true });
 </script>
 
 <template>

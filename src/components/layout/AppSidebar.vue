@@ -177,23 +177,51 @@
         @click="toggleSection('recruitment')"
       >
         <span class="nav-section-icon">🎯</span>
-        <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
+        <span class="nav-section-label">{{ `${t('sidebar.recruitment')}(space)` }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('recruitment')" class="nav-children" :class="{ open: openSections.recruitment }">
-        <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students' }, accessClass('new-students')]" @click="navigateTo('new-students', '/recruitment/new-students')">
+        <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students' }, accessClass('new-students')]" @click="navigateTo('new-students', '/recruitment/space/new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
         </div>
-        <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads' }, accessClass('leads')]" @click="navigateTo('leads', '/recruitment/leads')">
+        <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads' }, accessClass('leads')]" @click="navigateTo('leads', '/recruitment/space/leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
         </div>
-        <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled' }, accessClass('expelled')]" @click="navigateTo('expelled', '/recruitment/expelled-students')">
+        <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled' }, accessClass('expelled')]" @click="navigateTo('expelled', '/recruitment/space/expelled-students')">
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
-        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/new-groups')">
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/space/new-groups')">
           <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
         </div>
-        <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived' }, accessClass('archived')]" @click="navigateTo('archived', '/recruitment/archived-students')">
+        <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived' }, accessClass('archived')]" @click="navigateTo('archived', '/recruitment/space/archived-students')">
+          <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
+        </div>
+      </div>
+
+      <div
+        v-if="isSectionAllowed('recruitment')"
+        class="nav-section"
+        :class="{ open: openSections.recruitmentIndigo }"
+        @click="toggleSection('recruitmentIndigo')"
+      >
+        <span class="nav-section-icon">🟣</span>
+        <span class="nav-section-label">{{ `${t('sidebar.recruitment')} Indigo` }}</span>
+        <span class="nav-section-arrow">›</span>
+      </div>
+      <div v-if="isSectionAllowed('recruitment')" class="nav-children" :class="{ open: openSections.recruitmentIndigo }">
+        <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students-indigo' }, accessClass('new-students')]" @click="navigateTo('new-students-indigo', '/recruitment/indigo/new-students', 'new-students')">
+          <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
+        </div>
+        <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads-indigo' }, accessClass('leads')]" @click="navigateTo('leads-indigo', '/recruitment/indigo/leads', 'leads')">
+          <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled-indigo' }, accessClass('expelled')]" @click="navigateTo('expelled-indigo', '/recruitment/indigo/expelled-students', 'expelled')">
+          <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
+        </div>
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups-indigo' }, accessClass('new-groups')]" @click="navigateTo('new-groups-indigo', '/recruitment/indigo/new-groups', 'new-groups')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+        </div>
+        <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived-indigo' }, accessClass('archived')]" @click="navigateTo('archived-indigo', '/recruitment/indigo/archived-students', 'archived')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
         </div>
       </div>
@@ -414,6 +442,7 @@ const openSections = ref<Record<string, boolean>>({
   secretariat: true,
   finance: false,
   recruitment: false,
+  recruitmentIndigo: false,
   hr: false,
   trainer: false,
   accounting: false,
@@ -424,19 +453,34 @@ const openSections = ref<Record<string, boolean>>({
 const activeItem = ref('students')
 
 watch(() => route.path, (path) => {
-  if (path.startsWith('/recruitment/leads')) {
+  if (path.startsWith('/recruitment/indigo/leads')) {
+    activeItem.value = 'leads-indigo'
+    openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/indigo/new-students')) {
+    activeItem.value = 'new-students-indigo'
+    openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/indigo/new-groups')) {
+    activeItem.value = 'new-groups-indigo'
+    openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/indigo/expelled-students')) {
+    activeItem.value = 'expelled-indigo'
+    openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/indigo/archived-students')) {
+    activeItem.value = 'archived-indigo'
+    openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/space/leads')) {
     activeItem.value = 'leads'
     openSections.value.recruitment = true
-  } else if (path.startsWith('/recruitment/new-students')) {
+  } else if (path.startsWith('/recruitment/space/new-students')) {
     activeItem.value = 'new-students'
     openSections.value.recruitment = true
-  } else if (path.startsWith('/recruitment/new-groups')) {
+  } else if (path.startsWith('/recruitment/space/new-groups')) {
     activeItem.value = 'new-groups'
     openSections.value.recruitment = true
-  } else if (path.startsWith('/recruitment/expelled-students')) {
+  } else if (path.startsWith('/recruitment/space/expelled-students')) {
     activeItem.value = 'expelled'
     openSections.value.recruitment = true
-  } else if (path.startsWith('/recruitment/archived-students')) {
+  } else if (path.startsWith('/recruitment/space/archived-students')) {
     activeItem.value = 'archived'
     openSections.value.recruitment = true
   } else if (path.startsWith('/finance/returns')) {
@@ -554,8 +598,8 @@ const setActive = (item: string) => {
   }
 }
 
-const navigateTo = (item: string, path: string) => {
-  if (!canOpen(item)) return
+const navigateTo = (item: string, path: string, menuKey = item) => {
+  if (!canOpen(menuKey)) return
   activeItem.value = item
   router.push(path)
 }

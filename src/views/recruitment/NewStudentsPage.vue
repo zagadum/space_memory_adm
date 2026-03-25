@@ -281,16 +281,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import { useNewStudentsStore, type NewStudent, type StudentPayments, MANAGER_COLORS } from '../../stores/newStudents.store'
 import { useNotificationStore } from '../../stores/notification.store'
+import type { RecruitmentBackend } from '../../api/http'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
 
 const { t } = useI18n()
+const route = useRoute()
 const store = useNewStudentsStore()
 const notif = useNotificationStore()
+const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 
 // ─── FILTERS ───
 const searchQ    = ref('')
@@ -415,7 +419,7 @@ function onEmail(_id: number) {
 }
 function onArchive(id: number) {
   const s = store.students.find(x => x.id === id)
-  store.archiveStudent(id)
+  store.archiveStudent(id, recruitmentBackend.value)
   openActions.value = null
   notif.addToast(`📦 ${s?.name} — ${t('newStudents.archived')}`, 'success')
 }
@@ -425,11 +429,11 @@ function onExport() {
 
 function goToPage(page: number) {
   if (page < 1 || page > store.pagination.lastPage || page === store.pagination.currentPage) return
-  store.fetchStudentsFromApi(page)
+  store.fetchStudentsFromApi(page, recruitmentBackend.value)
 }
 
 function reloadCurrentPage() {
-  store.fetchStudentsFromApi(store.pagination.currentPage)
+  store.fetchStudentsFromApi(store.pagination.currentPage, recruitmentBackend.value)
 }
 
 // Close dropdowns on outside click
@@ -438,7 +442,6 @@ function onDocClick(_e: MouseEvent) {
   openActions.value = null
 }
 onMounted(() => {
-  store.fetchStudentsFromApi()
   document.addEventListener('click', onDocClick)
 })
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
@@ -456,7 +459,7 @@ function submitAdd() {
     age: newForm.value.age || 0,
     manager: newForm.value.manager || null,
     startDate: newForm.value.startDate || null,
-  })
+  }, recruitmentBackend.value)
   newForm.value = { firstName: '', lastName: '', age: 0, manager: '', startDate: '' }
   addModalOpen.value = false
   notif.addToast(`✅ ${t('newStudents.studentAdded')}`, 'success')
@@ -511,21 +514,27 @@ const activePayments = computed<StudentPayments | null>(() => {
   }
 })
 
+watch(recruitmentBackend, () => {
+  activeStudent.value = null
+  openActions.value = null
+  store.fetchStudentsFromApi(1, recruitmentBackend.value)
+}, { immediate: true })
+
 function openPanel(s: NewStudent) {
   openActions.value = null
   activeStudent.value = s
-  store.fetchStudentById(s.id)
-  store.fetchStudentHistory(s.id)
+  store.fetchStudentById(s.id, recruitmentBackend.value)
+  store.fetchStudentHistory(s.id, recruitmentBackend.value)
 }
 function onPanelSave(data: Parameters<typeof store.saveDetails>[1]) {
   if (!activeStudent.value) return
-  store.saveDetails(activeStudent.value.id, data)
+  store.saveDetails(activeStudent.value.id, data, recruitmentBackend.value)
   notif.addToast(`✅ ${t('newStudents.panel.saved')}`, 'success')
 }
 function onPanelDelete() {
   if (!activeStudent.value) return
   const name = activeStudent.value.name
-  store.archiveStudent(activeStudent.value.id)
+  store.archiveStudent(activeStudent.value.id, recruitmentBackend.value)
   activeStudent.value = null
   notif.addToast(`🗑 ${name} ${t('newStudents.deleted')}`, 'success')
 }
@@ -539,7 +548,7 @@ function onPanelSetPrice(amount: string, desc: string) {
 }
 function onPanelLoadPayments() {
   if (!activeStudent.value) return
-  store.fetchStudentPayments(activeStudent.value.id)
+  store.fetchStudentPayments(activeStudent.value.id, recruitmentBackend.value)
 }
 </script>
 

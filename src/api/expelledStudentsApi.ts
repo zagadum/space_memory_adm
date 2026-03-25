@@ -1,4 +1,4 @@
-import { httpRecruitment } from "./http";
+import { getRecruitmentHttpClient, type RecruitmentBackend } from "./http";
 
 export interface ExpelledHistoryItem {
   event: string;
@@ -39,16 +39,19 @@ export interface ExpelledUpdatePayload {
   comment?: string;
 }
 
-export const expelledStudentsApi = {
+function createExpelledStudentsApi(backend: RecruitmentBackend = "default") {
+  const client = getRecruitmentHttpClient(backend);
+
+  return {
   async getList(projectId = 1): Promise<ExpelledListResponse> {
-    const { data } = await httpRecruitment.get<ExpelledListResponse>('expelled-students', {
+    const { data } = await client.get<ExpelledListResponse>('expelled-students', {
       params: { project_id: projectId },
     });
     return data;
   },
 
   async update(id: number, payload: ExpelledUpdatePayload): Promise<{ id: number; updatedAt: string }> {
-    const { data } = await httpRecruitment.patch<{ id: number; updatedAt: string }>(
+    const { data } = await client.patch<{ id: number; updatedAt: string }>(
       `expelled-students/${id}`,
       payload
     );
@@ -56,7 +59,7 @@ export const expelledStudentsApi = {
   },
 
   async archive(id: number, reason: string): Promise<{ id: number; archivedAt: string }> {
-    const { data } = await httpRecruitment.post<{ id: number; archivedAt: string }>(
+    const { data } = await client.post<{ id: number; archivedAt: string }>(
       `expelled-students/${id}/archive`,
       { reason }
     );
@@ -64,7 +67,7 @@ export const expelledStudentsApi = {
   },
 
   async transfer(id: number, groupId: number): Promise<{ id: number; newGroup: string }> {
-    const { data } = await httpRecruitment.post<{ id: number; newGroup: string }>(
+    const { data } = await client.post<{ id: number; newGroup: string }>(
       `expelled-students/${id}/transfer`,
       { group_id: groupId }
     );
@@ -72,7 +75,7 @@ export const expelledStudentsApi = {
   },
 
   async bulkAssign(ids: number[], manager: string): Promise<{ updated: number }> {
-    const { data } = await httpRecruitment.post<{ updated: number }>(
+    const { data } = await client.post<{ updated: number }>(
       'expelled-students/bulk-assign',
       { ids, manager }
     );
@@ -80,10 +83,17 @@ export const expelledStudentsApi = {
   },
 
   async bulkArchive(ids: number[], reason: string): Promise<{ archived: number }> {
-    const { data } = await httpRecruitment.post<{ archived: number }>(
+    const { data } = await client.post<{ archived: number }>(
       'expelled-students/bulk-archive',
       { ids, reason }
     );
     return data;
   },
-};
+  };
+}
+
+export const expelledStudentsApi = createExpelledStudentsApi();
+
+export function getExpelledStudentsApi(backend: RecruitmentBackend = "default") {
+  return createExpelledStudentsApi(backend);
+}

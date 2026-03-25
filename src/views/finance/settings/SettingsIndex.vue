@@ -111,8 +111,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute, useRouter } from 'vue-router'
 const { t } = useI18n()
 import { useSettingsFirmyStore } from '../../../stores/settingsFirmy.store'
 import FirmyPanel from './components/FirmyPanel.vue'
@@ -127,7 +128,37 @@ import IntegracjePanel from './components/IntegracjePanel.vue'
 import EksportPanel from './components/EksportPanel.vue'
 
 const StoreFirmy = useSettingsFirmyStore()
-const activeTab = ref('firma')
+const route = useRoute()
+const router = useRouter()
+
+const SETTINGS_TABS = ['firma', 'projekty', 'konta', 'logo', 'serie', 'szablony', 'vat', 'users', 'integracje', 'eksport'] as const
+type SettingsTab = typeof SETTINGS_TABS[number]
+
+function normalizeTab(value: unknown): SettingsTab {
+  const tab = String(value ?? '').trim()
+  return (SETTINGS_TABS as readonly string[]).includes(tab) ? (tab as SettingsTab) : 'firma'
+}
+
+const activeTab = ref<SettingsTab>(normalizeTab(route.query.tab))
+
+watch(() => route.query.tab, (tab) => {
+  const normalized = normalizeTab(tab)
+  if (activeTab.value !== normalized) {
+    activeTab.value = normalized
+  }
+}, { immediate: true })
+
+watch(activeTab, (tab) => {
+  const current = normalizeTab(route.query.tab)
+  if (current === tab) return
+
+  router.replace({
+    query: {
+      ...route.query,
+      tab,
+    },
+  })
+})
 </script>
 
 <style scoped>

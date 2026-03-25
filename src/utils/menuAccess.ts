@@ -61,7 +61,7 @@ export function getFirstAllowedFallbackPath(): string {
   const fallbackChecks: Array<{ key: string; path: string }> = [
     { key: "dashboard", path: "/" },
     { key: "students", path: "/students" },
-    { key: "new-students", path: "/recruitment/new-students" },
+    { key: "new-students", path: "/recruitment/space/new-students" },
   ];
 
   const found = fallbackChecks.find((x) => isMenuAllowed(x.key));

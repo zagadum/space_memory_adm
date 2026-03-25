@@ -62,12 +62,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useRoute } from 'vue-router';
 import { useLeadsStore, type LeadStatus } from '../../stores/leads.store';
+import type { RecruitmentBackend } from '../../api/http';
 
 const { t } = useI18n();
+const route = useRoute();
 const leadsStore = useLeadsStore();
+const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default');
 
 const columns = [
   { id: 'new' },
@@ -80,9 +84,9 @@ const getLeadsByStatus = (status: LeadStatus) => {
   return leadsStore.leads.filter(l => l.status === status);
 };
 
-onMounted(() => {
-  leadsStore.fetchLeads();
-});
+watch(recruitmentBackend, () => {
+  leadsStore.fetchLeads(recruitmentBackend.value);
+}, { immediate: true });
 
 // Drag & Drop Logic
 let draggedLeadId: string | null = null;
@@ -93,7 +97,7 @@ const onDragStart = (id: string) => {
 
 const onDrop = (newStatus: LeadStatus) => {
   if (draggedLeadId) {
-    leadsStore.moveLead(draggedLeadId, newStatus);
+    leadsStore.moveLead(draggedLeadId, newStatus, recruitmentBackend.value);
     draggedLeadId = null;
   }
 };

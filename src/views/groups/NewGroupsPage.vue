@@ -137,9 +137,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
+import type { RecruitmentBackend } from '../../api/http'
 import CreateGroupModal from './components/CreateGroupModal.vue'
 import StartGroupModal from './components/StartGroupModal.vue'
 import GroupDetailPanel from './components/GroupDetailPanel.vue'
@@ -147,7 +149,9 @@ import { useNotificationStore } from '../../stores/notification.store'
 import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
 
 // ── Data ──
+const route = useRoute()
 const notify = useNotificationStore()
+const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 const isLoading = ref(false)
 const groups = ref<NewGroup[]>([])
 const masterStudents = ref<MasterStudent[]>([])
@@ -228,7 +232,7 @@ async function openStartModal(g: NewGroup) {
   if (!alreadyLoaded) {
     loadingStudents.value = true
     try {
-      const res = await getNewGroupStudents(g.id)
+      const res = await getNewGroupStudents(g.id, recruitmentBackend.value)
       panelStudents.value = res.items
     } catch {
       // Не критично — модал всё равно откроется, просто списки будут пустые
@@ -245,7 +249,7 @@ async function openPanel(id: number) {
   panelStudents.value = []
   loadingStudents.value = true
   try {
-    const res = await getNewGroupStudents(id)
+    const res = await getNewGroupStudents(id, recruitmentBackend.value)
     panelStudents.value = res.items
   } finally {
     loadingStudents.value = false
@@ -259,7 +263,7 @@ function closePanel() {
 
 async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
   try {
-    const res = await createNewGroup(payload)
+    const res = await createNewGroup(payload, recruitmentBackend.value)
     groups.value.unshift(res.group)
     showCreateModal.value = false
     notify.addToast('Группа создана ✅', 'success')
@@ -270,7 +274,7 @@ async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
 
 async function onGroupStarted(id: number) {
   try {
-    await apiStartGroup(id)
+    await apiStartGroup(id, recruitmentBackend.value)
     groups.value = groups.value.filter(g => g.id !== id)
     startGroup.value = null
     if (panelGroup.value?.id === id) closePanel()
@@ -282,7 +286,7 @@ async function onGroupStarted(id: number) {
 
 async function onDeleteGroup(id: number) {
   try {
-    await deleteNewGroup(id)
+    await deleteNewGroup(id, recruitmentBackend.value)
     groups.value = groups.value.filter(g => g.id !== id)
     closePanel()
     notify.addToast('Группа удалена', 'warning')
@@ -293,8 +297,8 @@ async function onDeleteGroup(id: number) {
 
 async function onStudentsAdded(payload: { groupId: number; studentIds: number[] }) {
   try {
-    await addStudentsToGroup(payload)
-    const res = await getNewGroupStudents(payload.groupId)
+    await addStudentsToGroup(payload, recruitmentBackend.value)
+    const res = await getNewGroupStudents(payload.groupId, recruitmentBackend.value)
     panelStudents.value = res.items
     notify.addToast('Ученики добавлены ✅', 'success')
   } catch (err: any) {
@@ -304,7 +308,7 @@ async function onStudentsAdded(payload: { groupId: number; studentIds: number[] 
 
 async function onStudentRemoved(payload: { groupId: number; studentId: number }) {
   try {
-    await removeStudentFromGroup(payload)
+    await removeStudentFromGroup(payload, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
     notify.addToast('Ученик убран из группы', 'warning')
   } catch (err: any) {
@@ -313,13 +317,16 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
 }
 
 // ── Init ──
-onMounted(async () => {
+watch(recruitmentBackend, async () => {
+  showCreateModal.value = false
+  startGroup.value = null
+  closePanel()
   isLoading.value = true
   try {
     const [gRes, sRes, tRes] = await Promise.all([
-      getNewGroups(),
-      getMasterStudents(),
-      getTeachers(),
+      getNewGroups(recruitmentBackend.value),
+      getMasterStudents(recruitmentBackend.value),
+      getTeachers(recruitmentBackend.value),
     ])
     groups.value = gRes.items
     masterStudents.value = sRes.items
@@ -329,7 +336,7 @@ onMounted(async () => {
   } finally {
     isLoading.value = false
   }
-})
+}, { immediate: true })
 </script>
 
 <style scoped>
