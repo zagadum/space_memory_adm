@@ -13,6 +13,7 @@
     "newStudents": "New Students",
     "newGroups": "New Groups",
     "expelled": "Withdrawn Students",
+    "targetMail": "TargetMail",
     "archive": "Archive",
     "salesDept": "Sales Dept",
     "leads": "Leads Board",
@@ -1479,6 +1480,25 @@
       "transactionsTitle": "Payments",
       "transactionStatus": "Status",
       "transactionsEmpty": "No transactions found"
+    }
+  },
+  "targetMail": {
+    "pageTitle": "TargetMail",
+    "searchPlaceholder": "Search by surname, email, status...",
+    "loading": "Loading TargetMail...",
+    "errorTitle": "Failed to load TargetMail",
+    "emptyTitle": "List is empty",
+    "emptyText": "The API returned an empty array: there are no TargetMail entries yet.",
+    "emptyFiltered": "Nothing matched the current search.",
+    "showing": "Showing {shown} of {total} records",
+    "table": {
+      "surname": "Surname",
+      "name": "Name",
+      "parentEmail": "Parent email",
+      "status": "Status",
+      "errorMessage": "Error message",
+      "linkClickedAt": "Link clicked at",
+      "convertedAt": "Converted at"
     }
   },
   "archived": {

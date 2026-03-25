@@ -1337,6 +1337,69 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
+  if (method === 'get' && (
+    url === 'target-mail' ||
+    url === 'recruitment/target-mail' ||
+    url === 'targetmail' ||
+    url === 'recruitment/targetmail'
+  )) {
+    console.log(`[MOCK] GET ${url}`);
+    return ok(config, {
+      data: [
+        {
+          id: 1,
+          surname: 'Kowalska',
+          name: 'Anna',
+          parent_email: 'anna.kowalska@example.com',
+          status: 'sent',
+          error_message: null,
+          link_clicked_at: '2026-03-20T09:30:00Z',
+          converted_at: null,
+        },
+        {
+          id: 2,
+          surname: 'Nowak',
+          name: 'Piotr',
+          parent_email: 'piotr.nowak@example.com',
+          status: 'clicked',
+          error_message: null,
+          link_clicked_at: '2026-03-21T14:12:00Z',
+          converted_at: null,
+        },
+        {
+          id: 3,
+          surname: 'Wiśniewska',
+          name: 'Maja',
+          parent_email: 'maja.parent@example.com',
+          status: 'converted',
+          error_message: null,
+          link_clicked_at: '2026-03-18T08:05:00Z',
+          converted_at: '2026-03-18T12:40:00Z',
+        },
+        {
+          id: 4,
+          surname: 'Lewandowski',
+          name: 'Jan',
+          parent_email: 'jan.parent@example.com',
+          status: 'error',
+          error_message: 'SMTP mailbox unavailable',
+          link_clicked_at: null,
+          converted_at: null,
+        },
+        {
+          id: 5,
+          surname: 'Dąbrowska',
+          name: 'Zofia',
+          parent_email: 'zofia.parent@example.com',
+          status: 'opened',
+          error_message: null,
+          link_clicked_at: '2026-03-24T17:55:00Z',
+          converted_at: null,
+        },
+      ]
+    });
+  }
+
   // POST leads/move (or PATCH leads/:id based on API)
   if ((method === 'post' || method === 'patch') && (url === 'leads/move' || url.startsWith('recruitment/leads/'))) {
     console.log(`[MOCK] ${method.toUpperCase()} ${url}`);

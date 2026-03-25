@@ -13,6 +13,7 @@
     "newStudents": "Nowi uczniowie",
     "newGroups": "Nowe grupy",
     "expelled": "Skreśleni uczniowie",
+    "targetMail": "TargetMail",
     "archive": "Archiwum",
     "salesDept": "Dział sprzedaży",
     "leads": "Tablica Kanban",
@@ -1479,6 +1480,25 @@
       "transactionsTitle": "Płatności",
       "transactionStatus": "Status",
       "transactionsEmpty": "Nie znaleziono transakcji"
+    }
+  },
+  "targetMail": {
+    "pageTitle": "TargetMail",
+    "searchPlaceholder": "Szukaj po nazwisku, emailu, statusie...",
+    "loading": "Ładowanie TargetMail...",
+    "errorTitle": "Nie udało się załadować TargetMail",
+    "emptyTitle": "Lista jest pusta",
+    "emptyText": "API zwróciło pustą tablicę: brak wpisów TargetMail.",
+    "emptyFiltered": "Brak wyników dla bieżącego wyszukiwania.",
+    "showing": "Pokazano {shown} z {total} rekordów",
+    "table": {
+      "surname": "Nazwisko",
+      "name": "Imię",
+      "parentEmail": "Email rodzica",
+      "status": "Status",
+      "errorMessage": "Błąd",
+      "linkClickedAt": "Kliknięcie linku",
+      "convertedAt": "Konwersja"
     }
   },
   "archived": {

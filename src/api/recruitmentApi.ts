@@ -26,6 +26,17 @@ export interface RecruitmentLead {
   status: "new" | "in_progress" | "trial" | "decision";
 }
 
+export interface RecruitmentTargetMail {
+  id: number | string;
+  surname: string;
+  name: string;
+  parent_email: string;
+  status: string;
+  error_message: string | null;
+  link_clicked_at: string | null;
+  converted_at: string | null;
+}
+
 export interface RecruitmentPagination {
   currentPage: number;
   lastPage: number;
@@ -105,6 +116,19 @@ function pickItems<T>(payload: any): T[] {
   return [];
 }
 
+function pickTargetMailItems(payload: any): RecruitmentTargetMail[] {
+  return pickItems<any>(payload).map((item, index) => ({
+    id: item?.id ?? `${item?.surname ?? 'target-mail'}-${item?.name ?? index}`,
+    surname: String(item?.surname ?? item?.last_name ?? ''),
+    name: String(item?.name ?? item?.first_name ?? ''),
+    parent_email: String(item?.parent_email ?? item?.parentEmail ?? item?.email ?? ''),
+    status: String(item?.status ?? 'unknown'),
+    error_message: item?.error_message == null ? null : String(item.error_message),
+    link_clicked_at: item?.link_clicked_at ?? item?.linkClickedAt ?? null,
+    converted_at: item?.converted_at ?? item?.convertedAt ?? null,
+  }));
+}
+
 function pickPagination(payload: any, itemCount: number): RecruitmentPagination {
   const source = payload?.data?.data && !Array.isArray(payload?.data)
     ? payload.data
@@ -129,6 +153,21 @@ function pickPagination(payload: any, itemCount: number): RecruitmentPagination 
 
 function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   const client = getRecruitmentHttpClient(backend);
+
+  const getByAliases = async (aliases: string[]) => {
+    let lastError: unknown = null;
+
+    for (const alias of aliases) {
+      try {
+        return await client.get(alias);
+      } catch (error: any) {
+        lastError = error;
+        if (error?.response?.status !== 404) throw error;
+      }
+    }
+
+    throw lastError ?? new Error('TargetMail endpoint not found');
+  };
 
   return {
   async getNewStudents(params: { page?: number; perPage?: number } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
@@ -183,6 +222,16 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   async getLeads(): Promise<RecruitmentLead[]> {
     const { data } = await client.get("recruitment/leads");
     return pickItems<RecruitmentLead>(data);
+  },
+
+  async getTargetMail(): Promise<RecruitmentTargetMail[]> {
+    const { data } = await getByAliases([
+      'recruitment/target-mail',
+      'recruitment/targetmail',
+      'target-mail',
+      'targetmail',
+    ]);
+    return pickTargetMailItems(data);
   },
 
   async updateLeadStatus(leadId: string, status: RecruitmentLead["status"]) {

@@ -13,6 +13,7 @@
     "newStudents": "Новые ученики",
     "newGroups": "Новые группы",
     "expelled": "Выписанные ученики",
+    "targetMail": "TargetMail",
     "archive": "Архив",
     "salesDept": "Отдел продаж",
     "leads": "Канбан-доска",
@@ -1481,6 +1482,25 @@
       "transactionsTitle": "Оплаты",
       "transactionStatus": "Статус",
       "transactionsEmpty": "Транзакции не найдены"
+    }
+  },
+  "targetMail": {
+    "pageTitle": "TargetMail",
+    "searchPlaceholder": "Поиск по фамилии, email, статусу...",
+    "loading": "Загружаем TargetMail...",
+    "errorTitle": "Не удалось загрузить TargetMail",
+    "emptyTitle": "Список пуст",
+    "emptyText": "API вернул пустой массив: записей TargetMail пока нет.",
+    "emptyFiltered": "По текущему поиску ничего не найдено.",
+    "showing": "Показано {shown} из {total} записей",
+    "table": {
+      "surname": "Фамилия",
+      "name": "Имя",
+      "parentEmail": "Email родителя",
+      "status": "Статус",
+      "errorMessage": "Ошибка",
+      "linkClickedAt": "Клик по ссылке",
+      "convertedAt": "Конверсия"
     }
   },
   "archived": {

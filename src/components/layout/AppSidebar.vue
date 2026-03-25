@@ -187,6 +187,9 @@
         <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads' }, accessClass('leads')]" @click="navigateTo('leads', '/recruitment/space/leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
         </div>
+        <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail' }, accessClass('target-mail')]" @click="navigateTo('target-mail', '/recruitment/space/target-mail')">
+          <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
+        </div>
         <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled' }, accessClass('expelled')]" @click="navigateTo('expelled', '/recruitment/space/expelled-students')">
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
         </div>
@@ -214,6 +217,9 @@
         </div>
         <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads-indigo' }, accessClass('leads')]" @click="navigateTo('leads-indigo', '/recruitment/indigo/leads', 'leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail-indigo' }, accessClass('target-mail')]" @click="navigateTo('target-mail-indigo', '/recruitment/indigo/target-mail', 'target-mail')">
+          <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
         </div>
         <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled-indigo' }, accessClass('expelled')]" @click="navigateTo('expelled-indigo', '/recruitment/indigo/expelled-students', 'expelled')">
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
@@ -456,6 +462,9 @@ watch(() => route.path, (path) => {
   if (path.startsWith('/recruitment/indigo/leads')) {
     activeItem.value = 'leads-indigo'
     openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/indigo/target-mail')) {
+    activeItem.value = 'target-mail-indigo'
+    openSections.value.recruitmentIndigo = true
   } else if (path.startsWith('/recruitment/indigo/new-students')) {
     activeItem.value = 'new-students-indigo'
     openSections.value.recruitmentIndigo = true
@@ -470,6 +479,9 @@ watch(() => route.path, (path) => {
     openSections.value.recruitmentIndigo = true
   } else if (path.startsWith('/recruitment/space/leads')) {
     activeItem.value = 'leads'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/space/target-mail')) {
+    activeItem.value = 'target-mail'
     openSections.value.recruitment = true
   } else if (path.startsWith('/recruitment/space/new-students')) {
     activeItem.value = 'new-students'

@@ -49,6 +49,12 @@ export const router = createRouter({
           meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'default' }
         },
         {
+          path: "recruitment/space/target-mail",
+          name: "target-mail",
+          component: () => import("../views/recruitment/TargetMailPage.vue"),
+          meta: { title: 'targetMail.pageTitle', icon: '✉️', recruitmentBackend: 'default' }
+        },
+        {
           path: 'recruitment/space/expelled-students',
           name: 'expelled-students',
           component: () => import('../views/recruitment/ExpelledStudentsPage.vue'),
@@ -69,6 +75,7 @@ export const router = createRouter({
         { path: 'recruitment/space', redirect: { name: 'new-students' } },
         { path: 'recruitment/new-students', redirect: { name: 'new-students' } },
         { path: 'recruitment/leads', redirect: { name: 'leads' } },
+        { path: 'recruitment/target-mail', redirect: { name: 'target-mail' } },
         { path: 'recruitment/expelled-students', redirect: { name: 'expelled-students' } },
         { path: 'recruitment/new-groups', redirect: { name: 'new-groups' } },
         { path: 'recruitment/archived-students', redirect: { name: 'archived-students' } },
@@ -83,6 +90,12 @@ export const router = createRouter({
           name: "leads-indigo",
           component: () => import("../views/recruitment/LeadsPage.vue"),
           meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'indigo' }
+        },
+        {
+          path: "recruitment/indigo/target-mail",
+          name: "target-mail-indigo",
+          component: () => import("../views/recruitment/TargetMailPage.vue"),
+          meta: { title: 'targetMail.pageTitle', icon: '✉️', recruitmentBackend: 'indigo' }
         },
         {
           path: 'recruitment/indigo/expelled-students',
