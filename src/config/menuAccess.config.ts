@@ -16,11 +16,11 @@ export const MENU_ACCESS_CONFIG: MenuAccessMap = {
   "dashboard": { mode: "active" },
 
   // Secretariat
-  "secretariat": { mode: "active" },
-      "students": { mode: "active" },
-      "groups": { mode: "active" },
-      "teachers": { mode: "active" },
-      "course-endings": { mode: "active" },
+  "secretariat": { mode: "hidden" },
+      "students": { mode: "hidden" },
+      "groups": { mode: "hidden" },
+      "teachers": { mode: "hidden" },
+      "course-endings": { mode: "hidden" },
 
   // Recruitment
   recruitment: { mode: "active" },
@@ -41,10 +41,10 @@ export const MENU_ACCESS_CONFIG: MenuAccessMap = {
       "settings": { mode: "active" },
 
   // Other sections
-  hr: { mode: "active" },
-  "trainer": { mode: "active" },
-  "quality": { mode: "active" },
-  "settings-section": { mode: "active" },
+  hr: { mode: "hidden" },
+  "trainer": { mode: "hidden" },
+  "quality": { mode: "hidden" },
+  "settings-section": { mode: "hidden" },
 };
 
 export const MENU_SECTION_ITEMS: Record<string, string[]> = {

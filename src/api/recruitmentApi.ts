@@ -4,6 +4,8 @@ export interface RecruitmentNewStudent {
   id: number;
   name: string;
   surname?: string;
+  nickname?: string;
+  nick_name?: string;
   dob?: string;
   age: number;
   contract: "signed" | "pending";

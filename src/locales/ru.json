@@ -1452,6 +1452,7 @@
       "sectionConsents": "Соглашения",
       "sectionComment": "Комментарий при регистрации",
       "fieldPassword": "Пароль",
+      "fieldNickname": "Nickname",
       "fieldFirstName": "Имя",
       "fieldLastName": "Фамилия",
       "fieldBirthDate": "Дата рождения",

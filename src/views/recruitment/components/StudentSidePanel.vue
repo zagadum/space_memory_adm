@@ -39,6 +39,9 @@
               <div class="sp-field"><div class="sp-label">Email</div><input class="sp-input" v-model="form.email" type="email" /></div>
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPassword') }}</div><input class="sp-input" v-model="form.password" type="text" /></div>
             </div>
+            <div class="sp-grid cols-1">
+              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldNickname') }}</div><input class="sp-input" v-model="form.nickname" /></div>
+            </div>
 
             <div class="sp-section-title">{{ t('newStudents.panel.sectionPersonal') }}</div>
             <div class="sp-grid">
@@ -205,7 +208,7 @@ const tabs = computed(() => [
 ])
 
 const defaultForm = {
-  email: '', password: '', firstName: '', lastName: '', birthDate: '',
+  email: '', password: '', nickname: '', firstName: '', lastName: '', birthDate: '',
   country: '', city: '', street: '', apt: '', postCode: '',
   parentFirst: '', parentLast: '', parentPhone: '', parentPassport: '',
   photoConsent: false, comment: '',

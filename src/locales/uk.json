@@ -1449,6 +1449,7 @@
       "sectionConsents": "Згоди",
       "sectionComment": "Коментар при реєстрації",
       "fieldPassword": "Пароль",
+      "fieldNickname": "Nickname",
       "fieldFirstName": "Ім'я",
       "fieldLastName": "Прізвище",
       "fieldBirthDate": "Дата народження",
