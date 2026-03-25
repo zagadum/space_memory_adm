@@ -1491,6 +1491,14 @@
     "emptyText": "The API returned an empty array: there are no TargetMail entries yet.",
     "emptyFiltered": "Nothing matched the current search.",
     "showing": "Showing {shown} of {total} records",
+    "filters": {
+      "label": "Statuses:",
+      "statuses": {
+        "clicked": "Clicked",
+        "converted": "Converted",
+        "sent": "Sent"
+      }
+    },
     "table": {
       "surname": "Surname",
       "name": "Name",

@@ -1491,6 +1491,14 @@
     "emptyText": "API zwróciło pustą tablicę: brak wpisów TargetMail.",
     "emptyFiltered": "Brak wyników dla bieżącego wyszukiwania.",
     "showing": "Pokazano {shown} z {total} rekordów",
+    "filters": {
+      "label": "Statusy:",
+      "statuses": {
+        "clicked": "Clicked",
+        "converted": "Converted",
+        "sent": "Sent"
+      }
+    },
     "table": {
       "surname": "Nazwisko",
       "name": "Imię",

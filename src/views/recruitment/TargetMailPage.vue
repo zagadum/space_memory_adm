@@ -6,6 +6,19 @@
           <span class="search-icon">🔍</span>
           <input v-model="searchQ" :placeholder="t('targetMail.searchPlaceholder')" />
         </div>
+        <div class="filter-chips">
+          <span class="filter-label">{{ t('targetMail.filters.label') }}</span>
+          <button
+            v-for="status in filterOptions"
+            :key="status"
+            type="button"
+            class="chip"
+            :class="{ active: selectedStatuses.includes(status) }"
+            @click="toggleStatus(status)"
+          >
+            {{ t(`targetMail.filters.statuses.${status}`) }}
+          </button>
+        </div>
       </div>
 
       <div class="table-container">
@@ -81,7 +94,12 @@ import { useTargetMailStore } from '../../stores/targetMail.store';
 const route = useRoute();
 const store = useTargetMailStore();
 const searchQ = ref('');
+const selectedStatuses = ref<TargetMailFilterStatus[]>([]);
 const { t, locale } = useI18n();
+
+type TargetMailFilterStatus = 'clicked' | 'converted' | 'sent';
+
+const filterOptions: TargetMailFilterStatus[] = ['clicked', 'converted', 'sent'];
 
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default');
 
@@ -92,12 +110,24 @@ const localeMap: Record<string, string> = {
   en: 'en-GB',
 };
 
+function normalizeStatus(status: string): string {
+  return String(status || '').trim().toLowerCase();
+}
+
+function getFilterStatus(status: string): TargetMailFilterStatus | null {
+  const normalized = normalizeStatus(status);
+
+  if (normalized.includes('convert')) return 'converted';
+  if (normalized.includes('click') || normalized.includes('open')) return 'clicked';
+  if (normalized.includes('sent')) return 'sent';
+
+  return null;
+}
+
 const filteredItems = computed(() => {
   const query = searchQ.value.trim().toLowerCase();
-  if (!query) return store.items;
-
   return store.items.filter((row) => {
-    return [
+    const matchesQuery = !query || [
       row.surname,
       row.name,
       row.parent_email,
@@ -106,8 +136,22 @@ const filteredItems = computed(() => {
       row.link_clicked_at ?? '',
       row.converted_at ?? '',
     ].some((value) => String(value).toLowerCase().includes(query));
+
+    const normalizedStatus = getFilterStatus(row.status);
+    const matchesStatus = !selectedStatuses.value.length || (normalizedStatus !== null && selectedStatuses.value.includes(normalizedStatus));
+
+    return matchesQuery && matchesStatus;
   });
 });
+
+function toggleStatus(status: TargetMailFilterStatus) {
+  if (selectedStatuses.value.includes(status)) {
+    selectedStatuses.value = selectedStatuses.value.filter((item) => item !== status);
+    return;
+  }
+
+  selectedStatuses.value = [...selectedStatuses.value, status];
+}
 
 function formatDateTime(value: string | null) {
   if (!value) return '—';
@@ -125,12 +169,12 @@ function formatDateTime(value: string | null) {
 }
 
 function statusClass(status: string) {
-  const normalized = status.toLowerCase();
+  const normalized = normalizeStatus(status);
 
-  if (normalized.includes('convert')) return 'success';
-  if (normalized.includes('click') || normalized.includes('open')) return 'info';
-  if (normalized.includes('error') || normalized.includes('fail')) return 'danger';
-  return 'default';
+  if (normalized.includes('convert')) return 'status-success';
+  if (normalized.includes('click') || normalized.includes('open')) return 'status-info';
+  if (normalized.includes('error') || normalized.includes('fail')) return 'status-danger';
+  return 'status-default';
 }
 
 function reload() {
@@ -139,6 +183,7 @@ function reload() {
 
 watch(recruitmentBackend, () => {
   searchQ.value = '';
+  selectedStatuses.value = [];
   store.fetchTargetMail(recruitmentBackend.value);
 }, { immediate: true });
 </script>
@@ -152,9 +197,49 @@ watch(recruitmentBackend, () => {
 .tm-actions-row {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filter-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--app-text-dim);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border: 1px solid var(--app-border);
+  background: var(--app-card);
+  color: var(--app-text-dim);
+}
+
+.chip:hover {
+  border-color: var(--app-border-hi);
+  color: var(--app-text-main);
+}
+
+.chip.active {
+  background: rgba(79,110,247,0.15);
+  border-color: rgba(79,110,247,0.5);
+  color: var(--app-text-main);
 }
 
 .search-box {
@@ -219,10 +304,10 @@ td {
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.status-badge.default { background: rgba(148,163,184,0.12); color: var(--app-text-dim); border: 1px solid rgba(148,163,184,0.22); }
-.status-badge.info { background: rgba(79,110,247,0.12); color: #4f6ef7; border: 1px solid rgba(79,110,247,0.24); }
-.status-badge.success { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.24); }
-.status-badge.danger { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.24); }
+.status-badge.status-default { background: rgba(148,163,184,0.12); color: var(--app-text-dim); border: 1px solid rgba(148,163,184,0.22); }
+.status-badge.status-info { background: rgba(79,110,247,0.12); color: #4f6ef7; border: 1px solid rgba(79,110,247,0.24); }
+.status-badge.status-success { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.24); }
+.status-badge.status-danger { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.24); }
 
 .email-link {
   color: #4f6ef7;

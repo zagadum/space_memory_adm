@@ -1481,6 +1481,33 @@
       "transactionsEmpty": "Транзакції не знайдені"
     }
   },
+  "targetMail": {
+    "pageTitle": "TargetMail",
+    "searchPlaceholder": "Пошук за прізвищем, email, статусом...",
+    "loading": "Завантажуємо TargetMail...",
+    "errorTitle": "Не вдалося завантажити TargetMail",
+    "emptyTitle": "Список порожній",
+    "emptyText": "API повернув порожній масив: записів TargetMail поки немає.",
+    "emptyFiltered": "За поточним пошуком нічого не знайдено.",
+    "showing": "Показано {shown} з {total} записів",
+    "filters": {
+      "label": "Статуси:",
+      "statuses": {
+        "clicked": "Clicked",
+        "converted": "Converted",
+        "sent": "Sent"
+      }
+    },
+    "table": {
+      "surname": "Прізвище",
+      "name": "Ім'я",
+      "parentEmail": "Email батьків",
+      "status": "Статус",
+      "errorMessage": "Помилка",
+      "linkClickedAt": "Клік по посиланню",
+      "convertedAt": "Конверсія"
+    }
+  },
   "archived": {
     "pageTitle": "Архів учнів",
     "pageSubTitle": "учні, які не будуть навчатися",

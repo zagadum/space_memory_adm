@@ -1493,6 +1493,14 @@
     "emptyText": "API вернул пустой массив: записей TargetMail пока нет.",
     "emptyFiltered": "По текущему поиску ничего не найдено.",
     "showing": "Показано {shown} из {total} записей",
+    "filters": {
+      "label": "Статусы:",
+      "statuses": {
+        "clicked": "Clicked",
+        "converted": "Converted",
+        "sent": "Sent"
+      }
+    },
     "table": {
       "surname": "Фамилия",
       "name": "Имя",
