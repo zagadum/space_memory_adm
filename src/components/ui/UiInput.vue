@@ -1,19 +1,33 @@
 <template>
   <div class="ui-input-wrap" :class="{ 'ui-input-wrap--error': !!error }">
     <label v-if="label" class="ui-input-label">{{ label }}</label>
-    <input
-      class="ui-input"
-      :type="type"
-      :placeholder="placeholder"
-      :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
-    />
+    <div class="ui-input-container">
+      <input
+        class="ui-input"
+        :type="inputType"
+        :placeholder="placeholder"
+        :value="modelValue"
+        @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
+      />
+      <button
+        v-if="type === 'password'"
+        type="button"
+        class="ui-input-toggle"
+        @click="togglePassword"
+        title="Toggle password visibility"
+      >
+        <span v-if="isPasswordVisible">👁️</span>
+        <span v-else>👁️‍🗨️</span>
+      </button>
+    </div>
     <span v-if="error" class="ui-input-error">{{ error }}</span>
   </div>
 </template>
 
 <script setup lang="ts">
-withDefaults(
+import { ref, computed } from "vue";
+
+const props = withDefaults(
   defineProps<{
     modelValue?: string | number;
     label?: string;
@@ -27,6 +41,19 @@ withDefaults(
 defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
+
+const isPasswordVisible = ref(false);
+
+const inputType = computed(() => {
+  if (props.type === "password") {
+    return isPasswordVisible.value ? "text" : "password";
+  }
+  return props.type;
+});
+
+function togglePassword() {
+  isPasswordVisible.value = !isPasswordVisible.value;
+}
 </script>
 
 <style scoped>
@@ -45,6 +72,12 @@ defineEmits<{
   color: var(--dim, #8892b0);
   margin-bottom: 5px;
   display: block;
+}
+
+.ui-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .ui-input {
@@ -68,6 +101,26 @@ defineEmits<{
 .ui-input:focus {
   border-color: var(--blue, #4f6ef7);
   box-shadow: 0 0 0 2px rgba(79, 110, 247, 0.12);
+}
+
+.ui-input-toggle {
+  position: absolute;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--dim, #8892b0);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.ui-input-toggle:hover {
+  opacity: 1;
 }
 
 /* ── error state ── */

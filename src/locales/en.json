@@ -160,7 +160,9 @@
     "title": "Sign In",
     "email": "Email",
     "password": "Password",
-    "submit": "Log In"
+    "submit": "Log In",
+    "description": "CRM platform for managing Space Memory & Indigo Mental schools within Global Leaders Skills. Enables comprehensive management of educational processes, communication with students, and facility management.",
+    "schools": "School websites:"
   },
   "tabs": {
     "payments": "Payments",

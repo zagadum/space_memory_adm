@@ -159,10 +159,12 @@
     }
   },
   "auth": {
-    "title": "Вход",
+    "title": "Вход в систему",
     "email": "Email",
     "password": "Пароль",
-    "submit": "Войти"
+    "submit": "Войти",
+    "description": "CRM-платформа для управления школами Space Memory и Indigo Mental в рамках Global Leaders Skills. Обеспечивает комплексное управление образовательными процессами, общение со студентами и управление филиалами.",
+    "schools": "Сайты школ:"
   },
   "tabs": {
     "payments": "Оплаты",

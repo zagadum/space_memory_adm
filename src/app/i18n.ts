@@ -10,15 +10,15 @@ export type Locale = (typeof SUPPORTED)[number];
 function detectLocale(): Locale {
   const saved = localStorage.getItem("locale") as Locale | null;
   if (saved && (SUPPORTED as readonly string[]).includes(saved)) return saved;
-  const nav = (navigator.language || "en").slice(0, 2) as Locale;
+  const nav = (navigator.language || "pl").slice(0, 2) as Locale;
   if ((SUPPORTED as readonly string[]).includes(nav)) return nav;
-  return "en";
+  return "pl";
 }
 
 export const i18n = createI18n({
   legacy: false,
   locale: detectLocale(),
-  fallbackLocale: "en",
+  fallbackLocale: "pl",
   messages: { ru, en, pl, uk },
 });
 
