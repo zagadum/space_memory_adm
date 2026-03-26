@@ -7,18 +7,38 @@
         </div>
         <div>
           <div class="logo-text">GLS Admin</div>
-          <div class="logo-sub">Space Memory</div>
+          <div class="logo-sub">{{ projectStore.projectName }}</div>
         </div>
       </div>
-      <RouterLink to="/projects" class="school-pill-link" active-class="active">
-        <div class="school-pill">
-          <div class="school-dot"></div>
-          <div>
-            <div class="school-name">{{ t('sidebar.allProjects') }}</div>
+      <div class="project-selector-container">
+        <div class="school-pill" @click="toggleProjectDropdown" :class="{ 'dropdown-open': isProjectDropdownOpen }">
+          <div class="school-dot" :class="{ 'dot-indigo': projectStore.isIndigo }"></div>
+          <div class="project-info">
+            <div class="school-name">{{ projectStore.projectName }}</div>
             <div class="school-city">GLS Network</div>
           </div>
+          <span class="selector-arrow">▼</span>
         </div>
-      </RouterLink>
+        
+        <div v-if="isProjectDropdownOpen" class="project-dropdown">
+          <div 
+            class="dropdown-item" 
+            :class="{ active: projectStore.isSpace }"
+            @click="selectProject('space')"
+          >
+            <div class="school-dot"></div>
+            <span>Space Memory</span>
+          </div>
+          <div 
+            class="dropdown-item" 
+            :class="{ active: projectStore.isIndigo }"
+            @click="selectProject('indigo')"
+          >
+            <div class="school-dot dot-indigo"></div>
+            <span>Indigo</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <nav class="sidebar-nav">
@@ -169,18 +189,18 @@
         </div>
       </div>
 
-      <!-- RECRUITMENT -->
+      <!-- RECRUITMENT (SPACE) -->
       <div
-        v-if="isSectionAllowed('recruitment')"
+        v-if="isSectionAllowed('recruitment') && projectStore.isSpace"
         class="nav-section"
         :class="{ open: openSections.recruitment }"
         @click="toggleSection('recruitment')"
       >
         <span class="nav-section-icon">🎯</span>
-        <span class="nav-section-label">{{ `${t('sidebar.recruitment')}(space)` }}</span>
+        <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div v-if="isSectionAllowed('recruitment')" class="nav-children" :class="{ open: openSections.recruitment }">
+      <div v-if="isSectionAllowed('recruitment') && projectStore.isSpace" class="nav-children" :class="{ open: openSections.recruitment }">
         <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students' }, accessClass('new-students')]" @click="navigateTo('new-students', '/recruitment/space/new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
         </div>
@@ -201,8 +221,9 @@
         </div>
       </div>
 
+      <!-- RECRUITMENT (INDIGO) -->
       <div
-        v-if="isSectionAllowed('recruitment')"
+        v-if="isSectionAllowed('recruitment') && projectStore.isIndigo"
         class="nav-section"
         :class="{ open: openSections.recruitmentIndigo }"
         @click="toggleSection('recruitmentIndigo')"
@@ -211,7 +232,7 @@
         <span class="nav-section-label">{{ `${t('sidebar.recruitment')} Indigo` }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div v-if="isSectionAllowed('recruitment')" class="nav-children" :class="{ open: openSections.recruitmentIndigo }">
+      <div v-if="isSectionAllowed('recruitment') && projectStore.isIndigo" class="nav-children" :class="{ open: openSections.recruitmentIndigo }">
         <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students-indigo' }, accessClass('new-students')]" @click="navigateTo('new-students-indigo', '/recruitment/indigo/new-students', 'new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
         </div>
@@ -412,6 +433,7 @@ import { useGroupsListStore } from '../../stores/groupsList.store'
 import { useTeachersListStore } from '../../stores/teachersList.store'
 import { useAuthStore } from '../../stores/auth.store'
 import { useAppStore } from '../../stores/app.store'
+import { useProjectStore } from '../../stores/project.store'
 
 const router = useRouter()
 const route = useRoute()
@@ -424,6 +446,29 @@ const teachersListStore = useTeachersListStore()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 const appStore = useAppStore()
+const projectStore = useProjectStore()
+
+const isProjectDropdownOpen = ref(false)
+
+function toggleProjectDropdown() {
+  isProjectDropdownOpen.value = !isProjectDropdownOpen.value
+}
+
+function selectProject(project: 'space' | 'indigo') {
+  projectStore.setProject(project)
+  isProjectDropdownOpen.value = false
+  
+  // При смене проекта переходим на дашборд этого проекта или оставляем пользователя где он есть
+  // Если пользователь в рекрутации, можно попробовать перекинуть на ту же страницу другого проекта
+  const currentPath = route.path
+  if (currentPath.includes('/recruitment/')) {
+    const targetPath = currentPath.replace(
+      project === 'indigo' ? '/recruitment/space/' : '/recruitment/indigo/',
+      project === 'indigo' ? '/recruitment/indigo/' : '/recruitment/space/'
+    )
+    router.push(targetPath)
+  }
+}
 
 // Логика смены языка
 function onLocale(l: string) {
@@ -643,10 +688,43 @@ const navigateTo = (item: string, path: string, menuKey = item) => {
   background: transparent !important;
 }
 
-.school-pill { margin-top: 10px; display: flex; align-items: center; gap: 7px; padding: 6px 9px; background: rgba(79,110,247,0.07); border: 1px solid rgba(79,110,247,0.18); border-radius: 8px; }
+.school-pill { margin-top: 10px; display: flex; align-items: center; gap: 7px; padding: 6px 9px; background: rgba(79,110,247,0.07); border: 1px solid rgba(79,110,247,0.18); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+.school-pill:hover { background: rgba(79,110,247,0.12); border-color: rgba(79,110,247,0.3); }
+.school-pill.dropdown-open { background: var(--status-info-bg); border-color: var(--blue); }
 .school-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
+.school-dot.dot-indigo { background: #8b5cf6; box-shadow: 0 0 6px #8b5cf6; }
+.project-info { flex: 1; }
 .school-name { font-size: 11.5px; font-weight: 600; color: var(--app-text-main); }
 .school-city { font-size: 10px; color: var(--app-text-dim); }
+.selector-arrow { font-size: 8px; color: var(--app-text-dim); margin-left: auto; }
+
+.project-selector-container { position: relative; }
+.project-dropdown {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  right: 0;
+  background: var(--app-sidebar);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  z-index: 10;
+  padding: 5px;
+  backdrop-filter: blur(20px);
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--app-text-dim);
+  transition: all 0.15s;
+}
+.dropdown-item:hover { background: var(--status-info-bg); color: var(--app-text-main); }
+.dropdown-item.active { background: rgba(79,110,247,0.1); color: var(--app-text-main); font-weight: 600; }
 
 .sidebar-nav { padding: 10px; flex: 1; overflow-y: auto; }
 .sidebar-nav::-webkit-scrollbar { width: 3px; }
