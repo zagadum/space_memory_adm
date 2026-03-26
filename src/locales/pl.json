@@ -1400,6 +1400,8 @@
       "contract": "Umowa",
       "signed": "Podpisana",
       "pending": "Oczekuje",
+      "documents": "Dokumenty",
+      "signedStatus": "Podpisano {n} z {total}",
       "payment": "Płatność",
       "group": "Grupa",
       "startDate": "Start",

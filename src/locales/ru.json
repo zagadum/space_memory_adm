@@ -1402,6 +1402,8 @@
       "contract": "Договор",
       "signed": "Подписан",
       "pending": "Ожидает",
+      "documents": "Документы",
+      "signedStatus": "Подписано {n} из {total}",
       "payment": "Оплата",
       "group": "Группа",
       "startDate": "Старт",

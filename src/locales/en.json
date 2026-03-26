@@ -1400,6 +1400,8 @@
       "contract": "Contract",
       "signed": "Signed",
       "pending": "Pending",
+      "documents": "Documents",
+      "signedStatus": "Signed {n} of {total}",
       "payment": "Payment",
       "group": "Group",
       "startDate": "Start",

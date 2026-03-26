@@ -8,11 +8,18 @@ import {
 } from '../api/recruitmentApi'
 import type { RecruitmentBackend } from '../api/http'
 
+export interface StudentDocumentItem {
+  id: number | string
+  name: string
+  signed: boolean
+}
+
 export interface NewStudent {
   id: number
   name: string
   age: number
   contract: 'signed' | 'pending'
+  documents: StudentDocumentItem[]
   payment: number
   paymentStr: string
   group: string | null
@@ -50,12 +57,6 @@ export interface HistoryEvent {
   date: string
   detail: string
   color: string
-}
-
-export interface StudentDocumentItem {
-  id: number | string
-  name: string
-  signed: boolean
 }
 
 export interface StudentTransactionItem {
@@ -111,7 +112,6 @@ export const ALL_GROUPS: Group[] = [
   { name: 'Сб 12 ЕЛа Средняя',  color: '#f59e0b', age: '8-10',  teacher: 'Елена Лисова',       day: 'Сб', time: '12:00', slots: 10, taken: 6  },
   { name: 'Сб 14 ПЗе Старшая',  color: '#ef4444', age: '11-14', teacher: 'Пётр Зелинский',     day: 'Сб', time: '14:00', slots: 12, taken: 3  },
 ]
-
 
 const MOCK_DETAILS: Record<number, StudentDetails> = {
   1: { email: 'artem.volkov@gmail.com', password: 'Qwerty123!', nickname: 'Arty', firstName: 'Артем',  lastName: 'Волков',  birthDate: '2012-05-14', country: 'Польша', city: 'Варшава', street: 'ул. Маршалковска 10', apt: 'кв. 3', postCode: '00-001', parentFirst: 'Сергей', parentLast: 'Волков',  parentPhone: '+48 601 111 222', parentPassport: 'ABC 123456', photoConsent: true,  comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.', currentPrice: '489.00', currentPriceDesc: 'Group lessons' },
@@ -234,6 +234,17 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     return Math.max(0, Math.floor((Date.now() - date.getTime()) / 86400000))
   }
 
+  function calculateAge(birthDate: string): number {
+    const today = new Date()
+    const birth = new Date(birthDate)
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
+    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+      age--
+    }
+    return age
+  }
+
   function normalizeStudent(s: RecruitmentNewStudent): NewStudent {
     const row = s as RecruitmentNewStudent & Record<string, any>
     const createdDate = toIsoDate(row.createdDate ?? row.created_at ?? row.createdAt ?? row.date_create)
@@ -254,17 +265,22 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     const manager = typeof row.manager === 'string'
       ? row.manager
       : (row.manager_name ?? row.managerName ?? managerNameFromObj ?? null)
-    const contract = row.contract === 'signed' || row.contract === 'pending'
-      ? row.contract
-      : (row.contract_signed || row.is_signed || row.signed_at ? 'signed' : 'pending')
+    
+    // Support multi-documents
+    const docs: StudentDocumentItem[] = row.documents || row.document_list || []
+    if (docs.length === 0) {
+      const isSigned = row.contract === 'signed' || row.contract_signed || row.is_signed || row.signed_at
+      docs.push({ id: 'doc1', name: 'Umowa edukacyjna', signed: !!isSigned })
+      docs.push({ id: 'doc2', name: 'Zgoda RODO', signed: !!isSigned })
+    }
+    const allSigned = docs.length > 0 && docs.every(d => d.signed)
 
     return {
       id: Number(row.id),
       name: [row.name ?? row.first_name ?? row.firstName, row.surname ?? row.last_name ?? row.lastName].filter(Boolean).join(' ').trim() || `#${row.id}`,
-      age: dob
-        ? Math.max(0, Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000))
-        : Number(row.age ?? 0),
-      contract,
+      age: dob ? calculateAge(dob) : Number(row.age ?? 0),
+      contract: allSigned ? 'signed' : 'pending',
+      documents: docs,
       payment,
       paymentStr: row.paymentStr ?? row.payment_str ?? `${payment} zł`,
       group: groupName,
@@ -380,12 +396,16 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract'>, backend?: RecruitmentBackend) {
+  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract' | 'documents'>, backend?: RecruitmentBackend) {
     const today = new Date().toISOString().slice(0, 10)
     const newId = Date.now()
-    students.value.unshift({
+    const newStudent: NewStudent = {
       id: newId,
       contract: 'pending',
+      documents: [
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
+        { id: 'doc2', name: 'Zgoda RODO', signed: false }
+      ],
       payment: 0,
       paymentStr: '0 zł',
       group: null,
@@ -393,7 +413,8 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       createdDate: today,
       waitDays: 0,
       ...data,
-    })
+    }
+    students.value.unshift(newStudent)
     pagination.value = {
       ...pagination.value,
       total: pagination.value.total + 1,

@@ -136,9 +136,41 @@
               </td>
               <!-- Contract -->
               <td>
-                <span class="contract-badge" :class="s.contract === 'signed' ? 'contract-signed' : 'contract-pending'">
-                  {{ s.contract === 'signed' ? `✓ ${t('newStudents.table.signed')}` : `⏳ ${t('newStudents.table.pending')}` }}
-                </span>
+                <div class="contract-cell">
+                  <span 
+                    class="contract-badge" 
+                    :class="[
+                      s.contract === 'signed' ? 'contract-signed' : 'contract-pending',
+                      { 'partial': s.contract !== 'signed' && s.documents.some(d => d.signed) }
+                    ]"
+                  >
+                    <template v-if="s.contract === 'signed'">
+                      ✓ {{ t('newStudents.table.signed') }}
+                    </template>
+                    <template v-else-if="s.documents.some(d => d.signed)">
+                      {{ s.documents.filter(d => d.signed).length }}/{{ s.documents.length }} {{ t('newStudents.table.signed') }}
+                    </template>
+                    <template v-else>
+                      ⏳ {{ t('newStudents.table.pending') }}
+                    </template>
+                  </span>
+
+                  <!-- Premium Tooltip -->
+                  <div class="documents-tooltip">
+                    <div class="tooltip-header">
+                      <span class="tooltip-title">{{ t('newStudents.table.documents') }}</span>
+                      <span class="tooltip-count">{{ s.documents.filter(d => d.signed).length }}/{{ s.documents.length }}</span>
+                    </div>
+                    <div class="tooltip-divider"></div>
+                    <div class="tooltip-list">
+                      <div v-for="doc in s.documents" :key="doc.id" class="tooltip-item" :class="{ 'signed': doc.signed }">
+                        <span class="item-icon">{{ doc.signed ? '✓' : '○' }}</span>
+                        <span class="item-name">{{ doc.name }}</span>
+                        <span class="item-status">{{ doc.signed ? t('newStudents.table.signed') : t('newStudents.table.pending') }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
               <!-- Payment -->
               <td>
@@ -584,6 +616,161 @@ function onPanelLoadPayments() {
 .list-state-text { max-width: 560px; font-size: 13px; color: var(--app-text-dim); line-height: 1.5; }
 .list-state.error .list-state-title { color: #ef4444; }
 .list-state.loading .list-state-title { color: #4f6ef7; }
+
+/* CONTRACT COLUMN */
+.contract-cell {
+  position: relative;
+  display: inline-block;
+}
+
+.contract-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  cursor: help;
+}
+
+.contract-signed {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.contract-pending {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+  border: 1px solid rgba(100, 116, 139, 0.2);
+}
+
+.contract-badge.partial {
+  background: rgba(79, 110, 247, 0.1);
+  color: #4f6ef7;
+  border: 1px solid rgba(79, 110, 247, 0.2);
+}
+
+/* Tooltip Styles */
+.documents-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  width: 240px;
+  background: var(--app-surface); /* Changed from --surface */
+  border: 1px solid var(--app-border); /* Changed from --border */
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.contract-cell:hover .documents-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(-5px);
+}
+
+.tooltip-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tooltip-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: var(--app-text-dim); /* Changed from --text-muted */
+}
+
+.tooltip-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  background: var(--app-card); /* Changed from --bg-soft */
+  border-radius: 4px;
+}
+
+.tooltip-divider {
+  height: 1px;
+  background: var(--app-border); /* Changed from --border-light */
+  margin: 0 -12px 10px -12px;
+}
+
+.tooltip-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tooltip-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--app-text-dim); /* Changed from --text-muted */
+}
+
+.tooltip-item.signed {
+  color: var(--app-text-main); /* Changed from --text */
+}
+
+.item-icon {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.7rem;
+  background: var(--app-card); /* Changed from --bg-soft */
+  flex-shrink: 0;
+}
+
+.signed .item-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.item-name {
+  flex-grow: 1;
+  font-weight: 500;
+}
+
+.item-status {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--app-card); /* Changed from --bg-soft */
+}
+
+.signed .item-status {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+[data-theme='dark'] .documents-tooltip {
+  background: #1e1e2d;
+  border-color: #2b2b40;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .documents-tooltip {
+    display: none; /* Hide tooltip on mobile to prevent layout issues, or make it click-based if needed */
+  }
+}
 
 /* STATS */
 .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }

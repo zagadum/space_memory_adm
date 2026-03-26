@@ -1181,16 +1181,37 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
   const newStudentsDb: any[] = (globalThis as any).__mock_new_students ?? ((globalThis as any).__mock_new_students = [
     { id: 1, name: 'Артем', surname: 'Волков', nickname: 'Arty', dob: '2012-05-14', contract: 'signed', payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана' },
-    { id: 2, name: 'Кирилл', surname: 'Морозов', nickname: 'Kiri', dob: '2015-09-22', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Ср 15 ПИе Младшая', group_color: '#8b5cf6', start_date: '2024-03-05', created_at: '2024-03-01', wait_days: 2, manager_name: 'Александр' },
+    { 
+      id: 2, name: 'Кирилл', surname: 'Морозов', nickname: 'Kiri', dob: '2015-09-22', contract: 'pending', 
+      document_list: [
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
+        { id: 'doc2', name: 'Zgoda RODO', signed: false }
+      ],
+      payment: 0, payment_str: '0 zł', group_name: 'Ср 15 ПИе Младшая', group_color: '#8b5cf6', start_date: '2024-03-05', created_at: '2024-03-01', wait_days: 2, manager_name: 'Александр' 
+    },
     { id: 3, name: 'Даниил', surname: 'Глебов', nickname: 'Dan', dob: '2010-11-03', contract: 'signed', payment: 440, payment_str: '440 zł', group_name: 'Пт 19 АНа Старшая', group_color: '#06b6d4', start_date: '2024-02-22', created_at: '2024-02-17', wait_days: 1, manager_name: 'Артём' },
-    { id: 4, name: 'Никита', surname: 'Иванов', nickname: '', dob: '2017-03-19', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-10', wait_days: 7, manager_name: null },
+    { 
+      id: 4, name: 'Никита', surname: 'Иванов', nickname: '', dob: '2017-03-19', contract: 'pending', 
+      document_list: [
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: true },
+        { id: 'doc2', name: 'Zgoda RODO', signed: false }
+      ],
+      payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-10', wait_days: 7, manager_name: null 
+    },
     { id: 5, name: 'Полина', surname: 'Синяк', nickname: 'Poli', dob: '2014-07-08', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-03', wait_days: 3, manager_name: 'Мария' },
     { id: 6, name: 'Аня', surname: 'Белова', nickname: 'Anya', dob: '2016-02-14', contract: 'signed', payment: 464, payment_str: '464 zł', group_name: 'Сб 12 ЕЛа Средняя', group_color: '#f59e0b', start_date: '2024-03-07', created_at: '2024-03-01', wait_days: 5, manager_name: 'Мария' },
     { id: 7, name: 'Саша', surname: 'Попов', nickname: 'Sash', dob: '2013-11-25', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-28', wait_days: 14, manager_name: null },
     { id: 8, name: 'Ева', surname: 'Коваль', nickname: 'Evi', dob: '2018-06-30', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-10', created_at: '2024-03-05', wait_days: 4, manager_name: 'Александр' },
     { id: 9, name: 'Марк', surname: 'Левин', nickname: 'Marky', dob: '2012-01-12', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-12', wait_days: 6, manager_name: 'Светлана' },
     { id: 10, name: 'Олег', surname: 'Бойко', nickname: 'Oli', dob: '2011-04-19', contract: 'signed', payment: 530, payment_str: '530 zł', group_name: 'Пн 18 ЕЛа Старшая', group_color: '#ef4444', start_date: '2024-03-14', created_at: '2024-03-10', wait_days: 2, manager_name: 'Артём' },
-    { id: 11, name: 'Лера', surname: 'Сокол', nickname: '', dob: '2015-12-03', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-13', wait_days: 9, manager_name: null },
+    { 
+      id: 11, name: 'Лера', surname: 'Сокол', nickname: '', dob: '2015-12-03', contract: 'pending', 
+      document_list: [
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
+        { id: 'doc2', name: 'Zgoda RODO', signed: true }
+      ],
+      payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-13', wait_days: 9, manager_name: null 
+    },
     { id: 12, name: 'Мия', surname: 'Янович', nickname: 'Mimi', dob: '2016-10-10', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-18', created_at: '2024-03-15', wait_days: 1, manager_name: 'Мария' },
   ]);
 
