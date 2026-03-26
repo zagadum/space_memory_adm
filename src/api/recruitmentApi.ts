@@ -17,6 +17,7 @@ export interface RecruitmentNewStudent {
   createdDate?: string;
   waitDays?: number;
   manager?: string | null;
+  phone?: string | null;
 }
 
 export interface RecruitmentLead {

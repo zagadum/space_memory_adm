@@ -128,6 +128,10 @@
               <!-- Name -->
               <td>
                 <div class="student-name" @click="openPanel(s)">{{ s.name }}</div>
+                <div class="student-info-sub">
+                  <span class="sub-id">#{{ s.id }}</span>
+                  <span v-if="s.phone" class="sub-phone">{{ s.phone }}</span>
+                </div>
               </td>
               <!-- Age -->
               <td>
@@ -601,6 +605,15 @@ function onPanelLoadPayments() {
 .search-icon { color: var(--app-text-dim); font-size: 14px; }
 .search-box input { background: none; border: none; outline: none; color: var(--app-text-main); font-family: 'Outfit', sans-serif; font-size: 13px; width: 200px; }
 .search-box input::placeholder { color: var(--app-text-dim); }
+ 
+/* NAME COLUMN SUB INFO */
+.student-info-sub {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; color: var(--app-text-dim); opacity: 0.6;
+  margin-top: 1px; line-height: 1.2;
+}
+.sub-id { font-weight: 700; font-family: 'Space Mono', monospace; }
+.sub-phone { font-weight: 400; }
 
 /* CONTENT */
 .ns-content { padding: 24px 28px; flex: 1; overflow-y: auto; }

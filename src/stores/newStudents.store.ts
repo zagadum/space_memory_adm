@@ -29,6 +29,7 @@ export interface NewStudent {
   createdDate: string
   waitDays: number
   manager: string | null
+  phone: string | null
 }
 
 export interface StudentDetails {
@@ -58,6 +59,7 @@ export interface StudentDetails {
   internalQualityConsent: boolean
   currentPrice: string
   currentPriceDesc: string
+  phone?: string | null
 }
 
 export interface HistoryEvent {
@@ -122,8 +124,8 @@ export const ALL_GROUPS: Group[] = [
 ]
 
 const MOCK_DETAILS: Record<number, StudentDetails> = {
-  1: { email: 'artem.volkov@gmail.com', password: 'Qwerty123!', nickname: 'Arty', firstName: 'Артем',  lastName: 'Волков',  birthDate: '2012-05-14', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Маршалковска 10', apt: 'кв. 3', postCode: '00-001', parentFirst: 'Сергей', parentLast: 'Волков',  parentPhone: '+48 601 111 222', parentPassport: 'ABC 123456', hobbies: 'Robotyka, LEGO', photoConsent: true,  marketingConsent: true, digitalContentConsent: true, dataProcessingConsent: true, socialMediaConsent: true, internalQualityConsent: true, comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.', currentPrice: '489.00', currentPriceDesc: 'Group lessons' },
-  2: { email: 'kirill.morozov@mail.ru',  password: 'Pass9876!', nickname: 'Kiri', firstName: 'Кирилл', lastName: 'Морозов', birthDate: '2015-09-22', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Новый Свят 5',   apt: '',       postCode: '00-400', parentFirst: 'Анна',   parentLast: 'Морозова', parentPhone: '+48 602 333 444', parentPassport: 'DEF 654321', hobbies: '', photoConsent: false, marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
+  1: { phone: '+48 601 111 222', email: 'artem.volkov@gmail.com', password: 'Qwerty123!', nickname: 'Arty', firstName: 'Артем',  lastName: 'Волков',  birthDate: '2012-05-14', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Маршалковска 10', apt: 'кв. 3', postCode: '00-001', parentFirst: 'Сергей', parentLast: 'Волков',  parentPhone: '+48 601 111 222', parentPassport: 'ABC 123456', hobbies: 'Robotyka, LEGO', photoConsent: true,  marketingConsent: true, digitalContentConsent: true, dataProcessingConsent: true, socialMediaConsent: true, internalQualityConsent: true, comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.', currentPrice: '489.00', currentPriceDesc: 'Group lessons' },
+  2: { phone: '+48 602 333 444', email: 'kirill.morozov@mail.ru',  password: 'Pass9876!', nickname: 'Kiri', firstName: 'Кирилл', lastName: 'Морозов', birthDate: '2015-09-22', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Новый Свят 5',   apt: '',       postCode: '00-400', parentFirst: 'Анна',   parentLast: 'Морозова', parentPhone: '+48 602 333 444', parentPassport: 'DEF 654321', hobbies: '', photoConsent: false, marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
   3: { email: 'daniil.glebov@wp.pl',     password: 'Secure789@', nickname: 'Dan', firstName: 'Даниил', lastName: 'Глебов',  birthDate: '2010-11-03', country: 'Польша', voivodeship: 'Małopolskie', city: 'Краков',  street: 'ул. Флорианска 20',  apt: 'кв. 7', postCode: '30-001', parentFirst: 'Ирина',  parentLast: 'Глебова',  parentPhone: '+48 603 555 666', parentPassport: 'GHI 987654', hobbies: 'Kosmos, książki', photoConsent: true,  marketingConsent: true, digitalContentConsent: true, dataProcessingConsent: true, socialMediaConsent: true, internalQualityConsent: true, comment: 'Ребёнок любит космос и читать книги.',                                             currentPrice: '440.10', currentPriceDesc: 'Family 2nd child −10%' },
   4: { email: 'nikita.ivanov@gmail.com', password: 'Ivan2024#', nickname: '', firstName: 'Никита', lastName: 'Иванов',  birthDate: '2017-03-19', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Пулавска 88',    apt: 'кв.12', postCode: '02-603', parentFirst: 'Дмитрий',parentLast: 'Иванов',   parentPhone: '+48 604 777 888', parentPassport: 'JKL 112233', hobbies: '', photoConsent: true,  marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: 'Застенчивый ребёнок, привыкает медленно.',                                         currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
   5: { email: 'polina.sinak@gmail.com',  password: 'Pol2024!', nickname: 'Poli', firstName: 'Полина', lastName: 'Синяк',   birthDate: '2014-07-08', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Садова 12',      apt: 'кв. 2', postCode: '00-500', parentFirst: 'Олег',   parentLast: 'Синяк',    parentPhone: '+48 605 888 999', parentPassport: 'MNO 345678', hobbies: '', photoConsent: true,  marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
@@ -304,6 +306,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       createdDate: createdDate ?? new Date().toISOString().slice(0, 10),
       waitDays: Number(row.waitDays ?? row.wait_days ?? diffDaysFrom(createdDate)) || 0,
       manager,
+      phone: row.phone ?? row.parent_phone ?? row.parentPhone ?? null,
     }
   }
 
@@ -411,7 +414,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract' | 'documents'>, backend?: RecruitmentBackend) {
+  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract' | 'documents' | 'phone'> & { phone?: string | null }, backend?: RecruitmentBackend) {
     const today = new Date().toISOString().slice(0, 10)
     const newId = Date.now()
     const newStudent: NewStudent = {
@@ -427,6 +430,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       groupColor: null,
       createdDate: today,
       waitDays: 0,
+      phone: data.phone || null,
       ...data,
     }
     students.value.unshift(newStudent)
