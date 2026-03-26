@@ -1179,19 +1179,41 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // ── END ARCHIVED STUDENTS ─────────────────────────────────────────────────
 
   // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
+  const mockHistory: Record<number, any[]> = (globalThis as any).__mock_new_students_history ?? ((globalThis as any).__mock_new_students_history = {});
   const newStudentsDb: any[] = (globalThis as any).__mock_new_students ?? ((globalThis as any).__mock_new_students = [
-    { id: 1, name: 'Артем', surname: 'Волков', nickname: 'Arty', dob: '2012-05-14', contract: 'signed', payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана' },
+    { 
+      id: 1, name: 'Артем', surname: 'Волков', nickname: 'Arty', email: 'artem.volkov@gmail.com', dob: '2012-05-14', contract: 'signed', 
+      country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', address: 'ул. Маршалковска 10', apartment: '3', zip: '00-001',
+      parent_name: 'Сергей', parent_surname: 'Волков', parent_phone: '+48 601 111 222', parent_passport: 'ABC 123456',
+      hobbies: 'Robotyka, LEGO', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
+      reg_comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.',
+      payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана' 
+    },
     { 
       id: 2, name: 'Кирилл', surname: 'Морозов', nickname: 'Kiri', dob: '2015-09-22', contract: 'pending', 
+      country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', address: 'ул. Новый Свят 5', apartment: '', zip: '00-400',
+      parent_name: 'Анна', parent_surname: 'Морозова', parent_phone: '+48 602 333 444', parent_passport: 'DEF 654321',
+      hobbies: 'Шахматы, рисование', photo_consent: 0, marketing_consent: 0, digital_content_consent: 0, data_processing_consent: 1, social_media_consent: 0, internal_quality_consent: 1,
+      reg_comment: 'Кирилл очень любознательный.',
       document_list: [
         { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
         { id: 'doc2', name: 'Zgoda RODO', signed: false }
       ],
-      payment: 0, payment_str: '0 zł', group_name: 'Ср 15 ПИе Младшая', group_color: '#8b5cf6', start_date: '2024-03-05', created_at: '2024-03-01', wait_days: 2, manager_name: 'Александр' 
     },
-    { id: 3, name: 'Даниил', surname: 'Глебов', nickname: 'Dan', dob: '2010-11-03', contract: 'signed', payment: 440, payment_str: '440 zł', group_name: 'Пт 19 АНа Старшая', group_color: '#06b6d4', start_date: '2024-02-22', created_at: '2024-02-17', wait_days: 1, manager_name: 'Артём' },
+    { 
+      id: 3, name: 'Даниил', surname: 'Глебов', nickname: 'Dan', dob: '2010-11-03', contract: 'signed', 
+      country: 'Польша', voivodeship: 'Małopolskie', city: 'Краков', address: 'ул. Флорианска 20', apartment: '7', zip: '30-001',
+      parent_name: 'Ірина', parent_surname: 'Глебова', parent_phone: '+48 603 555 666', parent_passport: 'GHI 987654',
+      hobbies: 'Kosmos, książki', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
+      reg_comment: 'Ребёнок любит космос и читать книги.',
+      payment: 440, payment_str: '440 zł', group_name: 'Пт 19 АНа Старшая', group_color: '#06b6d4', start_date: '2024-02-22', created_at: '2024-02-17', wait_days: 1, manager_name: 'Артём' 
+    },
     { 
       id: 4, name: 'Никита', surname: 'Иванов', nickname: '', dob: '2017-03-19', contract: 'pending', 
+      country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', address: 'ул. Пулавска 88', apartment: '12', zip: '02-603',
+      parent_name: 'Дмитрий', parent_surname: 'Иванов', parent_phone: '+48 604 777 888', parent_passport: 'JKL 112233',
+      hobbies: '', photo_consent: 1, marketing_consent: 0, digital_content_consent: 0, data_processing_consent: 1, social_media_consent: 0, internal_quality_consent: 1,
+      reg_comment: 'Застенчивый ребёнок, привыкает медленно.',
       document_list: [
         { id: 'doc1', name: 'Umowa edukacyjna', signed: true },
         { id: 'doc2', name: 'Zgoda RODO', signed: false }
@@ -1319,11 +1341,11 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const id = Number(url.split('/')[2]);
     const found = newStudentsDb.find((s) => Number(s.id) === id);
     if (!found) return err(config, 404, 'Student not found');
-    return ok(config, {
-      data: [
-        { event: 'Ученик создан', created_at: `${found.created_at}T09:00:00Z`, detail: 'Добавлен в рекрутинг', changed_by: found.manager_name || 'Система' },
-      ],
-    });
+    
+    const h = mockHistory[id] || [
+      { event: 'Ученик создан', created_at: `${found.created_at}T09:00:00Z`, detail: 'Добавлен в рекрутинг', changed_by: found.manager_name || 'Система' }
+    ];
+    return ok(config, { data: h });
   }
 
   // PATCH new-students/:id
@@ -1332,6 +1354,22 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const body = readBody(config) || {};
     const found = newStudentsDb.find((s) => Number(s.id) === id);
     if (!found) return err(config, 404, 'Student not found');
+
+    if (body.history_comment) {
+      if (!mockHistory[id]) {
+        mockHistory[id] = [
+          { event: 'Ученик создан', created_at: `${found.created_at}T09:00:00Z`, detail: 'Добавлен в рекрутинг', changed_by: found.manager_name || 'Система' }
+        ];
+      }
+      mockHistory[id].push({
+        event: 'Согласие изменено',
+        created_at: new Date().toISOString(),
+        detail: body.history_comment,
+        changed_by: 'Администратор'
+      });
+      delete body.history_comment;
+    }
+
     Object.assign(found, body);
     return ok(config, { ok: true, data: found });
   }

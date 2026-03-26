@@ -15,6 +15,7 @@
   <EditInfoModal v-else-if="openId==='edit-info'" />
   <AttendanceStatusModal v-else-if="openId==='attendance-status'" />
   <AttendanceModal v-else-if="openId==='attendance'" />
+  <ConsentConfirmModal v-else-if="openId==='consent-confirm'" />
 </template>
 
 <script setup lang="ts">
@@ -36,6 +37,7 @@ import TrainerPresenceModal from "./templates/TrainerPresenceModal.vue";
 import EditInfoModal from "./templates/EditInfoModal.vue";
 import AttendanceStatusModal from "./templates/AttendanceStatusModal.vue";
 import AttendanceModal from "./templates/AttendanceModal.vue";
+import ConsentConfirmModal from "./templates/ConsentConfirmModal.vue";
 
 const modal = useModalStore();
 const { openId } = storeToRefs(modal);

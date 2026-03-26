@@ -55,14 +55,17 @@
             <div class="sp-section-title">{{ t('newStudents.panel.sectionAddress') }}</div>
             <div class="sp-grid">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldCountry') }}</div><input class="sp-input" v-model="form.country" /></div>
+              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldVoivodeship') }}</div><input class="sp-input" v-model="form.voivodeship" /></div>
+            </div>
+            <div class="sp-grid">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldCity') }}</div><input class="sp-input" v-model="form.city" /></div>
+              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPostCode') }}</div><input class="sp-input" v-model="form.postCode" /></div>
             </div>
             <div class="sp-grid cols-1">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldStreet') }}</div><input class="sp-input" v-model="form.street" /></div>
             </div>
-            <div class="sp-grid">
+            <div class="sp-grid cols-1">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldApt') }}</div><input class="sp-input" v-model="form.apt" /></div>
-              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPostCode') }}</div><input class="sp-input" v-model="form.postCode" /></div>
             </div>
 
             <div class="sp-section-title">{{ t('newStudents.panel.sectionParent') }}</div>
@@ -75,18 +78,46 @@
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPassport') }}</div><input class="sp-input" v-model="form.parentPassport" /></div>
             </div>
 
-            <div class="sp-section-title">{{ t('newStudents.panel.sectionConsents') }}</div>
-            <div class="sp-toggle-row">
-              <div>
-                <div class="sp-toggle-label">📷 {{ t('newStudents.panel.consentPhoto') }}</div>
-                <div class="sp-toggle-sub">{{ t('newStudents.panel.consentPhotoSub') }}</div>
-              </div>
-              <div class="sp-toggle" :class="{ on: form.photoConsent }" @click="form.photoConsent = !form.photoConsent" />
-            </div>
-
-            <div class="sp-section-title">{{ t('newStudents.panel.sectionComment') }}</div>
+            <div class="sp-section-title">{{ t('newStudents.panel.sectionHobbies') }}</div>
             <div class="sp-grid cols-1">
               <div class="sp-field">
+                <div class="sp-label">{{ t('newStudents.panel.fieldHobbies') }}</div>
+                <textarea class="sp-input sp-textarea" v-model="form.hobbies" :placeholder="t('newStudents.panel.hobbiesPlaceholder')" />
+              </div>
+            </div>
+
+            <div class="sp-section-title">{{ t('newStudents.panel.sectionConsents') }}</div>
+            <div class="sp-consents-grid">
+              <div class="sp-toggle-card" :class="{ on: form.marketingConsent }" @click="confirmConsentToggle('marketingConsent', '📢', t('newStudents.panel.consentMarketing'))">
+                <div class="sp-toggle-icon">📢</div>
+                <div class="sp-toggle-text">{{ t('newStudents.panel.consentMarketing') }}</div>
+              </div>
+              <div class="sp-toggle-card" :class="{ on: form.digitalContentConsent }" @click="confirmConsentToggle('digitalContentConsent', '📦', t('newStudents.panel.consentDigitalContent'))">
+                <div class="sp-toggle-icon">📦</div>
+                <div class="sp-toggle-text">{{ t('newStudents.panel.consentDigitalContent') }}</div>
+              </div>
+              <div class="sp-toggle-card" :class="{ on: form.dataProcessingConsent }" @click="confirmConsentToggle('dataProcessingConsent', '⚖️', t('newStudents.panel.consentDataProcessing'))">
+                <div class="sp-toggle-icon">⚖️</div>
+                <div class="sp-toggle-text">{{ t('newStudents.panel.consentDataProcessing') }}</div>
+              </div>
+              <div class="sp-toggle-card" :class="{ on: form.socialMediaConsent }" @click="confirmConsentToggle('socialMediaConsent', '📸', t('newStudents.panel.consentSocialMedia'))">
+                <div class="sp-toggle-icon">📸</div>
+                <div class="sp-toggle-text">{{ t('newStudents.panel.consentSocialMedia') }}</div>
+              </div>
+              <div class="sp-toggle-card" :class="{ on: form.internalQualityConsent }" @click="confirmConsentToggle('internalQualityConsent', '🔍', t('newStudents.panel.consentInternalQuality'))">
+                <div class="sp-toggle-icon">🔍</div>
+                <div class="sp-toggle-text">{{ t('newStudents.panel.consentInternalQuality') }}</div>
+              </div>
+              <div class="sp-toggle-card" :class="{ on: form.photoConsent }" @click="confirmConsentToggle('photoConsent', '🖼️', t('newStudents.panel.consentPhoto'))">
+                <div class="sp-toggle-icon">🖼️</div>
+                <div class="sp-toggle-text">{{ t('newStudents.panel.consentPhoto') }}</div>
+              </div>
+            </div>
+
+            <div class="sp-section-title">{{ t('newStudents.panel.sectionComments') }}</div>
+            <div class="sp-grid cols-1">
+              <div class="sp-field">
+                <div class="sp-label">{{ t('newStudents.panel.fieldComment') }}</div>
                 <textarea class="sp-input sp-textarea" v-model="form.comment" :placeholder="t('newStudents.panel.commentPlaceholder')" />
               </div>
             </div>
@@ -177,6 +208,7 @@
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useModalStore } from '../../../stores/modal.store'
 import type { NewStudent, StudentDetails, HistoryEvent, StudentPayments } from '../../../stores/newStudents.store'
 
 const props = defineProps<{
@@ -209,9 +241,15 @@ const tabs = computed(() => [
 
 const defaultForm = {
   email: '', password: '', nickname: '', firstName: '', lastName: '', birthDate: '',
-  country: '', city: '', street: '', apt: '', postCode: '',
+  country: '', voivodeship: '', city: '', street: '', apt: '', postCode: '',
   parentFirst: '', parentLast: '', parentPhone: '', parentPassport: '',
-  photoConsent: false, comment: '',
+  hobbies: '', comment: '',
+  photoConsent: false,
+  marketingConsent: false,
+  digitalContentConsent: false,
+  dataProcessingConsent: false,
+  socialMediaConsent: false,
+  internalQualityConsent: false,
 }
 
 const form = ref({ ...defaultForm })
@@ -257,6 +295,21 @@ const individualPrices = [
   { amount: '689.00', name: 'Individual lessons',       tag: 'Стандарт', tagColor: 'var(--app-text-dim)' },
   { amount: '620.10', name: 'Individual lessons −10%',  tag: '−10%',     tagColor: '#f59e0b'              },
 ]
+
+const modal = useModalStore()
+
+function confirmConsentToggle(key: string, icon: string, label: string) {
+  if (!props.student) return
+  
+  const currentVal = (form.value as any)[key]
+  modal.open('consent-confirm', {
+    studentId: props.student.id,
+    consentKey: key,
+    consentIcon: icon,
+    consentLabel: label,
+    newValue: !currentVal
+  })
+}
 
 function pickPrice(p: { amount: string; name: string }) {
   selectedPrice.value = p.amount
@@ -390,6 +443,54 @@ function formatTxDate(dateText: string) {
 .sp-toggle.on { background: linear-gradient(135deg,#10b981,#06b6d4); border-color: transparent; box-shadow: 0 0 10px rgba(16,185,129,0.3); }
 .sp-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 .sp-toggle.on::after { left: 21px; }
+
+.sp-consents-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.sp-toggle-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 8px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: center;
+  gap: 8px;
+}
+.sp-toggle-card:hover {
+  border-color: var(--app-border-hi);
+  background: var(--app-surface);
+  transform: translateY(-2px);
+}
+.sp-toggle-card.on {
+  background: rgba(16, 185, 129, 0.08);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+}
+.sp-toggle-icon {
+  font-size: 18px;
+  filter: grayscale(1);
+  transition: filter 0.2s;
+}
+.sp-toggle-card.on .sp-toggle-icon {
+  filter: grayscale(0);
+}
+.sp-toggle-text {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--app-text-dim);
+  line-height: 1.2;
+}
+.sp-toggle-card.on .sp-toggle-text {
+  color: #10b981;
+}
 
 .sp-save-btn {
   width: 100%; display: flex; align-items: center; justify-content: center; padding: 10px 14px;

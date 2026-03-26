@@ -16,7 +16,8 @@ export type ModalId =
   | "trainer-presence"
   | "edit-info"
   | "attendance-status"
-  | "attendance";
+  | "attendance"
+  | "consent-confirm";
 
 export const useModalStore = defineStore("modal", {
   state: () => ({

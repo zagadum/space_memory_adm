@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { i18n } from '../app/i18n'
 import {
   getRecruitmentApi,
   type RecruitmentNewStudent,
@@ -38,6 +39,7 @@ export interface StudentDetails {
   lastName: string
   birthDate: string
   country: string
+  voivodeship: string
   city: string
   street: string
   apt: string
@@ -46,8 +48,14 @@ export interface StudentDetails {
   parentLast: string
   parentPhone: string
   parentPassport: string
-  photoConsent: boolean
+  hobbies: string
   comment: string
+  photoConsent: boolean // legacy/internal
+  marketingConsent: boolean
+  digitalContentConsent: boolean
+  dataProcessingConsent: boolean
+  socialMediaConsent: boolean
+  internalQualityConsent: boolean
   currentPrice: string
   currentPriceDesc: string
 }
@@ -114,14 +122,14 @@ export const ALL_GROUPS: Group[] = [
 ]
 
 const MOCK_DETAILS: Record<number, StudentDetails> = {
-  1: { email: 'artem.volkov@gmail.com', password: 'Qwerty123!', nickname: 'Arty', firstName: 'Артем',  lastName: 'Волков',  birthDate: '2012-05-14', country: 'Польша', city: 'Варшава', street: 'ул. Маршалковска 10', apt: 'кв. 3', postCode: '00-001', parentFirst: 'Сергей', parentLast: 'Волков',  parentPhone: '+48 601 111 222', parentPassport: 'ABC 123456', photoConsent: true,  comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.', currentPrice: '489.00', currentPriceDesc: 'Group lessons' },
-  2: { email: 'kirill.morozov@mail.ru',  password: 'Pass9876!', nickname: 'Kiri', firstName: 'Кирилл', lastName: 'Морозов', birthDate: '2015-09-22', country: 'Польша', city: 'Варшава', street: 'ул. Новый Свят 5',   apt: '',       postCode: '00-400', parentFirst: 'Анна',   parentLast: 'Морозова', parentPhone: '+48 602 333 444', parentPassport: 'DEF 654321', photoConsent: false, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
-  3: { email: 'daniil.glebov@wp.pl',     password: 'Secure789@', nickname: 'Dan', firstName: 'Даниил', lastName: 'Глебов',  birthDate: '2010-11-03', country: 'Польша', city: 'Краков',  street: 'ул. Флорианска 20',  apt: 'кв. 7', postCode: '30-001', parentFirst: 'Ирина',  parentLast: 'Глебова',  parentPhone: '+48 603 555 666', parentPassport: 'GHI 987654', photoConsent: true,  comment: 'Ребёнок любит космос и читать книги.',                                             currentPrice: '440.10', currentPriceDesc: 'Family 2nd child −10%' },
-  4: { email: 'nikita.ivanov@gmail.com', password: 'Ivan2024#', nickname: '', firstName: 'Никита', lastName: 'Иванов',  birthDate: '2017-03-19', country: 'Польша', city: 'Варшава', street: 'ул. Пулавска 88',    apt: 'кв.12', postCode: '02-603', parentFirst: 'Дмитрий',parentLast: 'Иванов',   parentPhone: '+48 604 777 888', parentPassport: 'JKL 112233', photoConsent: true,  comment: 'Застенчивый ребёнок, привыкает медленно.',                                         currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
-  5: { email: 'polina.sinak@gmail.com',  password: 'Pol2024!', nickname: 'Poli', firstName: 'Полина', lastName: 'Синяк',   birthDate: '2014-07-08', country: 'Польша', city: 'Варшава', street: 'ул. Садова 12',      apt: 'кв. 2', postCode: '00-500', parentFirst: 'Олег',   parentLast: 'Синяк',    parentPhone: '+48 605 888 999', parentPassport: 'MNO 345678', photoConsent: true,  comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
-  6: { email: 'anya.belova@wp.pl',       password: 'Bel2024#', nickname: 'Anya', firstName: 'Аня',    lastName: 'Белова',  birthDate: '2016-02-14', country: 'Польша', city: 'Варшава', street: 'ул. Крулевска 5',    apt: '',       postCode: '00-200', parentFirst: 'Наташа', parentLast: 'Белова',    parentPhone: '+48 606 111 222', parentPassport: 'PQR 456789', photoConsent: false, comment: 'Девочка активная, любит рисовать.',                                                 currentPrice: '464.50', currentPriceDesc: 'Recommendation −5%'  },
-  7: { email: 'sasha.popov@gmail.com',   password: 'Pop2024!', nickname: 'Sash', firstName: 'Саша',   lastName: 'Попов',   birthDate: '2013-11-25', country: 'Польша', city: 'Варшава', street: 'ул. Злота 22',       apt: 'кв. 4', postCode: '00-300', parentFirst: 'Виктор', parentLast: 'Попов',     parentPhone: '+48 607 222 333', parentPassport: 'STU 567890', photoConsent: true,  comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
-  8: { email: 'eva.koval@gmail.com',     password: 'Eva2024#', nickname: 'Evi', firstName: 'Ева',    lastName: 'Коваль',  birthDate: '2018-06-30', country: 'Польша', city: 'Варшава', street: 'ул. Мокотовска 8',   apt: '',       postCode: '00-600', parentFirst: 'Юлия',   parentLast: 'Коваль',    parentPhone: '+48 608 333 444', parentPassport: 'VWX 678901', photoConsent: true,  comment: 'Самый маленький ребёнок в наборе — нужна мягкая адаптация.',                       currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
+  1: { email: 'artem.volkov@gmail.com', password: 'Qwerty123!', nickname: 'Arty', firstName: 'Артем',  lastName: 'Волков',  birthDate: '2012-05-14', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Маршалковска 10', apt: 'кв. 3', postCode: '00-001', parentFirst: 'Сергей', parentLast: 'Волков',  parentPhone: '+48 601 111 222', parentPassport: 'ABC 123456', hobbies: 'Robotyka, LEGO', photoConsent: true,  marketingConsent: true, digitalContentConsent: true, dataProcessingConsent: true, socialMediaConsent: true, internalQualityConsent: true, comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.', currentPrice: '489.00', currentPriceDesc: 'Group lessons' },
+  2: { email: 'kirill.morozov@mail.ru',  password: 'Pass9876!', nickname: 'Kiri', firstName: 'Кирилл', lastName: 'Морозов', birthDate: '2015-09-22', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Новый Свят 5',   apt: '',       postCode: '00-400', parentFirst: 'Анна',   parentLast: 'Морозова', parentPhone: '+48 602 333 444', parentPassport: 'DEF 654321', hobbies: '', photoConsent: false, marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
+  3: { email: 'daniil.glebov@wp.pl',     password: 'Secure789@', nickname: 'Dan', firstName: 'Даниил', lastName: 'Глебов',  birthDate: '2010-11-03', country: 'Польша', voivodeship: 'Małopolskie', city: 'Краков',  street: 'ул. Флорианска 20',  apt: 'кв. 7', postCode: '30-001', parentFirst: 'Ирина',  parentLast: 'Глебова',  parentPhone: '+48 603 555 666', parentPassport: 'GHI 987654', hobbies: 'Kosmos, książki', photoConsent: true,  marketingConsent: true, digitalContentConsent: true, dataProcessingConsent: true, socialMediaConsent: true, internalQualityConsent: true, comment: 'Ребёнок любит космос и читать книги.',                                             currentPrice: '440.10', currentPriceDesc: 'Family 2nd child −10%' },
+  4: { email: 'nikita.ivanov@gmail.com', password: 'Ivan2024#', nickname: '', firstName: 'Никита', lastName: 'Иванов',  birthDate: '2017-03-19', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Пулавска 88',    apt: 'кв.12', postCode: '02-603', parentFirst: 'Дмитрий',parentLast: 'Иванов',   parentPhone: '+48 604 777 888', parentPassport: 'JKL 112233', hobbies: '', photoConsent: true,  marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: 'Застенчивый ребёнок, привыкает медленно.',                                         currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
+  5: { email: 'polina.sinak@gmail.com',  password: 'Pol2024!', nickname: 'Poli', firstName: 'Полина', lastName: 'Синяк',   birthDate: '2014-07-08', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Садова 12',      apt: 'кв. 2', postCode: '00-500', parentFirst: 'Олег',   parentLast: 'Синяк',    parentPhone: '+48 605 888 999', parentPassport: 'MNO 345678', hobbies: '', photoConsent: true,  marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
+  6: { email: 'anya.belova@wp.pl',       password: 'Bel2024#', nickname: 'Anya', firstName: 'Аня',    lastName: 'Белова',  birthDate: '2016-02-14', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Крулевска 5',    apt: '',       postCode: '00-200', parentFirst: 'Наташа', parentLast: 'Белова',    parentPhone: '+48 606 111 222', parentPassport: 'PQR 456789', hobbies: 'Rysowanie', photoConsent: false, marketingConsent: true, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: 'Девочка активная, любит рисовать.',                                                 currentPrice: '464.50', currentPriceDesc: 'Recommendation −5%'  },
+  7: { email: 'sasha.popov@gmail.com',   password: 'Pop2024!', nickname: 'Sash', firstName: 'Саша',   lastName: 'Попов',   birthDate: '2013-11-25', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Злота 22',       apt: 'кв. 4', postCode: '00-300', parentFirst: 'Виктор', parentLast: 'Попов',     parentPhone: '+48 607 222 333', parentPassport: 'STU 567890', hobbies: '', photoConsent: true,  marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: '',                                                                                 currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
+  8: { email: 'eva.koval@gmail.com',     password: 'Eva2024#', nickname: 'Evi', firstName: 'Ева',    lastName: 'Коваль',  birthDate: '2018-06-30', country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', street: 'ул. Мокотовска 8',   apt: '',       postCode: '00-600', parentFirst: 'Юлия',   parentLast: 'Коваль',    parentPhone: '+48 608 333 444', parentPassport: 'VWX 678901', hobbies: '', photoConsent: true,  marketingConsent: false, digitalContentConsent: false, dataProcessingConsent: true, socialMediaConsent: false, internalQualityConsent: true, comment: 'Самый маленький ребёнок в наборе — нужна мягкая адаптация.',                       currentPrice: '0.00',   currentPriceDesc: 'Не выбран'   },
 }
 
 const MOCK_HISTORY: Record<number, HistoryEvent[]> = {
@@ -183,6 +191,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       lastName:        s.surname       ?? '',
       birthDate:       s.dob           ?? '',
       country:         s.country       ?? '',
+      voivodeship:     s.voivodeship   ?? '',
       city:            s.city          ?? '',
       street:          s.address       ?? '',
       apt:             s.apartment     ? String(s.apartment) : '',
@@ -191,8 +200,14 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       parentLast:      s.parent_surname ?? '',
       parentPhone:     s.parent_phone  ? String(s.parent_phone) : '',
       parentPassport:  s.parent_passport ? String(s.parent_passport) : '',
-      photoConsent:    Boolean(s.photo_consent),
+      hobbies:         s.hobbies       ?? '',
       comment:         s.reg_comment   ?? '',
+      photoConsent:    Boolean(s.photo_consent),
+      marketingConsent: Boolean(s.marketing_consent),
+      digitalContentConsent: Boolean(s.digital_content_consent),
+      dataProcessingConsent: Boolean(s.data_processing_consent),
+      socialMediaConsent: Boolean(s.social_media_consent),
+      internalQualityConsent: Boolean(s.internal_quality_consent),
       currentPrice:    '0.00',
       currentPriceDesc: 'Не выбран',
     }
@@ -423,8 +438,11 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
     details.value[newId] = {
       email: '', password: '', nickname: '', firstName: data.name.split(' ')[0] || '', lastName: data.name.split(' ')[1] || '',
-      birthDate: '', country: 'Польша', city: 'Варшава', street: '', apt: '', postCode: '',
-      parentFirst: '', parentLast: '', parentPhone: '', parentPassport: '', photoConsent: false, comment: '',
+      birthDate: '', country: 'Польша', voivodeship: '', city: 'Варшава', street: '', apt: '', postCode: '',
+      parentFirst: '', parentLast: '', parentPhone: '', parentPassport: '', 
+      hobbies: '', comment: '',
+      photoConsent: false, marketingConsent: false, digitalContentConsent: false,
+      dataProcessingConsent: false, socialMediaConsent: false, internalQualityConsent: false,
       currentPrice: '0.00', currentPriceDesc: 'Не выбран',
     }
     history.value[newId] = [
@@ -461,15 +479,17 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     })
   }
 
-  async function saveDetails(studentId: number, data: Partial<StudentDetails>, backend?: RecruitmentBackend) {
+  async function saveDetails(studentId: number, data: Partial<StudentDetails>, backend?: RecruitmentBackend, historyComment?: string) {
     // 1. Map camelCase to snake_case for backend
     const payload: any = {}
+    if (historyComment) payload.history_comment = historyComment
     if (data.firstName !== undefined) payload.name = data.firstName
     if (data.lastName !== undefined)  payload.surname = data.lastName
     if (data.email !== undefined)     payload.email = data.email
     if (data.nickname !== undefined)  payload.nickname = data.nickname
     if (data.birthDate !== undefined) payload.dob = data.birthDate
     if (data.country !== undefined)   payload.country = data.country
+    if (data.voivodeship !== undefined) payload.voivodeship = data.voivodeship
     if (data.city !== undefined)      payload.city = data.city
     if (data.street !== undefined)    payload.address = data.street
     if (data.apt !== undefined)       payload.apartment = data.apt
@@ -478,8 +498,14 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     if (data.parentLast !== undefined)  payload.parent_surname = data.parentLast
     if (data.parentPhone !== undefined) payload.parent_phone = data.parentPhone
     if (data.parentPassport !== undefined) payload.parent_passport = data.parentPassport
-    if (data.photoConsent !== undefined) payload.photo_consent = data.photoConsent ? 1 : 0
+    if (data.hobbies !== undefined)      payload.hobbies = data.hobbies
     if (data.comment !== undefined)      payload.reg_comment = data.comment
+    if (data.photoConsent !== undefined) payload.photo_consent = data.photoConsent ? 1 : 0
+    if (data.marketingConsent !== undefined) payload.marketing_consent = data.marketingConsent ? 1 : 0
+    if (data.digitalContentConsent !== undefined) payload.digital_content_consent = data.digitalContentConsent ? 1 : 0
+    if (data.dataProcessingConsent !== undefined) payload.data_processing_consent = data.dataProcessingConsent ? 1 : 0
+    if (data.socialMediaConsent !== undefined) payload.social_media_consent = data.socialMediaConsent ? 1 : 0
+    if (data.internalQualityConsent !== undefined) payload.internal_quality_consent = data.internalQualityConsent ? 1 : 0
 
     try {
       // 2. Call API
@@ -500,6 +526,19 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       const d = details.value[studentId]
       if (s && (d.firstName || d.lastName)) {
         s.name = [d.firstName, d.lastName].filter(Boolean).join(' ')
+      }
+
+      if (historyComment) {
+        if (!history.value[studentId]) history.value[studentId] = []
+        history.value[studentId].push({
+          event: i18n.global.t('newStudents.panel.historyConsentChanged'),
+          date: new Date().toLocaleDateString('ru-RU'),
+          detail: historyComment,
+          color: 'var(--amber)'
+        })
+        if (currentStudent.value && Number(currentStudent.value.id) === Number(studentId)) {
+          currentHistory.value = [...history.value[studentId]]
+        }
       }
     } catch (err) {
       console.error('Failed to save student details:', err)
