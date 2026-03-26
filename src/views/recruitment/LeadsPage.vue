@@ -136,6 +136,23 @@ const onDrop = (newStatus: LeadStatus) => {
   min-height: 0; /* Important for inner scrolling */
 }
 
+@media (max-width: 1024px) {
+  .kanban-board {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .kanban-board {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .leads-page {
+    height: auto;
+    min-height: calc(100vh - 64px);
+  }
+}
+
 .kanban-column {
   background: var(--app-surface);
   border: 1px solid var(--app-border);

@@ -587,6 +587,12 @@ function onPanelLoadPayments() {
 
 /* STATS */
 .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
 .stat-card {
   background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px;
   padding: 20px; position: relative; overflow: hidden; transition: all 0.3s; cursor: default;
@@ -606,6 +612,10 @@ function onPanelLoadPayments() {
 
 /* TOOLBAR */
 .table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
+@media (max-width: 768px) {
+  .table-toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar-left, .toolbar-right { justify-content: space-between; }
+}
 .toolbar-left  { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .toolbar-right { display: flex; gap: 8px; }
 .section-title { font-size: 16px; font-weight: 600; color: var(--app-text-main); display: flex; align-items: center; gap: 8px; }

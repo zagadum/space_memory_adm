@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar">
+  <div class="sidebar" :class="{ open: appStore.isSidebarOpen }">
     <div class="sidebar-logo">
       <div class="logo-badge">
         <div class="logo-icon">
@@ -411,6 +411,7 @@ import { useStudentsListStore } from '../../stores/studentsList.store'
 import { useGroupsListStore } from '../../stores/groupsList.store'
 import { useTeachersListStore } from '../../stores/teachersList.store'
 import { useAuthStore } from '../../stores/auth.store'
+import { useAppStore } from '../../stores/app.store'
 
 const router = useRouter()
 const route = useRoute()
@@ -422,6 +423,7 @@ const groupsListStore = useGroupsListStore()
 const teachersListStore = useTeachersListStore()
 const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
+const appStore = useAppStore()
 
 // Логика смены языка
 function onLocale(l: string) {

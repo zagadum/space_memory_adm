@@ -189,6 +189,28 @@ onMounted(() => {
   }
 }
 
+@media (max-width: 768px) {
+  .auth-top-actions {
+    top: 16px;
+    right: 16px;
+    gap: 8px;
+  }
+  
+  .theme-toggle-btn span:last-child {
+    display: none;
+  }
+  
+  .theme-toggle-btn {
+    padding: 8px;
+    border-radius: 10px;
+  }
+
+  .auth-card {
+    padding: 24px 20px;
+    border-radius: 20px;
+  }
+}
+
 :deep(.popup-label) {
   display: none;
 }

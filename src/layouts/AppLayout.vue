@@ -1,6 +1,14 @@
 <template>
   <div v-if="appStore.isGlobalLoading" class="global-loading-bar"></div>
   <AppSidebar />
+  
+  <!-- Mobile Overlay -->
+  <div 
+    class="mobile-overlay" 
+    :class="{ active: appStore.isSidebarOpen }" 
+    @click="appStore.toggleSidebar(false)"
+  ></div>
+
   <div class="main">
     <AppTopbar />
     <RouterView />
@@ -11,7 +19,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, watch } from "vue";
+import { useRoute } from "vue-router";
 import AppSidebar from "../components/layout/AppSidebar.vue";
 import AppTopbar from "../components/layout/AppTopbar.vue";
 import ToastContainer from "../components/ui/ToastContainer.vue";
@@ -23,10 +32,15 @@ import { usePaymentsStore } from "../stores/payments.store";
 const auth = useAuthStore();
 const appStore = useAppStore();
 const payments = usePaymentsStore();
+const route = useRoute();
+
+// Close sidebar on route change (mobile)
+watch(() => route.path, () => {
+  appStore.toggleSidebar(false);
+});
 
 onMounted(async () => {
   await auth.loadMe();
-  //if (!payments.student) await payments.loadStudent("s_1");
 });
 </script>
 
