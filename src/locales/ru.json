@@ -123,10 +123,13 @@
     "export": "Экспорт",
     "searchHint": "Поиск по имени, телефону...",
     "welcome": "Привет, {name}! 👋",
-    "search": "Поиск",
-    "none": "— Нет —",
-    "select": "— Выберите —"
-  },
+     "search": "Поиск",
+     "none": "— Нет —",
+     "select": "— Выберите —",
+     "yes": "Да",
+     "no": "Нет",
+     "error": "Ошибка"
+   },
   "dashboard": {
     "header": {
       "newStudent": "Новый ученик"
@@ -1751,6 +1754,52 @@
       "city": "Город",
       "comment": "Комментарий"
     },
-    "noTeachers": "Нет преподавателей по заданным фильтрам"
-  }
-}
+     "noTeachers": "Нет преподавателей по заданным фильтрам"
+   },
+   "importDb": {
+     "pageTitle": "Import DB",
+     "pageSubtitle": "Управление импортированными данными",
+     "searchPlaceholder": "Поиск по имени, email, телефону...",
+     "listTitle": "Список импорта",
+     "itemsWord": "записей",
+     "loading": "Загружаем список...",
+     "errorTitle": "Не удалось загрузить список",
+     "emptyTitle": "Список пуст",
+     "emptyText": "Нет данных для отображения",
+     "stats": {
+       "total": "Всего записей",
+       "totalSub": "в системе",
+       "sent": "Отправлено",
+       "sentSub": "приглашений",
+       "done": "Завершено",
+       "doneSub": "записей",
+       "pending": "В ожидании",
+       "pendingSub": "действий"
+     },
+     "table": {
+       "surname": "Фамилия",
+       "firstName": "Имя",
+       "parentEmail": "Email родителя",
+       "phone": "Телефон",
+       "nickname": "Никнейм",
+       "subscriptionAmount": "Сумма подписки",
+       "contractOldNew": "Тип контракта",
+       "balanceOverpayment": "Переплата",
+       "discount": "Скидка",
+       "isSend": "Отправлено",
+       "isDone": "Завершено",
+       "actions": "Действия"
+     },
+     "actions": {
+       "resendInvitation": "Отправить приглашение",
+       "resendConfirm": "Выслать приглашение повторно?",
+       "edit": "Редактировать",
+       "delete": "Удалить",
+       "deleteConfirm": "Вы уверены, что хотите удалить эту запись?",
+       "deleteSuccess": "Запись успешно удалена",
+       "updateSuccess": "Данные обновлены",
+       "resendSuccess": "Приглашение успешно отправлено"
+     },
+     "showing": "Показано {shown} из {total} записей"
+   }
+ }

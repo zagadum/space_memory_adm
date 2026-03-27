@@ -219,6 +219,9 @@
         <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived' }, accessClass('archived')]" @click="navigateTo('archived', '/recruitment/space/archived-students')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
         </div>
+        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db' }, accessClass('import-db')]" @click="navigateTo('import-db', '/recruitment/space/import-db')">
+          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
+        </div>
       </div>
 
       <!-- RECRUITMENT (INDIGO) -->
@@ -250,6 +253,9 @@
         </div>
         <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived-indigo' }, accessClass('archived')]" @click="navigateTo('archived-indigo', '/recruitment/indigo/archived-students', 'archived')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
+        </div>
+        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db-indigo' }, accessClass('import-db')]" @click="navigateTo('import-db-indigo', '/recruitment/indigo/import-db', 'import-db')">
+          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
       </div>
 
@@ -541,6 +547,12 @@ watch(() => route.path, (path) => {
     openSections.value.recruitment = true
   } else if (path.startsWith('/recruitment/space/archived-students')) {
     activeItem.value = 'archived'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/indigo/import-db')) {
+    activeItem.value = 'import-db-indigo'
+    openSections.value.recruitmentIndigo = true
+  } else if (path.startsWith('/recruitment/space/import-db')) {
+    activeItem.value = 'import-db'
     openSections.value.recruitment = true
   } else if (path.startsWith('/finance/returns')) {
     activeItem.value = 'returns'

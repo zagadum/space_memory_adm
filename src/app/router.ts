@@ -115,6 +115,19 @@ export const router = createRouter({
           component: () => import('../views/recruitment/ArchivedStudentsPage.vue'),
           meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'indigo' }
         },
+        {
+          path: "recruitment/space/import-db",
+          name: "import-db",
+          component: () => import("../views/recruitment/ImportDbPage.vue"),
+          meta: { title: 'importDb.pageTitle', icon: '📥', recruitmentBackend: 'default' }
+        },
+        {
+          path: "recruitment/indigo/import-db",
+          name: "import-db-indigo",
+          component: () => import("../views/recruitment/ImportDbPage.vue"),
+          meta: { title: 'importDb.pageTitle', icon: '📥', recruitmentBackend: 'indigo' }
+        },
+        { path: 'recruitment/import-db', redirect: { name: 'import-db' } },
         { path: 'recruitment/indigo', redirect: { name: 'new-students-indigo' } },
         {
           path: "finance/returns",
