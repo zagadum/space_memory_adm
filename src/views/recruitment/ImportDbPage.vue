@@ -270,10 +270,12 @@ async function loadData() {
 
 async function resendInvitation(id: number | string) {
   try {
-    await store.resendInvitation(id);
-    notificationStore.addToast(t('importDb.actions.resendSuccess'), 'success');
+    const response = await store.resendInvitation(id) as any;
+    const successMessage = String(response?.message ?? t('importDb.actions.resendSuccess'));
+    notificationStore.addToast(successMessage, 'success');
   } catch (error: any) {
-    notificationStore.addToast(error?.message || t('common.error'), 'error');
+    const errorMessage = String(error?.response?.data?.message ?? error?.message ?? t('common.error'));
+    notificationStore.addToast(errorMessage, 'error');
   }
 }
 
