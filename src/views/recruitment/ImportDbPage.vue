@@ -105,8 +105,26 @@
               </td>
               <td class="text-right">{{ formatAmount(item.subscription_amount) }}</td>
               <td>{{ item.contract_old_new }}</td>
-              <td class="text-right">{{ formatAmount(item.balance_overpayment) }}</td>
-              <td class="text-right">{{ formatAmount(item.discount) }}</td>
+              <td class="text-right">
+                <input
+                  v-if="editingRowId === item.id"
+                  v-model="editForm.balance_overpayment"
+                  class="cell-input cell-input--numeric"
+                  type="text"
+                  inputmode="decimal"
+                />
+                <span v-else>{{ formatAmount(item.balance_overpayment) }}</span>
+              </td>
+              <td class="text-right">
+                <input
+                  v-if="editingRowId === item.id"
+                  v-model="editForm.discount"
+                  class="cell-input cell-input--numeric"
+                  type="text"
+                  inputmode="decimal"
+                />
+                <span v-else>{{ formatAmount(item.discount) }}</span>
+              </td>
               <td>
                 <span v-if="item.is_send" class="badge badge-success">{{ t('common.yes') }}</span>
                 <span v-else class="badge badge-warning">{{ t('common.no') }}</span>
@@ -235,6 +253,8 @@ const editingRowId = ref<number | string | null>(null);
 const editForm = ref({
   parent_email: '',
   nickname: '',
+  balance_overpayment: '',
+  discount: '',
 });
 
 const backend = computed(() => {
@@ -295,24 +315,46 @@ function deleteItem(id: number | string) {
   deleteConfirmId.value = id;
 }
 
-function startEdit(item: { id: number | string; parent_email: string; nickname?: string }) {
+function startEdit(item: {
+  id: number | string;
+  parent_email: string;
+  nickname?: string;
+  balance_overpayment: number | string;
+  discount: number | string;
+}) {
   editingRowId.value = item.id;
   editForm.value = {
     parent_email: item.parent_email ?? '',
     nickname: item.nickname ?? '',
+    balance_overpayment: String(item.balance_overpayment ?? ''),
+    discount: String(item.discount ?? ''),
   };
 }
 
 function cancelEdit() {
   editingRowId.value = null;
-  editForm.value = { parent_email: '', nickname: '' };
+  editForm.value = { parent_email: '', nickname: '', balance_overpayment: '', discount: '' };
+}
+
+function parseNumericField(rawValue: string, label: string): number {
+  const normalized = rawValue.trim().replace(',', '.');
+  const num = Number(normalized);
+  if (!normalized || Number.isNaN(num)) {
+    throw new Error(`Поле "${label}" должно быть числом`);
+  }
+  return num;
 }
 
 async function saveEdit(id: number | string) {
   try {
+    const balanceOverpayment = parseNumericField(editForm.value.balance_overpayment, t('importDb.table.balanceOverpayment'));
+    const discount = parseNumericField(editForm.value.discount, t('importDb.table.discount'));
+
     await store.updateImportDbItem(id, {
       parent_email: editForm.value.parent_email.trim(),
       nickname: editForm.value.nickname.trim(),
+      balance_overpayment: balanceOverpayment,
+      discount,
     });
     notificationStore.addToast(t('importDb.actions.updateSuccess'), 'success');
     cancelEdit();
@@ -638,6 +680,11 @@ onMounted(() => {
   background: var(--app-surface);
   color: var(--app-text-main);
   font-family: inherit;
+}
+
+.cell-input--numeric {
+  min-width: 100px;
+  text-align: right;
 }
 
 .actions-cell {
