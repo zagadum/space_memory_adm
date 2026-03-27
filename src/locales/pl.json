@@ -1406,6 +1406,8 @@
       "age": "Wiek",
       "years": "lat",
       "contract": "Umowa",
+      "contractOld": "Stara",
+      "contractNew": "Nowa",
       "signed": "Podpisana",
       "pending": "Oczekuje",
       "documents": "Dokumenty",
@@ -1750,5 +1752,51 @@
       "comment": "Komentarz"
     },
     "noTeachers": "Brak nauczycieli dla wybranych filtrów"
+  },
+  "importDb": {
+    "pageTitle": "Import DB",
+    "pageSubtitle": "Zarządzanie zaimportowanymi danymi",
+    "searchPlaceholder": "Szukaj po nazwisku, emailu, telefonie...",
+    "listTitle": "Lista importu",
+    "itemsWord": "rekordów",
+    "loading": "Ładowanie listy...",
+    "errorTitle": "Nie udało się załadować listy",
+    "emptyTitle": "Lista jest pusta",
+    "emptyText": "Brak danych do wyświetlenia",
+    "stats": {
+      "total": "Wszystkie rekordy",
+      "totalSub": "w systemie",
+      "sent": "Wysłano",
+      "sentSub": "zaproszeń",
+      "done": "Zakończono",
+      "doneSub": "rekordów",
+      "pending": "Oczekujące",
+      "pendingSub": "działań"
+    },
+    "table": {
+      "surname": "Nazwisko",
+      "firstName": "Imię",
+      "parentEmail": "Email rodzica",
+      "phone": "Telefon",
+      "nickname": "Nickname",
+      "subscriptionAmount": "Kwota subskrypcji",
+      "contractOldNew": "Typ kontraktu",
+      "balanceOverpayment": "Nadpłata",
+      "discount": "Zniżka",
+      "isSend": "Wysłano",
+      "isDone": "Zakończono",
+      "actions": "Działania"
+    },
+    "actions": {
+      "resendInvitation": "Wyślij zaproszenie",
+      "resendConfirm": "Czy wysłać zaproszenie ponownie?",
+      "edit": "Edytuj",
+      "delete": "Usuń",
+      "deleteConfirm": "Czy na pewno chcesz usunąć ten rekord?",
+      "deleteSuccess": "Rekord został pomyślnie usunięty",
+      "updateSuccess": "Dane zostały zaktualizowane",
+      "resendSuccess": "Zaproszenie zostało pomyślnie wysłane"
+    },
+    "showing": "Pokazano {shown} z {total} rekordów"
   }
 }
