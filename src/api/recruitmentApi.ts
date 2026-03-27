@@ -73,6 +73,8 @@ export interface RecruitmentStudentPayments {
   currentPriceDesc: string;
   documentList: RecruitmentDocumentItem[];
   transactionList: RecruitmentTransactionItem[];
+  discount?: string;
+  balance_overpayment?: string;
 }
 
 function pickStudentPayments(payload: any): RecruitmentStudentPayments {
@@ -108,6 +110,8 @@ function pickStudentPayments(payload: any): RecruitmentStudentPayments {
     currentPriceDesc,
     documentList,
     transactionList,
+    discount: source?.discount != null ? String(source.discount) : undefined,
+    balance_overpayment: source?.balance_overpayment != null ? String(source.balance_overpayment) : undefined,
   };
 }
 

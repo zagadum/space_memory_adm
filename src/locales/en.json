@@ -1506,7 +1506,15 @@
       "documentsEmpty": "No contracts found",
       "transactionsTitle": "Payments",
       "transactionStatus": "Status",
-      "transactionsEmpty": "No transactions found"
+      "transactionsEmpty": "No transactions found",
+      "adjustmentsTitle": "Adjustments",
+      "discountLabel": "Discount",
+      "discountPlaceholder": "0.00",
+      "discountSaved": "Discount saved",
+      "overpaymentLabel": "Overpayment",
+      "overpaymentPlaceholder": "0.00",
+      "overpaymentSaved": "Overpayment saved",
+      "save": "Save"
     }
   },
   "targetMail": {

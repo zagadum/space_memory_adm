@@ -1506,7 +1506,15 @@
       "documentsEmpty": "Nie znaleziono umów",
       "transactionsTitle": "Płatności",
       "transactionStatus": "Status",
-      "transactionsEmpty": "Nie znaleziono transakcji"
+      "transactionsEmpty": "Nie znaleziono transakcji",
+      "adjustmentsTitle": "Korekty",
+      "discountLabel": "Zniżka",
+      "discountPlaceholder": "0.00",
+      "discountSaved": "Zniżka zapisana",
+      "overpaymentLabel": "Nadpłata",
+      "overpaymentPlaceholder": "0.00",
+      "overpaymentSaved": "Nadpłata zapisana",
+      "save": "Zapisz"
     }
   },
   "targetMail": {

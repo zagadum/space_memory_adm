@@ -319,6 +319,8 @@
       @email="onPanelEmail"
       @set-price="onPanelSetPrice"
       @load-payments="onPanelLoadPayments"
+      @save-discount="onPanelSaveDiscount"
+      @save-overpayment="onPanelSaveOverpayment"
     />
 
   </div>
@@ -545,8 +547,17 @@ const activeHistory = computed(() =>
 )
 const activePayments = computed<StudentPayments | null>(() => {
   if (!activeStudent.value) return null
+  // Always pull the freshest discount/overpayment from currentStudent raw data
+  const disc = store.currentStudentDiscount
+  const ovp  = store.currentStudentOverpayment
+
   if (store.currentStudentPayments?.studentId === activeStudent.value.id) {
-    return store.currentStudentPayments
+    // Spread into a new object so the watch in StudentSidePanel fires on every change
+    return {
+      ...store.currentStudentPayments,
+      discount: disc || store.currentStudentPayments.discount,
+      balance_overpayment: ovp || store.currentStudentPayments.balance_overpayment,
+    }
   }
 
   return {
@@ -555,6 +566,8 @@ const activePayments = computed<StudentPayments | null>(() => {
     currentPriceDesc: activeDetails.value?.currentPriceDesc || 'Не выбран',
     documentList: [],
     transactionList: [],
+    discount: disc,
+    balance_overpayment: ovp,
   }
 })
 
@@ -593,6 +606,34 @@ function onPanelSetPrice(amount: string, desc: string) {
 function onPanelLoadPayments() {
   if (!activeStudent.value) return
   store.fetchStudentPayments(activeStudent.value.id, recruitmentBackend.value)
+}
+
+async function onPanelSaveDiscount(value: string) {
+  if (!activeStudent.value) return
+  try {
+    await store.updateStudentPaymentAdjustments(
+      activeStudent.value.id,
+      { discount: value },
+      recruitmentBackend.value
+    )
+    notif.addToast(`💰 ${t('newStudents.panel.discountSaved')}`, 'success')
+  } catch {
+    notif.addToast(t('common.error'), 'error')
+  }
+}
+
+async function onPanelSaveOverpayment(value: string) {
+  if (!activeStudent.value) return
+  try {
+    await store.updateStudentPaymentAdjustments(
+      activeStudent.value.id,
+      { balance_overpayment: value },
+      recruitmentBackend.value
+    )
+    notif.addToast(`💰 ${t('newStudents.panel.overpaymentSaved')}`, 'success')
+  } catch {
+    notif.addToast(t('common.error'), 'error')
+  }
 }
 </script>
 

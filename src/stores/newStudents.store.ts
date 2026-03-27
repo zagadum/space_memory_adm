@@ -84,6 +84,8 @@ export interface StudentPayments {
   currentPriceDesc: string
   documentList: StudentDocumentItem[]
   transactionList: StudentTransactionItem[]
+  discount?: string
+  balance_overpayment?: string
 }
 
 export interface Group {
@@ -349,6 +351,20 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     try {
       const result = await resolveApi(backend).getStudentById(id)
       currentStudent.value = result.data
+      // Fix race condition: if payments were already loaded, merge discount/overpayment now
+      const studentId = Number(id)
+      if (currentStudentPayments.value?.studentId === studentId) {
+        const raw = result.data
+        const disc = raw?.discount != null ? String(raw.discount) : undefined
+        const ovp  = raw?.balance_overpayment != null ? String(raw.balance_overpayment) : undefined
+        if (disc !== undefined || ovp !== undefined) {
+          currentStudentPayments.value = {
+            ...currentStudentPayments.value,
+            ...(disc !== undefined ? { discount: disc } : {}),
+            ...(ovp  !== undefined ? { balance_overpayment: ovp } : {}),
+          }
+        }
+      }
     } catch (err: any) {
       error.value = err?.response?.data?.message || 'Ошибка загрузки'
     } finally {
@@ -391,6 +407,8 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       currentPriceDesc: payload.currentPriceDesc || 'Не выбран',
       documentList: Array.isArray(payload.documentList) ? payload.documentList : [],
       transactionList: Array.isArray(payload.transactionList) ? payload.transactionList : [],
+      discount: payload.discount,
+      balance_overpayment: payload.balance_overpayment,
     }
   }
 
@@ -404,14 +422,27 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     currentStudentPayments.value = null
     try {
       const result = await resolveApi(backend).getStudentPayments(id)
-      currentStudentPayments.value = mapStudentPayments(studentId, result)
+      const mapped = mapStudentPayments(studentId, result)
+      // Merge discount/overpayment from currentStudent raw data if not provided by payments endpoint
+      if (currentStudent.value && Number(currentStudent.value.id) === studentId) {
+        if (mapped.discount === undefined && currentStudent.value.discount != null) {
+          mapped.discount = String(currentStudent.value.discount)
+        }
+        if (mapped.balance_overpayment === undefined && currentStudent.value.balance_overpayment != null) {
+          mapped.balance_overpayment = String(currentStudent.value.balance_overpayment)
+        }
+      }
+      currentStudentPayments.value = mapped
     } catch {
+      const raw = currentStudent.value
       currentStudentPayments.value = {
         studentId,
         currentPrice: details.value[studentId]?.currentPrice || '0.00',
         currentPriceDesc: details.value[studentId]?.currentPriceDesc || 'Не выбран',
         documentList: [],
         transactionList: [],
+        discount: raw?.discount != null ? String(raw.discount) : undefined,
+        balance_overpayment: raw?.balance_overpayment != null ? String(raw.balance_overpayment) : undefined,
       }
     }
   }
@@ -552,6 +583,22 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
+  async function updateStudentPaymentAdjustments(
+    studentId: number,
+    payload: { discount?: string; balance_overpayment?: string },
+    backend?: RecruitmentBackend
+  ) {
+    await resolveApi(backend).updateStudent(studentId, payload)
+    if (currentStudent.value && Number(currentStudent.value.id) === studentId) {
+      if (payload.discount !== undefined) currentStudent.value.discount = payload.discount
+      if (payload.balance_overpayment !== undefined) currentStudent.value.balance_overpayment = payload.balance_overpayment
+    }
+    if (currentStudentPayments.value?.studentId === studentId) {
+      if (payload.discount !== undefined) currentStudentPayments.value.discount = payload.discount
+      if (payload.balance_overpayment !== undefined) currentStudentPayments.value.balance_overpayment = payload.balance_overpayment
+    }
+  }
+
   function setPrice(studentId: number, amount: string, desc: string) {
     const s = students.value.find(x => x.id === studentId)
     if (s) { s.paymentStr = `${amount} zł`; s.payment = parseFloat(amount) }
@@ -576,12 +623,27 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     return history.value[studentId] || [{ event: 'Ученик создан', date: '—', detail: '', color: 'var(--blue)' }]
   }
 
+  // Always-fresh computed values pulled directly from currentStudent raw data
+  const currentStudentDiscount = computed<string>(() => {
+    if (currentStudent.value?.discount != null) return String(currentStudent.value.discount)
+    if (currentStudentPayments.value?.discount != null) return String(currentStudentPayments.value.discount)
+    return ''
+  })
+
+  const currentStudentOverpayment = computed<string>(() => {
+    if (currentStudent.value?.balance_overpayment != null) return String(currentStudent.value.balance_overpayment)
+    if (currentStudentPayments.value?.balance_overpayment != null) return String(currentStudentPayments.value.balance_overpayment)
+    return ''
+  })
+
   return {
     students, totalCount, signedCount, noManagerCount, avgWaitDays,
-    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, currentHistory, currentStudentPayments, isLoading, error,
+    uniqueGroups, uniqueManagers, currentStudent, currentStudentDetails, currentHistory, currentStudentPayments,
+    currentStudentDiscount, currentStudentOverpayment,
+    isLoading, error,
     isListLoading, listError, pagination,
     fetchStudentsFromApi, fetchStudentById, fetchStudentHistory, fetchStudentPayments,
-    addStudent, assignGroup, archiveStudent, saveDetails, setPrice,
+    addStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments,
     getDetails, getHistory,
   }
 })

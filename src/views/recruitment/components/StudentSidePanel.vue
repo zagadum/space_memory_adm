@@ -175,6 +175,49 @@
               <span v-else class="payment-zero">{{ t('newStudents.panel.notPaid') }}</span>
             </div>
 
+            <!-- Discount & Overpayment -->
+            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.adjustmentsTitle') }}</div>
+            <div class="sp-adj-row">
+              <div class="sp-adj-label">{{ t('newStudents.panel.discountLabel') }}</div>
+              <div class="sp-adj-input-wrap">
+                <input
+                  class="sp-input sp-adj-input"
+                  v-model="localDiscount"
+                  type="text"
+                  inputmode="decimal"
+                  :placeholder="t('newStudents.panel.discountPlaceholder')"
+                />
+                <button
+                  class="sp-adj-save-btn"
+                  :disabled="isSavingDiscount"
+                  :title="t('newStudents.panel.save')"
+                  @click="onSaveDiscount"
+                >
+                  {{ isSavingDiscount ? '⏳' : '💾' }}
+                </button>
+              </div>
+            </div>
+            <div class="sp-adj-row" style="margin-top:10px">
+              <div class="sp-adj-label">{{ t('newStudents.panel.overpaymentLabel') }}</div>
+              <div class="sp-adj-input-wrap">
+                <input
+                  class="sp-input sp-adj-input"
+                  v-model="localOverpayment"
+                  type="text"
+                  inputmode="decimal"
+                  :placeholder="t('newStudents.panel.overpaymentPlaceholder')"
+                />
+                <button
+                  class="sp-adj-save-btn"
+                  :disabled="isSavingOverpayment"
+                  :title="t('newStudents.panel.save')"
+                  @click="onSaveOverpayment"
+                >
+                  {{ isSavingOverpayment ? '⏳' : '💾' }}
+                </button>
+              </div>
+            </div>
+
             <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.documentsTitle') }}</div>
             <div v-if="payments?.documentList?.length" class="sp-list-wrap">
               <div v-for="doc in payments.documentList" :key="doc.id" class="sp-row-item">
@@ -197,9 +240,10 @@
               </div>
             </div>
             <div v-else class="sp-empty-state">{{ t('newStudents.panel.transactionsEmpty') }}</div>
-          </div>
 
-        </div>
+          </div><!-- end sp-tab-content payments -->
+
+        </div><!-- end sp-body -->
       </template>
     </div>
   </Teleport>
@@ -225,6 +269,8 @@ const emit = defineEmits<{
   email: []
   setPrice: [amount: string, desc: string]
   loadPayments: []
+  saveDiscount: [value: string]
+  saveOverpayment: [value: string]
 }>()
 
 const { t } = useI18n()
@@ -232,6 +278,11 @@ const { t } = useI18n()
 const activeTab = ref<'info' | 'history' | 'payments'>('info')
 const priceListOpen = ref(false)
 const selectedPrice = ref<string | null>(null)
+
+const localDiscount = ref('')
+const localOverpayment = ref('')
+const isSavingDiscount = ref(false)
+const isSavingOverpayment = ref(false)
 
 const tabs = computed(() => [
   { key: 'info' as const,     icon: '👤', label: t('newStudents.panel.tabProfile')  },
@@ -283,6 +334,33 @@ watch(activeTab, (tab) => {
     emit('loadPayments')
   }
 })
+
+watch(
+  () => ({ ref: props.payments, disc: props.payments?.discount, ovp: props.payments?.balance_overpayment }),
+  ({ disc, ovp }) => {
+    localDiscount.value    = disc ?? ''
+    localOverpayment.value = ovp  ?? ''
+  },
+  { immediate: true }
+)
+
+async function onSaveDiscount() {
+  isSavingDiscount.value = true
+  try {
+    emit('saveDiscount', localDiscount.value)
+  } finally {
+    isSavingDiscount.value = false
+  }
+}
+
+async function onSaveOverpayment() {
+  isSavingOverpayment.value = true
+  try {
+    emit('saveOverpayment', localOverpayment.value)
+  } finally {
+    isSavingOverpayment.value = false
+  }
+}
 
 const groupPrices = [
   { amount: '489.00', name: 'Group lessons',                      tag: 'Стандарт', tagColor: 'var(--app-text-dim)' },
@@ -564,4 +642,30 @@ function formatTxDate(dateText: string) {
 
 .payment-value { font-family: 'Space Mono', monospace; font-weight: 700; color: #10b981; }
 .payment-zero  { color: var(--app-text-dim); font-style: italic; }
+
+/* Adjustments (discount / overpayment) */
+.sp-adj-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 10px 14px;
+  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px;
+}
+.sp-adj-label {
+  font-size: 13px; font-weight: 500; color: var(--app-text-main); flex-shrink: 0; min-width: 100px;
+}
+.sp-adj-input-wrap {
+  display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end;
+}
+.sp-adj-input {
+  width: 120px; padding: 6px 10px; font-size: 13px; text-align: right;
+}
+.sp-adj-save-btn {
+  width: 32px; height: 32px; border: none; border-radius: 7px; cursor: pointer;
+  background: rgba(79,110,247,0.12); color: #4f6ef7; font-size: 16px;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.sp-adj-save-btn:hover:not(:disabled) {
+  background: rgba(79,110,247,0.25);
+}
+.sp-adj-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

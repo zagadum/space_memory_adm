@@ -1502,7 +1502,15 @@
       "documentsEmpty": "Договори не знайдені",
       "transactionsTitle": "Оплати",
       "transactionStatus": "Статус",
-      "transactionsEmpty": "Транзакції не знайдені"
+      "transactionsEmpty": "Транзакції не знайдені",
+      "adjustmentsTitle": "Коригування",
+      "discountLabel": "Знижка",
+      "discountPlaceholder": "0.00",
+      "discountSaved": "Знижку збережено",
+      "overpaymentLabel": "Переплата",
+      "overpaymentPlaceholder": "0.00",
+      "overpaymentSaved": "Переплату збережено",
+      "save": "Зберегти"
     }
   },
   "targetMail": {
