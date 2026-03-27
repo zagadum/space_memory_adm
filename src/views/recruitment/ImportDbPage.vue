@@ -376,44 +376,65 @@ onMounted(() => {
 <style scoped>
 .import-db-page {
   min-height: 100vh;
-  background: linear-gradient(to bottom right, #f8f9fa, #ffffff);
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
 }
 
 .idb-content {
-  max-width: 1400px;
-  margin: 0 auto;
+  padding: 24px 28px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.idb-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.idb-content::-webkit-scrollbar-thumb {
+  background: rgba(79, 110, 247, 0.2);
+  border-radius: 2px;
 }
 
 .idb-actions-row {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
 }
 
 .search-box {
-  flex: 1;
-  min-width: 250px;
-  position: relative;
   display: flex;
   align-items: center;
-  background: white;
-  border: 1px solid #e0e0e0;
+  gap: 8px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  padding: 8px 12px;
+  padding: 7px 12px;
+  transition: all 0.2s;
+}
+
+.search-box:focus-within {
+  border-color: var(--app-border-hi);
+  box-shadow: 0 0 12px rgba(79, 110, 247, 0.1);
 }
 
 .search-icon {
-  font-size: 18px;
-  margin-right: 8px;
-  color: #666;
+  color: var(--app-text-dim);
+  font-size: 14px;
 }
 
 .search-box input {
+  background: none;
   border: none;
   outline: none;
-  font-size: 14px;
+  color: var(--app-text-main);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  width: 240px;
   flex: 1;
 }
 
@@ -436,13 +457,13 @@ onMounted(() => {
 }
 
 .btn-ghost {
-  background: white;
-  color: #333;
-  border: 1px solid #e0e0e0;
+  background: var(--app-surface);
+  color: var(--app-text-main);
+  border: 1px solid var(--app-border);
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: #f5f5f5;
+  background: rgba(79, 110, 247, 0.05);
 }
 
 .btn-danger {
@@ -468,14 +489,14 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .stat-card {
-  background: white;
-  border-radius: 8px;
+  background: var(--app-card);
+  border-radius: 12px;
   padding: 20px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid var(--app-border);
   position: relative;
   overflow: hidden;
 }
@@ -488,7 +509,6 @@ onMounted(() => {
   right: 0;
   height: 4px;
   background: currentColor;
-  opacity: 0.2;
 }
 
 .stat-card.blue { color: #5b6ef5; }
@@ -498,22 +518,22 @@ onMounted(() => {
 
 .stat-label {
   font-size: 12px;
-  color: #999;
+  color: var(--app-text-dim);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .stat-value {
   font-size: 32px;
   font-weight: bold;
-  color: #333;
-  margin-bottom: 8px;
+  color: var(--app-text-main);
+  margin-bottom: 6px;
 }
 
 .stat-sub {
   font-size: 13px;
-  color: #999;
+  color: var(--app-text-dim);
 }
 
 .stat-icon {
@@ -528,9 +548,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 12px;
 }
 
 .toolbar-left {
@@ -540,11 +558,11 @@ onMounted(() => {
 .section-title {
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--app-text-main);
 }
 
 .section-count {
-  color: #999;
+  color: var(--app-text-dim);
   font-size: 14px;
   margin-left: 8px;
 }
@@ -555,43 +573,53 @@ onMounted(() => {
 
 .pagination-info {
   font-size: 12px;
-  color: #999;
+  color: var(--app-text-dim);
 }
 
 .table-container {
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
   overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .data-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  min-width: 1200px;
 }
 
 .data-table thead {
-  background: #f9f9f9;
-  border-bottom: 2px solid #e0e0e0;
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
 }
 
 .data-table th {
-  padding: 12px;
+  padding: 11px 12px;
   text-align: left;
   font-weight: 600;
-  color: #333;
+  font-size: 11px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--app-text-dim);
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 12px;
-  border-bottom: 1px solid #e0e0e0;
-  color: #555;
+  padding: 11px 12px;
+  border-bottom: 1px solid rgba(100, 120, 255, 0.07);
+  color: var(--app-text-main);
+  font-size: 13px;
 }
 
 .data-table tbody tr:hover {
-  background: #f9f9f9;
+  background: rgba(79, 110, 247, 0.04);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .text-right {
@@ -601,21 +629,24 @@ onMounted(() => {
 .cell-input {
   width: 100%;
   min-width: 150px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--app-border);
   border-radius: 6px;
-  padding: 6px 8px;
+  padding: 5px 8px;
   font-size: 13px;
+  background: var(--app-surface);
+  color: var(--app-text-main);
+  font-family: inherit;
 }
 
 .actions-cell {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
 }
 
 .action-icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border: none;
   border-radius: 6px;
   display: inline-flex;
@@ -624,6 +655,7 @@ onMounted(() => {
   cursor: pointer;
   font-size: 16px;
   transition: all 0.2s;
+  flex-shrink: 0;
 }
 
 .action-icon-btn:disabled {
@@ -648,19 +680,19 @@ onMounted(() => {
 }
 
 .action-icon-btn--neutral {
-  background: #e5e7eb;
+  background: rgba(100, 120, 255, 0.1);
 }
 
 .action-icon-btn--neutral:hover:not(:disabled) {
-  background: #d1d5db;
+  background: rgba(79, 110, 247, 0.15);
 }
 
 .action-icon-btn--success {
-  background: #48bb78;
+  background: rgba(16, 185, 129, 0.2);
 }
 
 .action-icon-btn--success:hover:not(:disabled) {
-  background: #38a169;
+  background: rgba(16, 185, 129, 0.35);
 }
 
 .badge {
@@ -685,10 +717,10 @@ onMounted(() => {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  background: white;
-  border: 1px solid #e0e0e0;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  color: #999;
+  color: var(--app-text-dim);
 }
 
 .empty-icon {
@@ -699,13 +731,13 @@ onMounted(() => {
 .empty-title {
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: var(--app-text-main);
   margin-bottom: 8px;
 }
 
 .empty-text {
   font-size: 14px;
-  color: #999;
+  color: var(--app-text-dim);
 }
 
 /* MODAL STYLES */
@@ -715,7 +747,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -723,11 +755,12 @@ onMounted(() => {
 }
 
 .modal-content {
-  background: white;
+  background: var(--app-card);
   border-radius: 8px;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--app-border);
 }
 
 .modal-header {
@@ -735,13 +768,13 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid var(--app-border);
 }
 
 .modal-header h3 {
   margin: 0;
   font-size: 18px;
-  color: #333;
+  color: var(--app-text-main);
 }
 
 .modal-close {
@@ -749,13 +782,13 @@ onMounted(() => {
   border: none;
   font-size: 24px;
   cursor: pointer;
-  color: #999;
+  color: var(--app-text-dim);
   padding: 0;
 }
 
 .modal-body {
   padding: 20px;
-  color: #555;
+  color: var(--app-text-main);
 }
 
 .modal-footer {
@@ -763,7 +796,7 @@ onMounted(() => {
   gap: 12px;
   justify-content: flex-end;
   padding: 20px;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid var(--app-border);
 }
 </style>
 
