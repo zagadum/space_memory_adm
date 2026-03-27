@@ -1187,7 +1187,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       parent_name: 'Сергей', parent_surname: 'Волков', parent_phone: '+48 601 111 222', parent_passport: 'ABC 123456',
       hobbies: 'Robotyka, LEGO', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
       reg_comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.',
-      payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана' 
+      payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана',
+      contract_old_new: 'old'
     },
     { 
       id: 2, name: 'Кирилл', surname: 'Морозов', nickname: 'Kiri', dob: '2015-09-22', contract: 'pending', 
@@ -1199,6 +1200,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
         { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
         { id: 'doc2', name: 'Zgoda RODO', signed: false }
       ],
+      contract_old_new: 'new'
     },
     { 
       id: 3, name: 'Даниил', surname: 'Глебов', nickname: 'Dan', dob: '2010-11-03', contract: 'signed', 
@@ -1206,7 +1208,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       parent_name: 'Ірина', parent_surname: 'Глебова', parent_phone: '+48 603 555 666', parent_passport: 'GHI 987654',
       hobbies: 'Kosmos, książki', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
       reg_comment: 'Ребёнок любит космос и читать книги.',
-      payment: 440, payment_str: '440 zł', group_name: 'Пт 19 АНа Старшая', group_color: '#06b6d4', start_date: '2024-02-22', created_at: '2024-02-17', wait_days: 1, manager_name: 'Артём' 
+      payment: 440, payment_str: '440 zł', group_name: 'Пт 19 АНа Старшая', group_color: '#06b6d4', start_date: '2024-02-22', created_at: '2024-02-17', wait_days: 1, manager_name: 'Артём',
+      contract_old_new: 'old'
     },
     { 
       id: 4, name: 'Никита', surname: 'Иванов', nickname: '', dob: '2017-03-19', contract: 'pending', 
