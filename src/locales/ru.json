@@ -1411,6 +1411,8 @@
       "age": "Возраст",
       "years": "лет",
       "contract": "Договор",
+      "contractOld": "Старый",
+      "contractNew": "Новый",
       "signed": "Подписан",
       "pending": "Ожидает",
       "documents": "Документы",

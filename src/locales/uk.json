@@ -1402,6 +1402,8 @@
       "age": "Вік",
       "years": "років",
       "contract": "Договір",
+      "contractOld": "Старий",
+      "contractNew": "Новий",
       "signed": "Підписано",
       "pending": "Очікує",
       "documents": "Документи",
@@ -1746,5 +1748,51 @@
       "comment": "Коментар"
     },
     "noTeachers": "Немає вчителів за обраними фільтрами"
+  },
+  "importDb": {
+    "pageTitle": "Import DB",
+    "pageSubtitle": "Управління імпортованими даними",
+    "searchPlaceholder": "Пошук за ім'ям, email, телефоном...",
+    "listTitle": "Список імпорту",
+    "itemsWord": "записів",
+    "loading": "Завантажуємо список...",
+    "errorTitle": "Не вдалося завантажити список",
+    "emptyTitle": "Список порожній",
+    "emptyText": "Немає даних для відображення",
+    "stats": {
+      "total": "Всього записів",
+      "totalSub": "в системі",
+      "sent": "Відправлено",
+      "sentSub": "запрошень",
+      "done": "Завершено",
+      "doneSub": "записів",
+      "pending": "В очікуванні",
+      "pendingSub": "дій"
+    },
+    "table": {
+      "surname": "Прізвище",
+      "firstName": "Ім'я",
+      "parentEmail": "Email батьків",
+      "phone": "Телефон",
+      "nickname": "Нікнейм",
+      "subscriptionAmount": "Сума подписки",
+      "contractOldNew": "Тип контракту",
+      "balanceOverpayment": "Переплата",
+      "discount": "Знижка",
+      "isSend": "Відправлено",
+      "isDone": "Завершено",
+      "actions": "Дії"
+    },
+    "actions": {
+      "resendInvitation": "Надіслати запрошення",
+      "resendConfirm": "Надіслати запрошення повторно?",
+      "edit": "Редагувати",
+      "delete": "Видалити",
+      "deleteConfirm": "Ви впевнені, що хочете видалити цей запис?",
+      "deleteSuccess": "Запис успішно видалено",
+      "updateSuccess": "Дані оновлено",
+      "resendSuccess": "Запрошення успішно надіслано"
+    },
+    "showing": "Показано {shown} з {total} записів"
   }
 }

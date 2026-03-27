@@ -155,14 +155,22 @@
                       {{ s.documents.filter(d => d.signed).length }}/{{ s.documents.length }} {{ t('newStudents.table.signed') }}
                     </template>
                     <template v-else>
-                      ⏳ {{ t('newStudents.table.pending') }}
+                      ⌛ {{ t('newStudents.table.pending') }}
                     </template>
+                  </span>
+
+                  <!-- Contract Type Badge (Old/New) -->
+                  <span v-if="s.contractOldNew" class="contract-type-tag" :class="s.contractOldNew">
+                    {{ s.contractOldNew === 'old' ? t('newStudents.table.contractOld') : t('newStudents.table.contractNew') }}
                   </span>
 
                   <!-- Premium Tooltip -->
                   <div class="documents-tooltip">
                     <div class="tooltip-header">
                       <span class="tooltip-title">{{ t('newStudents.table.documents') }}</span>
+                      <span class="tooltip-type" v-if="s.contractOldNew">
+                        {{ s.contractOldNew === 'old' ? t('newStudents.table.contractOld') : t('newStudents.table.contractNew') }}
+                      </span>
                       <span class="tooltip-count">{{ s.documents.filter(d => d.signed).length }}/{{ s.documents.length }}</span>
                     </div>
                     <div class="tooltip-divider"></div>
@@ -667,6 +675,29 @@ function onPanelLoadPayments() {
   border: 1px solid rgba(79, 110, 247, 0.2);
 }
 
+.contract-type-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.contract-type-tag.old {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.contract-type-tag.new {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
 /* Tooltip Styles */
 .documents-tooltip {
   position: absolute;
@@ -712,6 +743,16 @@ function onPanelLoadPayments() {
   font-weight: 600;
   padding: 2px 6px;
   background: var(--app-card); /* Changed from --bg-soft */
+  border-radius: 4px;
+}
+
+.tooltip-type {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--app-text-dim);
+  text-transform: uppercase;
+  background: rgba(100, 120, 255, 0.1);
+  padding: 1px 6px;
   border-radius: 4px;
 }
 

@@ -1406,6 +1406,8 @@
       "age": "Age",
       "years": "y.o.",
       "contract": "Contract",
+      "contractOld": "Old",
+      "contractNew": "New",
       "signed": "Signed",
       "pending": "Pending",
       "documents": "Documents",
@@ -1750,5 +1752,51 @@
       "comment": "Comment"
     },
     "noTeachers": "No teachers match the current filters"
+  },
+  "importDb": {
+    "pageTitle": "Import DB",
+    "pageSubtitle": "Management of imported data",
+    "searchPlaceholder": "Search by name, email, phone...",
+    "listTitle": "Import list",
+    "itemsWord": "records",
+    "loading": "Loading list...",
+    "errorTitle": "Failed to load list",
+    "emptyTitle": "List is empty",
+    "emptyText": "No data to display",
+    "stats": {
+      "total": "Total records",
+      "totalSub": "in system",
+      "sent": "Sent",
+      "sentSub": "invitations",
+      "done": "Completed",
+      "doneSub": "records",
+      "pending": "Pending",
+      "pendingSub": "actions"
+    },
+    "table": {
+      "surname": "Surname",
+      "firstName": "First Name",
+      "parentEmail": "Parent Email",
+      "phone": "Phone",
+      "nickname": "Nickname",
+      "subscriptionAmount": "Subscription Amount",
+      "contractOldNew": "Contract Type",
+      "balanceOverpayment": "Overpayment",
+      "discount": "Discount",
+      "isSend": "Sent",
+      "isDone": "Completed",
+      "actions": "Actions"
+    },
+    "actions": {
+      "resendInvitation": "Send Invitation",
+      "resendConfirm": "Resend invitation?",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Are you sure you want to delete this record?",
+      "deleteSuccess": "Record deleted successfully",
+      "updateSuccess": "Data updated",
+      "resendSuccess": "Invitation sent successfully"
+    },
+    "showing": "Showing {shown} of {total} records"
   }
 }

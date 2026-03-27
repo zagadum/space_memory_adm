@@ -30,6 +30,7 @@ export interface NewStudent {
   waitDays: number
   manager: string | null
   phone: string | null
+  contractOldNew?: 'old' | 'new' | string | null
 }
 
 export interface StudentDetails {
@@ -205,9 +206,9 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       hobbies:         s.hobbies       ?? '',
       comment:         s.reg_comment   ?? '',
       photoConsent:    Boolean(s.photo_consent),
-      marketingConsent: Boolean(s.marketing_consent),
-      digitalContentConsent: Boolean(s.digital_content_consent),
-      dataProcessingConsent: Boolean(s.data_processing_consent),
+      marketingConsent: Boolean(s.marketing_consent_accepted ?? s.marketing_consent),
+      digitalContentConsent: Boolean(s.digital_content_consent ?? s.recording_consent_accepted),
+      dataProcessingConsent: Boolean(s.data_processing_accepted ?? s.data_processing_consent),
       socialMediaConsent: Boolean(s.social_media_consent),
       internalQualityConsent: Boolean(s.internal_quality_consent),
       currentPrice:    '0.00',
@@ -307,6 +308,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       waitDays: Number(row.waitDays ?? row.wait_days ?? diffDaysFrom(createdDate)) || 0,
       manager,
       phone: row.phone ?? row.parent_phone ?? row.parentPhone ?? null,
+      contractOldNew: row.contract_old_new ?? row.contractOldNew ?? null,
     }
   }
 
@@ -505,9 +507,9 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     if (data.hobbies !== undefined)      payload.hobbies = data.hobbies
     if (data.comment !== undefined)      payload.reg_comment = data.comment
     if (data.photoConsent !== undefined) payload.photo_consent = data.photoConsent ? 1 : 0
-    if (data.marketingConsent !== undefined) payload.marketing_consent = data.marketingConsent ? 1 : 0
+    if (data.marketingConsent !== undefined) payload.marketing_consent_accepted = data.marketingConsent ? 1 : 0
     if (data.digitalContentConsent !== undefined) payload.digital_content_consent = data.digitalContentConsent ? 1 : 0
-    if (data.dataProcessingConsent !== undefined) payload.data_processing_consent = data.dataProcessingConsent ? 1 : 0
+    if (data.dataProcessingConsent !== undefined) payload.data_processing_accepted = data.dataProcessingConsent ? 1 : 0
     if (data.socialMediaConsent !== undefined) payload.social_media_consent = data.socialMediaConsent ? 1 : 0
     if (data.internalQualityConsent !== undefined) payload.internal_quality_consent = data.internalQualityConsent ? 1 : 0
 
