@@ -10,63 +10,81 @@ export interface User {
   teacherId?: number;   // ID преподавателя — приходит с бэкенда для роли teacher
 }
 
-export const useAuthStore = defineStore("auth", {
-  state: () => ({
-    token: localStorage.getItem("token") || null,
-    user: null as User | null,
-    loading: false,
-    error: "" as string,
-  }),
-  getters: {
-    isAuthenticated: (s) => !!s.token,
-  },
-  actions: {
-    setToken(token: string) {
-      this.token = token;
-      localStorage.setItem("token", token);
-    },
-    updateProfile(data: Partial<User>) {
-      if (this.user) {
-        this.user = { ...this.user, ...data };
-        if (!this.user.initials && this.user.email) {
-          this.user.initials = this.user.email.substring(0, 2).toUpperCase();
-        }
+import { ref, computed } from "vue";
+
+export const useAuthStore = defineStore("auth", () => {
+  // ── State ──
+  const token = ref<string | null>(localStorage.getItem("token") || null);
+  const user = ref<User | null>(null);
+  const loading = ref(false);
+  const error = ref("");
+
+  // ── Getters ──
+  const isAuthenticated = computed(() => !!token.value);
+
+  // ── Actions ──
+  function setToken(newToken: string) {
+    token.value = newToken;
+    localStorage.setItem("token", newToken);
+  }
+
+  function updateProfile(data: Partial<User>) {
+    if (user.value) {
+      user.value = { ...user.value, ...data };
+      if (!user.value.initials && user.value.email) {
+        user.value.initials = user.value.email.substring(0, 2).toUpperCase();
       }
-    },
-    async signIn(email: string, password: string) {
-      this.loading = true;
-      this.error = "";
-      try {
-        const res = await authApi.signIn({ email, password });
-        this.setToken(res.token);
-        if (!res.user.initials && res.user.email) {
-          res.user.initials = res.user.email.substring(0, 2).toUpperCase();
-        }
-        this.user = res.user;
-        return true;
-      } catch (e: any) {
-        this.error = e?.response?.data?.message || "Sign in failed";
-        return false;
-      } finally {
-        this.loading = false;
+    }
+  }
+
+  async function signIn(email: string, password: string) {
+    loading.value = true;
+    error.value = "";
+    try {
+      const res = await authApi.signIn({ email, password });
+      setToken(res.token);
+      if (!res.user.initials && res.user.email) {
+        res.user.initials = res.user.email.substring(0, 2).toUpperCase();
       }
-    },
-    async loadMe() {
-      if (!this.token) return;
-      try {
-        const user = await authApi.me();
-        if (!user.initials && user.email) {
-          user.initials = user.email.substring(0, 2).toUpperCase();
-        }
-        this.user = user;
-      } catch {
-        this.logout();
+      user.value = res.user;
+      return true;
+    } catch (e: any) {
+      error.value = e?.response?.data?.message || "Sign in failed";
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function loadMe() {
+    if (!token.value) return;
+    try {
+      const u = await authApi.me();
+      if (!u.initials && u.email) {
+        u.initials = u.email.substring(0, 2).toUpperCase();
       }
-    },
-    logout() {
-      this.token = null;
-      this.user = null;
-      localStorage.removeItem("token");
-    },
-  },
+      user.value = u;
+    } catch {
+      logout();
+    }
+  }
+
+  function logout() {
+    token.value = null;
+    user.value = null;
+    localStorage.removeItem("token");
+  }
+
+  return {
+    token,
+    user,
+    loading,
+    error,
+    isAuthenticated,
+    setToken,
+    updateProfile,
+    signIn,
+    loadMe,
+    logout,
+  };
 });

@@ -1,5 +1,7 @@
 import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from "axios";
 import { mockAdapter } from "./mockAdapter";
+import { useAppStore } from "../stores/app.store";
+import { useNotificationStore } from "../stores/notification.store";
 
 const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? "false").toLowerCase();
 const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
@@ -70,16 +72,12 @@ function attachInterceptors(client: ReturnType<typeof axios.create>) {
       config.params._t = Date.now();
     }
     
-    // Global loading: lazy import to avoid circular deps
-    import('../stores/app.store').then(({ useAppStore }) => {
-      useAppStore().startRequest();
-    });
+    // Global loading (static import fixes race condition)
+    useAppStore().startRequest();
     return config;
   },
   (error) => {
-    import('../stores/app.store').then(({ useAppStore }) => {
-      useAppStore().endRequest();
-    });
+    useAppStore().endRequest();
     return Promise.reject(error);
   }
   );
@@ -87,15 +85,11 @@ function attachInterceptors(client: ReturnType<typeof axios.create>) {
   // Response interceptor: end loading, handle 401 logout, timeout errors
   client.interceptors.response.use(
   (response) => {
-    import('../stores/app.store').then(({ useAppStore }) => {
-      useAppStore().endRequest();
-    });
+    useAppStore().endRequest();
     return response;
   },
   (error) => {
-    import('../stores/app.store').then(({ useAppStore }) => {
-      useAppStore().endRequest();
-    });
+    useAppStore().endRequest();
 
     // Timeout error — user-friendly message
     if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
@@ -113,6 +107,11 @@ function attachInterceptors(client: ReturnType<typeof axios.create>) {
       import('../stores/auth.store').then(({ useAuthStore }) => {
         useAuthStore().logout();
       });
+    }
+
+    // 403 Forbidden
+    if (error.response?.status === 403) {
+      useNotificationStore().addToast("У вас нет прав для выполнения этого действия", "error");
     }
 
     return Promise.reject(error);

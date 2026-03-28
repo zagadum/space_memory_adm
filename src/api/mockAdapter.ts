@@ -595,17 +595,18 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "new-groups/add-students") {
+  if (method === "post" && url.match(/^new-groups\/\d+\/students$/)) {
+    const groupId = Number(url.split('/')[1]);
     const body = readBody(config);
-    if (!body?.groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
+    if (!groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
     const today = new Date().toISOString().slice(0, 10);
-    if (!ngStudents[body.groupId]) ngStudents[body.groupId] = [];
-    const existing = new Set(ngStudents[body.groupId].map((s: any) => s.name));
+    if (!ngStudents[groupId]) ngStudents[groupId] = [];
+    const existing = new Set(ngStudents[groupId].map((s: any) => s.name));
     let added = 0;
     for (const sid of body.studentIds) {
       const ms = mockMasterStudents.find(s => s.id === sid);
       if (ms && !existing.has(ms.name)) {
-        ngStudents[body.groupId].push({ id: Date.now() + Math.random(), name: ms.name, age: ms.age, contract: "pending", paymentStr: "0 zł", createdDate: today, manager: null });
+        ngStudents[groupId].push({ id: Date.now() + Math.random(), name: ms.name, age: ms.age, contract: "pending", paymentStr: "0 zł", createdDate: today, manager: null });
         added++;
       }
     }

@@ -51,119 +51,129 @@ function normalizeExpelledStats(payload: unknown, list: ExpelledStudent[]): Expe
   };
 }
 
-export const useExpelledStudentsStore = defineStore('expelledStudents', {
-  state: () => ({
-    list: [] as ExpelledStudent[],
-    stats: null as ExpelledStats | null,
-    isLoading: false,
-    error: null as string | null,
-    selectedIds: [] as number[],
-    currentBackend: 'default' as RecruitmentBackend,
-  }),
+import { ref } from 'vue';
+import { useNotificationStore } from './notification.store';
 
-  actions: {
-    resolveApi(backend?: RecruitmentBackend) {
-      this.currentBackend = backend ?? this.currentBackend;
-      return getExpelledStudentsApi(this.currentBackend);
-    },
+export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
+  // ── State ──
+  const list = ref<ExpelledStudent[]>([]);
+  const stats = ref<ExpelledStats | null>(null);
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
+  const selectedIds = ref<number[]>([]);
+  const currentBackend = ref<RecruitmentBackend>('default');
 
-    async fetchList(backend?: RecruitmentBackend) {
-      this.isLoading = true;
-      this.error = null;
-      try {
-        const res = await this.resolveApi(backend).getList();
-        const list = normalizeExpelledList(res);
-        this.list = list;
-        this.stats = normalizeExpelledStats(res, list);
-      } catch (err: any) {
-        this.list = [];
-        this.stats = { ...EMPTY_STATS };
-        this.error = err?.response?.data?.message || err?.message || 'Ошибка загрузки';
-      } finally {
-        this.isLoading = false;
-      }
-    },
+  // ── Actions ──
+  function resolveApi(backend?: RecruitmentBackend) {
+    currentBackend.value = backend ?? currentBackend.value;
+    return getExpelledStudentsApi(currentBackend.value);
+  }
 
-    async updateStudent(id: number, patch: ExpelledUpdatePayload, backend?: RecruitmentBackend) {
-      try {
-        await this.resolveApi(backend).update(id, patch);
-        const s = this.list.find(x => x.id === id);
-        if (s) Object.assign(s, patch);
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('💾 Сохранено', 'success');
-      } catch (err: any) {
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('Ошибка сохранения', 'error');
-      }
-    },
+  async function fetchList(backend?: RecruitmentBackend) {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const res = await resolveApi(backend).getList();
+      const normalizedList = normalizeExpelledList(res);
+      list.value = normalizedList;
+      stats.value = normalizeExpelledStats(res, normalizedList);
+    } catch (err: any) {
+      list.value = [];
+      stats.value = { ...EMPTY_STATS };
+      error.value = err?.response?.data?.message || err?.message || 'Ошибка загрузки';
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-    async archiveStudent(id: number, reason: string, backend?: RecruitmentBackend) {
-      try {
-        await this.resolveApi(backend).archive(id, reason);
-        this.list = this.list.filter(x => x.id !== id);
-        if (this.stats) this.stats.total = this.list.length;
-        this.selectedIds = this.selectedIds.filter(x => x !== id);
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('🗃️ Ученик архивирован', 'success');
-      } catch (err: any) {
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('Ошибка архивации', 'error');
-      }
-    },
+  async function updateStudent(id: number, patch: ExpelledUpdatePayload, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).update(id, patch);
+      const s = list.value.find(x => x.id === id);
+      if (s) Object.assign(s, patch);
+      useNotificationStore().addToast('💾 Сохранено', 'success');
+    } catch (err: any) {
+      useNotificationStore().addToast('Ошибка сохранения', 'error');
+    }
+  }
 
-    async transferStudent(id: number, groupId: number, backend?: RecruitmentBackend) {
-      try {
-        await this.resolveApi(backend).transfer(id, groupId);
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('✅ Ученик перенесён в группу', 'success');
-      } catch (err: any) {
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('Ошибка переноса', 'error');
-      }
-    },
+  async function archiveStudent(id: number, reason: string, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).archive(id, reason);
+      list.value = list.value.filter(x => x.id !== id);
+      if (stats.value) stats.value.total = list.value.length;
+      selectedIds.value = selectedIds.value.filter(x => x !== id);
+      useNotificationStore().addToast('🗃️ Ученик архивирован', 'success');
+    } catch (err: any) {
+      useNotificationStore().addToast('Ошибка архивации', 'error');
+    }
+  }
 
-    async bulkAssign(ids: number[], manager: string, backend?: RecruitmentBackend) {
-      try {
-        await this.resolveApi(backend).bulkAssign(ids, manager);
-        ids.forEach(id => {
-          const s = this.list.find(x => x.id === id);
-          if (s) s.manager = manager;
-        });
-        this.selectedIds = [];
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast(`✅ Назначен: ${manager}`, 'success');
-      } catch (err: any) {
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('Ошибка назначения', 'error');
-      }
-    },
+  async function transferStudent(id: number, groupId: number, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).transfer(id, groupId);
+      useNotificationStore().addToast('✅ Ученик перенесён в группу', 'success');
+    } catch (err: any) {
+      useNotificationStore().addToast('Ошибка переноса', 'error');
+    }
+  }
 
-    async bulkArchive(ids: number[], reason: string, backend?: RecruitmentBackend) {
-      try {
-        await this.resolveApi(backend).bulkArchive(ids, reason);
-        this.list = this.list.filter(x => !ids.includes(x.id));
-        if (this.stats) this.stats.total = this.list.length;
-        this.selectedIds = [];
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast(`🗃️ Архивировано ${ids.length} учеников`, 'success');
-      } catch (err: any) {
-        const { useNotificationStore } = await import('./notification.store');
-        useNotificationStore().addToast('Ошибка архивации', 'error');
-      }
-    },
+  async function bulkAssign(ids: number[], manager: string, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).bulkAssign(ids, manager);
+      ids.forEach(id => {
+        const s = list.value.find(x => x.id === id);
+        if (s) s.manager = manager;
+      });
+      selectedIds.value = [];
+      useNotificationStore().addToast(`✅ Назначен: ${manager}`, 'success');
+    } catch (err: any) {
+      useNotificationStore().addToast('Ошибка назначения', 'error');
+    }
+  }
 
-    toggleSelect(id: number) {
-      const idx = this.selectedIds.indexOf(id);
-      if (idx === -1) this.selectedIds.push(id);
-      else this.selectedIds.splice(idx, 1);
-    },
+  async function bulkArchive(ids: number[], reason: string, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).bulkArchive(ids, reason);
+      list.value = list.value.filter(x => !ids.includes(x.id));
+      if (stats.value) stats.value.total = list.value.length;
+      selectedIds.value = [];
+      useNotificationStore().addToast(`🗃️ Архивировано ${ids.length} учеников`, 'success');
+    } catch (err: any) {
+      useNotificationStore().addToast('Ошибка архивации', 'error');
+    }
+  }
 
-    selectAll(ids: number[]) {
-      this.selectedIds = [...ids];
-    },
+  function toggleSelect(id: number) {
+    const idx = selectedIds.value.indexOf(id);
+    if (idx === -1) selectedIds.value.push(id);
+    else selectedIds.value.splice(idx, 1);
+  }
 
-    clearSelection() {
-      this.selectedIds = [];
-    },
-  },
+  function selectAll(ids: number[]) {
+    selectedIds.value = [...ids];
+  }
+
+  function clearSelection() {
+    selectedIds.value = [];
+  }
+
+  return {
+    list,
+    stats,
+    isLoading,
+    error,
+    selectedIds,
+    currentBackend,
+    resolveApi,
+    fetchList,
+    updateStudent,
+    archiveStudent,
+    transferStudent,
+    bulkAssign,
+    bulkArchive,
+    toggleSelect,
+    selectAll,
+    clearSelection,
+  };
 });

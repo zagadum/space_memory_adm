@@ -29,3 +29,7 @@ Thumbs.db
 *.tmp
 *.temp
 ts_errors.log
+
+# Playwright
+playwright-report/
+test-results/
