@@ -221,7 +221,10 @@
             <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.documentsTitle') }}</div>
             <div v-if="payments?.documentList?.length" class="sp-list-wrap">
               <div v-for="doc in payments.documentList" :key="doc.id" class="sp-row-item">
-                <div class="sp-row-main">{{ doc.name }}</div>
+                <div class="sp-row-main">
+                  <div>{{ doc.name }}</div>
+                  <div v-if="doc.template" class="doc-template-label">{{ doc.template }}</div>
+                </div>
                 <span class="contract-badge" :class="doc.signed ? 'contract-signed' : 'contract-pending'">
                   {{ doc.signed ? t('newStudents.panel.documentSigned') : t('newStudents.panel.documentPending') }}
                 </span>
@@ -631,6 +634,14 @@ function formatTxDate(dateText: string) {
 .sp-row-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sp-row-main { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
 .sp-row-sub { font-size: 11.5px; color: var(--app-text-dim); }
+.doc-template-label {
+  font-size: 10px;
+  color: var(--app-text-dim);
+  opacity: 0.7;
+  margin-top: 2px;
+  font-family: 'Space Mono', monospace;
+  text-transform: lowercase;
+}
 .sp-empty-state {
   padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--app-border);
   color: var(--app-text-dim); font-size: 12px;

@@ -159,25 +159,21 @@
                     </template>
                   </span>
 
-                  <!-- Contract Type Badge (Old/New) -->
-                  <span v-if="s.contractOldNew" class="contract-type-tag" :class="s.contractOldNew">
-                    {{ s.contractOldNew === 'old' ? t('newStudents.table.contractOld') : t('newStudents.table.contractNew') }}
-                  </span>
 
                   <!-- Premium Tooltip -->
                   <div class="documents-tooltip">
                     <div class="tooltip-header">
                       <span class="tooltip-title">{{ t('newStudents.table.documents') }}</span>
-                      <span class="tooltip-type" v-if="s.contractOldNew">
-                        {{ s.contractOldNew === 'old' ? t('newStudents.table.contractOld') : t('newStudents.table.contractNew') }}
-                      </span>
                       <span class="tooltip-count">{{ s.documents.filter(d => d.signed).length }}/{{ s.documents.length }}</span>
                     </div>
                     <div class="tooltip-divider"></div>
                     <div class="tooltip-list">
                       <div v-for="doc in s.documents" :key="doc.id" class="tooltip-item" :class="{ 'signed': doc.signed }">
                         <span class="item-icon">{{ doc.signed ? '✓' : '○' }}</span>
-                        <span class="item-name">{{ doc.name }}</span>
+                        <div class="item-content">
+                          <div class="item-name">{{ doc.name }}</div>
+                          <div v-if="doc.template" class="item-template">{{ doc.template }}</div>
+                        </div>
                         <span class="item-status">{{ doc.signed ? t('newStudents.table.signed') : t('newStudents.table.pending') }}</span>
                       </div>
                     </div>
@@ -838,9 +834,24 @@ async function onPanelSaveOverpayment(value: string) {
   color: #10b981;
 }
 
-.item-name {
+.item-content {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-name {
   font-weight: 500;
+  line-height: 1.2;
+}
+
+.item-template {
+  font-size: 9px;
+  color: var(--app-text-dim);
+  opacity: 0.6;
+  font-family: 'Space Mono', monospace;
+  text-transform: lowercase;
+  margin-top: 1px;
 }
 
 .item-status {
@@ -848,6 +859,7 @@ async function onPanelSaveOverpayment(value: string) {
   padding: 1px 6px;
   border-radius: 4px;
   background: var(--app-card); /* Changed from --bg-soft */
+  align-self: flex-start;
 }
 
 .signed .item-status {

@@ -58,6 +58,7 @@ export interface RecruitmentDocumentItem {
   id: number | string;
   name: string;
   signed: boolean;
+  template?: string | null;
 }
 
 export interface RecruitmentTransactionItem {
@@ -92,6 +93,7 @@ function pickStudentPayments(payload: any): RecruitmentStudentPayments {
         id: d?.id ?? idx,
         name: String(d?.name ?? d?.title ?? d?.document_name ?? 'Документ'),
         signed: Boolean(d?.signed ?? d?.is_signed ?? d?.status === 'signed'),
+        template: d?.template ?? null,
       }))
     : [];
 

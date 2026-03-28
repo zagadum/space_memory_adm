@@ -1188,6 +1188,10 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       hobbies: 'Robotyka, LEGO', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
       reg_comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.',
       payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана',
+      document_list: [
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: true, template: 'contract_old' },
+        { id: 'doc2', name: 'Zgoda RODO', signed: true, template: 'rodo_standard' }
+      ],
       contract_old_new: 'old'
     },
     { 
@@ -1197,8 +1201,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       hobbies: 'Шахматы, рисование', photo_consent: 0, marketing_consent: 0, digital_content_consent: 0, data_processing_consent: 1, social_media_consent: 0, internal_quality_consent: 1,
       reg_comment: 'Кирилл очень любознательный.',
       document_list: [
-        { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
-        { id: 'doc2', name: 'Zgoda RODO', signed: false }
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: false, template: 'contract_new' },
+        { id: 'doc2', name: 'Zgoda RODO', signed: false, template: 'rodo_standard' }
       ],
       contract_old_new: 'new'
     },
@@ -1218,8 +1222,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       hobbies: '', photo_consent: 1, marketing_consent: 0, digital_content_consent: 0, data_processing_consent: 1, social_media_consent: 0, internal_quality_consent: 1,
       reg_comment: 'Застенчивый ребёнок, привыкает медленно.',
       document_list: [
-        { id: 'doc1', name: 'Umowa edukacyjna', signed: true },
-        { id: 'doc2', name: 'Zgoda RODO', signed: false }
+        { id: 'doc1', name: 'Umowa edukacyjna', signed: true, template: 'contract_new' },
+        { id: 'doc2', name: 'Zgoda RODO', signed: false, template: 'rodo_standard' }
       ],
       payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-10', wait_days: 7, manager_name: null
     },
@@ -1313,8 +1317,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
         current_price: amount > 0 ? amount.toFixed(2) : '0.00',
         current_price_desc: amount > 0 ? 'Group lessons' : 'Не выбран',
         document_list: [
-          { id: `${id}-contract`, name: 'Umowa edukacyjna', signed },
-          { id: `${id}-rodo`, name: 'Zgoda RODO', signed: true },
+          { id: `${id}-contract`, name: 'Umowa edukacyjna', signed, template: 'contract_new' },
+          { id: `${id}-rodo`, name: 'Zgoda RODO', signed: true, template: 'rodo_standard' },
         ],
         transaction_list: amount > 0
           ? [

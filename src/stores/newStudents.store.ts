@@ -13,6 +13,7 @@ export interface StudentDocumentItem {
   id: number | string
   name: string
   signed: boolean
+  template?: string | null
 }
 
 export interface NewStudent {
