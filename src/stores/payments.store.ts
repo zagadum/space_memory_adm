@@ -1,334 +1,326 @@
 import { defineStore } from "pinia";
+import { ref, reactive, computed } from "vue";
 import { paymentsApi } from "../api/paymentsApi";
 import type { Program, StudentProfile, MonthObj, KsefInvoice } from "../api/mockDb";
 import type { Transaction, ProjectSummary } from "../api/paymentsApi";
+import { parseApiError } from "../api/errorHelper";
 
-function extractErrorMessage(e: unknown, fallback: string): string {
-  if (e && typeof e === 'object') {
-    const err = e as any;
-    if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-      return 'Большая нагрузка на сервер. Пожалуйста, повторите попытку через несколько секунд.';
-    }
-    if ('response' in err) {
-      const resp = err.response as { data?: { message?: string } };
-      if (resp?.data?.message) return resp.data.message;
+export const usePaymentsStore = defineStore("payments", () => {
+  // ── State ──
+  const student = ref<StudentProfile | null>(null);
+  const programs = ref<Program[]>([]);
+  const loading = ref(false);
+  const error = ref("");
+  const activeTab = ref<"payments" | "groups" | "info" | "attendance" | "progress" | "notes">("payments");
+
+  // Transactions & KSeF
+  const transactionsByProgram = ref<Record<string, Transaction[]>>({});
+  const txLoading = ref<Record<string, boolean>>({});
+  const txError = ref<Record<string, string>>({});
+  const ksefInvoicesByProgram = ref<Record<string, KsefInvoice[]>>({});
+  const ksefLoading = ref<Record<string, boolean>>({});
+  const ksefError = ref<Record<string, string>>({});
+
+  // ── UI state (per-program) ──
+  const activeYear = ref<Record<string, number>>({});
+  const activeMonth = ref<Record<string, number | null>>({});
+  const activeView = ref<Record<string, "grid" | "table">>({});
+
+  // ── НОВОЕ: Разбитые запросы ──────────────────────────────────────────────
+  // Список проектов (лёгкий, грузится сразу)
+  const projectSummaries = ref<ProjectSummary[]>([]);
+  const projectsLoading = ref(false);
+  const projectsError = ref("");
+
+  // Календарь — грузится по клику на проект (per-project)
+  const calendarByProject = ref<Record<string, Program['years']>>({});
+  const calendarLoading = ref<Record<string, boolean>>({});
+  const calendarError = ref<Record<string, string>>({});
+
+  // Транзакции — грузятся по клику на раздел (per-project, lazy)
+  const newTxByProject = ref<Record<string, Transaction[]>>({});
+  const newTxLoading = ref<Record<string, boolean>>({});
+  const newTxError = ref<Record<string, string>>({});
+
+  // Текущий studentId (нужен для lazy запросов)
+  const currentStudentId = ref("");
+
+  // Справочники для выпадающих списков
+  const dictionaries = reactive({
+    pauseReasons: [] as Array<any>,
+    paymentMethods: [] as Array<any>,
+    discountTypes: [] as Array<any>,
+    refundReasons: [] as Array<any>,
+    tariffs: [] as Array<any>
+  });
+
+  // ── Getters ──
+  const programsById = computed(() =>
+    Object.fromEntries(programs.value.map((p) => [p.id, p])) as Record<string, Program>
+  );
+
+  /** Возвращает массив MonthObj для данной программы и текущего года */
+  const monthsForProgram = computed(() => (progId: string): MonthObj[] => {
+    // Приоритет: новый calendar → старый programs
+    const years = calendarByProject.value[progId] || programs.value.find((x) => x.id === progId)?.years;
+    if (!years) return Array.from({ length: 12 }, () => ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj));
+    const year = String(activeYear.value[progId] || 2026);
+    const arr = (years[year] || []) as MonthObj[];
+    return Array.from({ length: 12 }, (_, i) =>
+      arr[i] || ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj)
+    );
+  });
+
+  /** Текущий выбранный месяц */
+  const currentMonth = computed(() => (progId: string): MonthObj | null => {
+    const idx = activeMonth.value[progId];
+    if (idx == null) return null;
+    const years = calendarByProject.value[progId] || programs.value.find((x) => x.id === progId)?.years;
+    if (!years) return null;
+    const year = String(activeYear.value[progId] || 2026);
+    const arr = (years[year] || []) as MonthObj[];
+    return arr[idx] || ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj);
+  });
+
+  /** Список годов для программы */
+  const yearsForProgram = computed(() => (progId: string): number[] => {
+    const years = calendarByProject.value[progId] || programs.value.find((x) => x.id === progId)?.years;
+    if (!years) return [2026];
+    const ys = Object.keys(years).map(Number).sort();
+    return ys.length ? ys : [2026];
+  });
+
+  /** Загружен ли календарь для проекта */
+  const isCalendarLoaded = computed(() => (progId: string): boolean => {
+    return !!calendarByProject.value[progId];
+  });
+
+  /** Транзакции: новый endpoint или старый fallback */
+  const txForProject = computed(() => (progId: string): Transaction[] => {
+    return newTxByProject.value[progId]
+      ?? transactionsByProgram.value[progId]
+      ?? [];
+  });
+
+  // ── Actions ──
+  async function fetchDictionaries() {
+    try {
+      const [pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs] =
+        await Promise.all([
+          paymentsApi.getPauseReasons(),
+          paymentsApi.getPaymentMethods(),
+          paymentsApi.getDiscountTypes(),
+          paymentsApi.getRefundReasons(),
+          paymentsApi.getTariffs(),
+        ]);
+      Object.assign(dictionaries, { pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs });
+    } catch (err: unknown) {
+      console.error('Ошибка загрузки словарей:', parseApiError(err));
     }
   }
-  if (e instanceof Error) return e.message;
-  return fallback;
-}
 
-export const usePaymentsStore = defineStore("payments", {
-  state: () => ({
-    student: null as StudentProfile | null,
-    programs: [] as Program[],
-    loading: false,
-    error: "" as string,
-    activeTab: "payments" as "payments" | "groups" | "info" | "attendance" | "progress" | "notes",
+  // ── СТАРЫЙ монолитный loadStudent (оставляем, пока бэкенд не готов) ───────
+  async function loadStudent(studentId = "s_1") {
+    loading.value = true;
+    error.value = "";
+    currentStudentId.value = studentId;
 
-    // Transactions & KSeF
-    transactionsByProgram: {} as Record<string, Transaction[]>,
-    txLoading: {} as Record<string, boolean>,
-    txError: {} as Record<string, string>,
-    ksefInvoicesByProgram: {} as Record<string, KsefInvoice[]>,
-    ksefLoading: {} as Record<string, boolean>,
-    ksefError: {} as Record<string, string>,
+    try {
+      const res = await paymentsApi.getStudentPayments(studentId);
+      student.value = res.student || null;
+      programs.value = res.programs || [];
 
-    // ── UI state (per-program) ──
-    activeYear: {} as Record<string, number>,
-    activeMonth: {} as Record<string, number | null>,
-    activeView: {} as Record<string, "grid" | "table">,
-
-    // ── НОВОЕ: Разбитые запросы ──────────────────────────────────────────────
-    // Список проектов (лёгкий, грузится сразу)
-    projectSummaries: [] as ProjectSummary[],
-    projectsLoading: false,
-    projectsError: "" as string,
-
-    // Календарь — грузится по клику на проект (per-project)
-    calendarByProject: {} as Record<string, Program['years']>,
-    calendarLoading: {} as Record<string, boolean>,
-    calendarError: {} as Record<string, string>,
-
-    // Транзакции — грузятся по клику на раздел (per-project, lazy)
-    newTxByProject: {} as Record<string, Transaction[]>,
-    newTxLoading: {} as Record<string, boolean>,
-    newTxError: {} as Record<string, string>,
-
-    // Текущий studentId (нужен для lazy запросов)
-    currentStudentId: "" as string,
-
-    // Справочники для выпадающих списков
-    dictionaries: {
-      pauseReasons: [] as Array<any>,
-      paymentMethods: [] as Array<any>,
-      discountTypes: [] as Array<any>,
-      refundReasons: [] as Array<any>,
-      tariffs: [] as Array<any>
+      for (const p of programs.value) {
+        if (activeYear.value[p.id] == null) {
+          const years = Object.keys(p.years || {}).map(Number).sort();
+          activeYear.value[p.id] = years.length ? years[years.length - 1] : 2026;
+        }
+        if (activeMonth.value[p.id] === undefined) activeMonth.value[p.id] = null;
+        if (activeView.value[p.id] == null) activeView.value[p.id] = "grid";
+      }
+    } catch (e: unknown) {
+      error.value = parseApiError(e, "Failed to load payments");
+    } finally {
+      loading.value = false;
     }
-  }),
+  }
 
-  getters: {
-    programsById: (s) =>
-      Object.fromEntries(s.programs.map((p) => [p.id, p])) as Record<string, Program>,
+  /**
+   * Запрос 1 — вызывается при открытии вкладки Платежи.
+   * Грузит только список проектов (имя, баланс, тариф) — без calendar и tx.
+   * Эндпоинт: GET /students/{student_id}/projects
+   */
+  async function loadProjects(studentId: string) {
+    console.log('loadProjects=>', studentId);
+    projectsLoading.value = true;
+    projectsError.value = "";
+    currentStudentId.value = studentId;
+    try {
+      projectSummaries.value = await paymentsApi.getStudentProjects(studentId);
 
-    /** Возвращает массив MonthObj для данной программы и текущего года */
-    monthsForProgram: (s) => (progId: string): MonthObj[] => {
-      // Приоритет: новый calendar → старый programs
-      const years = s.calendarByProject[progId] || s.programs.find((x) => x.id === progId)?.years;
-      if (!years) return Array.from({ length: 12 }, () => ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj));
-      const year = String(s.activeYear[progId] || 2026);
-      const arr = (years[year] || []) as MonthObj[];
-      return Array.from({ length: 12 }, (_, i) =>
-        arr[i] || ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj)
-      );
-    },
-
-    /** Текущий выбранный месяц */
-    currentMonth: (s) => (progId: string): MonthObj | null => {
-      const idx = s.activeMonth[progId];
-      if (idx == null) return null;
-      const years = s.calendarByProject[progId] || s.programs.find((x) => x.id === progId)?.years;
-      if (!years) return null;
-      const year = String(s.activeYear[progId] || 2026);
-      const arr = (years[year] || []) as MonthObj[];
-      return arr[idx] || ({ s: "future", a: 0, ksef: null, g1: 0, g2: 0 } as MonthObj);
-    },
-
-    /** Список годов для программы */
-    yearsForProgram: (s) => (progId: string): number[] => {
-      const years = s.calendarByProject[progId] || s.programs.find((x) => x.id === progId)?.years;
-      if (!years) return [2026];
-      const ys = Object.keys(years).map(Number).sort();
-      return ys.length ? ys : [2026];
-    },
-
-    /** Загружен ли календарь для проекта */
-    isCalendarLoaded: (s) => (progId: string): boolean => {
-      return !!s.calendarByProject[progId];
-    },
-
-    /** Транзакции: новый endpoint или старый fallback */
-    txForProject: (s) => (progId: string): Transaction[] => {
-      return s.newTxByProject[progId]
-        ?? s.transactionsByProgram[progId]
-        ?? [];
-    },
-  },
-
-  actions: {
-    // ── Справочники ────────────────────────────────────────────────────────────
-    async fetchDictionaries() {
-      try {
-        const [pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs] =
-          await Promise.all([
-            paymentsApi.getPauseReasons(),
-            paymentsApi.getPaymentMethods(),
-            paymentsApi.getDiscountTypes(),
-            paymentsApi.getRefundReasons(),
-            paymentsApi.getTariffs(),
-          ]);
-        this.dictionaries = { pauseReasons, paymentMethods, discountTypes, refundReasons, tariffs };
-      } catch (err: any) {
-        console.error('Ошибка загрузки словарей:', err?.message);
-        // Словари не критичны — не блокируем работу стора
+      // Инициализируем UI-состояние для каждого проекта
+      for (const p of projectSummaries.value) {
+        if (activeYear.value[p.id] == null) activeYear.value[p.id] = new Date().getFullYear();
+        if (activeMonth.value[p.id] === undefined) activeMonth.value[p.id] = null;
+        if (activeView.value[p.id] == null) activeView.value[p.id] = "grid";
       }
-    },
+    } catch (e: unknown) {
+      projectsError.value = parseApiError(e, "Failed to load projects");
+    } finally {
+      projectsLoading.value = false;
+    }
+  }
 
-    // ── СТАРЫЙ монолитный loadStudent (оставляем, пока бэкенд не готов) ───────
-    async loadStudent(studentId = "s_1") {
-      this.loading = true;
-      this.error = "";
-      this.currentStudentId = studentId;
+  /**
+   * Запрос 2 — вызывается по клику на проект в аккордеоне.
+   * Грузит календарь (years + months) только для этого проекта.
+   * Кэшируется: повторный клик не делает запрос.
+   * Эндпоинт: GET /students/{student_id}/projects/{project_id}/calendar
+   */
+  async function loadCalendar(projectId: string) {
+    // Уже загружен — не делаем повторный запрос
+    if (calendarByProject.value[projectId]) return;
 
-      try {
-        const res = await paymentsApi.getStudentPayments(studentId);
-        this.student = res.student || null;
-        this.programs = res.programs || [];
+    const studentId = currentStudentId.value;
+    if (!studentId) return;
 
-        for (const p of this.programs) {
-          if (this.activeYear[p.id] == null) {
-            const years = Object.keys(p.years || {}).map(Number).sort();
-            this.activeYear[p.id] = years.length ? years[years.length - 1] : 2026;
-          }
-          if (this.activeMonth[p.id] === undefined) this.activeMonth[p.id] = null;
-          if (this.activeView[p.id] == null) this.activeView[p.id] = "grid";
-        }
-      } catch (e: unknown) {
-        this.error = extractErrorMessage(e, "Failed to load payments");
-      } finally {
-        this.loading = false;
-      }
-    },
+    calendarLoading.value[projectId] = true;
+    calendarError.value[projectId] = "";
+    try {
+      const res = await paymentsApi.getProjectCalendar(studentId, projectId);
+      calendarByProject.value[projectId] = res.years;
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // НОВЫЕ РАЗБИТЫЕ ЗАПРОСЫ
-    // ══════════════════════════════════════════════════════════════════════════
+      // Синхронизируем activeYear с последним годом в данных
+      const years = Object.keys(res.years).map(Number).sort();
+      if (years.length) activeYear.value[projectId] = years[years.length - 1];
+    } catch (e: unknown) {
+      calendarError.value[projectId] = parseApiError(e, "Failed to load calendar");
+    } finally {
+      calendarLoading.value[projectId] = false;
+    }
+  }
 
-    /**
-     * Запрос 1 — вызывается при открытии вкладки Платежи.
-     * Грузит только список проектов (имя, баланс, тариф) — без calendar и tx.
-     * Эндпоинт: GET /students/{student_id}/projects
-     */
-    async loadProjects(studentId: string) {
-        console.log('loadProjects=>', studentId);
-      this.projectsLoading = true;
-      this.projectsError = "";
-      this.currentStudentId = studentId;
-      try {
-        this.projectSummaries = await paymentsApi.getStudentProjects(studentId);
+  /**
+   * Запрос 3 — вызывается по клику на раздел "Транзакции" внутри проекта.
+   * Грузит транзакции только для этого проекта.
+   * Кэшируется: повторный клик не делает запрос.
+   * Эндпоинт: GET /students/{student_id}/projects/{project_id}/transactions
+   */
+  async function loadProjectTransactions(projectId: string) {
+    // Уже загружены — не делаем повторный запрос
+    if (newTxByProject.value[projectId]?.length) return;
 
-        // Инициализируем UI-состояние для каждого проекта
-        for (const p of this.projectSummaries) {
-          if (this.activeYear[p.id] == null) this.activeYear[p.id] = new Date().getFullYear();
-          if (this.activeMonth[p.id] === undefined) this.activeMonth[p.id] = null;
-          if (this.activeView[p.id] == null) this.activeView[p.id] = "grid";
-        }
-      } catch (e: unknown) {
-        this.projectsError = extractErrorMessage(e, "Failed to load projects");
-      } finally {
-        this.projectsLoading = false;
-      }
-    },
+    const studentId = currentStudentId.value;
+    if (!studentId) return;
 
-    /**
-     * Запрос 2 — вызывается по клику на проект в аккордеоне.
-     * Грузит календарь (years + months) только для этого проекта.
-     * Кэшируется: повторный клик не делает запрос.
-     * Эндпоинт: GET /students/{student_id}/projects/{project_id}/calendar
-     */
-    async loadCalendar(projectId: string) {
-      // Уже загружен — не делаем повторный запрос
-      if (this.calendarByProject[projectId]) return;
+    newTxLoading.value[projectId] = true;
+    newTxError.value[projectId] = "";
+    try {
+      const res = await paymentsApi.getProjectTransactions(studentId, projectId);
+      newTxByProject.value[projectId] = res.items;
+    } catch (e: unknown) {
+      newTxError.value[projectId] = parseApiError(e, "Failed to load transactions");
+    } finally {
+      newTxLoading.value[projectId] = false;
+    }
+  }
 
-      const studentId = this.currentStudentId;
-      if (!studentId) return;
+  // ══════════════════════════════════════════════════════════════════════════
+  // СТАРЫЕ методы (для совместимости пока mock работает через старый эндпоинт)
+  // ══════════════════════════════════════════════════════════════════════════
 
-      this.calendarLoading[projectId] = true;
-      this.calendarError[projectId] = "";
-      try {
-        const res = await paymentsApi.getProjectCalendar(studentId, projectId);
-        this.calendarByProject[projectId] = res.years;
+  async function loadTransactions(programId: string) {
+    if (transactionsByProgram.value[programId]?.length) return;
+    txLoading.value[programId] = true;
+    txError.value[programId] = "";
+    try {
+      transactionsByProgram.value[programId] = await paymentsApi.getTransactions(programId);
+    } catch (e: unknown) {
+      txError.value[programId] = parseApiError(e, "Failed to load transactions");
+    } finally {
+      txLoading.value[programId] = false;
+    }
+  }
 
-        // Синхронизируем activeYear с последним годом в данных
-        const years = Object.keys(res.years).map(Number).sort();
-        if (years.length) this.activeYear[projectId] = years[years.length - 1];
-      } catch (e: unknown) {
-        this.calendarError[projectId] = extractErrorMessage(e, "Failed to load calendar");
-      } finally {
-        this.calendarLoading[projectId] = false;
-      }
-    },
+  async function loadKsefInvoices(programId: string) {
+    if (ksefInvoicesByProgram.value[programId]?.length) return;
+    ksefLoading.value[programId] = true;
+    ksefError.value[programId] = "";
+    try {
+      ksefInvoicesByProgram.value[programId] = await paymentsApi.getKsefInvoices(programId);
+    } catch (e: unknown) {
+      ksefError.value[programId] = parseApiError(e, "Failed to load KSeF invoices");
+    } finally {
+      ksefLoading.value[programId] = false;
+    }
+  }
 
-    /**
-     * Запрос 3 — вызывается по клику на раздел "Транзакции" внутри проекта.
-     * Грузит транзакции только для этого проекта.
-     * Кэшируется: повторный клик не делает запрос.
-     * Эндпоинт: GET /students/{student_id}/projects/{project_id}/transactions
-     */
-    async loadProjectTransactions(projectId: string) {
-      // Уже загружены — не делаем повторный запрос
-      if (this.newTxByProject[projectId]?.length) return;
+  // ── UI state ───────────────────────────────────────────────────────────────
+  function setYear(prog: string, year: number) {
+    activeYear.value[prog] = year;
+    activeMonth.value[prog] = null;
+  }
 
-      const studentId = this.currentStudentId;
-      if (!studentId) return;
+  function setMonth(prog: string, monthIdx: number | null) {
+    activeMonth.value[prog] = monthIdx;
+  }
 
-      this.newTxLoading[projectId] = true;
-      this.newTxError[projectId] = "";
-      try {
-        const res = await paymentsApi.getProjectTransactions(studentId, projectId);
-        this.newTxByProject[projectId] = res.items;
-      } catch (e: unknown) {
-        this.newTxError[projectId] = extractErrorMessage(e, "Failed to load transactions");
-      } finally {
-        this.newTxLoading[projectId] = false;
-      }
-    },
+  function setView(prog: string, view: "grid" | "table") {
+    activeView.value[prog] = view;
+  }
 
-    // ══════════════════════════════════════════════════════════════════════════
-    // СТАРЫЕ методы (для совместимости пока mock работает через старый эндпоинт)
-    // ══════════════════════════════════════════════════════════════════════════
+  function updateTariff(programId: string, value: number) {
+    const p = programs.value.find((x) => x.id === programId);
+    if (!p) return;
+    p.tariff = value;
+    p.sub = p.sub.replace(/\d+\s*зл\/мес/, `${value} зл/мес`);
+  }
 
-    async loadTransactions(programId: string) {
-      if (this.transactionsByProgram[programId]?.length) return;
-      this.txLoading[programId] = true;
-      this.txError[programId] = "";
-      try {
-        this.transactionsByProgram[programId] = await paymentsApi.getTransactions(programId);
-      } catch (e: unknown) {
-        this.txError[programId] = extractErrorMessage(e, "Failed to load transactions");
-      } finally {
-        this.txLoading[programId] = false;
-      }
-    },
+  function reset() {
+    student.value = null;
+    programs.value = [];
+    loading.value = false;
+    error.value = "";
+    transactionsByProgram.value = {};
+    txLoading.value = {};
+    txError.value = {};
+    ksefInvoicesByProgram.value = {};
+    ksefLoading.value = {};
+    ksefError.value = {};
+    activeYear.value = {};
+    activeMonth.value = {};
+    activeView.value = {};
+    // Новые поля
+    projectSummaries.value = [];
+    projectsLoading.value = false;
+    projectsError.value = "";
+    calendarByProject.value = {};
+    calendarLoading.value = {};
+    calendarError.value = {};
+    newTxByProject.value = {};
+    newTxLoading.value = {};
+    newTxError.value = {};
+    currentStudentId.value = "";
+    Object.assign(dictionaries, { pauseReasons: [], paymentMethods: [], discountTypes: [], refundReasons: [], tariffs: [] });
+  }
 
-    async loadKsefInvoices(programId: string) {
-      if (this.ksefInvoicesByProgram[programId]?.length) return;
-      this.ksefLoading[programId] = true;
-      this.ksefError[programId] = "";
-      try {
-        this.ksefInvoicesByProgram[programId] = await paymentsApi.getKsefInvoices(programId);
-      } catch (e: unknown) {
-        this.ksefError[programId] = extractErrorMessage(e, "Failed to load KSeF invoices");
-      } finally {
-        this.ksefLoading[programId] = false;
-      }
-    },
+  // Перезагрузка данных текущего студента (вызывается после мутаций)
+  async function reloadCurrent() {
+    if (currentStudentId.value) {
+      await loadStudent(currentStudentId.value);
+    }
+  }
 
-    // ── UI state ───────────────────────────────────────────────────────────────
-    setYear(prog: string, year: number) {
-      this.activeYear[prog] = year;
-      this.activeMonth[prog] = null;
-    },
-
-    setMonth(prog: string, monthIdx: number | null) {
-      this.activeMonth[prog] = monthIdx;
-    },
-
-    setView(prog: string, view: "grid" | "table") {
-      this.activeView[prog] = view;
-    },
-
-    updateTariff(programId: string, value: number) {
-      const p = this.programs.find((x) => x.id === programId);
-      if (!p) return;
-      p.tariff = value;
-      p.sub = p.sub.replace(/\d+\s*зл\/мес/, `${value} зл/мес`);
-    },
-
-    reset() {
-      this.student = null;
-      this.programs = [];
-      this.loading = false;
-      this.error = "";
-      this.transactionsByProgram = {};
-      this.txLoading = {};
-      this.txError = {};
-      this.ksefInvoicesByProgram = {};
-      this.ksefLoading = {};
-      this.ksefError = {};
-      this.activeYear = {};
-      this.activeMonth = {};
-      this.activeView = {};
-      // Новые поля
-      this.projectSummaries = [];
-      this.projectsLoading = false;
-      this.projectsError = "";
-      this.calendarByProject = {};
-      this.calendarLoading = {};
-      this.calendarError = {};
-      this.newTxByProject = {};
-      this.newTxLoading = {};
-      this.newTxError = {};
-      this.currentStudentId = "";
-      this.dictionaries = { pauseReasons: [], paymentMethods: [], discountTypes: [], refundReasons: [], tariffs: [] };
-    },
-
-    // Перезагрузка данных текущего студента (вызывается после мутаций)
-    async reloadCurrent() {
-      if (this.currentStudentId) {
-        await this.loadStudent(this.currentStudentId);
-      }
-    },
-  },
+  return {
+    student, programs, loading, error, activeTab,
+    transactionsByProgram, txLoading, txError, ksefInvoicesByProgram, ksefLoading, ksefError,
+    activeYear, activeMonth, activeView,
+    projectSummaries, projectsLoading, projectsError,
+    calendarByProject, calendarLoading, calendarError,
+    newTxByProject, newTxLoading, newTxError,
+    currentStudentId, dictionaries,
+    programsById, monthsForProgram, currentMonth, yearsForProgram, isCalendarLoaded, txForProject,
+    fetchDictionaries, loadStudent, loadProjects, loadCalendar, loadProjectTransactions,
+    loadTransactions, loadKsefInvoices, setYear, setMonth, setView, updateTariff, reset, reloadCurrent
+  };
 });
