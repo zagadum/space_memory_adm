@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useAuthStore } from './auth.store';
 import { getUsers, updateUser as apiUpdateUser, deleteUser as apiDeleteUser } from '../api/settingsApi';
+import { parseApiError } from '../api/errorHelper';
 
 export interface User {
     id: string;
@@ -32,8 +33,8 @@ export const useSettingsUsersStore = defineStore('settingsUsers', () => {
         try {
             const result = await getUsers();
             users.value = result.items ?? [];
-        } catch (err: any) {
-            error.value = err?.response?.data?.message || err?.message || 'Ошибка загрузки пользователей';
+        } catch (err: unknown) {
+            error.value = parseApiError(err, 'Ошибка загрузки пользователей');
             console.error('Ошибка загрузки пользователей:', err);
         } finally {
             isLoading.value = false;

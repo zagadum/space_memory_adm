@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { getRecruitmentApi, type RecruitmentTargetMail } from '../api/recruitmentApi';
 import type { RecruitmentBackend } from '../api/http';
+import { parseApiError } from '../api/errorHelper';
 
 export const useTargetMailStore = defineStore('targetMail', {
   state: () => ({
@@ -22,9 +23,9 @@ export const useTargetMailStore = defineStore('targetMail', {
 
       try {
         this.items = await this.resolveApi(backend).getTargetMail();
-      } catch (err: any) {
+      } catch (err: unknown) {
         this.items = [];
-        this.error = err?.response?.data?.message || err?.message || 'Ошибка загрузки TargetMail';
+        this.error = parseApiError(err, 'Ошибка загрузки TargetMail');
       } finally {
         this.isLoading = false;
       }

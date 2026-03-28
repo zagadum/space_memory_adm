@@ -53,6 +53,7 @@ function normalizeExpelledStats(payload: unknown, list: ExpelledStudent[]): Expe
 
 import { ref } from 'vue';
 import { useNotificationStore } from './notification.store';
+import { parseApiError } from '../api/errorHelper';
 
 export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
   // ── State ──
@@ -77,10 +78,10 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
       const normalizedList = normalizeExpelledList(res);
       list.value = normalizedList;
       stats.value = normalizeExpelledStats(res, normalizedList);
-    } catch (err: any) {
+    } catch (err: unknown) {
       list.value = [];
       stats.value = { ...EMPTY_STATS };
-      error.value = err?.response?.data?.message || err?.message || 'Ошибка загрузки';
+      error.value = parseApiError(err, 'Ошибка загрузки');
     } finally {
       isLoading.value = false;
     }
@@ -92,8 +93,8 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
       const s = list.value.find(x => x.id === id);
       if (s) Object.assign(s, patch);
       useNotificationStore().addToast('💾 Сохранено', 'success');
-    } catch (err: any) {
-      useNotificationStore().addToast('Ошибка сохранения', 'error');
+    } catch (err: unknown) {
+      useNotificationStore().addToast(parseApiError(err, 'Ошибка сохранения'), 'error');
     }
   }
 
@@ -104,8 +105,8 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
       if (stats.value) stats.value.total = list.value.length;
       selectedIds.value = selectedIds.value.filter(x => x !== id);
       useNotificationStore().addToast('🗃️ Ученик архивирован', 'success');
-    } catch (err: any) {
-      useNotificationStore().addToast('Ошибка архивации', 'error');
+    } catch (err: unknown) {
+      useNotificationStore().addToast(parseApiError(err, 'Ошибка архивации'), 'error');
     }
   }
 
@@ -113,8 +114,8 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
     try {
       await resolveApi(backend).transfer(id, groupId);
       useNotificationStore().addToast('✅ Ученик перенесён в группу', 'success');
-    } catch (err: any) {
-      useNotificationStore().addToast('Ошибка переноса', 'error');
+    } catch (err: unknown) {
+      useNotificationStore().addToast(parseApiError(err, 'Ошибка переноса'), 'error');
     }
   }
 
@@ -127,8 +128,8 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
       });
       selectedIds.value = [];
       useNotificationStore().addToast(`✅ Назначен: ${manager}`, 'success');
-    } catch (err: any) {
-      useNotificationStore().addToast('Ошибка назначения', 'error');
+    } catch (err: unknown) {
+      useNotificationStore().addToast(parseApiError(err, 'Ошибка назначения'), 'error');
     }
   }
 
@@ -139,8 +140,8 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
       if (stats.value) stats.value.total = list.value.length;
       selectedIds.value = [];
       useNotificationStore().addToast(`🗃️ Архивировано ${ids.length} учеников`, 'success');
-    } catch (err: any) {
-      useNotificationStore().addToast('Ошибка архивации', 'error');
+    } catch (err: unknown) {
+      useNotificationStore().addToast(parseApiError(err, 'Ошибка архивации'), 'error');
     }
   }
 

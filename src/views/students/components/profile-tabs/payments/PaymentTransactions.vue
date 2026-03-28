@@ -74,6 +74,7 @@ import { usePaymentsStore } from "../../../../../stores/payments.store";
 import { useModalStore } from "../../../../../stores/modal.store";
 import { paymentsApi } from "../../../../../api/paymentsApi";
 import type { Transaction } from "../../../../../api/paymentsApi";
+import { parseApiError } from "../../../../../api/errorHelper";
 
 const { t, tm } = useI18n();
 const payments = usePaymentsStore();
@@ -191,8 +192,8 @@ async function onDownload(tx: Transaction) {
   
   try {
     await paymentsApi.downloadInvoicePdf(docId);
-  } catch (err: any) {
-    console.error("Failed to download PDF:", err);
+  } catch (err: unknown) {
+    console.error("Failed to download PDF:", parseApiError(err));
     // Usually we would show a toast here, but for now just logging
   }
 }

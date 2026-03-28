@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getArchivedStudentsApi, type ArchivedStudent, type ArchivedStats } from '../api/archivedStudents.api';
 import type { RecruitmentBackend } from '../api/http';
+import { parseApiError } from '../api/errorHelper';
 
 export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
   const currentBackend = ref<RecruitmentBackend>('default');
@@ -27,8 +28,8 @@ export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
       const response = await resolveApi(backend).getList();
       students.value = response.data;
       stats.value = response.meta;
-    } catch (err: any) {
-      error.value = err.message || 'Failed to fetch archived students';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Failed to fetch archived students');
     } finally {
       isLoading.value = false;
     }
@@ -39,8 +40,8 @@ export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
       await resolveApi(backend).returnToNew(id, comment);
       students.value = students.value.filter((s: ArchivedStudent) => s.id !== id);
       stats.value.total--;
-    } catch (err: any) {
-      error.value = err.message || 'Failed to return student to new students list';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Failed to return student to new students list');
       throw err;
     }
   };
@@ -50,8 +51,8 @@ export const useArchivedStudentsStore = defineStore('archivedStudents', () => {
       await resolveApi(backend).transfer(id, groupId);
       students.value = students.value.filter((s: ArchivedStudent) => s.id !== id);
       stats.value.total--;
-    } catch (err: any) {
-      error.value = err.message || 'Failed to transfer student to group';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Failed to transfer student to group');
       throw err;
     }
   };

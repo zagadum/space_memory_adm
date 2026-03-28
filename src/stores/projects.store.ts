@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import type { Project } from '../types/projects';
+import { parseApiError } from '../api/errorHelper';
 
 export const useProjectsStore = defineStore('projects', {
     state: () => ({
@@ -110,8 +111,8 @@ export const useProjectsStore = defineStore('projects', {
                 } else {
                     this.error = 'Project not found';
                 }
-            } catch (err: any) {
-                this.error = err.message || 'Failed to fetch project';
+            } catch (err: unknown) {
+                this.error = parseApiError(err, 'Failed to fetch project');
             } finally {
                 this.isLoading = false;
             }

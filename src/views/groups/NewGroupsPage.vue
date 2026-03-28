@@ -146,6 +146,7 @@ import CreateGroupModal from './components/CreateGroupModal.vue'
 import StartGroupModal from './components/StartGroupModal.vue'
 import GroupDetailPanel from './components/GroupDetailPanel.vue'
 import { useNotificationStore } from '../../stores/notification.store'
+import { parseApiError } from '../../api/errorHelper'
 import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
 
 // ── Data ──
@@ -267,8 +268,8 @@ async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
     groups.value.unshift(res.group)
     showCreateModal.value = false
     notify.addToast('Группа создана ✅', 'success')
-  } catch (err: any) {
-    notify.addToast(err?.response?.data?.message || 'Ошибка создания группы', 'error')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, 'Ошибка создания группы'), 'error')
   }
 }
 
@@ -279,8 +280,8 @@ async function onGroupStarted(id: number) {
     startGroup.value = null
     if (panelGroup.value?.id === id) closePanel()
     notify.addToast('Группа запущена 🚀', 'success')
-  } catch (err: any) {
-    notify.addToast(err?.response?.data?.message || 'Ошибка запуска группы', 'error')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, 'Ошибка запуска группы'), 'error')
   }
 }
 
@@ -290,8 +291,8 @@ async function onDeleteGroup(id: number) {
     groups.value = groups.value.filter(g => g.id !== id)
     closePanel()
     notify.addToast('Группа удалена', 'warning')
-  } catch (err: any) {
-    notify.addToast(err?.response?.data?.message || 'Ошибка удаления группы', 'error')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, 'Ошибка удаления группы'), 'error')
   }
 }
 
@@ -301,8 +302,8 @@ async function onStudentsAdded(payload: { groupId: number; studentIds: number[] 
     const res = await getNewGroupStudents(payload.groupId, recruitmentBackend.value)
     panelStudents.value = res.items
     notify.addToast('Ученики добавлены ✅', 'success')
-  } catch (err: any) {
-    notify.addToast(err?.response?.data?.message || 'Ошибка добавления учеников', 'error')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, 'Ошибка добавления учеников'), 'error')
   }
 }
 
@@ -311,8 +312,8 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
     await removeStudentFromGroup(payload, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
     notify.addToast('Ученик убран из группы', 'warning')
-  } catch (err: any) {
-    notify.addToast(err?.response?.data?.message || 'Ошибка удаления ученика', 'error')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, 'Ошибка удаления ученика'), 'error')
   }
 }
 
@@ -331,8 +332,8 @@ watch(recruitmentBackend, async () => {
     groups.value = gRes.items
     masterStudents.value = sRes.items
     teachers.value = tRes.items
-  } catch (err: any) {
-    notify.addToast('Ошибка загрузки данных', 'error')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, 'Ошибка загрузки данных'), 'error')
   } finally {
     isLoading.value = false
   }

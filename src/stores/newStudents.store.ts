@@ -8,6 +8,7 @@ import {
   type RecruitmentStudentPayments,
 } from '../api/recruitmentApi'
 import type { RecruitmentBackend } from '../api/http'
+import { parseApiError } from '../api/errorHelper'
 
 export interface StudentDocumentItem {
   id: number | string
@@ -330,7 +331,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       })
       students.value = response.items.map(normalizeStudent)
       pagination.value = response.pagination
-    } catch (err: any) {
+    } catch (err: unknown) {
       students.value = []
       pagination.value = {
         ...pagination.value,
@@ -339,7 +340,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
         from: 0,
         to: 0,
       }
-      listError.value = err?.response?.data?.message || err?.message || 'Ошибка загрузки списка'
+      listError.value = parseApiError(err, 'Ошибка загрузки списка')
     } finally {
       isListLoading.value = false
     }
@@ -366,8 +367,8 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
           }
         }
       }
-    } catch (err: any) {
-      error.value = err?.response?.data?.message || 'Ошибка загрузки'
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Ошибка загрузки')
     } finally {
       isLoading.value = false
     }

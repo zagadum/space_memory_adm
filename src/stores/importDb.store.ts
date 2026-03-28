@@ -1,7 +1,8 @@
-﻿import { defineStore } from 'pinia';
+import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { getImportDbApi, type ImportDbItem, type ImportDbListResponse } from '../api/importDbApi';
 import type { RecruitmentBackend } from '../api/http';
+import { parseApiError } from '../api/errorHelper';
 export const useImportDbStore = defineStore('importDb', () => {
   const items = ref<ImportDbItem[]>([]);
   const isLoading = ref(false);
@@ -25,8 +26,8 @@ export const useImportDbStore = defineStore('importDb', () => {
       currentPage.value = response.pagination.currentPage;
       totalCount.value = response.pagination.total;
       lastPage.value = response.pagination.lastPage;
-    } catch (err: any) {
-      error.value = err?.message || 'Ошибка загрузки';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Ошибка загрузки');
     } finally {
       isLoading.value = false;
     }
@@ -39,8 +40,8 @@ export const useImportDbStore = defineStore('importDb', () => {
       await api.deleteImportDbItem(id);
       items.value = items.value.filter(i => i.id !== id);
       totalCount.value = Math.max(0, totalCount.value - 1);
-    } catch (err: any) {
-      error.value = err?.message || 'Ошибка удаления';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Ошибка удаления');
       throw err;
     } finally {
       isLoading.value = false;
@@ -55,8 +56,8 @@ export const useImportDbStore = defineStore('importDb', () => {
       const idx = items.value.findIndex(i => i.id === id);
       if (idx !== -1) items.value[idx].is_send = true;
       return result;
-    } catch (err: any) {
-      error.value = err?.message || 'Ошибка отправки';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Ошибка отправки');
       throw err;
     } finally {
       isLoading.value = false;
@@ -70,8 +71,8 @@ export const useImportDbStore = defineStore('importDb', () => {
       await api.updateImportDbItem(id, payload);
       const idx = items.value.findIndex(i => i.id === id);
       if (idx !== -1) items.value[idx] = { ...items.value[idx], ...payload };
-    } catch (err: any) {
-      error.value = err?.message || 'Ошибка обновления';
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Ошибка обновления');
       throw err;
     } finally {
       isLoading.value = false;

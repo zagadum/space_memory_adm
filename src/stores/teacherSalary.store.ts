@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { salaryApi } from '../api/salaryApi';
+import { parseApiError } from '../api/errorHelper';
 
 const DEFAULT_TEACHER_ID = 1;
 const DEFAULT_PROJECT_ID = 1;
@@ -208,16 +209,17 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             try {
                 const data = await salaryApi.getTeacherSalary(teacherId, month, projectId);
                 this.salaryData = data;
-            } catch (err: any) {
-                const msg = err?.response?.data?.message || err?.message || 'Ошибка загрузки зарплаты';
+            } catch (err: unknown) {
+                const msg = parseApiError(err, 'Ошибка загрузки зарплаты');
                 this.error = msg;
+                const errObj = err as any;
                 // 404 — расчёт ещё не создан за этот месяц
-                if (err?.response?.status === 404) {
+                if (errObj?.response?.status === 404) {
                     this.error = 'Расчёт зарплаты за этот месяц ещё не создан.';
                 }
                 // 422 — некорректный формат месяца
-                if (err?.response?.status === 422) {
-                    const validationErrors = err?.response?.data?.errors;
+                if (errObj?.response?.status === 422) {
+                    const validationErrors = errObj?.response?.data?.errors;
                     this.error = validationErrors
                         ? Object.values(validationErrors).flat().join(' ')
                         : 'Некорректные данные запроса.';
@@ -239,11 +241,12 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
                 this.salaryData.status = response.status as SalaryData['status'];
                 this.salaryData.confirmedAt = response.confirmedAt;
                 notify.addToast('Расчёт подтверждён ✅', 'success');
-            } catch (err: any) {
-                const msg = err?.response?.data?.message || 'Ошибка подтверждения';
+            } catch (err: unknown) {
+                const msg = parseApiError(err, 'Ошибка подтверждения');
                 this.error = msg;
                 notify.addToast(msg, 'error');
-                if (err?.response?.status === 404) {
+                const errObj = err as any;
+                if (errObj?.response?.status === 404) {
                     this.error = 'Расчёт не найден. Обновите страницу.';
                 }
             } finally {
@@ -275,10 +278,11 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
                 // Но бэкенд меняет статус расчёта тоже на 'disputed'
                 this.salaryData.status = 'disputed';
                 notify.addToast('Спор отправлен ⚠️', 'warning');
-            } catch (err: any) {
-                const msg = err?.response?.data?.message || 'Ошибка при отправке спора';
-                if (err?.response?.status === 422) {
-                    const validationErrors = err?.response?.data?.errors;
+            } catch (err: unknown) {
+                const msg = parseApiError(err, 'Ошибка при отправке спора');
+                const errObj = err as any;
+                if (errObj?.response?.status === 422) {
+                    const validationErrors = errObj?.response?.data?.errors;
                     this.error = validationErrors
                         ? Object.values(validationErrors).flat().join(' ')
                         : msg;
