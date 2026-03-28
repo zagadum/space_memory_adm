@@ -252,6 +252,24 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
     const { data } = await client.post("recruitment/leads", payload);
     return data;
   },
+
+  async downloadDocument(id: number | string, type: 'signed' | 'template' = 'signed') {
+    const { data } = await client.get(`recruitment/documents/${id}/download`, {
+      params: { type },
+      responseType: 'blob'
+    });
+    return data;
+  },
+
+  async deleteDocument(id: number | string) {
+    const { data } = await client.delete(`recruitment/documents/${id}`);
+    return data;
+  },
+
+  async deleteAllDocuments(studentId: number | string) {
+    const { data } = await client.delete(`recruitment/new-students/${studentId}/documents`);
+    return data;
+  },
   };
 }
 

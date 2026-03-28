@@ -162,13 +162,6 @@
               </div>
             </div>
 
-<!--            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.paymentStatus') }}</div>-->
-<!--            <div class="sp-status-row">-->
-<!--              <div class="sp-status-label">{{ t('newStudents.panel.contract') }}</div>-->
-<!--              <span class="contract-badge" :class="student.contract === 'signed' ? 'contract-signed' : 'contract-pending'">-->
-<!--                {{ student.contract === 'signed' ? `✓ ${t('newStudents.table.signed')}` : `⏳ ${t('newStudents.table.pending')}` }}-->
-<!--              </span>-->
-<!--            </div>-->
             <div class="sp-status-row">
               <div class="sp-status-label">{{ t('newStudents.panel.payment') }}</div>
               <span v-if="student.payment > 0" class="payment-value">{{ student.paymentStr }}</span>
@@ -218,16 +211,35 @@
               </div>
             </div>
 
-            <div class="sp-section-title" style="margin-top:16px">{{ t('newStudents.panel.documentsTitle') }}</div>
+            <div class="sp-section-title document-header" style="margin-top:16px; display: flex; align-items: center; justify-content: space-between;">
+              {{ t('newStudents.panel.documentsTitle') }}
+              <button
+                v-if="payments?.documentList?.length"
+                class="sp-title-action-btn delete-all"
+                :title="t('newStudents.panel.deleteAllDocs')"
+                @click="onDeleteAllDocs"
+              >
+                🗑 {{ t('newStudents.panel.deleteAllDocs') }}
+              </button>
+            </div>
             <div v-if="payments?.documentList?.length" class="sp-list-wrap">
-              <div v-for="doc in payments.documentList" :key="doc.id" class="sp-row-item">
-                <div class="sp-row-main">
+              <div v-for="doc in payments.documentList" :key="doc.id" class="sp-row-item doc-row">
+                <div class="sp-row-main" style="flex: 1;">
                   <div>{{ doc.name }}</div>
                   <div v-if="doc.template" class="doc-template-label">{{ doc.template }}</div>
                 </div>
-                <span class="contract-badge" :class="doc.signed ? 'contract-signed' : 'contract-pending'">
-                  {{ doc.signed ? t('newStudents.panel.documentSigned') : t('newStudents.panel.documentPending') }}
-                </span>
+                
+                <div class="doc-right">
+                  <span class="contract-badge" :class="doc.signed ? 'contract-signed' : 'contract-pending'">
+                    {{ doc.signed ? t('newStudents.panel.documentSigned') : t('newStudents.panel.documentPending') }}
+                  </span>
+                  
+                  <div class="doc-actions">
+                    <button class="doc-action-btn" :title="t('newStudents.panel.downloadTemplate')" @click="onDownloadDoc(doc, 'template')">📄</button>
+                    <button v-if="doc.signed" class="doc-action-btn" :title="t('newStudents.panel.downloadSigned')" @click="onDownloadDoc(doc, 'signed')">🖋️</button>
+                    <button class="doc-action-btn delete" :title="t('newStudents.panel.deleteDoc')" @click="onDeleteDoc(doc)">🗑</button>
+                  </div>
+                </div>
               </div>
             </div>
             <div v-else class="sp-empty-state">{{ t('newStudents.panel.documentsEmpty') }}</div>
@@ -274,6 +286,9 @@ const emit = defineEmits<{
   loadPayments: []
   saveDiscount: [value: string]
   saveOverpayment: [value: string]
+  downloadDoc: [doc: any, type: 'template' | 'signed']
+  deleteDoc: [doc: any]
+  deleteAllDocs: []
 }>()
 
 const { t } = useI18n()
@@ -409,6 +424,20 @@ function avatarColor(name: string) {
   return colors[name.charCodeAt(0) % colors.length]
 }
 
+function onDeleteDoc(doc: any) {
+  if (!confirm(t('newStudents.panel.deleteDoc') + '?')) return
+  emit('deleteDoc', doc)
+}
+
+function onDeleteAllDocs() {
+  if (!confirm(t('newStudents.panel.confirmDeleteAll'))) return
+  emit('deleteAllDocs')
+}
+
+function onDownloadDoc(doc: any, type: 'template' | 'signed') {
+  emit('downloadDoc', doc, type)
+}
+
 function initials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 }
@@ -511,26 +540,6 @@ function formatTxDate(dateText: string) {
 .sp-input::placeholder { color: rgba(136,146,176,0.4); }
 .sp-textarea { resize: vertical; min-height: 72px; }
 
-.sp-toggle-row {
-  display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
-  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; margin-bottom: 12px;
-}
-.sp-toggle-label { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
-.sp-toggle-sub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
-.sp-toggle {
-  width: 42px; height: 24px; border-radius: 12px; background: var(--app-surface);
-  border: 1px solid var(--app-border); position: relative; cursor: pointer; transition: all 0.2s; flex-shrink: 0;
-}
-.sp-toggle.on { background: linear-gradient(135deg,#10b981,#06b6d4); border-color: transparent; box-shadow: 0 0 10px rgba(16,185,129,0.3); }
-.sp-toggle::after { content: ''; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: white; transition: all 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
-.sp-toggle.on::after { left: 21px; }
-
-.sp-consents-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 20px;
-}
 .sp-toggle-card {
   display: flex;
   flex-direction: column;
@@ -545,33 +554,18 @@ function formatTxDate(dateText: string) {
   text-align: center;
   gap: 8px;
 }
-.sp-toggle-card:hover {
-  border-color: var(--app-border-hi);
-  background: var(--app-surface);
-  transform: translateY(-2px);
-}
+.sp-toggle-card:hover { border-color: var(--app-border-hi); background: var(--app-surface); transform: translateY(-2px); }
 .sp-toggle-card.on {
   background: rgba(16, 185, 129, 0.08);
   border-color: rgba(16, 185, 129, 0.4);
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
 }
-.sp-toggle-icon {
-  font-size: 18px;
-  filter: grayscale(1);
-  transition: filter 0.2s;
-}
-.sp-toggle-card.on .sp-toggle-icon {
-  filter: grayscale(0);
-}
-.sp-toggle-text {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--app-text-dim);
-  line-height: 1.2;
-}
-.sp-toggle-card.on .sp-toggle-text {
-  color: #10b981;
-}
+.sp-toggle-icon { font-size: 18px; filter: grayscale(1); transition: filter 0.2s; }
+.sp-toggle-card.on .sp-toggle-icon { filter: grayscale(0); }
+.sp-toggle-text { font-size: 11px; font-weight: 600; color: var(--app-text-dim); line-height: 1.2; }
+.sp-toggle-card.on .sp-toggle-text { color: #10b981; }
+
+.sp-consents-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
 
 .sp-save-btn {
   width: 100%; display: flex; align-items: center; justify-content: center; padding: 10px 14px;
@@ -583,7 +577,6 @@ function formatTxDate(dateText: string) {
 
 /* History */
 .sp-history-item { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--app-border); }
-.sp-history-item:last-child { border-bottom: none; }
 .sp-hist-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 .sp-hist-event { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
 .sp-hist-date  { font-size: 11px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; margin-top: 2px; }
@@ -609,12 +602,8 @@ function formatTxDate(dateText: string) {
 .sp-price-list.open { display: block; }
 .sp-price-group-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; padding: 10px 14px 6px; color: var(--app-text-dim); background: var(--app-surface); border-bottom: 1px solid var(--app-border); }
 .sp-price-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; cursor: pointer; transition: background 0.15s; border-bottom: 1px solid rgba(100,120,255,0.06); }
-.sp-price-item:last-child { border-bottom: none; }
-.sp-price-item:hover { background: rgba(79,110,247,0.08); }
-.sp-price-item.selected { background: rgba(79,110,247,0.12); }
 .sp-price-amount { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; color: var(--app-text-main); }
 .sp-price-name  { font-size: 12.5px; color: var(--app-text-dim); margin-top: 1px; }
-.sp-price-tag   { font-size: 11px; }
 
 .sp-status-row {
   display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
@@ -622,30 +611,33 @@ function formatTxDate(dateText: string) {
 }
 .sp-status-label { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
 
-.sp-list-wrap {
-  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden;
-}
-.sp-row-item {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 10px 14px; border-bottom: 1px solid rgba(100,120,255,0.06);
-}
+.sp-list-wrap { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; overflow: hidden; }
+.sp-row-item { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid rgba(100,120,255,0.06); }
 .sp-row-item:last-child { border-bottom: none; }
-.sp-row-item-col { display: flex; flex-direction: column; align-items: stretch; }
-.sp-row-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .sp-row-main { font-size: 13px; font-weight: 500; color: var(--app-text-main); }
-.sp-row-sub { font-size: 11.5px; color: var(--app-text-dim); }
-.doc-template-label {
-  font-size: 10px;
-  color: var(--app-text-dim);
-  opacity: 0.7;
-  margin-top: 2px;
-  font-family: 'Space Mono', monospace;
-  text-transform: lowercase;
+.doc-template-label { font-size: 10px; color: var(--app-text-dim); opacity: 0.7; margin-top: 2px; font-family: 'Space Mono', monospace; text-transform: lowercase; }
+
+.sp-title-action-btn {
+  background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #ef4444; border-radius: 6px; padding: 3px 8px; font-size: 10px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; font-family: 'Outfit', sans-serif;
 }
-.sp-empty-state {
-  padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--app-border);
-  color: var(--app-text-dim); font-size: 12px;
+.sp-title-action-btn:hover { background: rgba(239, 68, 68, 0.15); border-color: rgba(239, 68, 68, 0.4); }
+
+.doc-row { align-items: flex-start; padding: 12px 14px; }
+.doc-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.doc-actions { display: flex; align-items: center; gap: 8px; }
+
+.doc-action-btn {
+  width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--app-border);
+  background: var(--app-surface); color: var(--app-text-dim); display: flex;
+  align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;
+  font-size: 14px;
 }
+.doc-action-btn:hover { background: rgba(79, 110, 247, 0.12); color: #4f6ef7; border-color: rgba(79, 110, 247, 0.3); transform: translateY(-2px); }
+.doc-action-btn.delete:hover { background: rgba(239, 68, 68, 0.08); color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+
+.sp-empty-state { padding: 12px 14px; border-radius: 10px; border: 1px dashed var(--app-border); color: var(--app-text-dim); font-size: 12px; }
 
 .contract-badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .contract-signed  { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
@@ -654,29 +646,16 @@ function formatTxDate(dateText: string) {
 .payment-value { font-family: 'Space Mono', monospace; font-weight: 700; color: #10b981; }
 .payment-zero  { color: var(--app-text-dim); font-style: italic; }
 
-/* Adjustments (discount / overpayment) */
-.sp-adj-row {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  padding: 10px 14px;
-  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px;
-}
-.sp-adj-label {
-  font-size: 13px; font-weight: 500; color: var(--app-text-main); flex-shrink: 0; min-width: 100px;
-}
-.sp-adj-input-wrap {
-  display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end;
-}
-.sp-adj-input {
-  width: 120px; padding: 6px 10px; font-size: 13px; text-align: right;
-}
+.sp-adj-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; }
+.sp-adj-label { font-size: 13px; font-weight: 500; color: var(--app-text-main); flex-shrink: 0; min-width: 100px; }
+.sp-adj-input-wrap { display: flex; align-items: center; gap: 8px; flex: 1; justify-content: flex-end; }
+.sp-adj-input { width: 120px; padding: 6px 10px; font-size: 13px; text-align: right; }
 .sp-adj-save-btn {
   width: 32px; height: 32px; border: none; border-radius: 7px; cursor: pointer;
   background: rgba(79,110,247,0.12); color: #4f6ef7; font-size: 16px;
   display: inline-flex; align-items: center; justify-content: center;
   transition: all 0.2s; flex-shrink: 0;
 }
-.sp-adj-save-btn:hover:not(:disabled) {
-  background: rgba(79,110,247,0.25);
-}
+.sp-adj-save-btn:hover:not(:disabled) { background: rgba(79,110,247,0.25); }
 .sp-adj-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

@@ -616,6 +616,66 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
+  async function downloadDocument(id: number | string, type: 'signed' | 'template', filename: string, backend?: RecruitmentBackend) {
+    try {
+      const blob = await resolveApi(backend).downloadDocument(id, type)
+      const url = window.URL.createObjectURL(new Blob([blob]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', filename || `document-${id}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error('Failed to download document:', err)
+      throw err
+    }
+  }
+
+  async function deleteDocument(id: number | string, studentId: number, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).deleteDocument(id)
+      
+      // Update local currentStudentPayments
+      if (currentStudentPayments.value?.studentId === studentId) {
+        currentStudentPayments.value.documentList = currentStudentPayments.value.documentList.filter(d => d.id !== id)
+      }
+
+      // Update local students list (documents count/status)
+      const s = students.value.find(x => x.id === studentId)
+      if (s) {
+        s.documents = s.documents.filter(d => d.id !== id)
+        const allSigned = s.documents.length > 0 && s.documents.every(d => d.signed)
+        s.contract = allSigned ? 'signed' : 'pending'
+      }
+    } catch (err) {
+      console.error('Failed to delete document:', err)
+      throw err
+    }
+  }
+
+  async function deleteAllDocuments(studentId: number, backend?: RecruitmentBackend) {
+    try {
+      await resolveApi(backend).deleteAllDocuments(studentId)
+      
+      // Update local currentStudentPayments
+      if (currentStudentPayments.value?.studentId === studentId) {
+        currentStudentPayments.value.documentList = []
+      }
+
+      // Update local students list
+      const s = students.value.find(x => x.id === studentId)
+      if (s) {
+        s.documents = []
+        s.contract = 'pending'
+      }
+    } catch (err) {
+      console.error('Failed to delete all documents:', err)
+      throw err
+    }
+  }
+
   function getDetails(studentId: number): StudentDetails | null {
     return details.value[studentId] || null
   }
@@ -645,6 +705,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     isListLoading, listError, pagination,
     fetchStudentsFromApi, fetchStudentById, fetchStudentHistory, fetchStudentPayments,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments,
+    downloadDocument, deleteDocument, deleteAllDocuments,
     getDetails, getHistory,
   }
 })

@@ -317,6 +317,9 @@
       @load-payments="onPanelLoadPayments"
       @save-discount="onPanelSaveDiscount"
       @save-overpayment="onPanelSaveOverpayment"
+      @download-doc="onPanelDownloadDoc"
+      @delete-doc="onPanelDeleteDoc"
+      @delete-all-docs="onPanelDeleteAllDocs"
     />
 
   </div>
@@ -627,6 +630,36 @@ async function onPanelSaveOverpayment(value: string) {
       recruitmentBackend.value
     )
     notif.addToast(`💰 ${t('newStudents.panel.overpaymentSaved')}`, 'success')
+  } catch {
+    notif.addToast(t('common.error'), 'error')
+  }
+}
+
+async function onPanelDownloadDoc(doc: any, type: 'template' | 'signed') {
+  if (!activeStudent.value) return
+  try {
+    const filename = `${type === 'signed' ? 'Signed' : 'Template'}-${doc.name}.pdf`
+    await store.downloadDocument(doc.id, type, filename, recruitmentBackend.value)
+  } catch {
+    notif.addToast(t('common.error'), 'error')
+  }
+}
+
+async function onPanelDeleteDoc(doc: any) {
+  if (!activeStudent.value) return
+  try {
+    await store.deleteDocument(doc.id, activeStudent.value.id, recruitmentBackend.value)
+    notif.addToast(`✅ ${t('newStudents.panel.docDeleted')}`, 'success')
+  } catch {
+    notif.addToast(t('common.error'), 'error')
+  }
+}
+
+async function onPanelDeleteAllDocs() {
+  if (!activeStudent.value) return
+  try {
+    await store.deleteAllDocuments(activeStudent.value.id, recruitmentBackend.value)
+    notif.addToast(`✅ ${t('newStudents.panel.allDocsDeleted')}`, 'success')
   } catch {
     notif.addToast(t('common.error'), 'error')
   }
