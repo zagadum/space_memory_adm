@@ -178,6 +178,21 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
     throw lastError ?? new Error('TargetMail endpoint not found');
   };
 
+  const postByAliases = async (aliases: string[], payload: any) => {
+    let lastError: unknown = null;
+
+    for (const alias of aliases) {
+      try {
+        return await client.post(alias, payload);
+      } catch (error: any) {
+        lastError = error;
+        if (error?.response?.status !== 404) throw error;
+      }
+    }
+
+    throw lastError ?? new Error('Password endpoint not found');
+  };
+
   return {
   async getNewStudents(params: { page?: number; perPage?: number } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
     const { data } = await client.get("recruitment/new-students", {
@@ -224,7 +239,12 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   },
 
   async changePassword(id: number | string, password: string) {
-    const { data } = await client.post(`recruitment/new-students/${id}/change-password`, { password });
+    const payload = { password, student_id: id };
+    const { data } = await postByAliases([
+      `recruitment/new-students/${id}/change-password`,
+      `recruitment/new-students/change-password`,
+      `recruitment/new-students/${id}/password`,
+    ], payload);
     return data;
   },
 

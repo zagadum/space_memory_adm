@@ -522,7 +522,6 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     // 1. Map camelCase to snake_case for backend
     const payload: any = {}
     if (historyComment) payload.history_comment = historyComment
-    if (data.password !== undefined && data.password !== '') payload.password = data.password
     if (data.firstName !== undefined) payload.name = data.firstName
     if (data.lastName !== undefined)  payload.surname = data.lastName
     if (data.email !== undefined)     payload.email = data.email
@@ -599,6 +598,13 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     if (currentStudentPayments.value?.studentId === studentId) {
       if (payload.discount !== undefined) currentStudentPayments.value.discount = payload.discount
       if (payload.balance_overpayment !== undefined) currentStudentPayments.value.balance_overpayment = payload.balance_overpayment
+    }
+  }
+
+  async function changeStudentPassword(studentId: number, password: string, backend?: RecruitmentBackend) {
+    await resolveApi(backend).changePassword(studentId, password)
+    if (details.value[studentId]) {
+      details.value[studentId].password = ''
     }
   }
 
@@ -706,7 +712,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     isLoading, error,
     isListLoading, listError, pagination,
     fetchStudentsFromApi, fetchStudentById, fetchStudentHistory, fetchStudentPayments,
-    addStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments,
+    addStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments, changeStudentPassword,
     downloadDocument, deleteDocument, deleteAllDocuments,
     getDetails, getHistory,
   }

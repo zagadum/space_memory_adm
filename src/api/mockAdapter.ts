@@ -1382,6 +1382,26 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true, data: found });
   }
 
+  // POST new-students/:id/change-password
+  if (method === 'post' && /^recruitment\/new-students\/\d+\/change-password$/.test(url)) {
+    const id = Number(url.split('/')[2]);
+    const body = readBody(config) || {};
+    const found = newStudentsDb.find((s) => Number(s.id) === id);
+    if (!found) return err(config, 404, 'Student not found');
+    if (!body.password || String(body.password).trim() === '') return err(config, 422, 'Password is required');
+    return ok(config, { ok: true, message: 'Password changed', data: { id } });
+  }
+
+  // POST new-students/change-password
+  if (method === 'post' && url === 'recruitment/new-students/change-password') {
+    const body = readBody(config) || {};
+    const id = Number(body.student_id);
+    const found = newStudentsDb.find((s) => Number(s.id) === id);
+    if (!found) return err(config, 404, 'Student not found');
+    if (!body.password || String(body.password).trim() === '') return err(config, 422, 'Password is required');
+    return ok(config, { ok: true, message: 'Password changed', data: { id } });
+  }
+
   // POST new-students/:id/archive
   if (method === 'post' && /^recruitment\/new-students\/\d+\/archive$/.test(url)) {
     const id = Number(url.split('/')[2]);
