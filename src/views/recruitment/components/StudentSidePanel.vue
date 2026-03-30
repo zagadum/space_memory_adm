@@ -36,10 +36,14 @@
           <div v-show="activeTab === 'info'" class="sp-tab-content">
             <div class="sp-section-title">{{ t('newStudents.panel.sectionAccount') }}</div>
             <div class="sp-grid cols-1">
-              <div class="sp-field"><div class="sp-label">Email</div><input class="sp-input" v-model="form.email" type="email" /></div>
+              <div class="sp-field"><div class="sp-label">Email (Father)</div><input class="sp-input" v-model="form.email" type="email" /></div>
             </div>
 
             <!-- Change Password block -->
+
+            <div class="sp-grid cols-1">
+              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldNickname') }}</div><input class="sp-input" v-model="form.nickname" /></div>
+            </div>
             <div class="sp-change-pwd-block">
               <button class="sp-change-pwd-toggle" @click="showChangePassword = !showChangePassword">
                 🔑 {{ t('newStudents.panel.changePasswordBtn') }}
@@ -58,18 +62,14 @@
                 </div>
                 <div v-if="passwordMismatch" class="sp-pwd-error">{{ t('newStudents.panel.passwordMismatch') }}</div>
                 <button
-                  class="sp-save-pwd-btn"
-                  :disabled="!newPassword || passwordMismatch || isSavingPassword"
-                  @click="onChangePassword"
+                    class="sp-save-pwd-btn"
+                    :disabled="!newPassword || passwordMismatch || isSavingPassword"
+                    @click="onChangePassword"
                 >
                   {{ isSavingPassword ? '⏳' : '🔑' }} {{ t('newStudents.panel.savePasswordBtn') }}
                 </button>
               </div>
             </div>
-            <div class="sp-grid cols-1">
-              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldNickname') }}</div><input class="sp-input" v-model="form.nickname" /></div>
-            </div>
-
             <div class="sp-section-title">{{ t('newStudents.panel.sectionPersonal') }}</div>
             <div class="sp-grid">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldFirstName') }}</div><input class="sp-input" v-model="form.firstName" /></div>
