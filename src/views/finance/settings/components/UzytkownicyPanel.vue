@@ -7,54 +7,29 @@
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-ghost btn-sm" @click="activeSubTab = 'permissions'">{{ $t('financeSettings.usersRoles.btnPermissions') }}</button>
-        <button class="btn btn-primary" @click="showUserModal = true">{{ $t('financeSettings.usersRoles.btnAddUser') }}</button>
+        <button class="btn btn-primary" @click="openCreate">{{ $t('financeSettings.usersRoles.btnAddUser') }}</button>
       </div>
     </div>
 
     <!-- SUBTABS -->
     <div class="subtabs-bar">
-      <div 
-        class="users-tab" 
-        :class="{ act: activeSubTab === 'list' }" 
-        @click="activeSubTab = 'list'"
-      >
+      <div class="users-tab" :class="{ act: activeSubTab === 'list' }" @click="activeSubTab = 'list'">
         {{ $t('financeSettings.usersRoles.tabList') }}
       </div>
-      <div 
-        class="users-tab" 
-        :class="{ act: activeSubTab === 'permissions' }" 
-        @click="activeSubTab = 'permissions'"
-      >
+      <div class="users-tab" :class="{ act: activeSubTab === 'permissions' }" @click="activeSubTab = 'permissions'">
         {{ $t('financeSettings.usersRoles.tabPermissions') }}
       </div>
     </div>
 
-    <!-- TAB: LISTA -->
+    <!-- TAB: LIST -->
     <div v-if="activeSubTab === 'list'" class="users-list-tab">
       <div class="filters-row">
+        <!-- Role filter using canonical AppRole keys + i18n labels -->
         <select v-model="filterRole" class="tpl-filter-sel">
           <option value="">{{ $t('financeSettings.usersRoles.filterRoleAll') }}</option>
-          <optgroup :label="$t('financeSettings.usersRoles.groupAdmin')">
-            <option>Super-Admin</option><option>Admin</option>
-          </optgroup>
-          <optgroup :label="$t('financeSettings.usersRoles.groupRecruitment')">
-            <option>Kierownik działu rekrutacji</option><option>Dział rekrutacji uczniów</option>
-          </optgroup>
-          <optgroup :label="$t('financeSettings.usersRoles.groupQuality')">
-            <option>Kierownik Działu Jakości Space</option><option>Dział Jakości Space</option>
-            <option>Kierownik Działu Jakości INDIGO</option><option>Dział Jakości INDIGO</option>
-          </optgroup>
-          <optgroup :label="$t('financeSettings.usersRoles.groupTrainers')">
-            <option>Trener Space Memory</option><option>Trener INDIGO</option>
-          </optgroup>
-          <optgroup :label="$t('financeSettings.usersRoles.groupFinance')">
-            <option>Główna Księgowa</option>
-            <option>Pracownik działu finansów i administracji</option>
-            <option>Pracownik sekretariatu</option>
-          </optgroup>
-          <optgroup :label="$t('financeSettings.usersRoles.groupHr')">
-            <option>HR</option>
-          </optgroup>
+          <option v-for="role in APP_ROLES" :key="role" :value="role">
+            {{ t(`roles.${role}`) }}
+          </option>
         </select>
         <select v-model="filterProj" class="tpl-filter-sel">
           <option value="">{{ $t('financeSettings.usersRoles.filterProjAll') }}</option>
@@ -63,23 +38,49 @@
           <option value="olimp">🏆 Olimpiada</option>
           <option value="camp">🎓 Warsztaty / Obozy</option>
         </select>
+        <select v-model="filterStatus" class="tpl-filter-sel">
+          <option value="">Все статусы</option>
+          <option value="active">{{ $t('financeSettings.usersRoles.statusActive') }}</option>
+          <option value="inactive">{{ $t('financeSettings.usersRoles.statusInactive') }}</option>
+        </select>
       </div>
 
       <div class="users-rows">
-        <div v-for="u in filteredUsers" :key="u.id" class="user-row">
+        <div
+          v-for="u in filteredUsers" :key="u.id"
+          class="user-row"
+          :class="{ inactive: !u.isActive }"
+        >
           <div class="user-ava" :class="u.colorClass">{{ u.initials }}</div>
           <div style="flex:1;">
-            <div class="user-name">{{ u.name }}</div>
+            <div class="user-name">
+              {{ u.name }}
+              <span v-if="!u.isActive" class="badge b-red">{{ $t('financeSettings.usersRoles.statusInactive') }}</span>
+            </div>
             <div class="user-meta">{{ u.email }} · {{ getProjLabels(u.projects) }}</div>
           </div>
-          <span class="badge" :class="getRoleBadgeClass(u.role)">{{ u.role }}</span>
-          <span v-if="u.status === 'online'" class="online-indicator">
+          <span class="badge" :class="getRoleBadgeClass(u.role)">{{ t(`roles.${u.role}`) || u.role }}</span>
+          <span v-if="u.status === 'online' && u.isActive" class="online-indicator">
             <span class="dot"></span>{{ $t('financeSettings.usersRoles.statusOnline') }}
           </span>
           <div class="user-actions">
-            <button class="btn btn-ghost btn-sm" @click="editUser(u)">✏</button>
-            <button v-if="u.id !== 'KN'" class="btn btn-sm btn-red" @click="deleteUser(u)">✕</button>
+            <button class="btn btn-ghost btn-sm" @click="editUser(u)" :title="'Edit'">✏</button>
+            <button
+              class="btn btn-sm"
+              :class="u.isActive ? 'btn-warn' : 'btn-ok'"
+              @click="toggleActive(u)"
+              :title="u.isActive ? $t('financeSettings.usersRoles.btnDeactivate') : $t('financeSettings.usersRoles.btnActivate')"
+            >{{ u.isActive ? '⏸' : '▶' }}</button>
+            <button
+              v-if="u.id !== authStore.user?.id"
+              class="btn btn-sm btn-red"
+              @click="deleteUser(u)"
+              title="Delete"
+            >✕</button>
           </div>
+        </div>
+        <div v-if="filteredUsers.length === 0" class="empty-state">
+          Нет пользователей с выбранными фильтрами
         </div>
       </div>
     </div>
@@ -95,23 +96,14 @@
           <thead>
             <tr>
               <th style="min-width:180px;">{{ $t('financeSettings.usersRoles.thModule') }}</th>
-              <th>S-Admin</th><th>Admin</th><th>Kier.Rekr</th><th>Trener</th><th>Fin/Adm</th><th>Sekr.</th>
+              <th v-for="role in permCols" :key="role">{{ t(`roles.${role}`) }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr 
-              v-for="(p, idx) in store.permissionsMatrix" 
-              :key="idx"
-              :class="{ 'perm-section': p.section }"
-            >
-              <td :colspan="p.section ? 7 : 1">{{ p.module }}</td>
+            <tr v-for="(p, idx) in store.permissionsMatrix" :key="idx" :class="{ 'perm-section': p.section }">
+              <td :colspan="p.section ? permCols.length + 1 : 1">{{ p.module }}</td>
               <template v-if="!p.section">
-                <td>{{ p.roles['S-Admin'] }}</td>
-                <td>{{ p.roles['Admin'] }}</td>
-                <td>{{ p.roles['Kier.Rekr'] }}</td>
-                <td>{{ p.roles['Trener'] }}</td>
-                <td>{{ p.roles['Fin/Adm'] }}</td>
-                <td>{{ p.roles['Sekr.'] }}</td>
+                <td v-for="role in permCols" :key="role">{{ p.roles[role] ?? '—' }}</td>
               </template>
             </tr>
           </tbody>
@@ -125,33 +117,49 @@
       </div>
     </div>
 
-    <UserModal 
-      v-if="showUserModal" 
+    <UserModal
+      v-if="showUserModal"
       :user-id="selectedUserId"
       @close="closeUserModal"
+      @saved="store.fetchUsers()"
     />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingsUsersStore, type User } from '../../../../stores/settingsUsers.store'
+import { useAuthStore } from '../../../../stores/auth.store'
 import UserModal from './modals/UserModal.vue'
+import type { AppRole } from '../../../../config/roleMenuAccess.config'
 
 const { t } = useI18n()
 const store = useSettingsUsersStore()
+const authStore = useAuthStore()
+
 const activeSubTab = ref('list')
-const filterRole = ref('')
-const filterProj = ref('')
-const showUserModal = ref(false)
+const filterRole   = ref('')
+const filterProj   = ref('')
+const filterStatus = ref('')
+const showUserModal  = ref(false)
 const selectedUserId = ref<string | null>(null)
+
+const APP_ROLES: AppRole[] = [
+  'super-admin', 'admin', 'teacher', 'sales', 'quality', 'finance', 'secretariat', 'hr'
+]
+
+// Columns shown in the permissions table (short keys matching permissionsMatrix)
+const permCols = ['S-Admin', 'Admin', 'Kier.Rekr', 'Trener', 'Fin/Adm', 'Sekr.']
 
 const filteredUsers = computed(() => {
   return store.users.filter(u => {
-    const roleMatch = !filterRole.value || u.role === filterRole.value
-    const projMatch = !filterProj.value || u.projects.includes('all') || u.projects.includes(filterProj.value)
-    return roleMatch && projMatch
+    const roleMatch   = !filterRole.value   || u.role === filterRole.value
+    const projMatch   = !filterProj.value   || u.projects.includes('all') || u.projects.includes(filterProj.value)
+    const statusMatch = !filterStatus.value
+      || (filterStatus.value === 'active'   &&  u.isActive)
+      || (filterStatus.value === 'inactive' && !u.isActive)
+    return roleMatch && projMatch && statusMatch
   })
 })
 
@@ -161,12 +169,23 @@ function getProjLabels(projs: string[]) {
   return projs.map(p => map[p] || p).join(', ')
 }
 
-function getRoleBadgeClass(role: string) {
-  if (role === 'Super-Admin') return 'b-ok'
-  if (role.includes('Admin')) return 'b-purple'
-  if (role.includes('Kierownik')) return 'b-amber'
-  if (role.includes('Dział Jakości') || role.includes('Trener')) return 'b-green'
-  return 'b-cyan'
+function getRoleBadgeClass(role: string): string {
+  const map: Record<string, string> = {
+    'super-admin':  'b-ok',
+    'admin':        'b-purple',
+    'teacher':      'b-green',
+    'sales':        'b-amber',
+    'quality':      'b-cyan',
+    'finance':      'b-purple',
+    'secretariat':  'b-cyan',
+    'hr':           'b-amber',
+  }
+  return map[role] ?? 'b-cyan'
+}
+
+function openCreate() {
+  selectedUserId.value = null
+  showUserModal.value = true
 }
 
 function editUser(u: User) {
@@ -179,23 +198,30 @@ function closeUserModal() {
   selectedUserId.value = null
 }
 
-async function deleteUser(u: User) {
-  if (confirm(t('financeSettings.usersRoles.deleteConfirm', { name: u.name }))) {
-    try {
-      await store.deleteUser(u.id);
-      // Optional: replace alert with toast in future
-      alert(t('financeSettings.usersRoles.toastDeleted'));
-    } catch(e) {
-      alert("Error deleting user");
-    }
+async function toggleActive(u: User) {
+  const key = u.isActive
+    ? 'financeSettings.usersRoles.deactivateConfirm'
+    : 'financeSettings.usersRoles.activateConfirm'
+  if (!confirm(t(key, { name: u.name }))) return
+  try {
+    await store.updateUser(u.id, { isActive: !u.isActive })
+  } catch {
+    // error shown by store
   }
 }
 
-import { onMounted } from 'vue';
+async function deleteUser(u: User) {
+  if (!confirm(t('financeSettings.usersRoles.deleteConfirm', { name: u.name }))) return
+  try {
+    await store.deleteUser(u.id)
+  } catch {
+    // error shown by store
+  }
+}
 
 onMounted(() => {
-  store.fetchUsers();
-});
+  store.fetchUsers()
+})
 </script>
 
 <style scoped>
@@ -207,11 +233,11 @@ onMounted(() => {
 .panel-sub { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
 
 .subtabs-bar {
-  display: flex; gap: 0; border-bottom: 1px solid var(--app-border); margin-bottom: 16px;
+  display: flex; border-bottom: 1px solid var(--app-border); margin-bottom: 16px;
 }
 .users-tab {
   padding: 10px 16px; font-size: 11.5px; font-weight: 700; color: var(--app-text-dim);
-  cursor: pointer; transition: all .15s; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s;
 }
 .users-tab:hover { color: var(--app-text-main); }
 .users-tab.act { color: var(--blue); border-bottom-color: var(--blue); background: var(--status-info-bg); }
@@ -228,45 +254,61 @@ onMounted(() => {
   border-radius: 12px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; transition: all .15s;
 }
 .user-row:hover { border-color: var(--app-border-hi); background: var(--status-info-bg); }
+.user-row.inactive { opacity: .55; }
 
 .user-ava {
   width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 800; color: white;
+  font-size: 12px; font-weight: 800; color: white; flex-shrink: 0;
 }
-.ua-blue { background: var(--blue); }
+.ua-blue   { background: var(--blue); }
 .ua-purple { background: var(--purple); }
-.ua-amber { background: var(--amber); }
-.ua-green { background: var(--green); }
-.ua-cyan { background: var(--cyan); }
+.ua-amber  { background: var(--amber); }
+.ua-green  { background: var(--green); }
+.ua-cyan   { background: var(--cyan); }
 
-.user-name { font-size: 13px; font-weight: 700; color: var(--app-text-main); }
+.user-name { font-size: 13px; font-weight: 700; color: var(--app-text-main); display: flex; align-items: center; gap: 6px; }
 .user-meta { font-size: 10.5px; color: var(--app-text-dim); margin-top: 1px; }
 
-.badge { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 5px; }
-.b-ok { background: rgba(16, 185, 129, 0.12); color: var(--green); border: 1px solid rgba(16, 185, 129, 0.22); }
-.b-purple { background: rgba(139,92,246,.12); color: var(--purple); border: 1px solid rgba(139,92,246,.2); }
-.b-amber { background: rgba(245,158,11,.12); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
-.b-green { background: rgba(16,185,129,.12); color: var(--green); border: 1px solid rgba(16,185,129,.2); }
-.b-cyan { background: rgba(6,182,212,.12); color: var(--cyan); border: 1px solid rgba(6,182,212,.2); }
+.badge { font-size: 9.5px; font-weight: 800; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+.b-ok     { background: rgba(16,185,129,.12);  color: var(--green);  border: 1px solid rgba(16,185,129,.22); }
+.b-purple { background: rgba(139,92,246,.12);  color: var(--purple); border: 1px solid rgba(139,92,246,.2); }
+.b-amber  { background: rgba(245,158,11,.12);  color: var(--amber);  border: 1px solid rgba(245,158,11,.2); }
+.b-green  { background: rgba(16,185,129,.12);  color: var(--green);  border: 1px solid rgba(16,185,129,.2); }
+.b-cyan   { background: rgba(6,182,212,.12);   color: var(--cyan);   border: 1px solid rgba(6,182,212,.2); }
+.b-red    { background: rgba(239,68,68,.12);   color: #ef4444;       border: 1px solid rgba(239,68,68,.2); }
 
-.online-indicator { font-size: 10px; color: var(--green); display: flex; align-items: center; gap: 4px; }
+.online-indicator { font-size: 10px; color: var(--green); display: flex; align-items: center; gap: 4px; white-space: nowrap; }
 .online-indicator .dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; }
+
+.user-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; border: none; }
+.btn-sm   { padding: 5px 10px; font-size: 11px; }
+.btn-ghost { background: var(--app-surface); color: var(--app-text-dim); border: 1px solid var(--app-border); }
+.btn-primary { background: linear-gradient(135deg, #4f6ef7, #8b5cf6); color: #fff; }
+.btn-red  { background: rgba(239,68,68,.1);  color: #ef4444; border: 1px solid rgba(239,68,68,.2); }
+.btn-red:hover  { background: rgba(239,68,68,.2); }
+.btn-warn { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
+.btn-warn:hover { background: rgba(245,158,11,.2); }
+.btn-ok   { background: rgba(16,185,129,.1); color: var(--green); border: 1px solid rgba(16,185,129,.2); }
+.btn-ok:hover   { background: rgba(16,185,129,.2); }
+
+.empty-state { text-align: center; padding: 32px; color: var(--app-text-dim); font-size: 13px; }
 
 /* PERMISSIONS */
 .perm-table-wrap { overflow-x: auto; }
 .perm-tbl { width: 100%; border-collapse: collapse; margin-top: 10px; }
 .perm-tbl th {
-  padding: 10px 14px; font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--dim);
-  border-bottom: 1px solid var(--b); text-align: center;
+  padding: 10px 14px; font-size: 10px; font-weight: 800; text-transform: uppercase;
+  color: var(--app-text-dim); border-bottom: 1px solid var(--app-border); text-align: center;
 }
 .perm-tbl th:first-child { text-align: left; }
-.perm-tbl td { padding: 8px 14px; font-size: 11.5px; border-bottom: 1px solid rgba(100,120,255,0.06); text-align: center; color: var(--white); }
+.perm-tbl td { padding: 8px 14px; font-size: 11.5px; border-bottom: 1px solid rgba(100,120,255,0.06); text-align: center; color: var(--app-text-main); }
 .perm-tbl td:first-child { text-align: left; font-weight: 500; }
 .perm-section { background: rgba(255,255,255,0.02); }
-.perm-section td { font-size: 10px; font-weight: 900; color: var(--dim); text-transform: uppercase; padding: 6px 14px; }
+.perm-section td { font-size: 10px; font-weight: 900; color: var(--app-text-dim); text-transform: uppercase; padding: 6px 14px; }
+.perm-legend { margin-top: 14px; display: flex; gap: 16px; font-size: 10.5px; color: var(--app-text-dim); flex-wrap: wrap; }
 
-.perm-legend { margin-top: 14px; display: flex; gap: 16px; font-size: 10.5px; color: var(--dim); }
-
-.btn-red { background: rgba(239, 68, 68, 0.1); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.2); }
-.btn-red:hover { background: rgba(239, 68, 68, 0.2); }
+.ibox { display: flex; gap: 10px; padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; font-size: 12px; }
+.ibox-blue { background: var(--status-info-bg); border: 1px solid rgba(79,110,247,.2); color: var(--app-text-main); }
+.ibox-icon { font-size: 16px; flex-shrink: 0; }
 </style>

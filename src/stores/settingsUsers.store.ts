@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { useAuthStore } from './auth.store';
-import { getUsers, updateUser as apiUpdateUser, deleteUser as apiDeleteUser } from '../api/settingsApi';
+import { getUsers, createUser as apiCreateUser, updateUser as apiUpdateUser, deleteUser as apiDeleteUser } from '../api/settingsApi';
 import { parseApiError } from '../api/errorHelper';
 
 export interface User {
@@ -10,7 +10,8 @@ export interface User {
     email: string;
     role: string;
     status: 'online' | 'offline';
-    projects: string[]; // e.g. ["space", "indigo"]
+    isActive: boolean;        // false = account deactivated, no login allowed
+    projects: string[];       // e.g. ["space", "indigo"]
     initials: string;
     colorClass: string;
 }
@@ -62,6 +63,17 @@ export const useSettingsUsersStore = defineStore('settingsUsers', () => {
         { module: 'Użytkownicy', roles: { 'S-Admin': '✅', 'Admin': '—', 'Kier.Rekr': '—', 'Trener': '—', 'Fin/Adm': '—', 'Sekr.': '—' } }
     ]);
 
+    const createUser = async (payload: import('../api/settingsApi').CreateUserPayload) => {
+        try {
+            const newUser = await apiCreateUser(payload);
+            users.value.push(newUser);
+            return newUser;
+        } catch (err) {
+            error.value = parseApiError(err, 'Ошибка создания пользователя');
+            throw err;
+        }
+    };
+
     const updateUser = async (id: string, updatedData: Partial<User>) => {
         try {
             const updatedUser = await apiUpdateUser(id, updatedData);
@@ -97,6 +109,7 @@ export const useSettingsUsersStore = defineStore('settingsUsers', () => {
         roles,
         permissionsMatrix,
         fetchUsers,
+        createUser,
         updateUser,
         deleteUser
     };

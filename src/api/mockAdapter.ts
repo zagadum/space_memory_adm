@@ -652,15 +652,38 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   if (method === "get" && url === "settings/users") {
     return ok(config, {
       items: [
-        { id: "u_current", email: "artem@gls.edu.pl", name: "Artem", role: "Dział rekrutacji учащихся", status: "online", lastLogin: "2026-03-06 14:30:00", projects: ['space'], initials: 'AR', colorClass: 'ua-amber' },
-        { id: "u_2", email: "biuro@gls.edu.pl", name: "Karolina Nowak", role: "Super-Admin", status: "online", lastLogin: "2026-03-05 09:00:00", projects: ['all'], initials: 'KN', colorClass: 'ua-blue' },
-        { id: "u_3", email: "marta@gls.edu.pl", name: "Marta Kowalczyk", role: "Admin", status: "offline", lastLogin: "2026-03-05 09:00:00", projects: ['space', 'indigo'], initials: 'MK', colorClass: 'ua-purple' },
-        { id: "u_4", email: "p.wisniewski@gls.edu.pl", name: "Piotr Wiśniewski", role: "Kierownik działu rekrutacji", status: "offline", lastLogin: "2026-03-05 09:00:00", projects: ['space', 'olimp'], initials: 'PW', colorClass: 'ua-amber' }
+        { id: "u_1", email: "superadmin@demo.local",  name: "Super Admin",      role: "super-admin",  status: "online",  isActive: true,  projects: ["space", "indigo"], initials: "SA", colorClass: "ua-blue" },
+        { id: "u_2", email: "admin@demo.local",        name: "Demo Admin",       role: "admin",        status: "online",  isActive: true,  projects: ["space", "indigo"], initials: "DA", colorClass: "ua-purple" },
+        { id: "u_3", email: "teacher@demo.local",      name: "Jan Kowalski",     role: "teacher",      status: "offline", isActive: true,  projects: ["space"],           initials: "JK", colorClass: "ua-green" },
+        { id: "u_4", email: "sales@demo.local",        name: "Anna Nowak",       role: "sales",        status: "online",  isActive: true,  projects: ["space"],           initials: "AN", colorClass: "ua-amber" },
+        { id: "u_5", email: "quality@demo.local",      name: "Maria Wiśniewska", role: "quality",      status: "offline", isActive: true,  projects: ["space", "indigo"], initials: "MW", colorClass: "ua-cyan" },
+        { id: "u_6", email: "finance@demo.local",      name: "Piotr Zając",      role: "finance",      status: "offline", isActive: true,  projects: ["space"],           initials: "PZ", colorClass: "ua-purple" },
+        { id: "u_7", email: "secretariat@demo.local",  name: "Katarzyna Lis",    role: "secretariat",  status: "offline", isActive: false, projects: ["space"],           initials: "KL", colorClass: "ua-amber" },
+        { id: "u_8", email: "hr@demo.local",           name: "Tomasz Wróbel",    role: "hr",           status: "offline", isActive: true,  projects: ["space"],           initials: "TW", colorClass: "ua-green" },
       ]
     });
   }
+  if (method === "post" && url === "settings/users") {
+    const body = readBody(config);
+    if (!body?.email || !body?.name || !body?.role) return err(config, 400, "name, email and role are required");
+    const initials = body.name.split(" ").map((w: string) => w[0] || "").slice(0, 2).join("").toUpperCase();
+    const colors = ["ua-blue", "ua-purple", "ua-amber", "ua-green", "ua-cyan"];
+    const newUser = {
+      id: "u_" + Date.now(),
+      email: body.email,
+      name: body.name,
+      role: body.role,
+      status: "offline",
+      isActive: true,
+      projects: body.projects ?? ["space"],
+      initials,
+      colorClass: colors[Math.floor(Math.random() * colors.length)],
+    };
+    return ok(config, newUser);
+  }
   if (method === "patch" && /^settings\/users\//.test(url)) {
-    return ok(config, { ...JSON.parse(config.data || "{}"), id: url.split("/")[2] });
+    const body = readBody(config);
+    return ok(config, { ...body, id: url.split("/")[2] });
   }
   if (method === "delete" && /^settings\/users\//.test(url)) {
     return ok(config, { success: true });
