@@ -1821,5 +1821,15 @@
       "resendSuccess": "Invitation sent successfully"
     },
     "showing": "Showing {shown} of {total} records"
+  },
+  "roles": {
+    "super-admin":  "Super Admin",
+    "admin":        "Admin",
+    "teacher":      "Teacher",
+    "sales":        "Sales Department",
+    "quality":      "Quality Department",
+    "finance":      "Finance Department",
+    "secretariat":  "Secretariat",
+    "hr":           "HR"
   }
 }

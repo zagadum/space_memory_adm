@@ -1821,5 +1821,15 @@
       "resendSuccess": "Zaproszenie zostało pomyślnie wysłane"
     },
     "showing": "Pokazano {shown} z {total} rekordów"
+  },
+  "roles": {
+    "super-admin":  "Super Administrator",
+    "admin":        "Administrator",
+    "teacher":      "Trener",
+    "sales":        "Dział Rekrutacji",
+    "quality":      "Dział Jakości",
+    "finance":      "Dział Finansów",
+    "secretariat":  "Sekretariat",
+    "hr":           "HR"
   }
 }

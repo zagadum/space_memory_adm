@@ -88,33 +88,38 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   // --- AUTH ---
+  // Mock users — one per canonical role. All share password "demo".
+  // Token format: "mock.jwt.token.<role>"
+  const MOCK_USERS: Record<string, { id: string; email: string; name: string; role: string; initials: string; teacherId?: number }> = {
+    "mock.jwt.token.super-admin": { id: "1", email: "superadmin@demo.local",  name: "Super Admin",       role: "super-admin", initials: "SA" },
+    "mock.jwt.token.admin":       { id: "2", email: "admin@demo.local",        name: "Demo Admin",        role: "admin",       initials: "DA" },
+    "mock.jwt.token.teacher":     { id: "3", email: "teacher@demo.local",      name: "Jan Kowalski",      role: "teacher",     initials: "JK", teacherId: 42 },
+    "mock.jwt.token.sales":       { id: "4", email: "sales@demo.local",        name: "Anna Nowak",        role: "sales",       initials: "AN" },
+    "mock.jwt.token.quality":     { id: "5", email: "quality@demo.local",      name: "Maria Wiśniewska",  role: "quality",     initials: "MW" },
+    "mock.jwt.token.finance":     { id: "6", email: "finance@demo.local",      name: "Piotr Zając",       role: "finance",     initials: "PZ" },
+    "mock.jwt.token.secretariat": { id: "7", email: "secretariat@demo.local",  name: "Katarzyna Lis",     role: "secretariat", initials: "KL" },
+    "mock.jwt.token.hr":          { id: "8", email: "hr@demo.local",           name: "Tomasz Wróbel",     role: "hr",          initials: "TW" },
+  };
+  // email → token mapping (password is always "demo" for all mock users)
+  const MOCK_CREDENTIALS: Record<string, string> = Object.fromEntries(
+    Object.entries(MOCK_USERS).map(([token, u]) => [u.email, token])
+  );
+
   if (method === "post" && (url === "auth/sign-in" || url === "v1/auth/sign-in" || url === "api/auth/sign-in" || url === "api/v1/auth/sign-in")) {
     const body = readBody(config);
     if (!body?.email || !body?.password) return err(config, 400, "Missing credentials");
-    if (body.email !== "admin@demo.local" || body.password !== "demo") {
-      return err(config, 401, "Invalid credentials");
-    }
-    return ok(config, {
-      token: "mock.jwt.token.admin",
-      user: {
-        id: "1",
-        email: "admin@demo.local",
-        name: "Demo Admin",
-        role: "admin",
-        initials: "DA",
-      },
-    });
+    const token = MOCK_CREDENTIALS[body.email];
+    if (!token || body.password !== "demo") return err(config, 401, "Invalid credentials");
+    return ok(config, { token, user: MOCK_USERS[token] });
   }
+
   if (method === "get" && (url === "auth/me" || url === "v1/auth/me" || url === "api/auth/me" || url === "api/v1/auth/me")) {
-    const auth = (config.headers as any)?.Authorization || "";
-    if (!String(auth).startsWith("Bearer ")) return err(config, 401, "Unauthorized");
-    return ok(config, {
-      id: "1",
-      email: "admin@demo.local",
-      name: "Demo Admin",
-      role: "admin",
-      initials: "DA",
-    });
+    const authHeader = String((config.headers as any)?.Authorization || "");
+    if (!authHeader.startsWith("Bearer ")) return err(config, 401, "Unauthorized");
+    const token = authHeader.replace("Bearer ", "").trim();
+    const user = MOCK_USERS[token];
+    if (!user) return err(config, 401, "Invalid token");
+    return ok(config, user);
   }
 
   // --- PAYMENTS ---
