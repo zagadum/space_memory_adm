@@ -55,9 +55,21 @@ export function useCanAccess() {
     return !roles.includes(role.value)
   }
 
+  /**
+   * Проверяет, входит ли текущая роль в указанный массив ролей.
+   * Возвращает обычный boolean (не reactive) — используйте в computed или сразу в v-if.
+   *
+   * @example const canDelete = computed(() => canAny(['admin', 'super-admin']))
+   */
+  function canAny(roles: AppRole[]): boolean {
+    if (!role.value) return false
+    return roles.includes(role.value)
+  }
+
   return {
     role,
     isRole,
+    canAny,
     canAccess,
     hideFor,
   }

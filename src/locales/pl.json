@@ -1903,5 +1903,61 @@
     "typeMini":       "Mini",
     "typeIndividual": "Indyw.",
     "empty":       "Nie masz przypisanych grup"
+  },
+  "accessControl": {
+    "title":   "Kontrola dostępu",
+    "subtitle": "Macierz uprawnień — kto co widzi i może robić",
+    "save":           "Zapisz",
+    "resetDefaults":  "Resetuj",
+    "savedOk":        "✓ Macierz zapisana",
+    "savedError":     "✗ Błąd zapisu",
+    "resetOk":        "↺ Zresetowano do domyślnych",
+    "infoBanner":     "Zmiany są stosowane na frontendzie (localStorage). Po podłączeniu backendu dane będą zapisywane w DB.",
+    "apiContractToggle": "API Contract",
+    "colSection": "Sekcja / Akcja",
+    "mode": {
+      "active":    "Pełny dostęp",
+      "read-only": "Tylko podgląd",
+      "hidden":    "Ukryte"
+    },
+    "role": {
+      "super-admin": "Super Admin",
+      "admin":       "Admin",
+      "teacher":     "Nauczyciel",
+      "sales":       "Rekrutacja",
+      "quality":     "Jakość",
+      "finance":     "Finanse",
+      "secretariat": "Sekretariat",
+      "hr":          "HR"
+    },
+    "section": {
+      "students":    "Uczniowie",
+      "groups":      "Grupy",
+      "recruitment": "Rekrutacja",
+      "finance":     "Finanse",
+      "settings":    "Ustawienia"
+    },
+    "item": {
+      "student-list":           "Lista uczniów",
+      "student-profile":        "Profil ucznia",
+      "student-payments":       "Płatności ucznia",
+      "student-delete":         "Usuń ucznia",
+      "student-price-change":   "Zmień cenę",
+      "group-list":             "Lista grup",
+      "group-edit":             "Edytuj grupę",
+      "group-delete":           "Usuń grupę",
+      "leads-view":             "Podgląd leadów",
+      "leads-edit":             "Edytuj leady",
+      "new-students-panel":     "Panel nowych uczniów",
+      "finance-view":           "Podgląd finansów",
+      "finance-edit":           "Edytuj finanse",
+      "debtors-view":           "Lista dłużników",
+      "salary-view":            "Podgląd wynagrodzeń",
+      "salary-confirm":         "Potwierdź wynagrodzenie",
+      "settings-users":         "Zarządzanie użytkownikami",
+      "settings-access-control":"Macierz uprawnień",
+      "settings-school":        "Ustawienia szkoły",
+      "settings-integrations":  "Integracje"
+    }
   }
 }

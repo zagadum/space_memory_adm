@@ -1900,5 +1900,61 @@
      "typeMini":       "Мини",
      "typeIndividual": "Индив.",
      "empty":       "У вас нет назначенных групп"
+   },
+   "accessControl": {
+     "title":   "Управление доступом",
+     "subtitle": "Матрица прав — кто что видит и может делать",
+     "save":           "Сохранить",
+     "resetDefaults":  "Сбросить",
+     "savedOk":        "✓ Матрица сохранена",
+     "savedError":     "✗ Ошибка сохранения",
+     "resetOk":        "↺ Сброшено к умолчаниям",
+     "infoBanner":     "Изменения применяются на фронте (localStorage). После подключения бэкенда данные будут сохраняться в БД.",
+     "apiContractToggle": "API Contract",
+     "colSection": "Раздел / Действие",
+     "mode": {
+       "active":    "Полный доступ",
+       "read-only": "Только просмотр",
+       "hidden":    "Скрыто"
+     },
+     "role": {
+       "super-admin": "Super Admin",
+       "admin":       "Admin",
+       "teacher":     "Учитель",
+       "sales":       "Рекрутинг",
+       "quality":     "Качество",
+       "finance":     "Финансы",
+       "secretariat": "Секретариат",
+       "hr":          "HR"
+     },
+     "section": {
+       "students":    "Ученики",
+       "groups":      "Группы",
+       "recruitment": "Рекрутинг",
+       "finance":     "Финансы",
+       "settings":    "Настройки"
+     },
+     "item": {
+       "student-list":           "Список учеников",
+       "student-profile":        "Профиль ученика",
+       "student-payments":       "Оплаты ученика",
+       "student-delete":         "Удаление ученика",
+       "student-price-change":   "Изменение цены",
+       "group-list":             "Список групп",
+       "group-edit":             "Редактировать группу",
+       "group-delete":           "Удалить группу",
+       "leads-view":             "Просмотр лидов",
+       "leads-edit":             "Редактировать лиды",
+       "new-students-panel":     "Панель новых учеников",
+       "finance-view":           "Просмотр финансов",
+       "finance-edit":           "Редактировать финансы",
+       "debtors-view":           "Список должников",
+       "salary-view":            "Просмотр зарплат",
+       "salary-confirm":         "Подтвердить зарплату",
+       "settings-users":         "Управление пользователями",
+       "settings-access-control":"Матрица прав",
+       "settings-school":        "Настройки школы",
+       "settings-integrations":  "Интеграции"
+     }
    }
  }

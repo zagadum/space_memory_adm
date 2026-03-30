@@ -1903,5 +1903,61 @@
     "typeMini":       "Mini",
     "typeIndividual": "Individual",
     "empty":       "You have no assigned groups"
+  },
+  "accessControl": {
+    "title":   "Access Control",
+    "subtitle": "Permissions matrix — who sees and can do what",
+    "save":           "Save",
+    "resetDefaults":  "Reset",
+    "savedOk":        "✓ Matrix saved",
+    "savedError":     "✗ Save error",
+    "resetOk":        "↺ Reset to defaults",
+    "infoBanner":     "Changes are applied on the frontend (localStorage). Once the backend is connected, data will be stored in the DB.",
+    "apiContractToggle": "API Contract",
+    "colSection": "Section / Action",
+    "mode": {
+      "active":    "Full access",
+      "read-only": "View only",
+      "hidden":    "Hidden"
+    },
+    "role": {
+      "super-admin": "Super Admin",
+      "admin":       "Admin",
+      "teacher":     "Teacher",
+      "sales":       "Sales",
+      "quality":     "Quality",
+      "finance":     "Finance",
+      "secretariat": "Secretariat",
+      "hr":          "HR"
+    },
+    "section": {
+      "students":    "Students",
+      "groups":      "Groups",
+      "recruitment": "Recruitment",
+      "finance":     "Finance",
+      "settings":    "Settings"
+    },
+    "item": {
+      "student-list":           "Student list",
+      "student-profile":        "Student profile",
+      "student-payments":       "Student payments",
+      "student-delete":         "Delete student",
+      "student-price-change":   "Change price",
+      "group-list":             "Group list",
+      "group-edit":             "Edit group",
+      "group-delete":           "Delete group",
+      "leads-view":             "View leads",
+      "leads-edit":             "Edit leads",
+      "new-students-panel":     "New students panel",
+      "finance-view":           "View finance",
+      "finance-edit":           "Edit finance",
+      "debtors-view":           "View debtors",
+      "salary-view":            "View salary",
+      "salary-confirm":         "Confirm salary",
+      "settings-users":         "User management",
+      "settings-access-control":"Access matrix",
+      "settings-school":        "School settings",
+      "settings-integrations":  "Integrations"
+    }
   }
 }

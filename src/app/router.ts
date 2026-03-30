@@ -234,6 +234,13 @@ export const router = createRouter({
         { path: 'quality/zaliczenia-calendar', name: 'quality-zcalendar', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'quality/all-tasks', name: 'quality-all-tasks', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'quality/stats', name: 'quality-stats', component: () => import('../views/dashboard/DashboardIndex.vue') },
+        // ─── SuperAdmin: Access Control ───
+        {
+          path: 'settings/access-control',
+          name: 'access-control',
+          component: () => import('../views/settings/AccessControlPage.vue'),
+          meta: { title: 'accessControl.title', icon: '🔐', roles: ['super-admin'] },
+        },
         // ─── Error pages ───
         {
           path: '403',

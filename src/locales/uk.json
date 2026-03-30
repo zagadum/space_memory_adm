@@ -1899,5 +1899,61 @@
     "typeMini":       "Міні",
     "typeIndividual": "Індив.",
     "empty":       "У вас немає призначених груп"
+  },
+  "accessControl": {
+    "title":   "Управління доступом",
+    "subtitle": "Матриця прав — хто що бачить і може робити",
+    "save":           "Зберегти",
+    "resetDefaults":  "Скинути",
+    "savedOk":        "✓ Матрицю збережено",
+    "savedError":     "✗ Помилка збереження",
+    "resetOk":        "↺ Скинуто до стандартних",
+    "infoBanner":     "Зміни застосовуються на фронтенді (localStorage). Після підключення бекенду дані зберігатимуться у БД.",
+    "apiContractToggle": "API Contract",
+    "colSection": "Розділ / Дія",
+    "mode": {
+      "active":    "Повний доступ",
+      "read-only": "Тільки перегляд",
+      "hidden":    "Приховано"
+    },
+    "role": {
+      "super-admin": "Super Admin",
+      "admin":       "Admin",
+      "teacher":     "Вчитель",
+      "sales":       "Рекрутинг",
+      "quality":     "Якість",
+      "finance":     "Фінанси",
+      "secretariat": "Секретаріат",
+      "hr":          "HR"
+    },
+    "section": {
+      "students":    "Учні",
+      "groups":      "Групи",
+      "recruitment": "Рекрутинг",
+      "finance":     "Фінанси",
+      "settings":    "Налаштування"
+    },
+    "item": {
+      "student-list":           "Список учнів",
+      "student-profile":        "Профіль учня",
+      "student-payments":       "Оплати учня",
+      "student-delete":         "Видалити учня",
+      "student-price-change":   "Змінити ціну",
+      "group-list":             "Список груп",
+      "group-edit":             "Редагувати групу",
+      "group-delete":           "Видалити групу",
+      "leads-view":             "Перегляд лідів",
+      "leads-edit":             "Редагувати ліди",
+      "new-students-panel":     "Панель нових учнів",
+      "finance-view":           "Перегляд фінансів",
+      "finance-edit":           "Редагувати фінанси",
+      "debtors-view":           "Список боржників",
+      "salary-view":            "Перегляд зарплат",
+      "salary-confirm":         "Підтвердити зарплату",
+      "settings-users":         "Управління користувачами",
+      "settings-access-control":"Матриця прав",
+      "settings-school":        "Налаштування школи",
+      "settings-integrations":  "Інтеграції"
+    }
   }
 }

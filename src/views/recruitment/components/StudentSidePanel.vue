@@ -20,7 +20,13 @@
           </div>
           <div class="sp-action-bar">
             <button class="sp-btn sp-btn-email" @click="onEmail">✉️ {{ t('newStudents.panel.sendEmail') }}</button>
-            <button class="sp-btn sp-btn-delete" @click="onDelete">🗑 {{ t('newStudents.panel.deleteStudent') }}</button>
+            <button
+              v-if="canDelete"
+              class="sp-btn sp-btn-delete"
+              @click="onDelete"
+            >
+              🗑 {{ t('newStudents.panel.deleteStudent') }}
+            </button>
           </div>
           <div class="sp-tabs">
             <div v-for="tab in tabs" :key="tab.key" class="sp-tab" :class="{ active: activeTab === tab.key }" @click="activeTab = tab.key">
@@ -174,7 +180,7 @@
                 <div class="sp-price-value">{{ (payments?.currentPrice || details.currentPrice) }} zł</div>
                 <div class="sp-price-desc">{{ payments?.currentPriceDesc || details.currentPriceDesc }}</div>
               </div>
-              <button class="sp-change-price-btn" @click="priceListOpen = !priceListOpen">🏷 {{ t('newStudents.panel.changePrice') }}</button>
+              <button v-if="canEditPrice" class="sp-change-price-btn" @click="priceListOpen = !priceListOpen">🏷 {{ t('newStudents.panel.changePrice') }}</button>
             </div>
 
             <!-- Price List -->
@@ -297,6 +303,7 @@
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useModalStore } from '../../../stores/modal.store'
+import { useCanAccess } from '../../../composables/useCanAccess'
 import type { NewStudent, StudentDetails, HistoryEvent, StudentPayments } from '../../../stores/newStudents.store'
 
 const props = defineProps<{
@@ -322,6 +329,12 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { canAny } = useCanAccess()
+
+// Права доступа — reactive computed-значения
+const canDelete    = computed(() => canAny(['super-admin', 'admin']))                           // удаление — только admin+
+const canEditPrice = computed(() => canAny(['super-admin', 'admin', 'sales', 'finance']))       // цена — не для teacher
+const showPayments = computed(() => canAny(['super-admin', 'admin', 'sales', 'finance', 'secretariat'])) // вкладка оплат
 
 const activeTab = ref<'info' | 'history' | 'payments'>('info')
 const priceListOpen = ref(false)
@@ -341,9 +354,9 @@ const passwordMismatch = computed(() => confirmPassword.value !== '' && newPassw
 const isParentEmailMissing = computed(() => !String(form.value.email ?? '').trim())
 
 const tabs = computed(() => [
-  { key: 'info' as const,     icon: '👤', label: t('newStudents.panel.tabProfile')  },
-  { key: 'history' as const,  icon: '📋', label: t('newStudents.panel.tabHistory')  },
-  { key: 'payments' as const, icon: '💳', label: t('newStudents.panel.tabPayments') },
+  { key: 'info' as const,    icon: '👤', label: t('newStudents.panel.tabProfile') },
+  { key: 'history' as const, icon: '📋', label: t('newStudents.panel.tabHistory') },
+  ...(showPayments.value ? [{ key: 'payments' as const, icon: '💳', label: t('newStudents.panel.tabPayments') }] : []),
 ])
 
 const defaultForm = {
