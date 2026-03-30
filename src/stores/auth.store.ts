@@ -8,6 +8,7 @@ export interface User {
   role: string;
   initials: string;
   teacherId?: number;   // ID преподавателя — приходит с бэкенда для роли teacher
+  forcePasswordChange?: boolean; // true = требует смены пароля после первого входа
 }
 
 import { ref, computed } from "vue";
@@ -46,7 +47,9 @@ export const useAuthStore = defineStore("auth", () => {
       if (!res.user.initials && res.user.email) {
         res.user.initials = res.user.email.substring(0, 2).toUpperCase();
       }
-      user.value = res.user;
+      user.value = res.user as User;
+
+      // Если поставлен флаг — router guard сам сделает редирект на /change-password
       return true;
     } catch (e: any) {
       error.value = e?.response?.data?.message || "Sign in failed";

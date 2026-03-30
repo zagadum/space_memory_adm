@@ -1863,5 +1863,25 @@
     "finance":      "Dział Finansów",
     "secretariat":  "Sekretariat",
     "hr":           "HR"
+  },
+  "accessDenied": {
+    "title":    "Brak dostępu",
+    "message":  "Nie masz uprawnień do wyświetlenia tej sekcji. Skontaktuj się z administratorem lub wybierz inną sekcję.",
+    "yourRole": "Twoja rola",
+    "btnHome":  "Strona główna",
+    "btnBack":  "Wróć",
+    "hint":     "Jeśli uważasz, że to błąd — skontaktuj się z administratorem systemu."
+  },
+  "changePassword": {
+    "title":           "Zmiana hasła",
+    "subtitle":        "To Twoje pierwsze logowanie. Musisz ustawić nowe hasło.",
+    "newPassword":     "Nowe hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "submit":          "Zmień hasło",
+    "saving":          "Zapisywanie…",
+    "errorMismatch":   "Hasła nie są zgodne",
+    "errorMinLength":  "Hasło musi mieć co najmniej 8 znaków",
+    "success":         "Hasło zostało zmienione",
+    "requirements":    "Minimum 8 znaków, zalecane litery i cyfry"
   }
 }

@@ -90,9 +90,9 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // --- AUTH ---
   // Mock users — one per canonical role. All share password "demo".
   // Token format: "mock.jwt.token.<role>"
-  const MOCK_USERS: Record<string, { id: string; email: string; name: string; role: string; initials: string; teacherId?: number }> = {
+  const MOCK_USERS: Record<string, { id: string; email: string; name: string; role: string; initials: string; teacherId?: number; forcePasswordChange?: boolean }> = {
     "mock.jwt.token.super-admin": { id: "1", email: "superadmin@demo.local",  name: "Super Admin",       role: "super-admin", initials: "SA" },
-    "mock.jwt.token.admin":       { id: "2", email: "admin@demo.local",        name: "Demo Admin",        role: "admin",       initials: "DA" },
+    "mock.jwt.token.admin":       { id: "2", email: "admin@demo.local",        name: "Demo Admin",        role: "admin",       initials: "DA", forcePasswordChange: true },
     "mock.jwt.token.teacher":     { id: "3", email: "teacher@demo.local",      name: "Jan Kowalski",      role: "teacher",     initials: "JK", teacherId: 42 },
     "mock.jwt.token.sales":       { id: "4", email: "sales@demo.local",        name: "Anna Nowak",        role: "sales",       initials: "AN" },
     "mock.jwt.token.quality":     { id: "5", email: "quality@demo.local",      name: "Maria Wiśniewska",  role: "quality",     initials: "MW" },
@@ -122,7 +122,21 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, user);
   }
 
-  // --- PAYMENTS ---
+  // POST /auth/change-password — снимает флаг forcePasswordChange в mock
+  if (method === "post" && (url === "auth/change-password" || url === "v1/auth/change-password")) {
+    const body = readBody(config);
+    if (!body?.newPassword || body.newPassword.length < 8) {
+      return err(config, 422, "Password too short");
+    }
+    // В mock просто симулируем успех — реальный API обновит forcePasswordChange в БД
+    const authHeader = String((config.headers as any)?.Authorization || "");
+    const token = authHeader.replace("Bearer ", "").trim();
+    if (MOCK_USERS[token]) {
+      (MOCK_USERS[token] as any).forcePasswordChange = false;
+    }
+    return ok(config, { message: "Password changed successfully" });
+  }
+
   if (method === "get" && url.startsWith("payments/student/")) {
     const studentId = url.split("/").pop();
     let data: { profile: StudentProfile; programs: Program[] } | null = studentId ? mockDb.students[studentId] : null;

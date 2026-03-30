@@ -1863,5 +1863,25 @@
     "finance":      "Finance Department",
     "secretariat":  "Secretariat",
     "hr":           "HR"
+  },
+  "accessDenied": {
+    "title":    "Access Denied",
+    "message":  "You don't have permission to view this section. Contact your administrator or choose another section.",
+    "yourRole": "Your role",
+    "btnHome":  "Go Home",
+    "btnBack":  "Go Back",
+    "hint":     "If you believe this is an error, please contact your system administrator."
+  },
+  "changePassword": {
+    "title":           "Change Password",
+    "subtitle":        "This is your first login. You need to set a new password.",
+    "newPassword":     "New Password",
+    "confirmPassword": "Confirm Password",
+    "submit":          "Change Password",
+    "saving":          "Saving…",
+    "errorMismatch":   "Passwords do not match",
+    "errorMinLength":  "Password must be at least 8 characters",
+    "success":         "Password changed successfully",
+    "requirements":    "At least 8 characters, letters and numbers recommended"
   }
 }

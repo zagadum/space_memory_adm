@@ -20,6 +20,12 @@ export const router = createRouter({
       ],
     },
     {
+      path: "/change-password",
+      name: "change-password",
+      component: () => import("../views/auth/ChangePasswordPage.vue"),
+      meta: { requiresPasswordChange: true },
+    },
+    {
       path: "/",
       component: () => import("../layouts/AppLayout.vue"),
       children: [
@@ -227,10 +233,18 @@ export const router = createRouter({
         { path: 'quality/materials', name: 'quality-materials', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'quality/zaliczenia-calendar', name: 'quality-zcalendar', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'quality/all-tasks', name: 'quality-all-tasks', component: () => import('../views/dashboard/DashboardIndex.vue') },
-        { path: 'quality/stats', name: 'quality-stats', component: () => import('../views/dashboard/DashboardIndex.vue') }
+        { path: 'quality/stats', name: 'quality-stats', component: () => import('../views/dashboard/DashboardIndex.vue') },
+        // ─── Error pages ───
+        {
+          path: '403',
+          name: 'access-denied',
+          component: () => import('../views/errors/AccessDeniedPage.vue'),
+          meta: { title: 'accessDenied.title' },
+        },
       ],
     },
-    { path: "/:pathMatch(.*)*", redirect: "/students" },
+    // Catch-all: 404 → redirect to 403-style page (shows access denied UI)
+    { path: "/:pathMatch(.*)*", redirect: "/403" },
   ],
 });
 
@@ -240,16 +254,26 @@ router.beforeEach((to) => {
   const auth = useAuthStore();
   if (!auth.isAuthenticated) return { name: "sign-in" };
 
+  // Если пользователь должен сменить пароль — пропускаем только /change-password
+  if ((auth.user as any)?.forcePasswordChange && to.name !== 'change-password' && to.name !== 'access-denied') {
+    return { name: 'change-password' };
+  }
+
+  // Доступ к /403 и /change-password разрешён всегда после авторизации
+  if (to.name === 'access-denied' || to.name === 'change-password') return true;
+
   const menuKey = getMenuKeyByRouteName(String(to.name || ""));
   if (menuKey && !isMenuAllowed(menuKey)) {
+    // Показываем причину отказа через тост
     const reason = getMenuAccessReason(menuKey);
     try {
       const notification = useNotificationStore();
       notification.addToast(reason || "Раздел недоступен по текущим правам", "warning");
     } catch {
-      // Router guard should still work even if notification store is not ready.
+      // Router guard работает даже без notification store
     }
-    return getFirstAllowedFallbackPath();
+    // Редиректим на 403 вместо тихого fallback
+    return { name: 'access-denied' };
   }
 
   return true;
