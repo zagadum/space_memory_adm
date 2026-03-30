@@ -1472,6 +1472,8 @@
       "passwordMismatch": "Hasła nie są zgodne",
       "savePasswordBtn": "Zapisz hasło",
       "passwordChanged": "Hasło zostało zmienione",
+      "passwordEmailNote": "Hasło jest wysyłane na Email (father).",
+      "passwordEmailRequired": "Aby zmienić hasło, email rodzica musi być uzupełniony.",
       "fieldNickname": "Nickname",
       "fieldFirstName": "Imię",
       "fieldLastName": "Nazwisko",

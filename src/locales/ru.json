@@ -1477,6 +1477,8 @@
       "passwordMismatch": "Пароли не совпадают",
       "savePasswordBtn": "Сохранить пароль",
       "passwordChanged": "Пароль успешно изменён",
+      "passwordEmailNote": "Пароль высылается на Email (father).",
+      "passwordEmailRequired": "Для смены пароля должен быть указан Email родителя.",
       "fieldNickname": "Nickname",
       "fieldFirstName": "Имя",
       "fieldLastName": "Фамилия",

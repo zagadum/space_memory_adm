@@ -50,6 +50,8 @@
                 <span class="sp-toggle-arrow" :class="{ open: showChangePassword }">▾</span>
               </button>
               <div v-if="showChangePassword" class="sp-change-pwd-body">
+                <div class="sp-pwd-note">{{ t('newStudents.panel.passwordEmailNote') }}</div>
+                <div v-if="isParentEmailMissing" class="sp-pwd-error">{{ t('newStudents.panel.passwordEmailRequired') }}</div>
                 <div class="sp-grid">
                   <div class="sp-field">
                     <div class="sp-label">{{ t('newStudents.panel.fieldNewPassword') }}</div>
@@ -63,7 +65,7 @@
                 <div v-if="passwordMismatch" class="sp-pwd-error">{{ t('newStudents.panel.passwordMismatch') }}</div>
                 <button
                     class="sp-save-pwd-btn"
-                    :disabled="!newPassword || passwordMismatch || isSavingPassword"
+                    :disabled="!newPassword || passwordMismatch || isSavingPassword || isParentEmailMissing"
                     @click="onChangePassword"
                 >
                   {{ isSavingPassword ? '⏳' : '🔑' }} {{ t('newStudents.panel.savePasswordBtn') }}
@@ -336,6 +338,7 @@ const newPassword = ref('')
 const confirmPassword = ref('')
 const isSavingPassword = ref(false)
 const passwordMismatch = computed(() => confirmPassword.value !== '' && newPassword.value !== confirmPassword.value)
+const isParentEmailMissing = computed(() => !String(form.value.email ?? '').trim())
 
 const tabs = computed(() => [
   { key: 'info' as const,     icon: '👤', label: t('newStudents.panel.tabProfile')  },
@@ -418,7 +421,7 @@ async function onSaveOverpayment() {
 }
 
 async function onChangePassword() {
-  if (!newPassword.value || passwordMismatch.value) return
+  if (!newPassword.value || passwordMismatch.value || isParentEmailMissing.value) return
   isSavingPassword.value = true
   try {
     emit('changePassword', newPassword.value)
@@ -724,6 +727,7 @@ function formatTxDate(dateText: string) {
 .sp-toggle-arrow { margin-left: auto; font-size: 14px; transition: transform 0.2s; display: inline-block; }
 .sp-toggle-arrow.open { transform: rotate(180deg); }
 .sp-change-pwd-body { padding: 0 14px 14px; border-top: 1px solid var(--app-border); padding-top: 12px; }
+.sp-pwd-note { font-size: 11px; color: var(--app-text-dim); margin-bottom: 8px; line-height: 1.35; }
 .sp-pwd-error { font-size: 11.5px; color: #ef4444; margin-bottom: 8px; }
 .sp-input-error { border-color: rgba(239,68,68,0.5) !important; }
 .sp-save-pwd-btn {

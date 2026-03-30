@@ -1468,6 +1468,8 @@
       "passwordMismatch": "Паролі не збігаються",
       "savePasswordBtn": "Зберегти пароль",
       "passwordChanged": "Пароль успішно змінено",
+      "passwordEmailNote": "Пароль надсилається на Email (father).",
+      "passwordEmailRequired": "Для зміни пароля має бути вказаний email батька.",
       "fieldNickname": "Nickname",
       "fieldFirstName": "Ім'я",
       "fieldLastName": "Прізвище",

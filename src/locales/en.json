@@ -1472,6 +1472,8 @@
       "passwordMismatch": "Passwords do not match",
       "savePasswordBtn": "Save Password",
       "passwordChanged": "Password changed successfully",
+      "passwordEmailNote": "The password is sent to Email (father).",
+      "passwordEmailRequired": "Parent email must be specified to change the password.",
       "fieldNickname": "Nickname",
       "fieldFirstName": "First name",
       "fieldLastName": "Last name",
