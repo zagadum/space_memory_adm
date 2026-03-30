@@ -223,6 +223,11 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
     return data;
   },
 
+  async changePassword(id: number | string, password: string) {
+    const { data } = await client.post(`recruitment/new-students/${id}/change-password`, { password });
+    return data;
+  },
+
   async archiveNewStudent(studentId: number) {
     const { data } = await client.post(`recruitment/new-students/${studentId}/archive`);
     return data;

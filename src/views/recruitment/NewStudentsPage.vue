@@ -639,7 +639,7 @@ async function onPanelSaveOverpayment(value: string) {
 async function onPanelChangePassword(password: string) {
   if (!activeStudent.value) return
   try {
-    await store.saveDetails(activeStudent.value.id, { password }, recruitmentBackend.value)
+    await store.changeStudentPassword(activeStudent.value.id, password, recruitmentBackend.value)
     notif.addToast(`🔑 ${t('newStudents.panel.passwordChanged')}`, 'success')
   } catch {
     notif.addToast(t('common.error'), 'error')
