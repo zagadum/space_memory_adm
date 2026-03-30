@@ -522,6 +522,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     // 1. Map camelCase to snake_case for backend
     const payload: any = {}
     if (historyComment) payload.history_comment = historyComment
+    if (data.password !== undefined && data.password !== '') payload.password = data.password
     if (data.firstName !== undefined) payload.name = data.firstName
     if (data.lastName !== undefined)  payload.surname = data.lastName
     if (data.email !== undefined)     payload.email = data.email

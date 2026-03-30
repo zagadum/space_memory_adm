@@ -317,6 +317,7 @@
       @load-payments="onPanelLoadPayments"
       @save-discount="onPanelSaveDiscount"
       @save-overpayment="onPanelSaveOverpayment"
+      @change-password="onPanelChangePassword"
       @download-doc="onPanelDownloadDoc"
       @delete-doc="onPanelDeleteDoc"
       @delete-all-docs="onPanelDeleteAllDocs"
@@ -630,6 +631,16 @@ async function onPanelSaveOverpayment(value: string) {
       recruitmentBackend.value
     )
     notif.addToast(`💰 ${t('newStudents.panel.overpaymentSaved')}`, 'success')
+  } catch {
+    notif.addToast(t('common.error'), 'error')
+  }
+}
+
+async function onPanelChangePassword(password: string) {
+  if (!activeStudent.value) return
+  try {
+    await store.saveDetails(activeStudent.value.id, { password }, recruitmentBackend.value)
+    notif.addToast(`🔑 ${t('newStudents.panel.passwordChanged')}`, 'success')
   } catch {
     notif.addToast(t('common.error'), 'error')
   }

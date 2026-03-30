@@ -35,9 +35,36 @@
           <!-- TAB: PROFILE -->
           <div v-show="activeTab === 'info'" class="sp-tab-content">
             <div class="sp-section-title">{{ t('newStudents.panel.sectionAccount') }}</div>
-            <div class="sp-grid">
+            <div class="sp-grid cols-1">
               <div class="sp-field"><div class="sp-label">Email</div><input class="sp-input" v-model="form.email" type="email" /></div>
-              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPassword') }}</div><input class="sp-input" v-model="form.password" type="text" /></div>
+            </div>
+
+            <!-- Change Password block -->
+            <div class="sp-change-pwd-block">
+              <button class="sp-change-pwd-toggle" @click="showChangePassword = !showChangePassword">
+                🔑 {{ t('newStudents.panel.changePasswordBtn') }}
+                <span class="sp-toggle-arrow" :class="{ open: showChangePassword }">▾</span>
+              </button>
+              <div v-if="showChangePassword" class="sp-change-pwd-body">
+                <div class="sp-grid">
+                  <div class="sp-field">
+                    <div class="sp-label">{{ t('newStudents.panel.fieldNewPassword') }}</div>
+                    <input class="sp-input" v-model="newPassword" type="password" :placeholder="t('newStudents.panel.newPasswordPlaceholder')" autocomplete="new-password" />
+                  </div>
+                  <div class="sp-field">
+                    <div class="sp-label">{{ t('newStudents.panel.fieldConfirmPassword') }}</div>
+                    <input class="sp-input" :class="{ 'sp-input-error': passwordMismatch }" v-model="confirmPassword" type="password" :placeholder="t('newStudents.panel.confirmPasswordPlaceholder')" autocomplete="new-password" />
+                  </div>
+                </div>
+                <div v-if="passwordMismatch" class="sp-pwd-error">{{ t('newStudents.panel.passwordMismatch') }}</div>
+                <button
+                  class="sp-save-pwd-btn"
+                  :disabled="!newPassword || passwordMismatch || isSavingPassword"
+                  @click="onChangePassword"
+                >
+                  {{ isSavingPassword ? '⏳' : '🔑' }} {{ t('newStudents.panel.savePasswordBtn') }}
+                </button>
+              </div>
             </div>
             <div class="sp-grid cols-1">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldNickname') }}</div><input class="sp-input" v-model="form.nickname" /></div>
@@ -289,6 +316,7 @@ const emit = defineEmits<{
   downloadDoc: [doc: any, type: 'template' | 'signed']
   deleteDoc: [doc: any]
   deleteAllDocs: []
+  changePassword: [password: string]
 }>()
 
 const { t } = useI18n()
@@ -301,6 +329,13 @@ const localDiscount = ref('')
 const localOverpayment = ref('')
 const isSavingDiscount = ref(false)
 const isSavingOverpayment = ref(false)
+
+// Change password
+const showChangePassword = ref(false)
+const newPassword = ref('')
+const confirmPassword = ref('')
+const isSavingPassword = ref(false)
+const passwordMismatch = computed(() => confirmPassword.value !== '' && newPassword.value !== confirmPassword.value)
 
 const tabs = computed(() => [
   { key: 'info' as const,     icon: '👤', label: t('newStudents.panel.tabProfile')  },
@@ -345,6 +380,9 @@ watch(() => props.student, () => {
   selectedPrice.value = null
   activeTab.value = 'info'
   priceListOpen.value = false
+  showChangePassword.value = false
+  newPassword.value = ''
+  confirmPassword.value = ''
 })
 
 watch(activeTab, (tab) => {
@@ -362,8 +400,7 @@ watch(
   { immediate: true }
 )
 
-async function onSaveDiscount() {
-  isSavingDiscount.value = true
+async function onSaveDiscount() {  isSavingDiscount.value = true
   try {
     emit('saveDiscount', localDiscount.value)
   } finally {
@@ -377,6 +414,19 @@ async function onSaveOverpayment() {
     emit('saveOverpayment', localOverpayment.value)
   } finally {
     isSavingOverpayment.value = false
+  }
+}
+
+async function onChangePassword() {
+  if (!newPassword.value || passwordMismatch.value) return
+  isSavingPassword.value = true
+  try {
+    emit('changePassword', newPassword.value)
+    newPassword.value = ''
+    confirmPassword.value = ''
+    showChangePassword.value = false
+  } finally {
+    isSavingPassword.value = false
   }
 }
 
@@ -658,4 +708,30 @@ function formatTxDate(dateText: string) {
 }
 .sp-adj-save-btn:hover:not(:disabled) { background: rgba(79,110,247,0.25); }
 .sp-adj-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Change Password Block */
+.sp-change-pwd-block {
+  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px;
+  margin-bottom: 16px; overflow: hidden;
+}
+.sp-change-pwd-toggle {
+  width: 100%; display: flex; align-items: center; gap: 8px; padding: 10px 14px;
+  background: transparent; border: none; cursor: pointer; color: var(--app-text-dim);
+  font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif; text-align: left;
+  transition: color 0.15s;
+}
+.sp-change-pwd-toggle:hover { color: #4f6ef7; }
+.sp-toggle-arrow { margin-left: auto; font-size: 14px; transition: transform 0.2s; display: inline-block; }
+.sp-toggle-arrow.open { transform: rotate(180deg); }
+.sp-change-pwd-body { padding: 0 14px 14px; border-top: 1px solid var(--app-border); padding-top: 12px; }
+.sp-pwd-error { font-size: 11.5px; color: #ef4444; margin-bottom: 8px; }
+.sp-input-error { border-color: rgba(239,68,68,0.5) !important; }
+.sp-save-pwd-btn {
+  width: 100%; padding: 8px 14px; border-radius: 8px; border: none; cursor: pointer;
+  background: linear-gradient(135deg,#4f6ef7,#8b5cf6); color: white;
+  font-size: 13px; font-weight: 600; font-family: 'Outfit', sans-serif;
+  transition: all 0.2s; margin-top: 4px;
+}
+.sp-save-pwd-btn:hover:not(:disabled) { box-shadow: 0 0 16px rgba(79,110,247,0.4); transform: translateY(-1px); }
+.sp-save-pwd-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 </style>
