@@ -704,22 +704,22 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
 
-  // ── GROUPS LIST (Secretariat) ──
   if (method === 'get' && url === 'groups') {
-    console.log('[MOCK] HIT groups, url:', url);
+    // teacherId 42 = Jan Kowalski (teacher@demo.local), 99 = Hanna Boyan
+    // 101 = Anna Kowalska, 102 = Ewa Lewandowska, 103 = Tomasz Wiśniewski, 104 = Maria Nowak
     const mockGroupsList = [
-      { id: 1, name: 'SM-A / Пн 16:00', type: 'group', studentsCount: 8, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-14', lastComment: 'Ученики подготовлены к зачёту', durationDays: 180, startDate: '2025-09-15' },
-      { id: 2, name: 'SM-B / Ср 17:30', type: 'group', studentsCount: 6, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-10', lastComment: 'Нужна замена на следующей неделе', durationDays: 120, startDate: '2025-11-15' },
-      { id: 3, name: 'IND-C / Пт 15:00', type: 'mini', studentsCount: 3, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-12', lastComment: 'Прогресс отличный, переход на следующий уровень', durationDays: 90, startDate: '2025-12-15' },
-      { id: 4, name: 'SM-D / Вт 18:00', type: 'group', studentsCount: 10, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-08', lastComment: 'Двое учеников пропускают регулярно', durationDays: 365, startDate: '2025-03-15' },
-      { id: 5, name: 'INDIGO-A / Чт 16:30', type: 'group', studentsCount: 7, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-13', lastComment: 'Олимпиада в апреле — идёт подготовка', durationDays: 240, startDate: '2025-07-20' },
-      { id: 6, name: 'IND-1 / Пн 10:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-02-28', lastComment: 'Родители просят усилить математику', durationDays: 60, startDate: '2026-01-15' },
-      { id: 7, name: 'SM-E / Сб 11:00', type: 'group', studentsCount: 9, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-01', lastComment: 'Субботняя группа — высокая посещаемость', durationDays: 300, startDate: '2025-05-20' },
-      { id: 8, name: 'MINI-B / Ср 14:00', type: 'mini', studentsCount: 4, teacherName: 'Maria Nowak', lastCommentDate: null, lastComment: null, durationDays: 30, startDate: '2026-02-13' },
-      { id: 9, name: 'SM-F / Пт 18:30', type: 'group', studentsCount: 5, teacherName: 'Anna Kowalska', lastCommentDate: '2026-03-11', lastComment: 'Группа готовится к выступлению', durationDays: 150, startDate: '2025-10-15' },
-      { id: 10, name: 'IND-2 / Вт 09:00', type: 'individual', studentsCount: 1, teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-14', lastComment: 'Ребёнок делает быстрый прогресс', durationDays: 45, startDate: '2026-01-30' },
-      { id: 11, name: 'SM-G / Чт 17:00', type: 'group', studentsCount: 8, teacherName: 'Ewa Lewandowska', lastCommentDate: '2026-03-09', lastComment: 'Запланирован открытый урок для родителей', durationDays: 200, startDate: '2025-08-28' },
-      { id: 12, name: 'INDIGO-B / Пн 15:00', type: 'group', studentsCount: 6, teacherName: 'Maria Nowak', lastCommentDate: '2026-03-07', lastComment: 'Нужны дополнительные материалы', durationDays: 100, startDate: '2025-12-05' },
+      { id: 1, teacherId: 42,  name: 'SM-A / Пн 16:00',    type: 'group',      studentsCount: 8,  teacherName: 'Jan Kowalski',      lastCommentDate: '2026-03-14', lastComment: 'Ученики подготовлены к зачёту', durationDays: 180, startDate: '2025-09-15' },
+      { id: 2, teacherId: 102, name: 'SM-B / Ср 17:30',    type: 'group',      studentsCount: 6,  teacherName: 'Ewa Lewandowska',   lastCommentDate: '2026-03-10', lastComment: 'Нужна замена на следующей неделе', durationDays: 120, startDate: '2025-11-15' },
+      { id: 3, teacherId: 103, name: 'IND-C / Пт 15:00',   type: 'mini',       studentsCount: 3,  teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-12', lastComment: 'Прогресс отличный, переход на следующий уровень', durationDays: 90, startDate: '2025-12-15' },
+      { id: 4, teacherId: 42,  name: 'SM-D / Вт 18:00',    type: 'group',      studentsCount: 10, teacherName: 'Jan Kowalski',      lastCommentDate: '2026-03-08', lastComment: 'Двое учеников пропускают регулярно', durationDays: 365, startDate: '2025-03-15' },
+      { id: 5, teacherId: 104, name: 'INDIGO-A / Чт 16:30', type: 'group',     studentsCount: 7,  teacherName: 'Maria Nowak',       lastCommentDate: '2026-03-13', lastComment: 'Олимпиада в апреле — идёт подготовка', durationDays: 240, startDate: '2025-07-20' },
+      { id: 6, teacherId: 103, name: 'IND-1 / Пн 10:00',   type: 'individual', studentsCount: 1,  teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-02-28', lastComment: 'Родители просят усилить математику', durationDays: 60, startDate: '2026-01-15' },
+      { id: 7, teacherId: 102, name: 'SM-E / Сб 11:00',    type: 'group',      studentsCount: 9,  teacherName: 'Ewa Lewandowska',   lastCommentDate: '2026-03-01', lastComment: 'Субботняя группа — высокая посещаемость', durationDays: 300, startDate: '2025-05-20' },
+      { id: 8, teacherId: 42,  name: 'SM-C / Чт 15:00',    type: 'mini',       studentsCount: 4,  teacherName: 'Jan Kowalski',      lastCommentDate: null, lastComment: null, durationDays: 30, startDate: '2026-02-13' },
+      { id: 9, teacherId: 101, name: 'SM-F / Пт 18:30',    type: 'group',      studentsCount: 5,  teacherName: 'Anna Kowalska',     lastCommentDate: '2026-03-11', lastComment: 'Группа готовится к выступлению', durationDays: 150, startDate: '2025-10-15' },
+      { id: 10, teacherId: 103, name: 'IND-2 / Вт 09:00',  type: 'individual', studentsCount: 1,  teacherName: 'Tomasz Wiśniewski', lastCommentDate: '2026-03-14', lastComment: 'Ребёнок делает быстрый прогресс', durationDays: 45, startDate: '2026-01-30' },
+      { id: 11, teacherId: 102, name: 'SM-G / Чт 17:00',   type: 'group',      studentsCount: 8,  teacherName: 'Ewa Lewandowska',   lastCommentDate: '2026-03-09', lastComment: 'Запланирован открытый урок для родителей', durationDays: 200, startDate: '2025-08-28' },
+      { id: 12, teacherId: 104, name: 'INDIGO-B / Пн 15:00', type: 'group',    studentsCount: 6,  teacherName: 'Maria Nowak',       lastCommentDate: '2026-03-07', lastComment: 'Нужны дополнительные материалы', durationDays: 100, startDate: '2025-12-05' },
     ]
 
     // Фильтрация
@@ -734,10 +734,9 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       items = items.filter(g => g.type === p.type)
     }
     if (p.teacher_id) {
-      // Простая фильтрация по имени для mock
-      const teacherMap: Record<number, string> = { 1: 'Anna Kowalska', 2: 'Ewa Lewandowska', 3: 'Tomasz Wiśniewski', 4: 'Maria Nowak' }
-      const tName = teacherMap[Number(p.teacher_id)]
-      if (tName) items = items.filter(g => g.teacherName === tName)
+      // Прямая фильтрация по teacherId (совпадает с mock-пользователями)
+      const tid = Number(p.teacher_id)
+      items = items.filter(g => g.teacherId === tid)
     }
 
     // Сортировка
@@ -832,9 +831,11 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   if (method === "get" && url === "students") {
     // Генерируем mock данные для списка студентов
+    // teacherId 42 = Jan Kowalski (teacher@demo.local), 99 = Hanna Boyan
     const mockStudentsList = [
       {
         id: 1,
+        teacherId: 42, // Jan Kowalski
         full_name: "Иван Иванов",
         firstName: "Иван",
         lastName: "Иванов",
@@ -863,6 +864,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       },
       {
         id: 2,
+        teacherId: 99, // Hanna Boyan
         full_name: "Мария Петрова",
         firstName: "Мария",
         lastName: "Петрова",
@@ -891,6 +893,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       },
       {
         id: 3,
+        teacherId: 42, // Jan Kowalski
         full_name: "Алексей Сидоров",
         firstName: "Алексей",
         lastName: "Сидоров",
@@ -919,6 +922,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       },
       {
         id: 4,
+        teacherId: 99, // Hanna Boyan
         full_name: "Елена Смирнова",
         firstName: "Елена",
         lastName: "Смирнова",
@@ -949,13 +953,27 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
     const page = Number((config.params as any)?.page) || 1;
     const perPage = Number((config.params as any)?.per_page) || 20;
-    const total = mockStudentsList.length;
+    const teacherIdFilter = Number((config.params as any)?.teacher_id) || null;
+    const searchFilter = String((config.params as any)?.search || "").toLowerCase().trim();
 
-    const from = (page - 1) * perPage + 1;
+    // Фильтрация: по teacherId (для роли teacher) и поиску
+    let filtered = [...mockStudentsList];
+    if (teacherIdFilter) {
+      filtered = filtered.filter(s => s.teacherId === teacherIdFilter);
+    }
+    if (searchFilter) {
+      filtered = filtered.filter(s =>
+        s.full_name.toLowerCase().includes(searchFilter) ||
+        s.phone.includes(searchFilter) ||
+        s.email.toLowerCase().includes(searchFilter)
+      );
+    }
+
+    const total = filtered.length;
+    const from = total > 0 ? (page - 1) * perPage + 1 : 0;
     const to = Math.min(page * perPage, total);
-    const lastPage = Math.ceil(total / perPage);
-
-    const paginatedStudents = mockStudentsList.slice((page - 1) * perPage, page * perPage);
+    const lastPage = Math.ceil(total / perPage) || 1;
+    const paginatedStudents = filtered.slice((page - 1) * perPage, page * perPage);
 
     return ok(config, {
       data: paginatedStudents,
@@ -963,12 +981,13 @@ export const mockAdapter: AxiosAdapter = async (config) => {
         current_page: page,
         last_page: lastPage,
         per_page: perPage,
-        total: total,
-        from: from,
-        to: to
+        total,
+        from: paginatedStudents.length ? from : null,
+        to: paginatedStudents.length ? to : null,
       }
     });
   }
+
 
   // ══════════════════════════════════════════════════════════════════════════
   // SALARY — mock-роуты для офлайн-разработки

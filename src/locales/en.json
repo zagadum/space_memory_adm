@@ -1883,5 +1883,25 @@
     "errorMinLength":  "Password must be at least 8 characters",
     "success":         "Password changed successfully",
     "requirements":    "At least 8 characters, letters and numbers recommended"
+  },
+  "trainerStudents": {
+    "title":       "My Students",
+    "subtitle":    "Teacher cabinet · your students only",
+    "total":       "total students",
+    "lastContact": "Last contact",
+    "empty":       "You have no assigned students"
+  },
+  "trainerGroups": {
+    "title":       "My Groups",
+    "subtitle":    "Teacher cabinet · your groups only",
+    "total":       "total groups",
+    "students":    "total students",
+    "pupils":      "pupils",
+    "days":        "days",
+    "typeAll":        "All",
+    "typeGroup":      "Groups",
+    "typeMini":       "Mini",
+    "typeIndividual": "Individual",
+    "empty":       "You have no assigned groups"
   }
 }

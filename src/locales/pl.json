@@ -1883,5 +1883,25 @@
     "errorMinLength":  "Hasło musi mieć co najmniej 8 znaków",
     "success":         "Hasło zostało zmienione",
     "requirements":    "Minimum 8 znaków, zalecane litery i cyfry"
+  },
+  "trainerStudents": {
+    "title":       "Moi uczniowie",
+    "subtitle":    "Panel trenera · tylko Twoi uczniowie",
+    "total":       "łącznie uczniów",
+    "lastContact": "Ostatni kontakt",
+    "empty":       "Nie masz przypisanych uczniów"
+  },
+  "trainerGroups": {
+    "title":       "Moje grupy",
+    "subtitle":    "Panel trenera · tylko Twoje grupy",
+    "total":       "łącznie grup",
+    "students":    "łącznie uczniów",
+    "pupils":      "ucz.",
+    "days":        "dni",
+    "typeAll":        "Wszystkie",
+    "typeGroup":      "Grupy",
+    "typeMini":       "Mini",
+    "typeIndividual": "Indyw.",
+    "empty":       "Nie masz przypisanych grup"
   }
 }
