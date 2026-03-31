@@ -12,7 +12,7 @@
           </select>
           <button class="btn btn-ghost" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
         </div>
-        <button class="btn btn-primary" @click="modal.open('invite-lead', { backend: recruitmentBackend.value })">✉️ {{ t('newStudents.inviteStudent') }}</button>
+        <button class="btn btn-primary" @click="modal.open('invite-lead', { backend: recruitmentBackend })">✉️ {{ t('newStudents.inviteStudent') }}</button>
       </div>
 
       <!-- STATS GRID -->

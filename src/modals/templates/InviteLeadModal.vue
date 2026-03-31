@@ -91,6 +91,7 @@
 <script setup lang="ts">
 import { reactive, ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
+import { useRoute } from "vue-router";
 import BaseModal from "../BaseModal.vue";
 import UiInput from "../../components/ui/UiInput.vue";
 import UiButton from "../../components/ui/UiButton.vue";
@@ -99,15 +100,20 @@ import { useLeadsStore } from "../../stores/leads.store";
 import type { RecruitmentBackend } from "../../api/http";
 
 const { t } = useI18n();
+const route = useRoute();
 const modal = useModalStore();
 const leadsStore = useLeadsStore();
 
 const payload = computed(() => modal.payload as any);
 const lead = computed(() => payload.value?.lead);
 const student = computed(() => payload.value?.student);
-const backend = computed<RecruitmentBackend>(() =>
-  payload.value?.backend === 'indigo' ? 'indigo' : 'default'
-);
+
+// Определяем backend: сначала из payload (явная передача), затем из meta текущего маршрута
+const backend = computed<RecruitmentBackend>(() => {
+  if (payload.value?.backend === 'indigo') return 'indigo';
+  if ((route.meta as any)?.recruitmentBackend === 'indigo') return 'indigo';
+  return 'default';
+});
 
 const displayData = computed(() => {
   if (student.value) {
@@ -162,6 +168,7 @@ async function submit() {
   loading.value = true;
   error.value = null;
   try {
+    console.log('[InviteLeadModal] backend:', backend.value, '| route.meta:', route.meta?.recruitmentBackend, '| payload.backend:', payload.value?.backend);
     await leadsStore.inviteLead({
       first_name: form.firstName,
       surname: form.lastName,
