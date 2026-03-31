@@ -6,17 +6,27 @@
           <span class="search-icon">🔍</span>
           <input v-model="searchQ" :placeholder="t('targetMail.searchPlaceholder')" />
         </div>
-        <div class="filter-chips">
-          <span class="filter-label">{{ t('targetMail.filters.label') }}</span>
+        <div class="tm-actions-right">
+          <div class="filter-chips">
+            <span class="filter-label">{{ t('targetMail.filters.label') }}</span>
+            <button
+              v-for="status in filterOptions"
+              :key="status"
+              type="button"
+              class="chip"
+              :class="{ active: selectedStatuses.includes(status) }"
+              @click="toggleStatus(status)"
+            >
+              {{ t(`targetMail.filters.statuses.${status}`) }}
+            </button>
+          </div>
           <button
-            v-for="status in filterOptions"
-            :key="status"
             type="button"
-            class="chip"
-            :class="{ active: selectedStatuses.includes(status) }"
-            @click="toggleStatus(status)"
+            class="btn btn-primary export-btn"
+            :disabled="store.isLoading || !filteredItems.length"
+            @click="exportToExcel"
           >
-            {{ t(`targetMail.filters.statuses.${status}`) }}
+            📥 {{ t('targetMail.exportExcel') }}
           </button>
         </div>
       </div>
@@ -96,6 +106,7 @@ const store = useTargetMailStore();
 const searchQ = ref('');
 const selectedStatuses = ref<TargetMailFilterStatus[]>([]);
 const { t, locale } = useI18n();
+const emptyCellValue = '—';
 
 type TargetMailFilterStatus = 'clicked' | 'converted' | 'sent';
 
@@ -154,7 +165,7 @@ function toggleStatus(status: TargetMailFilterStatus) {
 }
 
 function formatDateTime(value: string | null) {
-  if (!value) return '—';
+  if (!value) return emptyCellValue;
 
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
@@ -181,6 +192,48 @@ function reload() {
   store.fetchTargetMail(recruitmentBackend.value);
 }
 
+async function exportToExcel() {
+  if (!filteredItems.value.length) return;
+
+  const { exportTableToExcel } = await import('../../utils/excelExport');
+  const dateStr = new Date().toISOString().split('T')[0];
+  const backendLabel = recruitmentBackend.value === 'indigo' ? 'indigo' : 'default';
+
+  exportTableToExcel({
+    fileName: `${t('targetMail.export.fileNamePrefix')}_${backendLabel}_${dateStr}`,
+    sheetName: t('targetMail.export.sheetName'),
+    rows: [
+      [
+        t('targetMail.table.surname'),
+        t('targetMail.table.name'),
+        t('targetMail.table.parentEmail'),
+        t('targetMail.table.status'),
+        t('targetMail.table.errorMessage'),
+        t('targetMail.table.linkClickedAt'),
+        t('targetMail.table.convertedAt'),
+      ],
+      ...filteredItems.value.map((row) => [
+        row.surname || emptyCellValue,
+        row.name || emptyCellValue,
+        row.parent_email || emptyCellValue,
+        row.status || emptyCellValue,
+        row.error_message || emptyCellValue,
+        formatDateTime(row.link_clicked_at),
+        formatDateTime(row.converted_at),
+      ]),
+    ],
+    columnWidths: [
+      { wch: 20 },
+      { wch: 20 },
+      { wch: 32 },
+      { wch: 18 },
+      { wch: 40 },
+      { wch: 22 },
+      { wch: 22 },
+    ],
+  });
+}
+
 watch(recruitmentBackend, () => {
   searchQ.value = '';
   selectedStatuses.value = [];
@@ -200,6 +253,14 @@ watch(recruitmentBackend, () => {
   justify-content: space-between;
   gap: 10px;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tm-actions-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -262,6 +323,10 @@ watch(recruitmentBackend, () => {
   font-family: 'Outfit', sans-serif;
   font-size: 13px;
   width: 240px;
+}
+
+.export-btn {
+  white-space: nowrap;
 }
 
 .table-container {

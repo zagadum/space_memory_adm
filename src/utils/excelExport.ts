@@ -1,10 +1,56 @@
 import * as XLSX from 'xlsx';
 
+type ExcelCell = string | number | boolean | null | undefined;
+
+export interface TableExcelExportOptions {
+    fileName: string;
+    sheetName: string;
+    rows: ExcelCell[][];
+    columnWidths?: Array<{ wch: number }>;
+}
+
 export interface ExcelRow {
     category: string;
     description: string;
     rateQty: string | number;
     amount: number;
+}
+
+export function exportTableToExcel({
+    fileName,
+    sheetName,
+    rows,
+    columnWidths
+}: TableExcelExportOptions) {
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    const workbook = XLSX.utils.book_new();
+
+    if (columnWidths?.length) {
+        worksheet['!cols'] = columnWidths;
+    }
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName || 'Sheet1');
+
+    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+    const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+
+    let safeName = fileName || 'Export';
+    safeName = safeName.replace(/\.xlsx$/i, '').replace(/[<>:"/\\|?*]/g, '_');
+
+    const url = window.URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${safeName}.xlsx`;
+    link.style.display = 'none';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.addEventListener('click', (e) => e.stopPropagation());
+    link.click();
+
+    setTimeout(() => {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+    }, 200);
 }
 
 export function exportSalaryToExcel(
@@ -42,37 +88,15 @@ export function exportSalaryToExcel(
         ]
     ];
 
-    const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Salary Report');
-
-    // 4. Красивая ширина колонок
-    worksheet['!cols'] = [
-        { wch: 20 }, // Category
-        { wch: 40 }, // Description
-        { wch: 15 }, // Rate
-        { wch: 15 }  // Amount
-    ];
-
-    // 5. Логика скачивания (пуленепробиваемая)
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-
-    let safeName = fileName || 'Salary_Export';
-    safeName = safeName.replace(/\.xlsx$/i, '').replace(/[<>:"/\\|?*]/g, '_');
-
-    const url = window.URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${safeName}.xlsx`;
-    link.style.display = 'none';
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.addEventListener('click', (e) => e.stopPropagation());
-    link.click();
-
-    setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-    }, 200);
+    exportTableToExcel({
+        fileName,
+        sheetName: 'Salary Report',
+        rows: worksheetData,
+        columnWidths: [
+            { wch: 20 },
+            { wch: 40 },
+            { wch: 15 },
+            { wch: 15 }
+        ]
+    });
 }

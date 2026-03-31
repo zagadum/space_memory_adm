@@ -1567,12 +1567,17 @@
   "targetMail": {
     "pageTitle": "TargetMail",
     "searchPlaceholder": "Search by surname, email, status...",
+    "exportExcel": "Export to Excel",
     "loading": "Loading TargetMail...",
     "errorTitle": "Failed to load TargetMail",
     "emptyTitle": "List is empty",
     "emptyText": "The API returned an empty array: there are no TargetMail entries yet.",
     "emptyFiltered": "Nothing matched the current search.",
     "showing": "Showing {shown} of {total} records",
+    "export": {
+      "sheetName": "TargetMail",
+      "fileNamePrefix": "TargetMail_Export"
+    },
     "filters": {
       "label": "Statuses:",
       "statuses": {

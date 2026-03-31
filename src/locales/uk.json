@@ -1563,12 +1563,17 @@
   "targetMail": {
     "pageTitle": "TargetMail",
     "searchPlaceholder": "Пошук за прізвищем, email, статусом...",
+    "exportExcel": "Експорт в Excel",
     "loading": "Завантажуємо TargetMail...",
     "errorTitle": "Не вдалося завантажити TargetMail",
     "emptyTitle": "Список порожній",
     "emptyText": "API повернув порожній масив: записів TargetMail поки немає.",
     "emptyFiltered": "За поточним пошуком нічого не знайдено.",
     "showing": "Показано {shown} з {total} записів",
+    "export": {
+      "sheetName": "TargetMail",
+      "fileNamePrefix": "TargetMail_Export"
+    },
     "filters": {
       "label": "Статуси:",
       "statuses": {

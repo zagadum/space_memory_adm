@@ -1567,12 +1567,17 @@
   "targetMail": {
     "pageTitle": "TargetMail",
     "searchPlaceholder": "Szukaj po nazwisku, emailu, statusie...",
+    "exportExcel": "Eksport do Excel",
     "loading": "Ładowanie TargetMail...",
     "errorTitle": "Nie udało się załadować TargetMail",
     "emptyTitle": "Lista jest pusta",
     "emptyText": "API zwróciło pustą tablicę: brak wpisów TargetMail.",
     "emptyFiltered": "Brak wyników dla bieżącego wyszukiwania.",
     "showing": "Pokazano {shown} z {total} rekordów",
+    "export": {
+      "sheetName": "TargetMail",
+      "fileNamePrefix": "TargetMail_Export"
+    },
     "filters": {
       "label": "Statusy:",
       "statuses": {

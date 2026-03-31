@@ -1564,12 +1564,17 @@
   "targetMail": {
     "pageTitle": "TargetMail",
     "searchPlaceholder": "Поиск по фамилии, email, статусу...",
+    "exportExcel": "Экспорт в Excel",
     "loading": "Загружаем TargetMail...",
     "errorTitle": "Не удалось загрузить TargetMail",
     "emptyTitle": "Список пуст",
     "emptyText": "API вернул пустой массив: записей TargetMail пока нет.",
     "emptyFiltered": "По текущему поиску ничего не найдено.",
     "showing": "Показано {shown} из {total} записей",
+    "export": {
+      "sheetName": "TargetMail",
+      "fileNamePrefix": "TargetMail_Export"
+    },
     "filters": {
       "label": "Статусы:",
       "statuses": {
