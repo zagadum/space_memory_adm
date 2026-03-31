@@ -1837,158 +1837,177 @@
       "city": "Город",
       "comment": "Комментарий"
     },
-     "noTeachers": "Нет преподавателей по заданным фильтрам"
-   },
-   "importDb": {
-     "pageTitle": "Import DB",
-     "pageSubtitle": "Управление импортированными данными",
-     "searchPlaceholder": "Поиск по имени, email, телефону...",
-     "listTitle": "Список импорта",
-     "itemsWord": "записей",
-     "loading": "Загружаем список...",
-     "errorTitle": "Не удалось загрузить список",
-     "emptyTitle": "Список пуст",
-     "emptyText": "Нет данных для отображения",
-     "stats": {
-       "total": "Всего записей",
-       "totalSub": "в системе",
-       "sent": "Отправлено",
-       "sentSub": "приглашений",
-       "done": "Завершено",
-       "doneSub": "записей",
-       "pending": "В ожидании",
-       "pendingSub": "действий"
-     },
-     "table": {
-       "surname": "Фамилия",
-       "firstName": "Имя",
-       "parentEmail": "Email родителя",
-       "phone": "Телефон",
-       "nickname": "Никнейм",
-       "subscriptionAmount": "Сумма подписки",
-       "contractOldNew": "Тип контракта",
-       "balanceOverpayment": "Переплата",
-       "discount": "Скидка",
-       "isSend": "Отправлено",
-       "isDone": "Завершено",
-       "actions": "Действия"
-     },
-     "actions": {
-       "resendInvitation": "Отправить приглашение",
-       "resendConfirm": "Выслать приглашение повторно?",
-       "edit": "Редактировать",
-       "delete": "Удалить",
-       "deleteConfirm": "Вы уверены, что хотите удалить эту запись?",
-       "deleteSuccess": "Запись успешно удалена",
-       "updateSuccess": "Данные обновлены",
-       "resendSuccess": "Приглашение успешно отправлено"
-     },
-     "showing": "Показано {shown} из {total} записей"
-   },
-   "roles": {
-     "super-admin":  "Супер Администратор",
-     "admin":        "Администратор",
-     "teacher":      "Преподаватель",
-     "sales":        "Отдел продаж",
-     "quality":      "Отдел качества",
-     "finance":      "Финансовый отдел",
-     "secretariat":  "Секретариат",
-     "hr":           "HR"
-   },
-   "accessDenied": {
-     "title":    "Доступ запрещён",
-     "message":  "У вас нет прав для просмотра этого раздела. Обратитесь к администратору или выберите другой раздел.",
-     "yourRole": "Ваша роль",
-     "btnHome":  "На главную",
-     "btnBack":  "Назад",
-     "hint":     "Если вы считаете, что это ошибка — свяжитесь с системным администратором."
-   },
-   "changePassword": {
-     "title":           "Смена пароля",
-     "subtitle":        "Вы входите в систему впервые. Необходимо сменить пароль.",
-     "newPassword":     "Новый пароль",
-     "confirmPassword": "Подтвердите пароль",
-     "submit":          "Сменить пароль",
-     "saving":          "Сохранение…",
-     "errorMismatch":   "Пароли не совпадают",
-     "errorMinLength":  "Пароль должен содержать минимум 8 символов",
-     "success":         "Пароль успешно изменён",
-     "requirements":    "Минимум 8 символов, рекомендуется использовать буквы и цифры"
-   },
-   "trainerStudents": {
-     "title":       "Мои ученики",
-     "subtitle":    "Кабинет преподавателя · только ваши ученики",
-     "total":       "всего учеников",
-     "lastContact": "Последний контакт",
-     "empty":       "У вас нет назначенных учеников"
-   },
-   "trainerGroups": {
-     "title":       "Мои группы",
-     "subtitle":    "Кабинет преподавателя · только ваши группы",
-     "total":       "всего групп",
-     "students":    "всего учеников",
-     "pupils":      "уч.",
-     "days":        "дн.",
-     "typeAll":        "Все",
-     "typeGroup":      "Группы",
-     "typeMini":       "Мини",
-     "typeIndividual": "Индив.",
-     "empty":       "У вас нет назначенных групп"
-   },
-   "accessControl": {
-     "title":   "Управление доступом",
-     "subtitle": "Матрица прав — кто что видит и может делать",
-     "save":           "Сохранить",
-     "resetDefaults":  "Сбросить",
-     "savedOk":        "✓ Матрица сохранена",
-     "savedError":     "✗ Ошибка сохранения",
-     "resetOk":        "↺ Сброшено к умолчаниям",
-     "infoBanner":     "Изменения применяются на фронте (localStorage). После подключения бэкенда данные будут сохраняться в БД.",
-     "apiContractToggle": "API Contract",
-     "colSection": "Раздел / Действие",
-     "mode": {
-       "active":    "Полный доступ",
-       "read-only": "Только просмотр",
-       "hidden":    "Скрыто"
-     },
-     "role": {
-       "super-admin": "Super Admin",
-       "admin":       "Admin",
-       "teacher":     "Учитель",
-       "sales":       "Рекрутинг",
-       "quality":     "Качество",
-       "finance":     "Финансы",
-       "secretariat": "Секретариат",
-       "hr":          "HR"
-     },
-     "section": {
-       "students":    "Ученики",
-       "groups":      "Группы",
-       "recruitment": "Рекрутинг",
-       "finance":     "Финансы",
-       "settings":    "Настройки"
-     },
-     "item": {
-       "student-list":           "Список учеников",
-       "student-profile":        "Профиль ученика",
-       "student-payments":       "Оплаты ученика",
-       "student-delete":         "Удаление ученика",
-       "student-price-change":   "Изменение цены",
-       "group-list":             "Список групп",
-       "group-edit":             "Редактировать группу",
-       "group-delete":           "Удалить группу",
-       "leads-view":             "Просмотр лидов",
-       "leads-edit":             "Редактировать лиды",
-       "new-students-panel":     "Панель новых учеников",
-       "finance-view":           "Просмотр финансов",
-       "finance-edit":           "Редактировать финансы",
-       "debtors-view":           "Список должников",
-       "salary-view":            "Просмотр зарплат",
-       "salary-confirm":         "Подтвердить зарплату",
-       "settings-users":         "Управление пользователями",
-       "settings-access-control":"Матрица прав",
-       "settings-school":        "Настройки школы",
-       "settings-integrations":  "Интеграции"
-     }
-   }
- }
+    "noTeachers": "Нет преподавателей по заданным фильтрам"
+  },
+  "importDb": {
+    "pageTitle": "Import DB",
+    "pageSubtitle": "Управление импортированными данными",
+    "searchPlaceholder": "Поиск по имени, email, телефону...",
+    "listTitle": "Список импорта",
+    "itemsWord": "записей",
+    "loading": "Загружаем список...",
+    "errorTitle": "Не удалось загрузить список",
+    "emptyTitle": "Список пуст",
+    "emptyText": "Нет данных для отображения",
+    "stats": {
+      "total": "Всего записей",
+      "totalSub": "в системе",
+      "sent": "Отправлено",
+      "sentSub": "приглашений",
+      "done": "Завершено",
+      "doneSub": "записей",
+      "pending": "В ожидании",
+      "pendingSub": "действий"
+    },
+    "table": {
+      "surname": "Фамилия",
+      "firstName": "Имя",
+      "parentEmail": "Email родителя",
+      "phone": "Телефон",
+      "nickname": "Никнейм",
+      "subscriptionAmount": "Сумма подписки",
+      "contractOldNew": "Тип контракта",
+      "balanceOverpayment": "Переплата",
+      "discount": "Скидка",
+      "isSend": "Отправлено",
+      "isDone": "Завершено",
+      "actions": "Действия"
+    },
+    "actions": {
+      "resendInvitation": "Отправить приглашение",
+      "resendConfirm": "Выслать приглашение повторно?",
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "deleteConfirm": "Вы уверены, что хотите удалить эту запись?",
+      "deleteSuccess": "Запись успешно удалена",
+      "updateSuccess": "Данные обновлены",
+      "resendSuccess": "Приглашение успешно отправлено"
+    },
+    "showing": "Показано {shown} из {total} записей"
+  },
+  "roles": {
+    "super-admin": "Супер Администратор",
+    "admin": "Администратор",
+    "teacher": "Преподаватель",
+    "sales": "Отдел продаж",
+    "quality": "Отдел качества",
+    "finance": "Финансовый отдел",
+    "secretariat": "Секретариат",
+    "hr": "HR"
+  },
+  "accessDenied": {
+    "title": "Доступ запрещён",
+    "message": "У вас нет прав для просмотра этого раздела. Обратитесь к администратору или выберите другой раздел.",
+    "yourRole": "Ваша роль",
+    "btnHome": "На главную",
+    "btnBack": "Назад",
+    "hint": "Если вы считаете, что это ошибка — свяжитесь с системным администратором."
+  },
+  "changePassword": {
+    "title": "Смена пароля",
+    "subtitle": "Вы входите в систему впервые. Необходимо сменить пароль.",
+    "newPassword": "Новый пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "submit": "Сменить пароль",
+    "saving": "Сохранение…",
+    "errorMismatch": "Пароли не совпадают",
+    "errorMinLength": "Пароль должен содержать минимум 8 символов",
+    "success": "Пароль успешно изменён",
+    "requirements": "Минимум 8 символов, рекомендуется использовать буквы и цифры"
+  },
+  "trainerStudents": {
+    "title": "Мои ученики",
+    "subtitle": "Кабинет преподавателя · только ваши ученики",
+    "total": "всего учеников",
+    "lastContact": "Последний контакт",
+    "empty": "У вас нет назначенных учеников"
+  },
+  "trainerGroups": {
+    "title": "Мои группы",
+    "subtitle": "Кабинет преподавателя · только ваши группы",
+    "total": "всего групп",
+    "students": "всего учеников",
+    "pupils": "уч.",
+    "days": "дн.",
+    "typeAll": "Все",
+    "typeGroup": "Группы",
+    "typeMini": "Мини",
+    "typeIndividual": "Индив.",
+    "empty": "У вас нет назначенных групп"
+  },
+  "accessControl": {
+    "title": "Управление доступом",
+    "subtitle": "Матрица прав — кто что видит и может делать",
+    "save": "Сохранить",
+    "resetDefaults": "Сбросить",
+    "savedOk": "✓ Матрица сохранена",
+    "savedError": "✗ Ошибка сохранения",
+    "resetOk": "↺ Сброшено к умолчаниям",
+    "infoBanner": "Изменения применяются на фронте (localStorage). После подключения бэкенда данные будут сохраняться в БД.",
+    "apiContractToggle": "API Contract",
+    "colSection": "Раздел / Действие",
+    "mode": {
+      "active": "Полный доступ",
+      "read-only": "Только просмотр",
+      "hidden": "Скрыто"
+    },
+    "role": {
+      "super-admin": "Super Admin",
+      "admin": "Admin",
+      "teacher": "Учитель",
+      "sales": "Рекрутинг",
+      "quality": "Качество",
+      "finance": "Финансы",
+      "secretariat": "Секретариат",
+      "hr": "HR"
+    },
+    "section": {
+      "students": "Ученики",
+      "groups": "Группы",
+      "recruitment": "Рекрутинг",
+      "finance": "Финансы",
+      "settings": "Настройки"
+    },
+    "item": {
+      "student-list": "Список учеников",
+      "student-profile": "Профиль ученика",
+      "student-payments": "Оплаты ученика",
+      "student-delete": "Удаление ученика",
+      "student-price-change": "Изменение цены",
+      "group-list": "Список групп",
+      "group-edit": "Редактировать группу",
+      "group-delete": "Удалить группу",
+      "leads-view": "Просмотр лидов",
+      "leads-edit": "Редактировать лиды",
+      "new-students-panel": "Панель новых учеников",
+      "finance-view": "Просмотр финансов",
+      "finance-edit": "Редактировать финансы",
+      "debtors-view": "Список должников",
+      "salary-view": "Просмотр зарплат",
+      "salary-confirm": "Подтвердить зарплату",
+      "settings-users": "Управление пользователями",
+      "settings-access-control": "Матрица прав",
+      "settings-school": "Настройки школы",
+      "settings-integrations": "Интеграции"
+    }
+  },
+  "recruitment": {
+    "inviteLead": "Пригласить лида",
+    "inviteSuccess": "Приглашение успешно отправлено",
+    "inviteError": "Ошибка при отправке приглашения",
+    "alreadyExists": "Пользователь с таким email (nickname) уже существует",
+    "form": {
+      "firstName": "Имя ученика",
+      "lastName": "Фамилия ученика",
+      "parentEmail": "Email родителя",
+      "studentEmail": "Email ученика (Nickname)",
+      "phone": "Телефон",
+      "subscriptionAmount": "Сумма абонемента",
+      "contract": "Тип договора",
+      "discount": "Скидка (необязательно)",
+      "submit": "Отправить приглашение",
+      "studentEmailHint": "Будет использоваться как логин в систему",
+      "contractHint": "Выберите тип договора из списка"
+    }
+  }
+}

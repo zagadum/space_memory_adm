@@ -2,10 +2,10 @@
   <div class="leads-page">
     <header class="leads-header">
       <div class="header-left">
-        <h1 class="page-title">{{ t('leads.title') }}</h1>
+        <h1 class="page-title">{{ t('sidebar.leads') }}</h1>
       </div>
       <div class="header-right">
-        <button class="btn btn-primary">＋ {{ t('dashboard.quickActions.addStudent') }}</button>
+        <button class="btn btn-primary" @click="openInviteModal()">＋ {{ t('recruitment.inviteLead') }}</button>
       </div>
     </header>
 
@@ -48,10 +48,10 @@
               </div>
             </div>
             <div class="card-footer">
-              <div class="lead-avatar">{{ lead.name.split(' ').map(n => n[0]).join('') }}</div>
+              <div class="lead-avatar">{{ lead.name && lead.name.split(' ').map(n => n[0]).join('') }}</div>
               <div class="action-btns">
+                <button class="icon-btn" :title="t('recruitment.inviteLead')" @click="openInviteModal(lead)">✉️</button>
                 <button class="icon-btn">📞</button>
-                <button class="icon-btn">💬</button>
               </div>
             </div>
           </div>
@@ -67,12 +67,14 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useLeadsStore, type LeadStatus } from '../../stores/leads.store';
 import { useGlobalSearchStore } from '../../stores/globalSearch.store';
+import { useModalStore } from '../../stores/modal.store';
 import type { RecruitmentBackend } from '../../api/http';
 
 const { t } = useI18n();
 const route = useRoute();
 const leadsStore = useLeadsStore();
 const searchStore = useGlobalSearchStore();
+const modalStore = useModalStore();
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default');
 
 const columns = [
@@ -91,6 +93,10 @@ const getLeadsByStatus = (status: LeadStatus) => {
          && !(l.subject || '').toLowerCase().includes(q)) return false;
     return true;
   });
+};
+
+const openInviteModal = (lead?: any) => {
+  modalStore.open('invite-lead', { lead });
 };
 
 watch(recruitmentBackend, () => {

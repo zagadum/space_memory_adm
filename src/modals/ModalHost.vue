@@ -16,6 +16,7 @@
   <AttendanceStatusModal v-else-if="openId==='attendance-status'" />
   <AttendanceModal v-else-if="openId==='attendance'" />
   <ConsentConfirmModal v-else-if="openId==='consent-confirm'" />
+  <InviteLeadModal v-else-if="openId==='invite-lead'" />
 </template>
 
 <script setup lang="ts">
@@ -38,6 +39,7 @@ import EditInfoModal from "./templates/EditInfoModal.vue";
 import AttendanceStatusModal from "./templates/AttendanceStatusModal.vue";
 import AttendanceModal from "./templates/AttendanceModal.vue";
 import ConsentConfirmModal from "./templates/ConsentConfirmModal.vue";
+import InviteLeadModal from "./templates/InviteLeadModal.vue";
 
 const modal = useModalStore();
 const { openId } = storeToRefs(modal);

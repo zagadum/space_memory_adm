@@ -2,13 +2,35 @@ import { getRecruitmentHttpClient, type RecruitmentBackend } from "./http";
 
 export interface RecruitmentNewStudent {
   id: number;
+  external_id?: string | number | null;
+  group_external_id?: string | number | null;
+  teacher_external_id?: string | number | null;
   name: string;
+  first_name?: string;
   surname?: string;
+  patronymic?: string | null;
   nickname?: string;
   nick_name?: string;
   dob?: string;
   age: number;
+  phone?: string | null;
+  email?: string | null;
+  parent_email?: string | null;
+  parent1_first_name?: string | null;
+  parent1_surname?: string | null;
+  parent1_phone?: string | null;
   contract: "signed" | "pending";
+  contract_old_new?: string | null;
+  start_date?: string | null;
+  subscription_end_date?: string | null;
+  subscription_amount?: string | number | null;
+  discount?: string | number | null;
+  discount_name?: string | null;
+  discount_mode?: string | null;
+  discount_2_children?: boolean | number | null;
+  second_child_external_id?: string | number | null;
+  balance_overpayment?: string | number | null;
+  referral_discount_note?: string | null;
   payment?: number;
   paymentStr?: string;
   group?: string | null;
@@ -17,8 +39,6 @@ export interface RecruitmentNewStudent {
   createdDate?: string;
   waitDays?: number;
   manager?: string | null;
-  phone?: string | null;
-  email?: string | null;
 }
 
 export interface RecruitmentLead {
@@ -223,12 +243,15 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   async inviteNewStudent(payload: {
     first_name: string;
     surname: string;
+    email: string;
     parent_email: string;
-    subscription_amount: string | number;
+    nickname: string;
     phone?: string;
+    subscription_amount: string | number;
+    contract_old_new: string;
     discount?: string | number;
+    balance_overpayment?: number;
   }) {
-    // This is the new endpoint on the backend that will create a TargetMail and send the email
     const { data } = await client.post("recruitment/invite", payload);
     return data;
   },

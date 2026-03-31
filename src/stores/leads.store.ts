@@ -65,6 +65,25 @@ export const useLeadsStore = defineStore('leads', {
             } catch {
                 // keep local record to avoid blocking UX
             }
+        },
+        async inviteLead(data: {
+            first_name: string;
+            surname: string;
+            email: string;
+            parent_email: string;
+            nickname: string;
+            phone: string;
+            subscription_amount: string | number;
+            contract_old_new: string;
+            discount?: string | number;
+            balance_overpayment?: number;
+        }, backend?: RecruitmentBackend) {
+            this.isLoading = true;
+            try {
+                await this.resolveApi(backend).inviteNewStudent(data);
+            } finally {
+                this.isLoading = false;
+            }
         }
     }
 });

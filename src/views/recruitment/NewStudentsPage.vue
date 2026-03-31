@@ -12,7 +12,7 @@
           </select>
           <button class="btn btn-ghost" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
         </div>
-        <button class="btn btn-primary" @click="addModalOpen = true">✉️ {{ t('newStudents.inviteStudent') }}</button>
+        <button class="btn btn-primary" @click="modal.open('invite-lead')">✉️ {{ t('newStudents.inviteStudent') }}</button>
       </div>
 
       <!-- STATS GRID -->
@@ -225,7 +225,7 @@
                   <div class="actions-btn" @click.stop="toggleActions(s.id)">⋯</div>
                   <div class="actions-dropdown" :class="{ open: openActions === s.id }">
                     <div class="action-item" @click="openPanel(s)"><span class="ai">👤</span>{{ t('newStudents.actions.open') }}</div>
-                    <div class="action-item" @click="onEmail(s.id)"><span class="ai">✉️</span>{{ t('newStudents.actions.email') }}</div>
+                    <div class="action-item" @click="onInvite(s)"><span class="ai">✉️</span>{{ t('newStudents.actions.email') }}</div>
                     <div class="action-item danger" @click="onArchive(s.id)"><span class="ai">📦</span>{{ t('newStudents.actions.archive') }}</div>
                   </div>
                 </div>
@@ -259,52 +259,7 @@
 
     </div>
 
-    <!-- ADD STUDENT MODAL -->
-    <Teleport to="body">
-      <Transition name="modal">
-        <div class="modal-backdrop" v-if="addModalOpen" @click.self="addModalOpen = false">
-          <div class="modal">
-            <div class="modal-close-btn" @click="addModalOpen = false">✕</div>
-            <div class="modal-title">✉️ {{ t('newStudents.modal.inviteTitle') }}</div>
-            <div class="modal-sub">{{ t('newStudents.modal.inviteSubtitle') }}</div>
-            <div class="modal-grid">
-              <div class="modal-field">
-                <div class="modal-label">{{ t('newStudents.modal.firstName') }}</div>
-                <input class="modal-input" v-model="newForm.firstName" :placeholder="t('newStudents.modal.firstNamePh')" />
-              </div>
-              <div class="modal-field">
-                <div class="modal-label">{{ t('newStudents.modal.lastName') }}</div>
-                <input class="modal-input" v-model="newForm.lastName" :placeholder="t('newStudents.modal.lastNamePh')" />
-              </div>
-            </div>
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.email') }} <span style="color:var(--app-error)">*</span></div>
-              <input class="modal-input" v-model="newForm.email" type="email" :placeholder="t('newStudents.modal.emailPh')" />
-            </div>
-            <div class="modal-grid">
-              <div class="modal-field">
-                <div class="modal-label">{{ t('newStudents.modal.price') }}</div>
-                <input class="modal-input" v-model="newForm.price" type="number" min="0" step="1" />
-              </div>
-              <div class="modal-field">
-                <div class="modal-label">{{ t('newStudents.modal.discount') }}</div>
-                <input class="modal-input" v-model="newForm.discount" type="number" min="0" step="1" />
-              </div>
-            </div>
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.phone') }}</div>
-              <input class="modal-input" v-model="newForm.phone" type="tel" :placeholder="t('newStudents.modal.phonePh')" />
-            </div>
-            <div class="modal-actions">
-              <button class="btn btn-ghost" @click="addModalOpen = false" :disabled="isSendingInvite">{{ t('common.cancel') }}</button>
-              <button class="btn btn-primary" @click="submitAdd" :disabled="isSendingInvite">
-                {{ isSendingInvite ? '⏳...' : '✉️ ' + t('newStudents.modal.submitInvite') }}
-              </button>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
+    <!-- ADD STUDENT MODAL - REMOVED, using InviteLeadModal via modalStore -->
 
     <!-- GROUP PICKER -->
     <GroupPickerPanel
@@ -343,6 +298,7 @@ import { useRoute } from 'vue-router'
 import { useNewStudentsStore, type NewStudent, type StudentPayments, MANAGER_COLORS } from '../../stores/newStudents.store'
 import { useNotificationStore } from '../../stores/notification.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
+import { useModalStore } from '../../stores/modal.store'
 import type { RecruitmentBackend } from '../../api/http'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
@@ -352,6 +308,7 @@ const route = useRoute()
 const store = useNewStudentsStore()
 const notif = useNotificationStore()
 const searchStore = useGlobalSearchStore()
+const modal = useModalStore()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 
 // ─── FILTERS ───
@@ -472,9 +429,9 @@ function managerColor(name: string) { return MANAGER_COLORS[name] || 'linear-gra
 function toggleActions(id: number) {
   openActions.value = openActions.value === id ? null : id
 }
-function onEmail(_id: number) {
+function onInvite(s: NewStudent) {
   openActions.value = null
-  notif.addToast(`✉️ Email — ${t('newStudents.inDev')}`, 'info')
+  modal.open('invite-lead', { student: s })
 }
 function onArchive(id: number) {
   const s = store.students.find(x => x.id === id)
@@ -546,39 +503,7 @@ onMounted(() => {
 })
 onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
-// ─── ADD MODAL ───
-const addModalOpen = ref(false)
-const isSendingInvite = ref(false)
-const newForm = ref({ firstName: '', lastName: '', email: '', price: 0, discount: 0, phone: '' })
-
-async function submitAdd() {
-  const firstName = newForm.value.firstName.trim()
-  const lastName  = newForm.value.lastName.trim()
-  const email = newForm.value.email.trim()
-
-  if (!firstName) { notif.addToast(`⚠️ ${t('newStudents.modal.nameRequired')}`, 'error'); return }
-  if (!email) { notif.addToast(`⚠️ ${t('newStudents.modal.emailRequired')}`, 'error'); return }
-
-  try {
-    isSendingInvite.value = true
-    await store.inviteNewStudent({
-      firstName,
-      lastName,
-      email,
-      price: newForm.value.price || 0,
-      discount: newForm.value.discount || 0,
-      phone: newForm.value.phone.trim() || undefined
-    }, recruitmentBackend.value)
-    
-    newForm.value = { firstName: '', lastName: '', email: '', price: 0, discount: 0, phone: '' }
-    addModalOpen.value = false
-    notif.addToast(`✅ ${t('newStudents.inviteSent')}`, 'success')
-  } catch (err: any) {
-    notif.addToast(`❌ ${err.message || t('common.error')}`, 'error')
-  } finally {
-    isSendingInvite.value = false
-  }
-}
+// REMOVED legacy submitAdd logic
 
 // ─── GROUP PICKER ───
 const groupPickerOpen   = ref(false)

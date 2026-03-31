@@ -18,52 +18,66 @@ export interface StudentDocumentItem {
 }
 
 export interface NewStudent {
-  id: number
-  name: string
-  age: number
-  contract: 'signed' | 'pending'
-  documents: StudentDocumentItem[]
-  payment: number
-  paymentStr: string
-  group: string | null
-  groupColor: string | null
-  startDate: string | null
-  createdDate: string
-  waitDays: number
-  manager: string | null
-  phone: string | null
-  email: string | null
-  contractOldNew?: 'old' | 'new' | string | null
+  id: number;
+  externalId?: string | number | null;
+  groupExternalId?: string | number | null;
+  teacherExternalId?: string | number | null;
+  name: string;
+  firstName?: string;
+  lastName?: string;
+  patronymic?: string | null;
+  age: number;
+  contract: 'signed' | 'pending';
+  contractOldNew?: 'contract_399' | 'contract_489' | 'contract_600' | 'contract_689' | string | null;
+  documents: StudentDocumentItem[];
+  payment: number;
+  paymentStr: string;
+  group: string | null;
+  groupColor: string | null;
+  startDate: string | null;
+  subscriptionEndDate?: string | null;
+  createdDate: string;
+  waitDays: number;
+  manager: string | null;
+  phone: string | null;
+  email: string | null;
+  parentEmail?: string | null;
+  parent1FirstName?: string | null;
+  parent1Surname?: string | null;
+  parent1Phone?: string | null;
+  discount?: string | number | null;
+  discountName?: string | null;
+  discountMode?: string | null;
+  discount2Children?: boolean | number | null;
+  secondChildExternalId?: string | number | null;
+  balance_overpayment?: string | number | null;
+  referralDiscountNote?: string | null;
 }
 
-export interface StudentDetails {
-  email: string
-  password: string
-  nickname: string
-  firstName: string
-  lastName: string
-  birthDate: string
-  country: string
-  voivodeship: string
-  city: string
-  street: string
-  apt: string
-  postCode: string
-  parentFirst: string
-  parentLast: string
-  parentPhone: string
-  parentPassport: string
-  hobbies: string
-  comment: string
-  photoConsent: boolean // legacy/internal
-  marketingConsent: boolean
-  digitalContentConsent: boolean
-  dataProcessingConsent: boolean
-  socialMediaConsent: boolean
-  internalQualityConsent: boolean
-  currentPrice: string
-  currentPriceDesc: string
-  phone?: string | null
+export interface StudentDetails extends Partial<NewStudent> {
+  password?: string
+  nickname?: string
+  birthDate?: string
+  country?: string
+  voivodeship?: string
+  city?: string
+  street?: string
+  apt?: string
+  postCode?: string
+  parentFirst?: string
+  parentLast?: string
+  parentPhone?: string
+  parentPassport?: string
+  hobbies?: string
+  comment?: string
+  photoConsent?: boolean // legacy/internal
+  marketingConsent?: boolean
+  digitalContentConsent?: boolean
+  dataProcessingConsent?: boolean
+  socialMediaConsent?: boolean
+  internalQualityConsent?: boolean
+  currentPrice?: string
+  currentPriceDesc?: string
 }
 
 export interface HistoryEvent {
@@ -201,21 +215,24 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     const s = currentStudent.value
     if (!s) return null
     return {
-      email:           s.email        ?? '',
+      id:              s.id,
+      externalId:      s.external_id   ?? s.externalId ?? null,
+      email:           s.email         ?? s.parent_email ?? '',
       password:        s.password      ?? '',
       nickname:        s.nickname      ?? s.nick_name ?? '',
-      firstName:       s.name          ?? '',
-      lastName:        s.surname       ?? '',
-      birthDate:       s.dob           ?? '',
+      firstName:       s.name          ?? s.first_name ?? '',
+      lastName:        s.surname       ?? s.last_name ?? '',
+      patronymic:      s.patronymic    ?? null,
+      birthDate:       s.dob           ?? s.birth_date ?? '',
       country:         s.country       ?? '',
       voivodeship:     s.voivodeship   ?? '',
       city:            s.city          ?? '',
       street:          s.address       ?? '',
       apt:             s.apartment     ? String(s.apartment) : '',
       postCode:        s.zip           ?? '',
-      parentFirst:     s.parent_name   ?? '',
-      parentLast:      s.parent_surname ?? '',
-      parentPhone:     s.parent_phone  ? String(s.parent_phone) : '',
+      parentFirst:     s.parent_name   ?? s.parent1_first_name ?? '',
+      parentLast:      s.parent_surname ?? s.parent1_surname ?? '',
+      parentPhone:     s.parent_phone  ? String(s.parent_phone) : (s.parent1_phone ? String(s.parent1_phone) : ''),
       parentPassport:  s.parent_passport ? String(s.parent_passport) : '',
       hobbies:         s.hobbies       ?? '',
       comment:         s.reg_comment   ?? '',
@@ -225,8 +242,8 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       dataProcessingConsent: Boolean(s.data_processing_accepted),
       socialMediaConsent: Boolean(s.social_media_consent),
       internalQualityConsent: Boolean(s.internal_quality_consent),
-      currentPrice:    '0.00',
-      currentPriceDesc: 'Не выбран',
+      currentPrice:    s.subscription_amount ? String(s.subscription_amount) : '0.00',
+      currentPriceDesc: s.discount_name ?? 'Не выбран',
     }
   })
 
@@ -281,8 +298,9 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     const row = s as RecruitmentNewStudent & Record<string, any>
     const createdDate = toIsoDate(row.createdDate ?? row.created_at ?? row.createdAt ?? row.date_create)
     const startDate = toIsoDate(row.startDate ?? row.start_date ?? row.startAt)
+    const subscriptionEndDate = toIsoDate(row.subscription_end_date ?? row.subscriptionEndDate ?? null)
     const dob = row.dob ?? row.birth_date ?? row.birthDate ?? null
-    const payment = Number(row.payment ?? row.amount ?? row.price ?? 0) || 0
+    const payment = Number(row.payment ?? row.amount ?? row.price ?? row.subscription_amount ?? 0) || 0
     const rawGroup = row.group as unknown
     const rawManager = row.manager as unknown
     const groupObj = rawGroup && typeof rawGroup === 'object' ? (rawGroup as Record<string, any>) : null
@@ -309,21 +327,39 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
     return {
       id: Number(row.id),
+      externalId: row.external_id ?? row.externalId ?? null,
+      groupExternalId: row.group_external_id ?? row.groupExternalId ?? null,
+      teacherExternalId: row.teacher_external_id ?? row.teacherExternalId ?? null,
       name: [row.name ?? row.first_name ?? row.firstName, row.surname ?? row.last_name ?? row.lastName].filter(Boolean).join(' ').trim() || `#${row.id}`,
+      firstName: row.first_name ?? row.firstName ?? (row.name?.split(' ')[0]) ?? '',
+      lastName: row.surname ?? row.last_name ?? row.lastName ?? (row.name?.split(' ').slice(1).join(' ')) ?? '',
+      patronymic: row.patronymic ?? null,
       age: dob ? calculateAge(dob) : Number(row.age ?? 0),
       contract: allSigned ? 'signed' : 'pending',
+      contractOldNew: row.contract_old_new ?? row.contractOldNew ?? null,
       documents: docs,
       payment,
       paymentStr: row.paymentStr ?? row.payment_str ?? `${payment} zł`,
       group: groupName,
       groupColor,
       startDate,
+      subscriptionEndDate,
       createdDate: createdDate ?? new Date().toISOString().slice(0, 10),
       waitDays: Number(row.waitDays ?? row.wait_days ?? diffDaysFrom(createdDate)) || 0,
       manager,
-      phone: row.phone ?? row.parent_phone ?? row.parentPhone ?? null,
-      email: row.email ?? row.parent_email ?? row.parentEmail ?? null,
-      contractOldNew: row.contract_old_new ?? row.contractOldNew ?? null,
+      phone: String(row.phone ?? row.parent_phone ?? row.parentPhone ?? ''),
+      email: String(row.email ?? row.parent_email ?? row.parentEmail ?? ''),
+      parentEmail: row.parent_email ?? row.parentEmail ?? row.parent_email ?? null,
+      parent1FirstName: row.parent1_first_name ?? row.parent1FirstName ?? null,
+      parent1Surname: row.parent1_surname ?? row.parent1Surname ?? null,
+      parent1Phone: row.parent1_phone ?? row.parent1Phone ?? null,
+      discount: row.discount ?? null,
+      discountName: row.discount_name ?? row.discountName ?? null,
+      discountMode: row.discount_mode ?? row.discountMode ?? null,
+      discount2Children: row.discount_2_children ?? null,
+      secondChildExternalId: row.second_child_external_id ?? null,
+      balance_overpayment: row.balance_overpayment ?? null,
+      referralDiscountNote: row.referral_discount_note ?? null,
     }
   }
 
@@ -476,9 +512,11 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     firstName: string;
     lastName: string;
     email: string;
+    studentEmail: string;
     price: string | number;
     phone?: string;
     discount?: string | number;
+    contractType?: string;
   }, backend?: RecruitmentBackend) {
     // We do NOT add the user to the local `students` array yet.
     // They will only appear here once they complete registration via the TargetMail link.
@@ -487,9 +525,11 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       first_name: data.firstName,
       surname: data.lastName,
       parent_email: data.email,
+      student_email: data.studentEmail,
       subscription_amount: data.price,
       phone: data.phone,
-      discount: data.discount
+      discount: data.discount,
+      contract_type: data.contractType
     })
   }
 
