@@ -5,7 +5,13 @@
 
       <!-- PAGE ACTIONS ROW -->
       <div class="ns-actions-row">
-        <button class="btn btn-ghost" @click="onExport">⬇ {{ t('common.export') }}</button>
+        <div class="ns-actions-left">
+          <select v-model="exportFormat" class="format-select" :disabled="store.isListLoading || !sortedStudents.length">
+            <option value="xlsx">XLSX</option>
+            <option value="xls">XLS</option>
+          </select>
+          <button class="btn btn-ghost" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
+        </div>
         <button class="btn btn-primary" @click="addModalOpen = true">＋ {{ t('newStudents.addStudent') }}</button>
       </div>
 
@@ -360,6 +366,7 @@ const groupFilter = computed(() => store.filters.group)
 const managerFilter = computed(() => store.filters.manager)
 const openDf = ref<string | null>(null)
 const openActions = ref<number | null>(null)
+const exportFormat = ref<'xlsx' | 'xls'>('xlsx')
 
 const groupFilterLabel = computed(() => {
   if (groupFilter.value === 'all')     return t('newStudents.filterGroup')
@@ -476,8 +483,49 @@ function onArchive(id: number) {
   openActions.value = null
   notif.addToast(`📦 ${s?.name} — ${t('newStudents.archived')}`, 'success')
 }
-function onExport() {
-  notif.addToast(`⬇ ${t('newStudents.inDev')}`, 'info')
+async function exportToExcel() {
+  if (!sortedStudents.value.length) return
+
+  const { exportTableToExcel } = await import('../../utils/excelExport')
+  const dateStr = new Date().toISOString().split('T')[0]
+  const backendLabel = recruitmentBackend.value === 'indigo' ? 'indigo' : 'default'
+  const emptyCellValue = '—'
+
+  exportTableToExcel({
+    fileName: `${t('newStudents.export.fileNamePrefix')}_${backendLabel}_${dateStr}`,
+    sheetName: t('newStudents.export.sheetName'),
+    format: exportFormat.value,
+    rows: [
+      [
+        t('newStudents.table.name'),
+        t('newStudents.table.email'),
+        t('newStudents.table.age'),
+        t('newStudents.table.contract'),
+        t('newStudents.table.payment'),
+        t('newStudents.table.group'),
+        t('newStudents.table.startDate'),
+        t('newStudents.table.created'),
+        t('newStudents.table.waitDays'),
+        t('newStudents.table.manager')
+      ],
+      ...sortedStudents.value.map((row) => [
+        row.name || emptyCellValue,
+        row.email || emptyCellValue,
+        row.age,
+        row.contract === 'signed' ? t('newStudents.table.signed') : t('newStudents.table.pending'),
+        row.paymentStr || emptyCellValue,
+        row.group || emptyCellValue,
+        fmtDate(row.startDate) || emptyCellValue,
+        fmtDate(row.createdDate) || emptyCellValue,
+        row.waitDays,
+        row.manager || emptyCellValue
+      ]),
+    ],
+    columnWidths: [
+      { wch: 25 }, { wch: 30 }, { wch: 10 }, { wch: 15 }, { wch: 15 },
+      { wch: 20 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 20 },
+    ],
+  })
 }
 
 function goToPage(page: number) {
@@ -690,9 +738,17 @@ async function onPanelDeleteAllDocs() {
 
 /* ACTIONS ROW */
 .ns-actions-row {
-  display: flex; align-items: center; gap: 10px; justify-content: flex-end;
-  margin-bottom: 20px;
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-bottom: 20px; flex-wrap: wrap;
 }
+.ns-actions-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.format-select {
+  background: var(--app-surface); border: 1px solid var(--app-border); border-radius: 8px;
+  color: var(--app-text-main); font-size: 13px; font-weight: 500; font-family: 'Outfit', sans-serif;
+  padding: 8px 12px; cursor: pointer; height: 38px; outline: none; transition: border-color 0.2s;
+}
+.format-select:focus, .format-select:hover:not(:disabled) { border-color: var(--app-border-hi); }
+.format-select:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .search-box {
   display: flex; align-items: center; gap: 8px; background: var(--app-surface);

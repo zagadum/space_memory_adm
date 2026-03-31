@@ -1409,6 +1409,11 @@
   "newStudents": {
     "pageTitle": "Nowi uczniowie",
     "pageSubtitle": "panel rekrutacji",
+    "export": {
+      "exportExcel": "Eksportuj do Excela",
+      "fileNamePrefix": "NowiUczniowie",
+      "sheetName": "Uczniowie"
+    },
     "searchPlaceholder": "Szukaj po nazwisku...",
     "addStudent": "Dodaj ucznia",
     "listTitle": "Lista uczniów",

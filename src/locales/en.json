@@ -1409,6 +1409,11 @@
   "newStudents": {
     "pageTitle": "New Students",
     "pageSubtitle": "recruitment panel",
+    "export": {
+      "exportExcel": "Export to Excel",
+      "fileNamePrefix": "NewStudents",
+      "sheetName": "Students"
+    },
     "searchPlaceholder": "Search by name...",
     "addStudent": "Add Student",
     "listTitle": "Student List",

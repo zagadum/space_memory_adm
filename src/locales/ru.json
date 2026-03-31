@@ -1414,6 +1414,11 @@
   "newStudents": {
     "pageTitle": "Новые ученики",
     "pageSubtitle": "панель рекрутации",
+    "export": {
+      "exportExcel": "Экспорт в Excel",
+      "fileNamePrefix": "NewStudents",
+      "sheetName": "Students"
+    },
     "searchPlaceholder": "Поиск по имени...",
     "addStudent": "Добавить ученика",
     "listTitle": "Список учеников",
