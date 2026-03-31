@@ -43,9 +43,14 @@ function createExpelledStudentsApi(backend: RecruitmentBackend = "default") {
   const client = getRecruitmentHttpClient(backend);
 
   return {
-  async getList(projectId = 1): Promise<ExpelledListResponse> {
-    const { data } = await client.get<ExpelledListResponse>('expelled-students', {
-      params: { project_id: projectId },
+  async getList(params: { page?: number; perPage?: number; search?: string; projectId?: number } = {}): Promise<ExpelledListResponse & { meta: ExpelledStats & { current_page: number; last_page: number; per_page: number } }> {
+    const { data } = await client.get<any>('expelled-students', {
+      params: { 
+        project_id: params.projectId ?? 1,
+        page: params.page ?? 1,
+        per_page: params.perPage ?? 20,
+        search: params.search,
+      },
     });
     return data;
   },

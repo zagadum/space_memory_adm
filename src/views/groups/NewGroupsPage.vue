@@ -139,6 +139,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
@@ -150,8 +152,10 @@ import { parseApiError } from '../../api/errorHelper'
 import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
 
 // ── Data ──
+const { t } = useI18n()
 const route = useRoute()
 const notify = useNotificationStore()
+const searchStore = useGlobalSearchStore()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 const isLoading = ref(false)
 const groups = ref<NewGroup[]>([])
@@ -170,7 +174,22 @@ const sortCol = ref<string>('')
 const sortDir = ref<1 | -1>(1)
 
 // ── Computed ──
-const filteredGroups = computed(() => groups.value)
+const filteredGroups = computed(() => {
+  const q = searchStore.queryLower
+  if (!q) return groups.value
+  
+  return groups.value.filter(g => {
+    const searchString = [
+      g.name,
+      g.day,
+      g.time,
+      g.teacher?.name,
+      g.manager?.name
+    ].filter(Boolean).join(' ').toLowerCase()
+    
+    return searchString.includes(q)
+  })
+})
 
 const sortedGroups = computed(() => {
   if (!sortCol.value) return filteredGroups.value

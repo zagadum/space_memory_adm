@@ -194,11 +194,12 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   };
 
   return {
-  async getNewStudents(params: { page?: number; perPage?: number } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
+  async getNewStudents(params: { page?: number; perPage?: number; search?: string } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
     const { data } = await client.get("recruitment/new-students", {
       params: {
         page: params.page ?? 1,
         per_page: params.perPage ?? 10,
+        search: params.search,
       },
     });
     const items = pickItems<RecruitmentNewStudent>(data);

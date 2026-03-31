@@ -22,16 +22,6 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <div class="search-box">
-          <input
-            v-model="searchInput"
-            class="dropdown-filter-btn"
-            style="min-width: 220px;"
-            :placeholder="t('common.search')"
-            @keyup.enter="applySearch"
-          />
-          <button class="search-btn" @click="applySearch">🔍</button>
-        </div>
         <select class="dropdown-filter-btn" v-model.number="selectedTeacherId" @change="applyTeacherFilter">
           <option :value="0">{{ t('groupsList.toolbar.teacher') }}</option>
           <option :value="1">Anna Kowalska</option>
@@ -136,18 +126,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGroupsListStore } from '../../stores/groupsList.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 
 const router = useRouter()
 const { t } = useI18n()
 const listStore = useGroupsListStore()
+const searchStore = useGlobalSearchStore()
 
-const searchInput = ref(listStore.filters.search)
 const selectedTeacherId = ref(0)
 const groups = computed(() => listStore.groups)
+
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(async () => {
+    listStore.filters.search = val.trim()
+    await listStore.applyFilters()
+  }, 400)
+})
 
 function openGroup(id: number) {
   // Будущая навигация на детальную страницу группы
@@ -158,10 +159,6 @@ async function sortBy(col: string) {
   listStore.setSort(col)
 }
 
-async function applySearch() {
-  listStore.filters.search = searchInput.value.trim()
-  await listStore.applyFilters()
-}
 
 async function filterByType(type: string | null) {
   listStore.filters.type = type

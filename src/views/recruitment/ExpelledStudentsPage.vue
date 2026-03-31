@@ -83,13 +83,6 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <!-- Поиск -->
-        <div class="search-box">
-          <span style="color:var(--app-text-dim);font-size:13px">🔍</span>
-          <input v-model="search" type="text"
-            :placeholder="t('expelled.filter.search')" />
-        </div>
-
         <!-- Фильтр: Ответственный -->
         <div class="dropdown-filter">
           <select v-model="filterManager" class="dropdown-filter-btn" style="appearance: none; padding-right: 24px;">
@@ -247,8 +240,25 @@
         </tbody>
       </table>
 
-      <div class="tbl-footer" v-if="filtered.length">
-        <span class="pagination-info">{{ t('expelled.showing', { shown: filtered.length, total: store.stats?.total ?? 0 }) }}</span>
+      <div class="tbl-footer" v-if="store.pagination && store.pagination.lastPage > 1">
+        <div class="pagination-info">
+          {{ t('common.pagination.showing', { from: (store.pagination.currentPage - 1) * store.pagination.perPage + 1, to: Math.min(store.pagination.currentPage * store.pagination.perPage, store.pagination.total), total: store.pagination.total }) }}
+        </div>
+        <div class="pagination-btns">
+          <button class="page-btn nav" :disabled="store.pagination.currentPage <= 1 || store.isLoading" @click="store.fetchList(store.pagination.currentPage - 1)">‹</button>
+          <template v-for="page in store.pagination.lastPage" :key="page">
+            <button 
+              v-if="Math.abs(page - store.pagination.currentPage) < 3 || page === 1 || page === store.pagination.lastPage"
+              class="page-btn" 
+              :class="{ active: store.pagination.currentPage === page }"
+              @click="store.fetchList(page)"
+            >
+              {{ page }}
+            </button>
+            <span v-else-if="page === 2 || page === store.pagination.lastPage - 1" class="page-sep">...</span>
+          </template>
+          <button class="page-btn nav" :disabled="store.pagination.currentPage >= store.pagination.lastPage || store.isLoading" @click="store.fetchList(store.pagination.currentPage + 1)">›</button>
+        </div>
       </div>
     </div>
 
@@ -325,6 +335,7 @@ import { useExpelledStudentsStore } from '../../stores/expelledStudents.store'
 import { useAuthStore } from '../../stores/auth.store'
 import type { ExpelledStudent } from '../../api/expelledStudentsApi'
 import type { RecruitmentBackend } from '../../api/http'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import ExpelledHistoryPanel from './components/expelled/ExpelledHistoryPanel.vue'
 import ExpelledTransferPanel from './components/expelled/ExpelledTransferPanel.vue'
 
@@ -332,6 +343,7 @@ const { t } = useI18n()
 const route = useRoute()
 const store = useExpelledStudentsStore()
 const authStore = useAuthStore()
+const searchStore = useGlobalSearchStore()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 
 // ── РОЛЬ ────────────────────────────────────────────────
@@ -349,10 +361,18 @@ const ARCHIVE_REASONS = computed(() => [
 
 // ── ФИЛЬТРЫ ─────────────────────────────────────────────
 const showInfo = ref(false)
-const search = ref('')
-const filterManager = ref('all')
-const filterGroup = ref('all')
-const filterContact = ref('all')
+const filterManager = computed({
+  get: () => store.filters.manager,
+  set: (v) => { store.filters.manager = v; store.applyFilters() }
+})
+const filterGroup = computed({
+  get: () => store.filters.group,
+  set: (v) => { store.filters.group = v; store.applyFilters() }
+})
+const filterContact = computed({
+  get: () => store.filters.contact,
+  set: (v) => { store.filters.contact = v; store.applyFilters() }
+})
 const sortBy = ref('con_asc')
 
 const safeList = computed<ExpelledStudent[]>(() => Array.isArray(store.list) ? store.list : [])
@@ -371,32 +391,19 @@ const groupOptions = computed(() =>
 const daysAgo = (d: string | null): number =>
   d ? Math.floor((Date.now() - new Date(d).getTime()) / 86400000) : 9999
 
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(async () => {
+    store.filters.search = val.trim()
+    await store.applyFilters()
+  }, 400)
+})
+
 // Основной computed с фильтрацией и сортировкой
 const filtered = computed(() => {
   let list = safeList.value
-
-  if (search.value) {
-    const q = search.value.toLowerCase()
-    list = list.filter(s => s.name.toLowerCase().includes(q))
-  }
-
-  if (filterManager.value !== 'all') {
-    list = filterManager.value === '__none__'
-      ? list.filter(s => !s.manager)
-      : list.filter(s => s.manager === filterManager.value)
-  }
-
-  if (filterGroup.value !== 'all') {
-    list = list.filter(s => s.group === filterGroup.value)
-  }
-
-  if (filterContact.value !== 'all') {
-    if (filterContact.value === 'none')  list = list.filter(s => !s.lastContact)
-    if (filterContact.value === 'hot')   list = list.filter(s => daysAgo(s.lastContact) > 7)
-    if (filterContact.value === 'week')  list = list.filter(s => { const d = daysAgo(s.lastContact); return d >= 1 && d <= 7 })
-    if (filterContact.value === 'today') list = list.filter(s => daysAgo(s.lastContact) === 0)
-  }
-
   return [...list].sort((a, b) => {
     if (sortBy.value === 'con_asc')  return daysAgo(b.lastContact) - daysAgo(a.lastContact)
     if (sortBy.value === 'con_desc') return daysAgo(a.lastContact) - daysAgo(b.lastContact)
@@ -461,7 +468,7 @@ watch(recruitmentBackend, () => {
   showTransfer.value = false
   actMenuId.value = null
   store.clearSelection()
-  store.fetchList(recruitmentBackend.value)
+  store.fetchList(1, undefined, recruitmentBackend.value)
 }, { immediate: true })
 
 

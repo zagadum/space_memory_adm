@@ -66,11 +66,13 @@ import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useLeadsStore, type LeadStatus } from '../../stores/leads.store';
+import { useGlobalSearchStore } from '../../stores/globalSearch.store';
 import type { RecruitmentBackend } from '../../api/http';
 
 const { t } = useI18n();
 const route = useRoute();
 const leadsStore = useLeadsStore();
+const searchStore = useGlobalSearchStore();
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default');
 
 const columns = [
@@ -81,7 +83,14 @@ const columns = [
 ];
 
 const getLeadsByStatus = (status: LeadStatus) => {
-  return leadsStore.leads.filter(l => l.status === status);
+  const q = searchStore.queryLower;
+  return leadsStore.leads.filter(l => {
+    if (l.status !== status) return false;
+    if (q && !l.name.toLowerCase().includes(q)
+         && !(l.phone || '').toLowerCase().includes(q)
+         && !(l.subject || '').toLowerCase().includes(q)) return false;
+    return true;
+  });
 };
 
 watch(recruitmentBackend, () => {

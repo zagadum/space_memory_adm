@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuthStore } from "../stores/auth.store";
 import { useNotificationStore } from "../stores/notification.store";
+import { useGlobalSearchStore } from "../stores/globalSearch.store";
 import { getFirstAllowedFallbackPath, getMenuAccessReason, getMenuKeyByRouteName, isMenuAllowed } from "../utils/menuAccess";
 
 export const router = createRouter({
@@ -40,19 +41,19 @@ export const router = createRouter({
           path: "students",
           name: "students-list",
           component: () => import("../views/students/StudentListPage.vue"),
-          meta: { title: 'studentList.title', subTitle: 'studentList.secretariat', icon: '👩‍🚀' }
+          meta: { title: 'studentList.title', subTitle: 'studentList.secretariat', icon: '👩‍🚀', searchPlaceholder: 'search.students' }
         },
         {
           path: "recruitment/space/new-students",
           name: "new-students",
           component: () => import("../views/recruitment/NewStudentsPage.vue"),
-          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'default' }
+          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'default', searchPlaceholder: 'search.newStudents' }
         },
         {
           path: "recruitment/space/leads",
           name: "leads",
           component: () => import("../views/recruitment/LeadsPage.vue"),
-          meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'default' }
+          meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'default', searchPlaceholder: 'search.leads' }
         },
         {
           path: "recruitment/space/target-mail",
@@ -64,19 +65,19 @@ export const router = createRouter({
           path: 'recruitment/space/expelled-students',
           name: 'expelled-students',
           component: () => import('../views/recruitment/ExpelledStudentsPage.vue'),
-          meta: { title: 'expelled.pageTitle', icon: '📤', recruitmentBackend: 'default' }
+          meta: { title: 'expelled.pageTitle', icon: '📤', recruitmentBackend: 'default', searchPlaceholder: 'search.expelled' }
         },
         {
           path: "recruitment/space/new-groups",
           name: "new-groups",
           component: () => import("../views/groups/NewGroupsPage.vue"),
-          meta: { title: 'sidebar.newGroups', icon: '🚀', recruitmentBackend: 'default' }
+          meta: { title: 'sidebar.newGroups', icon: '🚀', recruitmentBackend: 'default', searchPlaceholder: 'search.newGroups' }
         },
         {
           path: 'recruitment/space/archived-students',
           name: 'archived-students',
           component: () => import('../views/recruitment/ArchivedStudentsPage.vue'),
-          meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'default' }
+          meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'default', searchPlaceholder: 'search.archived' }
         },
         { path: 'recruitment/space', redirect: { name: 'new-students' } },
         { path: 'recruitment/new-students', redirect: { name: 'new-students' } },
@@ -89,13 +90,13 @@ export const router = createRouter({
           path: "recruitment/indigo/new-students",
           name: "new-students-indigo",
           component: () => import("../views/recruitment/NewStudentsPage.vue"),
-          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'indigo' }
+          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'indigo', searchPlaceholder: 'search.newStudents' }
         },
         {
           path: "recruitment/indigo/leads",
           name: "leads-indigo",
           component: () => import("../views/recruitment/LeadsPage.vue"),
-          meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'indigo' }
+          meta: { title: 'sidebar.leads', icon: '📋', recruitmentBackend: 'indigo', searchPlaceholder: 'search.leads' }
         },
         {
           path: "recruitment/indigo/target-mail",
@@ -107,19 +108,19 @@ export const router = createRouter({
           path: 'recruitment/indigo/expelled-students',
           name: 'expelled-students-indigo',
           component: () => import('../views/recruitment/ExpelledStudentsPage.vue'),
-          meta: { title: 'expelled.pageTitle', icon: '📤', recruitmentBackend: 'indigo' }
+          meta: { title: 'expelled.pageTitle', icon: '📤', recruitmentBackend: 'indigo', searchPlaceholder: 'search.expelled' }
         },
         {
           path: "recruitment/indigo/new-groups",
           name: "new-groups-indigo",
           component: () => import("../views/groups/NewGroupsPage.vue"),
-          meta: { title: 'sidebar.newGroups', icon: '🚀', recruitmentBackend: 'indigo' }
+          meta: { title: 'sidebar.newGroups', icon: '🚀', recruitmentBackend: 'indigo', searchPlaceholder: 'search.newGroups' }
         },
         {
           path: 'recruitment/indigo/archived-students',
           name: 'archived-students-indigo',
           component: () => import('../views/recruitment/ArchivedStudentsPage.vue'),
-          meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'indigo' }
+          meta: { title: 'archived.pageTitle', icon: '🗃️', recruitmentBackend: 'indigo', searchPlaceholder: 'search.archived' }
         },
         {
           path: "recruitment/space/import-db",
@@ -139,7 +140,7 @@ export const router = createRouter({
           path: "finance/returns",
           name: "finance-returns",
           component: () => import("../views/finance/ZwrotyView.vue"),
-          meta: { title: 'Zwroty', icon: '↩️' }
+          meta: { title: 'Zwroty', icon: '↩️', searchPlaceholder: 'search.zwroty' }
         },
         {
           path: "finance/settings",
@@ -157,7 +158,7 @@ export const router = createRouter({
           path: "projects",
           name: "projects-list",
           component: () => import("../views/projects/ProjectsListPage.vue"),
-          meta: { title: 'projects.title', subTitle: 'projects.subTitle', icon: '📁' }
+          meta: { title: 'projects.title', subTitle: 'projects.subTitle', icon: '📁', searchPlaceholder: 'search.projects' }
         },
         {
           path: "projects/:id",
@@ -190,13 +191,13 @@ export const router = createRouter({
           path: 'groups',
           name: 'groups-list',
           component: () => import('../views/groups/GroupsListPage.vue'),
-          meta: { title: 'groupsList.pageTitle', subTitle: 'groupsList.pageSubTitle', icon: '🎓' }
+          meta: { title: 'groupsList.pageTitle', subTitle: 'groupsList.pageSubTitle', icon: '🎓', searchPlaceholder: 'search.groups' }
         },
         {
           path: 'teachers',
           name: 'teachers-list',
           component: () => import('../views/teachers/TeachersListPage.vue'),
-          meta: { title: 'teachersList.pageTitle', subTitle: 'teachersList.pageSubTitle', icon: '👨‍🏫' }
+          meta: { title: 'teachersList.pageTitle', subTitle: 'teachersList.pageSubTitle', icon: '👨‍🏫', searchPlaceholder: 'search.teachers' }
         },
         { path: 'hr/active', name: 'hr-active', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'hr/training', name: 'hr-training', component: () => import('../views/dashboard/DashboardIndex.vue') },
@@ -204,8 +205,8 @@ export const router = createRouter({
         { path: 'hr/personal', name: 'hr-personal', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'hr/analytics', name: 'hr-analytics', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'trainer/dashboard', name: 'trainer-dashboard', component: () => import('../views/dashboard/DashboardIndex.vue') },
-        { path: 'trainer/students',  name: 'trainer-students',  component: () => import('../views/teacher/TrainerStudentsPage.vue'), meta: { title: 'trainerStudents.title', icon: '👨‍🎓' } },
-        { path: 'trainer/groups',    name: 'trainer-groups',    component: () => import('../views/teacher/TrainerGroupsPage.vue'),   meta: { title: 'trainerGroups.title',   icon: '👥' } },
+        { path: 'trainer/students',  name: 'trainer-students',  component: () => import('../views/teacher/TrainerStudentsPage.vue'), meta: { title: 'trainerStudents.title', icon: '👨‍🎓', searchPlaceholder: 'search.trainerStudents' } },
+        { path: 'trainer/groups',    name: 'trainer-groups',    component: () => import('../views/teacher/TrainerGroupsPage.vue'),   meta: { title: 'trainerGroups.title',   icon: '👥', searchPlaceholder: 'search.trainerGroups' } },
         { path: 'trainer/lesson-tracker', name: 'lesson-tracker', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'trainer/tasks', name: 'trainer-tasks', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'trainer/trial-lesson', name: 'trial-lesson', component: () => import('../views/dashboard/DashboardIndex.vue') },
@@ -255,7 +256,17 @@ export const router = createRouter({
   ],
 });
 
-router.beforeEach((to) => {
+router.beforeEach((to, from) => {
+  // Очищаем глобальный поиск при навигации между страницами
+  if (to.name !== from.name) {
+    try {
+      const searchStore = useGlobalSearchStore();
+      searchStore.clear();
+    } catch {
+      // Store может быть ещё не инициализирован
+    }
+  }
+
   if (to.meta.public) return true;
 
   const auth = useAuthStore();

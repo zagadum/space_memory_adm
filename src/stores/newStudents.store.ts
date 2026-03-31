@@ -187,6 +187,15 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     to: 0,
   })
 
+  const filters = ref({
+    search: '',
+    manager: 'all',
+    group: 'all',
+    onlyMine: false,
+    noManager: false,
+    signed: false,
+  })
+
   const currentStudentDetails = computed((): StudentDetails | null => {
     const s = currentStudent.value
     if (!s) return null
@@ -328,6 +337,13 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       const response = await resolveApi(backend).getNewStudents({
         page,
         perPage: pagination.value.perPage,
+        search: filters.value.search,
+        // @ts-ignore - keeping it simple for mock support
+        manager: filters.value.manager !== 'all' ? filters.value.manager : undefined,
+        group: filters.value.group !== 'all' ? filters.value.group : undefined,
+        only_mine: filters.value.onlyMine ? 1 : 0,
+        no_manager: filters.value.noManager ? 1 : 0,
+        signed: filters.value.signed ? 1 : 0,
       })
       students.value = response.items.map(normalizeStudent)
       pagination.value = response.pagination
@@ -344,6 +360,11 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     } finally {
       isListLoading.value = false
     }
+  }
+
+  async function applyFilters() {
+    pagination.value.currentPage = 1
+    await fetchStudentsFromApi(1)
   }
 
   async function fetchStudentById(id: number | string, backend?: RecruitmentBackend) {
@@ -714,6 +735,6 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     fetchStudentsFromApi, fetchStudentById, fetchStudentHistory, fetchStudentPayments,
     addStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments, changeStudentPassword,
     downloadDocument, deleteDocument, deleteAllDocuments,
-    getDetails, getHistory,
+    getDetails, getHistory, filters, applyFilters,
   }
 })

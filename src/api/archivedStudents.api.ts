@@ -37,9 +37,14 @@ function createArchivedStudentsApi(backend: RecruitmentBackend = "default") {
   const client = getRecruitmentHttpClient(backend);
 
   return {
-    async getList(projectId = 1): Promise<ArchivedListResponse> {
-      const { data } = await client.get<ArchivedListResponse>("archived-students", {
-        params: { project_id: projectId },
+    async getList(params: { page?: number; perPage?: number; search?: string; projectId?: number } = {}): Promise<ArchivedListResponse & { meta: ArchivedStats & { current_page: number; last_page: number; per_page: number } }> {
+      const { data } = await client.get<any>("archived-students", {
+        params: { 
+          project_id: params.projectId ?? 1,
+          page: params.page ?? 1,
+          per_page: params.perPage ?? 20,
+          search: params.search,
+        },
       });
       return data;
     },

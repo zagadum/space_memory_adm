@@ -16,16 +16,6 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <div class="search-box">
-          <input
-            v-model="searchInput"
-            class="dropdown-filter-btn"
-            style="min-width: 220px;"
-            :placeholder="t('common.search')"
-            @keyup.enter="applySearch"
-          />
-          <button class="search-btn" @click="applySearch">🔍</button>
-        </div>
         <select class="dropdown-filter-btn" v-model.number="selectedGroupId" @change="applySelectFilters">
           <option :value="0">{{ t('studentList.toolbar.group') }}</option>
           <option v-for="group in listStore.groupsFilterOptions" :key="group.id" :value="group.id">{{ group.name }}</option>
@@ -179,25 +169,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-// Подключаем наш новый стор
 import { useStudentsListStore } from '../../stores/studentsList.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 
 const router = useRouter()
 const { t } = useI18n()
 // Инициализируем стор
 const listStore = useStudentsListStore()
+const searchStore = useGlobalSearchStore()
 
 function openStudent(id: number | string) {
   router.push({ name: 'student-payments', params: { id: id.toString() } })
 }
 
-const searchInput = ref(listStore.filters.search);
 const selectedGroupId = ref(0);
 const selectedTeacherId = ref(0);
 const students = computed(() => listStore.students);
+
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(async () => {
+    listStore.filters.search = val.trim()
+    await listStore.applyFilters()
+  }, 400)
+})
 
 // ── ВЫПАДАЮЩЕЕ МЕНЮ ДЕЙСТВИЙ ──
 const activeActionId = ref<number | string | null>(null);
@@ -213,10 +213,6 @@ async function sortBy(col: string) {
   await listStore.fetchStudents(1);
 }
 
-async function applySearch() {
-  listStore.filters.search = searchInput.value.trim();
-  await listStore.applyFilters();
-}
 
 async function applySelectFilters() {
   listStore.filters.groupId = selectedGroupId.value > 0 ? selectedGroupId.value : null;

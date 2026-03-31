@@ -59,10 +59,24 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
   // ── State ──
   const list = ref<ExpelledStudent[]>([]);
   const stats = ref<ExpelledStats | null>(null);
-  const isLoading = ref(false);
-  const error = ref<string | null>(null);
   const selectedIds = ref<number[]>([]);
   const currentBackend = ref<RecruitmentBackend>('default');
+  const isLoading = ref(false);
+  const error = ref<string | null>(null);
+  const pagination = ref({
+    currentPage: 1,
+    lastPage: 1,
+    perPage: 20,
+    total: 0,
+  });
+
+  const filters = ref({
+    search: '',
+    manager: 'all',
+    group: 'all',
+    contact: 'all',
+    onlyMine: false,
+  });
 
   // ── Actions ──
   function resolveApi(backend?: RecruitmentBackend) {
@@ -70,14 +84,39 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
     return getExpelledStudentsApi(currentBackend.value);
   }
 
-  async function fetchList(backend?: RecruitmentBackend) {
+  async function applyFilters() {
+    pagination.value.currentPage = 1;
+    await fetchList(1);
+  }
+
+  async function fetchList(page = pagination.value.currentPage, search?: string, backend?: RecruitmentBackend) {
     isLoading.value = true;
     error.value = null;
     try {
-      const res = await resolveApi(backend).getList();
+      const activeSearch = search !== undefined ? search : filters.value.search;
+      const res = await resolveApi(backend).getList({ 
+        page, 
+        search: activeSearch,
+        // @ts-ignore
+        manager: filters.value.manager !== 'all' ? filters.value.manager : undefined,
+        group: filters.value.group !== 'all' ? filters.value.group : undefined,
+        contact: filters.value.contact !== 'all' ? filters.value.contact : undefined,
+      });
       const normalizedList = normalizeExpelledList(res);
       list.value = normalizedList;
       stats.value = normalizeExpelledStats(res, normalizedList);
+      
+      const meta = (res as any).meta;
+      if (meta && meta.current_page) {
+        pagination.value = {
+          currentPage: meta.current_page,
+          lastPage: meta.last_page,
+          perPage: meta.per_page,
+          total: meta.total,
+        };
+      } else {
+        pagination.value.total = list.value.length;
+      }
     } catch (err: unknown) {
       list.value = [];
       stats.value = { ...EMPTY_STATS };
@@ -176,5 +215,8 @@ export const useExpelledStudentsStore = defineStore('expelledStudents', () => {
     toggleSelect,
     selectAll,
     clearSelection,
+    filters,
+    applyFilters,
+    pagination,
   };
 });

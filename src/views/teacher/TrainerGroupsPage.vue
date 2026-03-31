@@ -95,10 +95,12 @@
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTeacherFilter } from '../../composables/useTeacherFilter'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import { http } from '../../api/http'
 
 const { t } = useI18n()
 const { isTeacher, teacherId } = useTeacherFilter()
+const searchStore = useGlobalSearchStore()
 
 interface Group {
   id: number
@@ -125,8 +127,24 @@ const typeTabs = computed(() => [
 ])
 
 const filteredGroups = computed(() => {
-  if (typeFilter.value === 'all') return groups.value
-  return groups.value.filter(g => g.type === typeFilter.value)
+  let list = groups.value
+  
+  // Filter by type
+  if (typeFilter.value !== 'all') {
+    list = list.filter(g => g.type === typeFilter.value)
+  }
+  
+  // Search
+  const q = searchStore.queryLower
+  if (q) {
+    list = list.filter(g => 
+      g.name.toLowerCase().includes(q) ||
+      g.teacherName.toLowerCase().includes(q) ||
+      (g.lastComment || '').toLowerCase().includes(q)
+    )
+  }
+  
+  return list
 })
 
 const totalStudents = computed(() =>

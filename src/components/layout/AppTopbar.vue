@@ -14,11 +14,15 @@
       </div>
     </div>
     <div class="topbar-actions">
-      <div class="search-box">
-        <span style="color:var(--dim);font-size:14px">🔍</span>
-        <input type="text" :placeholder="t('common.searchHint')" />
+      <div v-if="route.meta.searchPlaceholder" class="search-box" :class="{ 'has-query': searchStore.query }">
+        <span class="search-icon-left">🔍</span>
+        <input
+          type="text"
+          v-model="searchStore.query"
+          :placeholder="searchPlaceholder"
+        />
+        <button v-if="searchStore.query" class="search-clear-btn" @click="searchStore.clear()">✕</button>
       </div>
-      <button class="btn btn-ghost">⬇ {{ t('common.export') }}</button>
       <button class="theme-toggle-btn" @click="themeStore.toggleTheme">
         <span class="theme-toggle-icon" v-if="themeStore.isDark">🌙</span>
         <span class="theme-toggle-icon" v-else>🌞</span>
@@ -34,15 +38,21 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useThemeStore } from '../../stores/theme.store';
 import { useAppStore } from '../../stores/app.store';
+import { useGlobalSearchStore } from '../../stores/globalSearch.store';
 
 const { t } = useI18n();
 const route = useRoute();
 const themeStore = useThemeStore();
 const appStore = useAppStore();
+const searchStore = useGlobalSearchStore();
 
 const pageTitle = computed(() => (route.meta.title as string) || 'studentList.title');
 const pageSubTitle = computed(() => (route.meta.subTitle as string) || '');
 const pageIcon = computed(() => (route.meta.icon as string) || '🛰');
+const searchPlaceholder = computed(() => {
+  const key = route.meta.searchPlaceholder as string;
+  return key ? t(key) : t('common.searchHint');
+});
 </script>
 
 <style scoped>
@@ -71,14 +81,18 @@ const pageIcon = computed(() => (route.meta.icon as string) || '🛰');
   border-color: var(--app-border-hi);
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
 @media (max-width: 1024px) {
   .menu-toggle-btn {
     display: flex;
   }
-  
-  /* Hide search and export on mobile Topbar to save space, 
-     they are usually duplicated or needed differently on mobile */
-  .search-box, .btn-ghost {
+
+  .search-box {
     display: none;
   }
 
@@ -93,5 +107,74 @@ const pageIcon = computed(() => (route.meta.icon as string) || '🛰');
     height: 36px;
     justify-content: center;
   }
+}
+
+/* ── Search box (global search) ── */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 0 12px;
+  height: 38px;
+  width: 280px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.search-box:focus-within {
+  border-color: var(--blue);
+  background: var(--app-card);
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1);
+}
+
+.search-box input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 13.5px;
+  color: var(--app-text-main);
+  padding: 0;
+  width: 100%;
+}
+
+.search-box input::placeholder {
+  color: var(--app-text-dim);
+  opacity: 0.7;
+}
+
+.search-icon-left {
+  color: var(--app-text-dim);
+  font-size: 14px;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.search-box.has-query {
+  border-color: rgba(79, 110, 247, 0.4);
+}
+
+.search-clear-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(136, 146, 176, 0.15);
+  color: var(--app-text-dim);
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.search-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
 }
 </style>

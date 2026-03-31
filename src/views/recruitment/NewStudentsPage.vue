@@ -5,10 +5,6 @@
 
       <!-- PAGE ACTIONS ROW -->
       <div class="ns-actions-row">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input v-model="searchQ" :placeholder="t('newStudents.searchPlaceholder')" @input="applyFilters" />
-        </div>
         <button class="btn btn-ghost" @click="onExport">⬇ {{ t('common.export') }}</button>
         <button class="btn btn-primary" @click="addModalOpen = true">＋ {{ t('newStudents.addStudent') }}</button>
       </div>
@@ -332,6 +328,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useNewStudentsStore, type NewStudent, type StudentPayments, MANAGER_COLORS } from '../../stores/newStudents.store'
 import { useNotificationStore } from '../../stores/notification.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import type { RecruitmentBackend } from '../../api/http'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
@@ -340,14 +337,19 @@ const { t } = useI18n()
 const route = useRoute()
 const store = useNewStudentsStore()
 const notif = useNotificationStore()
+const searchStore = useGlobalSearchStore()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 
 // ─── FILTERS ───
-const searchQ    = ref('')
-const chips      = ref({ mine: false, noManager: false, signed: false })
-const groupFilter   = ref('all')
-const managerFilter = ref('all')
-const openDf     = ref<string | null>(null)
+const chips = computed(() => ({
+  mine:      store.filters.onlyMine,
+  noManager: store.filters.noManager,
+  signed:    store.filters.signed,
+}))
+
+const groupFilter = computed(() => store.filters.group)
+const managerFilter = computed(() => store.filters.manager)
+const openDf = ref<string | null>(null)
 const openActions = ref<number | null>(null)
 
 const groupFilterLabel = computed(() => {
@@ -362,34 +364,29 @@ const managerFilterLabel = computed(() => {
 })
 
 function toggleChip(k: keyof typeof chips.value) {
-  chips.value[k] = !chips.value[k]
-  applyFilters()
+  if (k === 'mine')      store.filters.onlyMine = !store.filters.onlyMine
+  if (k === 'noManager') store.filters.noManager = !store.filters.noManager
+  if (k === 'signed')    store.filters.signed = !store.filters.signed
+  store.applyFilters()
 }
-function setGroupFilter(v: string)   { groupFilter.value = v;   openDf.value = null; }
-function setManagerFilter(v: string) { managerFilter.value = v; openDf.value = null; }
+function setGroupFilter(v: string)   { store.filters.group = v;   openDf.value = null; store.applyFilters(); }
+function setManagerFilter(v: string) { store.filters.manager = v; openDf.value = null; store.applyFilters(); }
 function toggleDf(name: string) { openDf.value = openDf.value === name ? null : name }
 
-// ─── FILTER COMPUTED ───
-const filteredStudents = computed(() => {
-  const q = searchQ.value.toLowerCase().trim()
-  return store.students.filter(s => {
-    if (q && !s.name.toLowerCase().includes(q)) return false
-    if (chips.value.mine      && s.manager !== 'Артём')    return false
-    if (chips.value.noManager && s.manager)                return false
-    if (chips.value.signed    && s.contract !== 'signed')  return false
-    if (groupFilter.value !== 'all') {
-      if (groupFilter.value === '__none__' && s.group)     return false
-      if (groupFilter.value !== '__none__' && s.group !== groupFilter.value) return false
-    }
-    if (managerFilter.value !== 'all') {
-      if (managerFilter.value === '__none__' && s.manager) return false
-      if (managerFilter.value !== '__none__' && s.manager !== managerFilter.value) return false
-    }
-    return true
-  })
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(async () => {
+    store.filters.search = val.trim()
+    await store.applyFilters()
+  }, 400)
 })
 
-function applyFilters() { /* reactivity handles it */ }
+// ─── FILTER COMPUTED ───
+const filteredStudents = computed(() => store.students)
+
+function applyFilters() { store.applyFilters() }
 
 // ─── SORT ───
 const sortCol = ref<string | null>(null)

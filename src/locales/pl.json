@@ -125,6 +125,17 @@
     "welcome": "Cześć, {name}! 👋",
     "search": "Szukaj"
   },
+  "search": {
+    "students": "Szukaj uczniów...",
+    "groups": "Szukaj grup...",
+    "teachers": "Szukaj nauczycieli...",
+    "leads": "Szukaj leadów (imię, telefon)...",
+    "projects": "Szukaj projektów...",
+    "refunds": "Szukaj zwrotów...",
+    "newStudents": "Szukaj nowych uczniów...",
+    "newGroups": "Szukaj nowych grup...",
+    "trainerStudents": "Szukaj wśród moich uczniów..."
+  },
   "dashboard": {
     "header": {
       "newStudent": "Nowy uczeń"

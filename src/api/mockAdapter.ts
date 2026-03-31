@@ -1110,11 +1110,16 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // GET expelled-students
   if (method === 'get' && url === 'expelled-students') {
+    const params = (config.params || {}) as Record<string, unknown>;
+    const search = String(params.search ?? params.q ?? '').toLowerCase().trim();
+    const page = Number(params.page) || 1;
+    const perPage = Number(params.per_page) || 20;
+
     const today = new Date();
     const daysBetween = (dateStr: string | null): number =>
       dateStr ? Math.floor((today.getTime() - new Date(dateStr).getTime()) / 86400000) : 9999;
 
-    const students = [
+    let items = [
       { id: 1, name: 'Анна Ковалевская',  phone: '+48 601 234 567', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(15), lastContact: _dAgo(8),  manager: 'Светлана',  comment: 'Обещала перезвонить' },
       { id: 2, name: 'Дмитрий Петров',    phone: '+48 602 345 678', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(45), lastContact: _dAgo(3),  manager: 'Александр', comment: '' },
       { id: 3, name: 'Марта Вишневска',   phone: '+48 603 456 789', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(30), lastContact: null,       manager: '',          comment: '' },
@@ -1125,7 +1130,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       { id: 8, name: 'Павел Мартиненко', phone: '+48 608 901 234', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(4),  lastContact: null,       manager: 'Александр', comment: 'Первый звонок провален' },
     ];
 
-    const withHistory = students.map(s => ({
+    if (search) {
+      items = items.filter(s => 
+        s.name.toLowerCase().includes(search) || 
+        s.phone.includes(search) ||
+        s.group.toLowerCase().includes(search) ||
+        s.manager.toLowerCase().includes(search) ||
+        s.comment.toLowerCase().includes(search)
+      );
+    }
+
+    const withHistory = items.map(s => ({
       ...s,
       history: [
         { event: 'Выписан из группы',     date: s.expelled,     detail: `Группа: ${s.group}`,                                                      color: '#ef4444' },
@@ -1134,16 +1149,23 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       ],
     }));
 
+    const total = withHistory.length;
+    const sliced = withHistory.slice((page - 1) * perPage, page * perPage);
+
     return ok(config, {
-      data: withHistory,
+      data: sliced,
       meta: {
-        total:  students.length,
-        hot:    students.filter(s => daysBetween(s.lastContact) > 7).length,
-        none:   students.filter(s => !s.lastContact).length,
-        unpaid: students.filter(s => !s.paid).length,
+        total,
+        hot:    sliced.filter(s => daysBetween(s.lastContact) > 7).length,
+        none:   sliced.filter(s => !s.lastContact).length,
+        unpaid: sliced.filter(s => !s.paid).length,
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
       },
     });
   }
+
 
   // PATCH expelled-students/:id
   if (method === 'patch' && /^expelled-students\/\d+$/.test(url)) {
@@ -1193,7 +1215,12 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
   // GET archived-students
   if (method === 'get' && url === 'archived-students') {
-    const students = [
+    const params = (config.params || {}) as Record<string, unknown>;
+    const search = String(params.search ?? params.q ?? '').toLowerCase().trim();
+    const page = Number(params.page) || 1;
+    const perPage = Number(params.per_page) || 20;
+
+    let items = [
       { id: 1, name: 'Анна Ковалевская',    phone: '+48 601 234 567', registered: _dAgo(90),  expelled: _dAgo(45), lastContact: _dAgo(8),  manager: 'Светлана',  comment: 'Обещала перезвонить',         archReason: 'Не актуально',       archComment: 'Сама попросила убрать из списка', hist: [] },
       { id: 2, name: 'Дмитрий Петров',      phone: '+48 602 345 678', registered: _dAgo(120), expelled: _dAgo(60), lastContact: _dAgo(22), manager: 'Александр', comment: 'Не отвечает',                  archReason: 'Не дозвонились 3 раза', archComment: '', hist: [] },
       { id: 3, name: 'Марта Вишневска',     phone: '+48 603 456 789', registered: _dAgo(75),  expelled: _dAgo(40), lastContact: null,       manager: '',          comment: '',                             archReason: 'Переехал',           archComment: 'Переехала в Краков',         hist: [] },
@@ -1201,7 +1228,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       { id: 5, name: 'Светлана Бондарь',    phone: '+48 605 678 901', registered: _dAgo(200), expelled: _dAgo(5),  lastContact: _dAgo(3),  manager: 'Артём',     comment: 'Заинтересована была',         archReason: 'Не актуально',       archComment: 'Ребёнок заболел, пауза на год', hist: [] },
     ];
 
-    const withHistory = students.map(s => ({
+    if (search) {
+      items = items.filter(s => 
+        s.name.toLowerCase().includes(search) || 
+        s.phone.includes(search) ||
+        s.archReason.toLowerCase().includes(search) ||
+        s.manager.toLowerCase().includes(search) ||
+        s.comment.toLowerCase().includes(search)
+      );
+    }
+
+    const withHistory = items.map(s => ({
       ...s,
       history: [
         { event: 'Регистрация',           date: s.registered, detail: 'Ученик зарегистрирован в системе',                            color: '#4f6ef7' },
@@ -1211,16 +1248,23 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       ],
     }));
 
+    const total = withHistory.length;
+    const sliced = withHistory.slice((page - 1) * perPage, page * perPage);
+
     return ok(config, {
-      data: withHistory,
+      data: sliced,
       meta: {
-        total:  students.length,
-        month:  students.filter(s => s.expelled >= _dAgo(30)).length,
-        none:   students.filter(s => !s.lastContact).length,
-        return: students.filter(s => s.archReason === 'Не актуально').length,
+        total,
+        month:  sliced.filter(s => s.expelled >= _dAgo(30)).length,
+        none:   sliced.filter(s => !s.lastContact).length,
+        return: sliced.filter(s => s.archReason === 'Не актуально').length,
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
       },
     });
   }
+
 
   // POST archived-students/:id/return-to-new
   if (method === 'post' && /^archived-students\/\d+\/return-to-new$/.test(url)) {
@@ -1311,6 +1355,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const params = (config.params || {}) as Record<string, unknown>;
     const page = Math.max(1, Number(params.page ?? 1) || 1);
     const perPage = Math.max(1, Number(params.per_page ?? params.perPage ?? 10) || 10);
+    const search = String(params.search ?? params.q ?? '').toLowerCase().trim();
     const forceError = String(params.fail ?? '') === '1';
     const forceEmpty = String(params.empty ?? '') === '1';
 
@@ -1318,7 +1363,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       return err(config, 500, 'Mock recruitment new-students error');
     }
 
-    const source = forceEmpty ? [] : newStudentsDb;
+    let source = forceEmpty ? [] : [...newStudentsDb];
+    if (search) {
+      source = source.filter(s => 
+        String(s.name ?? '').toLowerCase().includes(search) || 
+        String(s.surname ?? '').toLowerCase().includes(search) ||
+        String(s.phone ?? s.parent_phone ?? '').includes(search) ||
+        String(s.manager_name ?? '').toLowerCase().includes(search) ||
+        String(s.group_name ?? '').toLowerCase().includes(search)
+      );
+    }
+
     const total = source.length;
     const lastPage = Math.max(1, Math.ceil(total / perPage));
     const currentPage = Math.min(page, lastPage);
@@ -1327,7 +1382,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const from = rows.length ? start + 1 : 0;
     const to = rows.length ? start + rows.length : 0;
 
-    console.log(`[MOCK] GET ${url}, page=${currentPage}, perPage=${perPage}, total=${total}`);
+    console.log(`[MOCK] GET ${url}, page=${currentPage}, perPage=${perPage}, total=${total}, search="${search}"`);
     return ok(config, {
       data: {
         current_page: currentPage,
@@ -1340,6 +1395,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       },
     });
   }
+
 
   // POST new-students
   if (method === 'post' && (url === 'new-students' || url === 'recruitment/new-students')) {

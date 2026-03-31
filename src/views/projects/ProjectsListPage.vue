@@ -25,14 +25,10 @@
     </div>
 
     <div class="filter-bar">
-      <div class="search-wrap">
-        <span class="si">🔍</span>
-        <input type="text" v-model="searchQuery" :placeholder="t('common.search') || 'Szukaj projektu...'">
-      </div>
       <select class="fsel" v-model="statusFilter">
-        <option value="all">{{ t('common.allStatuses') || 'Wszystkie statusy' }}</option>
-        <option value="active">{{ t('common.active') || 'Aktywne' }}</option>
-        <option value="inactive">{{ t('common.inactive') || 'Nieaktywne' }}</option>
+        <option value="all">{{ t('common.allStatuses') || 'Все статусы' }}</option>
+        <option value="active">{{ t('common.active') || 'Активные' }}</option>
+        <option value="inactive">{{ t('common.inactive') || 'Неактивные' }}</option>
       </select>
     </div>
 
@@ -60,15 +56,16 @@
 import { ref, computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useProjectsStore } from '../../stores/projects.store';
+import { useGlobalSearchStore } from '../../stores/globalSearch.store';
 import ProjectCard from '../../components/projects/ProjectCard.vue';
 import ProjectModal from '../../components/projects/ProjectModal.vue';
 import type { Project } from '../../types/projects';
 
 const { t } = useI18n();
 const projectsStore = useProjectsStore();
+const searchStore = useGlobalSearchStore();
 
 const activeTab = ref('all');
-const searchQuery = ref('');
 const statusFilter = ref('all');
 const isAddModalOpen = ref(false);
 
@@ -87,7 +84,7 @@ const filteredProjects = computed(() => {
     if (activeTab.value !== 'archive' && p.status === 'archive') return false;
 
     // Search filter
-    if (searchQuery.value && !p.name.toLowerCase().includes(searchQuery.value.toLowerCase())) return false;
+    if (searchStore.queryLower && !p.name.toLowerCase().includes(searchStore.queryLower)) return false;
 
     // Status filter
     if (statusFilter.value !== 'all' && p.status !== statusFilter.value) return false;

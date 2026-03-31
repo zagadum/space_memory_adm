@@ -11,21 +11,10 @@
       </div>
       <div class="header-stats">
         <div class="stat-chip">
-          <span class="stat-num">{{ filteredStudents.length }}</span>
+          <span class="stat-num">{{ pagination.total }}</span>
           <span class="stat-label">{{ t('trainerStudents.total') }}</span>
         </div>
       </div>
-    </div>
-
-    <!-- Поиск -->
-    <div class="search-bar">
-      <input
-        v-model="search"
-        class="search-input"
-        :placeholder="t('common.searchHint')"
-        @input="onSearch"
-      />
-      <span class="search-icon">🔍</span>
     </div>
 
     <!-- Состояния загрузки/ошибки/пусто -->
@@ -36,7 +25,7 @@
     <div v-else-if="error" class="state-box error-state">
       <div class="state-icon">⚠️</div>
       <p class="state-text">{{ t('common.error') }}</p>
-      <button class="btn-retry" @click="loadStudents">{{ t('common.retry') }}</button>
+      <button class="btn-retry" @click="() => loadStudents(1)">{{ t('common.retry') }}</button>
     </div>
 
     <div v-else-if="filteredStudents.length === 0" class="state-box empty-state">
@@ -45,44 +34,72 @@
     </div>
 
     <!-- Список учеников -->
-    <div v-else class="students-grid">
-      <div
-        v-for="student in filteredStudents"
-        :key="student.id"
-        class="student-card"
-        @click="openStudent(student.id)"
-      >
-        <!-- Аватар + имя -->
-        <div class="card-header">
-          <div class="avatar" :style="{ background: student.avatarColor || 'var(--blue)' }">
-            {{ student.staffInitials || student.name?.substring(0,2) }}
+    <div v-else>
+      <div class="students-grid">
+        <div
+          v-for="student in filteredStudents"
+          :key="student.id"
+          class="student-card"
+          @click="openStudent(student.id)"
+        >
+          <!-- Аватар + имя -->
+          <div class="card-header">
+            <div class="avatar" :style="{ background: student.avatarColor || 'var(--blue)' }">
+              {{ student.staffInitials || student.name?.substring(0,2) }}
+            </div>
+            <div class="card-info">
+              <div class="student-name">{{ student.name }}</div>
+              <div class="student-phone">{{ student.phone || '—' }}</div>
+            </div>
+            <div class="contact-days" :class="{ hot: (student.daysSinceContact || 0) > 7 }">
+              {{ student.daysSinceContact || 0 }} дн.
+            </div>
           </div>
-          <div class="card-info">
-            <div class="student-name">{{ student.name }}</div>
-            <div class="student-phone">{{ student.phone || '—' }}</div>
+
+          <!-- Группы (без финансов — учитель не видит платёжные данные) -->
+          <div class="enrollments">
+            <div
+              v-for="(en, i) in student.enrollments"
+              :key="i"
+              class="enrollment-item"
+            >
+              <span class="group-dot"></span>
+              <span class="group-name">{{ en.group }}</span>
+              <span class="school-badge">{{ en.school }}</span>
+            </div>
           </div>
-          <div class="contact-days" :class="{ hot: (student.daysSinceContact || 0) > 7 }">
-            {{ student.daysSinceContact || 0 }} дн.
+
+          <!-- Нижняя строка: последний контакт -->
+          <div class="card-footer">
+            <span class="contact-label">{{ t('trainerStudents.lastContact') }}:</span>
+            <span class="contact-date">{{ student.lastContact || '—' }}</span>
           </div>
         </div>
+      </div>
 
-        <!-- Группы (без финансов — учитель не видит платёжные данные) -->
-        <div class="enrollments">
-          <div
-            v-for="(en, i) in student.enrollments"
-            :key="i"
-            class="enrollment-item"
-          >
-            <span class="group-dot"></span>
-            <span class="group-name">{{ en.group }}</span>
-            <span class="school-badge">{{ en.school }}</span>
-          </div>
+      <!-- Пагинация -->
+      <div v-if="pagination.lastPage > 1" class="tbl-footer">
+        <div class="pagination-info">
+          {{ t('common.pagination.showing', { 
+            from: (pagination.currentPage - 1) * pagination.perPage + 1, 
+            to: Math.min(pagination.currentPage * pagination.perPage, pagination.total), 
+            total: pagination.total 
+          }) }}
         </div>
-
-        <!-- Нижняя строка: последний контакт -->
-        <div class="card-footer">
-          <span class="contact-label">{{ t('trainerStudents.lastContact') }}:</span>
-          <span class="contact-date">{{ student.lastContact || '—' }}</span>
+        <div class="pagination-btns">
+          <button class="page-btn nav" :disabled="pagination.currentPage <= 1 || loading" @click="loadStudents(pagination.currentPage - 1)">‹</button>
+          <template v-for="page in pagination.lastPage" :key="page">
+            <button 
+              v-if="Math.abs(page - pagination.currentPage) < 3 || page === 1 || page === pagination.lastPage"
+              class="page-btn" 
+              :class="{ active: pagination.currentPage === page }"
+              @click="loadStudents(page)"
+            >
+              {{ page }}
+            </button>
+            <span v-else-if="page === 2 || page === pagination.lastPage - 1" class="page-sep">...</span>
+          </template>
+          <button class="page-btn nav" :disabled="pagination.currentPage >= pagination.lastPage || loading" @click="loadStudents(pagination.currentPage + 1)">›</button>
         </div>
       </div>
     </div>
@@ -90,16 +107,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '../../stores/auth.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import { useTeacherFilter } from '../../composables/useTeacherFilter'
 import { getStudents } from '../../api/studentApi'
 
 const { t } = useI18n()
 const router = useRouter()
 const authStore = useAuthStore()
+const searchStore = useGlobalSearchStore()
 const { isTeacher, teacherId } = useTeacherFilter()
 
 interface StudentItem {
@@ -114,24 +133,35 @@ interface StudentItem {
 }
 
 const students = ref<StudentItem[]>([])
-const search = ref('')
 const loading = ref(false)
 const error = ref(false)
-
-const filteredStudents = computed(() => {
-  if (!search.value.trim()) return students.value
-  const q = search.value.toLowerCase()
-  return students.value.filter(s =>
-    s.name.toLowerCase().includes(q) ||
-    (s.phone || '').includes(q)
-  )
+const pagination = ref({
+  currentPage: 1,
+  lastPage: 1,
+  perPage: 10,
+  total: 0
 })
 
-async function loadStudents() {
+const filteredStudents = computed(() => students.value)
+
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(() => {
+    loadStudents(1)
+  }, 400)
+})
+
+async function loadStudents(page = 1) {
   loading.value = true
   error.value = false
   try {
-    const params: Record<string, any> = {}
+    const params: any = {
+      page,
+      per_page: pagination.value.perPage,
+      search: searchStore.query.trim()
+    }
     // Учитель всегда видит только своих студентов
     if (isTeacher.value && teacherId.value) {
       params.teacher_id = teacherId.value
@@ -142,15 +172,24 @@ async function loadStudents() {
       name: s.full_name || s.name || `${s.firstName} ${s.lastName}`.trim(),
       phone: s.phone,
       avatarColor: s.avatarColor || 'var(--blue)',
-      staffInitials: s.initials || s.staffInitials,
-      daysSinceContact: s.daysSinceContact || s.days_since_last_contact,
-      lastContact: s.lastContact || s.last_contact_at,
+      staffInitials: s.initials || s.staffInitials || s.name?.substring(0, 2),
+      daysSinceContact: s.daysSinceContact || s.days_since_last_contact || 0,
+      lastContact: s.lastContact || s.last_contact_at || '—',
       enrollments: s.enrollments || s.groups?.map((g: any) => ({
         school: g.school_name || 'Space Memory',
         group: g.name || '—',
         teacher: g.teacher_name || '—',
       })) || [],
     }))
+    
+    if (res.meta) {
+      pagination.value = {
+        currentPage: res.meta.current_page,
+        lastPage: res.meta.last_page,
+        perPage: res.meta.per_page,
+        total: res.meta.total
+      }
+    }
   } catch {
     error.value = true
   } finally {
@@ -160,10 +199,6 @@ async function loadStudents() {
 
 function openStudent(id: number | string) {
   router.push({ name: 'student-payments', params: { id: id.toString() } })
-}
-
-function onSearch() {
-  // Поиск — локальный, фильтруется через computed
 }
 
 onMounted(() => {
@@ -440,5 +475,72 @@ onMounted(() => {
   color: var(--app-text-main);
   font-family: 'Space Mono', monospace;
   font-size: 11.5px;
+}
+
+/* ── Пагинация ── */
+.tbl-footer {
+  margin-top: 24px;
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--app-surface-sub);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--app-text-dim);
+}
+
+.pagination-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-main);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--app-surface-sub);
+}
+
+.page-btn.active {
+  background: var(--blue);
+  color: #fff;
+  border-color: var(--blue);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-btn.nav {
+  font-size: 18px;
+  padding-bottom: 2px;
+}
+
+.page-sep {
+  color: var(--app-text-dim);
+  font-size: 13px;
+  padding: 0 4px;
 }
 </style>

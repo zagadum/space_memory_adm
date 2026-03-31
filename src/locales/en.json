@@ -125,6 +125,17 @@
     "welcome": "Hi, {name}! 👋",
     "search": "Search"
   },
+  "search": {
+    "students": "Search students...",
+    "groups": "Search groups...",
+    "teachers": "Search teachers...",
+    "leads": "Search leads (name, phone)...",
+    "projects": "Search projects...",
+    "refunds": "Search refunds...",
+    "newStudents": "Search new students...",
+    "newGroups": "Search new groups...",
+    "trainerStudents": "Search my students..."
+  },
   "dashboard": {
     "header": {
       "newStudent": "New Student"

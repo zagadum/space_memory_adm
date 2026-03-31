@@ -9,11 +9,13 @@ import UiButton from '../../components/ui/UiButton.vue';
 import UiInput from '../../components/ui/UiInput.vue';
 import UiBadge from '../../components/ui/UiBadge.vue';
 import { useNotificationStore } from '../../stores/notification.store';
+import { useGlobalSearchStore } from '../../stores/globalSearch.store';
 
 const { t } = useI18n();
   const route = useRoute();
 const archivedStore = useArchivedStudentsStore();
 const notif = useNotificationStore();
+const searchStore = useGlobalSearchStore();
   const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default');
 
 // --- CONSTANTS ---
@@ -40,10 +42,18 @@ const GROUPS = [
 ];
 
 // --- STATE ---
-const searchQ = ref('');
-const chips = ref({ mine: false, noManager: false });
-const managerFilter = ref('all');
-const reasonFilter = ref('all');
+const chips = computed(() => ({
+  mine: archivedStore.filters.onlyMine,
+  noManager: archivedStore.filters.noManager,
+}));
+const managerFilter = computed({
+  get: () => archivedStore.filters.manager,
+  set: (v) => { archivedStore.filters.manager = v; archivedStore.applyFilters(); }
+});
+const reasonFilter = computed({
+  get: () => archivedStore.filters.reason,
+  set: (v) => { archivedStore.filters.reason = v; archivedStore.applyFilters(); }
+});
 const openDf = ref<string | null>(null);
 const openActions = ref<number | null>(null);
 
@@ -79,19 +89,18 @@ function toggleDf(name: string) {
   openDf.value = openDf.value === name ? null : name;
 }
 
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null;
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce);
+  searchDebounce = setTimeout(async () => {
+    archivedStore.filters.search = val.trim();
+    await archivedStore.applyFilters();
+  }, 400);
+});
+
 const filteredStudents = computed(() => {
-  const q = searchQ.value.toLowerCase().trim();
-  let list = archivedStore.students.filter(s => {
-    if (q && !(s.name.toLowerCase().includes(q) || s.phone.includes(q))) return false;
-    if (chips.value.mine && s.manager !== 'Артём') return false;
-    if (chips.value.noManager && s.manager) return false;
-    if (managerFilter.value !== 'all') {
-      if (managerFilter.value === '__none__' && s.manager) return false;
-      if (managerFilter.value !== '__none__' && s.manager !== managerFilter.value) return false;
-    }
-    if (reasonFilter.value !== 'all' && s.archReason !== reasonFilter.value) return false;
-    return true;
-  });
+  let list = [...archivedStore.students];
 
   if (sortCol.value) {
     list.sort((a, b) => {
@@ -186,7 +195,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
     transferPanelOpen.value = false;
     returnModalOpen.value = false;
     openActions.value = null;
-    archivedStore.fetchStudents(recruitmentBackend.value);
+    archivedStore.fetchStudents(1, undefined, recruitmentBackend.value);
   }, { immediate: true });
 </script>
 
@@ -195,10 +204,6 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
     <div class="ns-content">
       <!-- PAGE ACTIONS ROW -->
       <div class="ns-actions-row">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input v-model="searchQ" :placeholder="t('archived.filter.search')" />
-        </div>
         <UiButton variant="ghost" size="sm" class="btn">⬇ {{ t('common.export') }}</UiButton>
       </div>
 
@@ -355,8 +360,26 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
             </tr>
           </tbody>
         </table>
-        <div class="table-footer">
-          <span class="table-info">{{ t('archived.showing', { shown: filteredStudents.length, total: archivedStore.students.length }) }}</span>
+        <!-- Пагинация -->
+        <div v-if="archivedStore.pagination && archivedStore.pagination.lastPage > 1" class="tbl-footer">
+          <div class="pagination-info">
+            {{ t('common.pagination.showing', { from: (archivedStore.pagination.currentPage - 1) * archivedStore.pagination.perPage + 1, to: Math.min(archivedStore.pagination.currentPage * archivedStore.pagination.perPage, archivedStore.pagination.total), total: archivedStore.pagination.total }) }}
+          </div>
+          <div class="pagination-btns">
+            <button class="page-btn nav" :disabled="archivedStore.pagination.currentPage <= 1 || archivedStore.isLoading" @click="archivedStore.fetchStudents(archivedStore.pagination.currentPage - 1)">‹</button>
+            <template v-for="page in archivedStore.pagination.lastPage" :key="page">
+              <button 
+                v-if="Math.abs(page - archivedStore.pagination.currentPage) < 3 || page === 1 || page === archivedStore.pagination.lastPage"
+                class="page-btn" 
+                :class="{ active: archivedStore.pagination.currentPage === page }"
+                @click="archivedStore.fetchStudents(page)"
+              >
+                {{ page }}
+              </button>
+              <span v-else-if="page === 2 || page === archivedStore.pagination.lastPage - 1" class="page-sep">...</span>
+            </template>
+            <button class="page-btn nav" :disabled="archivedStore.pagination.currentPage >= archivedStore.pagination.lastPage || archivedStore.isLoading" @click="archivedStore.fetchStudents(archivedStore.pagination.currentPage + 1)">›</button>
+          </div>
         </div>
       </div>
     </div>

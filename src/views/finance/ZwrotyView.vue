@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useZwrotyStore, PRESET_TITLES } from '../../stores/zwroty.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import type { RefundRequest } from '../../stores/zwroty.store'
 
 const store = useZwrotyStore()
+const searchStore = useGlobalSearchStore()
+
+// Sync global search with zwroty store filter
+watch(() => searchStore.queryLower, (q) => {
+  store.filters.search = q
+})
 
 // ── Toast ──────────────────────────────────────────────────────────────────
 const toast = ref({ show: false, icon: '', t1: '', t2: '', type: 'success' as 'success'|'error'|'info' })
@@ -153,10 +160,6 @@ function onSelectChange(id: number, val: string) {
 
     <!-- ── FILTER BAR ── -->
     <div class="filter-bar">
-      <div class="search-wrap">
-        <span class="s-ico">🔍</span>
-        <input class="s-input" type="text" placeholder="Szukaj po nazwisku ucznia, trenerze, przyczynie..." v-model="store.filters.search">
-      </div>
       <select class="f-select" v-model="store.filters.month">
         <option value="">Wszystkie miesiące</option>
         <option value="2025-04">Kwiecień 2025</option>

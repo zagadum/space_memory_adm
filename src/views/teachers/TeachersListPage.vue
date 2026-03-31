@@ -8,16 +8,6 @@
         </div>
       </div>
       <div class="toolbar-right">
-        <div class="search-box">
-          <input
-            v-model="searchInput"
-            class="dropdown-filter-btn"
-            style="min-width: 220px;"
-            :placeholder="t('common.search')"
-            @keyup.enter="applySearch"
-          />
-          <button class="search-btn" @click="applySearch">🔍</button>
-        </div>
         <select class="dropdown-filter-btn" v-model="selectedCity" @change="applyCityFilter">
           <option value="">{{ t('teachersList.toolbar.allCities') }}</option>
           <option v-for="city in uniqueCities" :key="city" :value="city">{{ city }}</option>
@@ -102,18 +92,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTeachersListStore } from '../../stores/teachersList.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 
 const router = useRouter()
 const { t } = useI18n()
 const listStore = useTeachersListStore()
+const searchStore = useGlobalSearchStore()
 
-const searchInput = ref(listStore.filters.search)
 const selectedCity = ref('')
 const teachers = computed(() => listStore.teachers)
+
+// Дебаунс поиск через global search
+let searchDebounce: ReturnType<typeof setTimeout> | null = null
+watch(() => searchStore.query, (val) => {
+  if (searchDebounce) clearTimeout(searchDebounce)
+  searchDebounce = setTimeout(async () => {
+    listStore.filters.search = val.trim()
+    await listStore.applyFilters()
+  }, 400)
+})
 
 const uniqueCities = computed(() => {
   const cities = listStore.teachers.map(t => t.city)
@@ -126,11 +127,6 @@ function openTeacher(id: number) {
 
 async function sortBy(col: string) {
   listStore.setSort(col)
-}
-
-async function applySearch() {
-  listStore.filters.search = searchInput.value.trim()
-  await listStore.applyFilters()
 }
 
 async function applyCityFilter() {
