@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth.store'
-import { normalizeRole, ROLE_MENU_ACCESS, type AppRole } from '../config/roleMenuAccess.config'
+import { AUTHZ_BYPASS } from '../config/featureFlags'
+import { normalizeRole, type AppRole } from '../config/roleMenuAccess.config'
 import { isMenuAllowed } from '../utils/menuAccess'
 
 /**
@@ -30,6 +31,7 @@ export function useCanAccess() {
    * @example isRole('admin', 'super-admin')
    */
   function isRole(...roles: AppRole[]): boolean {
+    if (AUTHZ_BYPASS) return authStore.isAuthenticated
     if (!role.value) return false
     return roles.includes(role.value)
   }
@@ -51,6 +53,7 @@ export function useCanAccess() {
    * @example hideFor('teacher', 'sales')
    */
   function hideFor(...roles: AppRole[]): boolean {
+    if (AUTHZ_BYPASS) return false
     if (!role.value) return true
     return !roles.includes(role.value)
   }
@@ -62,6 +65,7 @@ export function useCanAccess() {
    * @example const canDelete = computed(() => canAny(['admin', 'super-admin']))
    */
   function canAny(roles: AppRole[]): boolean {
+    if (AUTHZ_BYPASS) return authStore.isAuthenticated
     if (!role.value) return false
     return roles.includes(role.value)
   }

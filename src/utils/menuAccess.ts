@@ -5,6 +5,7 @@ import {
   type MenuAccessMap,
   type MenuAccessMode,
 } from "../config/menuAccess.config";
+import { AUTHZ_BYPASS } from "../config/featureFlags";
 import { normalizeRole, ROLE_MENU_ACCESS } from "../config/roleMenuAccess.config";
 import { useAuthStore } from "../stores/auth.store";
 
@@ -34,12 +35,18 @@ function readOverrides(): MenuAccessMap {
 //   3. Hidden                               — safe fallback (deny by default)
 // ─────────────────────────────────────────────────────────────────────────────
 function resolveEntry(menuKey: string): MenuAccessEntry {
+  const auth = useAuthStore();
+
+  // Temporary mode: keep auth checks, but skip role-based restrictions.
+  if (AUTHZ_BYPASS && auth.isAuthenticated) {
+    return { mode: "active" };
+  }
+
   // 1. Dev override
   const overrides = readOverrides();
   if (overrides[menuKey]) return overrides[menuKey];
 
   // 2. Role-based lookup
-  const auth = useAuthStore();
   const role = normalizeRole(auth.user?.role);
   if (role) {
     const roleMap = ROLE_MENU_ACCESS[role];
