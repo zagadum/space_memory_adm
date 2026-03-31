@@ -7,6 +7,10 @@
           <input v-model="searchQ" :placeholder="t('targetMail.searchPlaceholder')" />
         </div>
         <div class="tm-actions-right">
+          <select v-model="exportFormat" class="format-select" :disabled="store.isLoading || !filteredItems.length">
+            <option value="xlsx">XLSX</option>
+            <option value="xls">XLS</option>
+          </select>
           <div class="filter-chips">
             <span class="filter-label">{{ t('targetMail.filters.label') }}</span>
             <button
@@ -104,6 +108,7 @@ import { useTargetMailStore } from '../../stores/targetMail.store';
 const route = useRoute();
 const store = useTargetMailStore();
 const searchQ = ref('');
+const exportFormat = ref<'xlsx' | 'xls'>('xlsx');
 const selectedStatuses = ref<TargetMailFilterStatus[]>([]);
 const { t, locale } = useI18n();
 const emptyCellValue = '—';
@@ -202,6 +207,7 @@ async function exportToExcel() {
   exportTableToExcel({
     fileName: `${t('targetMail.export.fileNamePrefix')}_${backendLabel}_${dateStr}`,
     sheetName: t('targetMail.export.sheetName'),
+    format: exportFormat.value,
     rows: [
       [
         t('targetMail.table.surname'),
@@ -262,6 +268,17 @@ watch(recruitmentBackend, () => {
   justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.format-select {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  color: var(--app-text-main);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 10px;
+  min-width: 78px;
 }
 
 .filter-chips {

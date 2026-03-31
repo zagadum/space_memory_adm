@@ -1,12 +1,24 @@
 import * as XLSX from 'xlsx';
 
 type ExcelCell = string | number | boolean | null | undefined;
+export type ExcelFormat = 'xlsx' | 'xls';
+
+const MIME_BY_FORMAT: Record<ExcelFormat, string> = {
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    xls: 'application/vnd.ms-excel',
+};
+
+function resolveFormat(fileName: string, format?: ExcelFormat): ExcelFormat {
+    if (format) return format;
+    return /\.xls$/i.test(fileName) ? 'xls' : 'xlsx';
+}
 
 export interface TableExcelExportOptions {
     fileName: string;
     sheetName: string;
     rows: ExcelCell[][];
     columnWidths?: Array<{ wch: number }>;
+    format?: ExcelFormat;
 }
 
 export interface ExcelRow {
@@ -20,8 +32,10 @@ export function exportTableToExcel({
     fileName,
     sheetName,
     rows,
-    columnWidths
+    columnWidths,
+    format,
 }: TableExcelExportOptions) {
+    const exportFormat = resolveFormat(fileName, format);
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
     const workbook = XLSX.utils.book_new();
 
@@ -31,16 +45,16 @@ export function exportTableToExcel({
 
     XLSX.utils.book_append_sheet(workbook, worksheet, sheetName || 'Sheet1');
 
-    const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-    const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const excelBuffer = XLSX.write(workbook, { bookType: exportFormat, type: 'array' });
+    const dataBlob = new Blob([excelBuffer], { type: MIME_BY_FORMAT[exportFormat] });
 
     let safeName = fileName || 'Export';
-    safeName = safeName.replace(/\.xlsx$/i, '').replace(/[<>:"/\\|?*]/g, '_');
+    safeName = safeName.replace(/\.(xlsx|xls)$/i, '').replace(/[<>:"/\\|?*]/g, '_');
 
     const url = window.URL.createObjectURL(dataBlob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${safeName}.xlsx`;
+    link.download = `${safeName}.${exportFormat}`;
     link.style.display = 'none';
     link.target = '_blank';
     document.body.appendChild(link);
@@ -57,7 +71,8 @@ export function exportSalaryToExcel(
     fileName: string,
     rows: ExcelRow[],
     totalAmount: number,
-    t: (key: string) => string
+    t: (key: string) => string,
+    format: ExcelFormat = 'xlsx'
 ) {
     // 1. Подготовка заголовков с фоллбэком (на случай если JSON не подгрузился)
     const headers = [
@@ -91,6 +106,7 @@ export function exportSalaryToExcel(
     exportTableToExcel({
         fileName,
         sheetName: 'Salary Report',
+        format,
         rows: worksheetData,
         columnWidths: [
             { wch: 20 },

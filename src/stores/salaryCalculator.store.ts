@@ -15,6 +15,8 @@ export interface Teacher {
     role: string
 }
 
+type ExcelFormat = 'xlsx' | 'xls'
+
 export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     const isLoading = ref(false)
     const error = ref<string | null>(null)
@@ -176,7 +178,7 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     function updateStatus(newStatus: 'draft' | 'confirmed' | 'paid') {
         status.value = newStatus
     }
-    function doExport(t: any) {
+    function doExport(t: any, format: ExcelFormat = 'xlsx') {
         const rows: any[] = []
         const d = salaryData.value
 
@@ -270,10 +272,10 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         }
 
         const dateStr = new Date().toISOString().split('T')[0]
-        const fileName = `Salary_Export_${selectedTeacher.value.name}_${selectedMonth.value}_${dateStr}.xlsx`
+        const fileName = `Salary_Export_${selectedTeacher.value.name}_${selectedMonth.value}_${dateStr}`
 
         import('../utils/excelExport').then(({ exportSalaryToExcel }) => {
-            exportSalaryToExcel(fileName, rows, totalPayout.value, t)
+            exportSalaryToExcel(fileName, rows, totalPayout.value, t, format)
         })
     }
 

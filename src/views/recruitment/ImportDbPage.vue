@@ -377,35 +377,58 @@ async function confirmDelete() {
   }
 }
 
-function onExport() {
-  const headers = [
-    'Фамилия', 'Имя', 'Email родителя', 'Телефон', 'Никнейм',
-    'Сумма подписки', 'Тип контракта', 'Переплата', 'Скидка', 'Отправлено', 'Завершено'
-  ];
+async function onExport() {
+  if (!filteredItems.value.length) return;
 
-  const rows = filteredItems.value.map(item => [
-    item.surname,
-    item.first_name,
-    item.parent_email,
-    item.phone,
-    item.nickname || '',
-    item.subscription_amount,
-    item.contract_old_new,
-    item.balance_overpayment,
-    item.discount,
-    item.is_send ? 'Да' : 'Нет',
-    item.is_done ? 'Да' : 'Нет'
-  ]);
+  const { exportTableToExcel } = await import('../../utils/excelExport');
+  const dateStr = new Date().toISOString().split('T')[0];
 
-  const csv = [headers, ...rows]
-    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-    .join('\n');
-
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `import-db-${new Date().toISOString().split('T')[0]}.csv`;
-  link.click();
+  exportTableToExcel({
+    fileName: `import-db-${dateStr}`,
+    sheetName: 'Import DB',
+    format: 'xlsx',
+    rows: [
+      [
+        t('importDb.table.surname'),
+        t('importDb.table.firstName'),
+        t('importDb.table.parentEmail'),
+        t('importDb.table.phone'),
+        t('importDb.table.nickname'),
+        t('importDb.table.subscriptionAmount'),
+        t('importDb.table.contractOldNew'),
+        t('importDb.table.balanceOverpayment'),
+        t('importDb.table.discount'),
+        t('importDb.table.isSend'),
+        t('importDb.table.isDone'),
+      ],
+      ...filteredItems.value.map((item) => [
+        item.surname,
+        item.first_name,
+        item.parent_email,
+        item.phone,
+        item.nickname || '—',
+        Number(item.subscription_amount),
+        item.contract_old_new,
+        Number(item.balance_overpayment),
+        Number(item.discount),
+        item.is_send ? t('common.yes') : t('common.no'),
+        item.is_done ? t('common.yes') : t('common.no'),
+      ]),
+    ],
+    columnWidths: [
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 28 },
+      { wch: 16 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 18 },
+      { wch: 16 },
+      { wch: 14 },
+      { wch: 12 },
+      { wch: 12 },
+    ],
+  });
 }
 
 watch(() => backend.value, () => {

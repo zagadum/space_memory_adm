@@ -4,6 +4,7 @@ import { parseApiError } from '../api/errorHelper';
 
 const DEFAULT_TEACHER_ID = 1;
 const DEFAULT_PROJECT_ID = 1;
+type ExcelFormat = 'xlsx' | 'xls';
 
 export interface Child {
     name: string;
@@ -295,7 +296,7 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             }
         },
 
-        async exportToExcel(t: any) {
+        async exportToExcel(t: any, format: ExcelFormat = 'xlsx') {
             if (!this.salaryData) return;
             const rows: any[] = [];
             const d = this.salaryData;
@@ -344,10 +345,10 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             }
 
             const dateStr = new Date().toISOString().split('T')[0];
-            const fileName = `Salary_Export_${d.trainerName}_${d.month}_${dateStr}.xlsx`;
+            const fileName = `Salary_Export_${d.trainerName}_${d.month}_${dateStr}`;
 
             const { exportSalaryToExcel } = await import('../utils/excelExport');
-            exportSalaryToExcel(fileName, rows, this.totalPayout, t);
+            exportSalaryToExcel(fileName, rows, this.totalPayout, t, format);
         }
     }
 });
