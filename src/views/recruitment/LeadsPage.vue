@@ -96,7 +96,7 @@ const getLeadsByStatus = (status: LeadStatus) => {
 };
 
 const openInviteModal = (lead?: any) => {
-  modalStore.open('invite-lead', { lead });
+  modalStore.open('invite-lead', { lead, backend: recruitmentBackend.value });
 };
 
 watch(recruitmentBackend, () => {

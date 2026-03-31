@@ -96,6 +96,7 @@ import UiInput from "../../components/ui/UiInput.vue";
 import UiButton from "../../components/ui/UiButton.vue";
 import { useModalStore } from "../../stores/modal.store";
 import { useLeadsStore } from "../../stores/leads.store";
+import type { RecruitmentBackend } from "../../api/http";
 
 const { t } = useI18n();
 const modal = useModalStore();
@@ -104,6 +105,9 @@ const leadsStore = useLeadsStore();
 const payload = computed(() => modal.payload as any);
 const lead = computed(() => payload.value?.lead);
 const student = computed(() => payload.value?.student);
+const backend = computed<RecruitmentBackend>(() =>
+  payload.value?.backend === 'indigo' ? 'indigo' : 'default'
+);
 
 const displayData = computed(() => {
   if (student.value) {
@@ -169,8 +173,8 @@ async function submit() {
       contract_old_new: form.contractType,
       discount: form.discount ? Number(form.discount) : 0,
       balance_overpayment: 0,
-    });
-    
+    }, backend.value);
+
     success.value = true;
     setTimeout(() => {
         modal.close();

@@ -12,7 +12,7 @@
           </select>
           <button class="btn btn-ghost" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
         </div>
-        <button class="btn btn-primary" @click="modal.open('invite-lead')">✉️ {{ t('newStudents.inviteStudent') }}</button>
+        <button class="btn btn-primary" @click="modal.open('invite-lead', { backend: recruitmentBackend.value })">✉️ {{ t('newStudents.inviteStudent') }}</button>
       </div>
 
       <!-- STATS GRID -->
@@ -431,7 +431,7 @@ function toggleActions(id: number) {
 }
 function onInvite(s: NewStudent) {
   openActions.value = null
-  modal.open('invite-lead', { student: s })
+  modal.open('invite-lead', { student: s, backend: recruitmentBackend.value })
 }
 function onArchive(id: number) {
   const s = store.students.find(x => x.id === id)
