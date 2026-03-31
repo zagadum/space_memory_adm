@@ -1451,6 +1451,7 @@
     },
     "table": {
       "name": "Имя Фамилия",
+      "email": "Email",
       "age": "Возраст",
       "years": "лет",
       "contract": "Договор",
@@ -1481,6 +1482,8 @@
       "firstNamePh": "Имя ученика",
       "lastName": "Фамилия",
       "lastNamePh": "Фамилия",
+      "email": "Email",
+      "emailPh": "example@mail.com",
       "age": "Возраст",
       "manager": "Ответственный",
       "notAssigned": "Не назначен",

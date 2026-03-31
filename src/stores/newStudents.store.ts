@@ -32,6 +32,7 @@ export interface NewStudent {
   waitDays: number
   manager: string | null
   phone: string | null
+  email: string | null
   contractOldNew?: 'old' | 'new' | string | null
 }
 
@@ -321,6 +322,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       waitDays: Number(row.waitDays ?? row.wait_days ?? diffDaysFrom(createdDate)) || 0,
       manager,
       phone: row.phone ?? row.parent_phone ?? row.parentPhone ?? null,
+      email: row.email ?? row.parent_email ?? row.parentEmail ?? null,
       contractOldNew: row.contract_old_new ?? row.contractOldNew ?? null,
     }
   }
@@ -470,7 +472,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract' | 'documents' | 'phone'> & { phone?: string | null }, backend?: RecruitmentBackend) {
+  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract' | 'documents' | 'phone' | 'email'> & { phone?: string | null; email?: string | null }, backend?: RecruitmentBackend) {
     const today = new Date().toISOString().slice(0, 10)
     const newId = Date.now()
     const newStudent: NewStudent = {
@@ -487,6 +489,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       createdDate: today,
       waitDays: 0,
       phone: data.phone || null,
+      email: data.email || null,
       ...data,
     }
     students.value.unshift(newStudent)

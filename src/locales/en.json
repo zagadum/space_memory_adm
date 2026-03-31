@@ -1446,6 +1446,7 @@
     },
     "table": {
       "name": "Name",
+      "email": "Email",
       "age": "Age",
       "years": "y.o.",
       "contract": "Contract",
@@ -1476,6 +1477,8 @@
       "firstNamePh": "Student's first name",
       "lastName": "Last name",
       "lastNamePh": "Last name",
+      "email": "Email",
+      "emailPh": "example@mail.com",
       "age": "Age",
       "manager": "Manager",
       "notAssigned": "Not assigned",

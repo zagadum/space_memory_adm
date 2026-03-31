@@ -1446,6 +1446,7 @@
     },
     "table": {
       "name": "Imię i nazwisko",
+      "email": "Email",
       "age": "Wiek",
       "years": "lat",
       "contract": "Umowa",
@@ -1476,6 +1477,8 @@
       "firstNamePh": "Imię ucznia",
       "lastName": "Nazwisko",
       "lastNamePh": "Nazwisko",
+      "email": "Email",
+      "emailPh": "example@mail.com",
       "age": "Wiek",
       "manager": "Opiekun",
       "notAssigned": "Nie przypisany",

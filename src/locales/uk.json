@@ -1442,6 +1442,7 @@
     },
     "table": {
       "name": "Ім'я Прізвище",
+      "email": "Email",
       "age": "Вік",
       "years": "років",
       "contract": "Договір",
@@ -1472,6 +1473,8 @@
       "firstNamePh": "Ім'я учня",
       "lastName": "Прізвище",
       "lastNamePh": "Прізвище",
+      "email": "Email",
+      "emailPh": "example@mail.com",
       "age": "Вік",
       "manager": "Відповідальний",
       "notAssigned": "Не призначено",

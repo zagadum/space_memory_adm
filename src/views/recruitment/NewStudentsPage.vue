@@ -108,6 +108,7 @@
           <thead>
             <tr>
               <th @click="setSort('name')">{{ t('newStudents.table.name') }} <span class="sort-icon">{{ sortIcon('name') }}</span></th>
+              <th @click="setSort('email')">{{ t('newStudents.table.email') }} <span class="sort-icon">{{ sortIcon('email') }}</span></th>
               <th @click="setSort('age')">{{ t('newStudents.table.age') }} <span class="sort-icon">{{ sortIcon('age') }}</span></th>
               <th class="no-sort">{{ t('newStudents.table.contract') }}</th>
               <th @click="setSort('payment')">{{ t('newStudents.table.payment') }} <span class="sort-icon">{{ sortIcon('payment') }}</span></th>
@@ -128,6 +129,10 @@
                   <span class="sub-id">#{{ s.id }}</span>
                   <span v-if="s.phone" class="sub-phone">{{ s.phone }}</span>
                 </div>
+              </td>
+              <!-- Email -->
+              <td>
+                <div class="student-email" :title="s.email || ''">{{ s.email || '—' }}</div>
               </td>
               <!-- Age -->
               <td>
@@ -280,6 +285,10 @@
               </div>
             </div>
             <div class="modal-field">
+              <div class="modal-label">{{ t('newStudents.modal.email') }}</div>
+              <input class="modal-input" v-model="newForm.email" :placeholder="t('newStudents.modal.emailPh')" />
+            </div>
+            <div class="modal-field">
               <div class="modal-label">{{ t('newStudents.modal.startDate') }}</div>
               <input class="modal-input" v-model="newForm.startDate" type="date" />
             </div>
@@ -403,6 +412,7 @@ function sortIcon(col: string) {
 function sortVal(s: NewStudent, col: string): string | number {
   switch (col) {
     case 'name':        return s.name.toLowerCase()
+    case 'email':       return (s.email || '').toLowerCase()
     case 'age':         return s.age
     case 'payment':     return s.payment
     case 'waitDays':    return s.waitDays
@@ -491,7 +501,7 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
 // ─── ADD MODAL ───
 const addModalOpen = ref(false)
-const newForm = ref({ firstName: '', lastName: '', age: 0, manager: '', startDate: '' })
+const newForm = ref({ firstName: '', lastName: '', email: '', age: 0, manager: '', startDate: '' })
 
 function submitAdd() {
   const firstName = newForm.value.firstName.trim()
@@ -499,11 +509,12 @@ function submitAdd() {
   if (!firstName) { notif.addToast(`⚠️ ${t('newStudents.modal.nameRequired')}`, 'error'); return }
   store.addStudent({
     name: [firstName, lastName].filter(Boolean).join(' '),
+    email: newForm.value.email.trim() || null,
     age: newForm.value.age || 0,
     manager: newForm.value.manager || null,
     startDate: newForm.value.startDate || null,
   }, recruitmentBackend.value)
-  newForm.value = { firstName: '', lastName: '', age: 0, manager: '', startDate: '' }
+  newForm.value = { firstName: '', lastName: '', email: '', age: 0, manager: '', startDate: '' }
   addModalOpen.value = false
   notif.addToast(`✅ ${t('newStudents.studentAdded')}`, 'success')
 }
@@ -1026,6 +1037,7 @@ td { padding: 12px 14px; font-size: 13.5px; vertical-align: middle; white-space:
 .timer-days.low  { color: #10b981; }
 .timer-days.mid  { color: #f59e0b; }
 .timer-days.high { color: #ef4444; }
+.student-email { font-size: 13px; color: var(--app-text-main); font-weight: 500; font-family: 'Outfit', sans-serif; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .person-cell { display: flex; align-items: center; gap: 8px; }
 .manager-avatar {

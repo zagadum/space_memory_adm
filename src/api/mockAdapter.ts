@@ -1101,7 +1101,9 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
   // ── EXPELLED STUDENTS ─────────────────────────────────────────────────────
 
-  // Вспомогательная функция внутри блока (или добавить в начало файла если там уже есть похожие)
+  const mockHistory: Record<number, any[]> = {};
+
+  // Helper inside the mock block (or defined globally if needed, but local is safer for this scratch fix)
   const _dAgo = (n: number): string => {
     const d = new Date();
     d.setDate(d.getDate() - n);
@@ -1115,19 +1117,12 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const page = Number(params.page) || 1;
     const perPage = Number(params.per_page) || 20;
 
-    const today = new Date();
-    const daysBetween = (dateStr: string | null): number =>
-      dateStr ? Math.floor((today.getTime() - new Date(dateStr).getTime()) / 86400000) : 9999;
-
     let items = [
       { id: 1, name: 'Анна Ковалевская',  phone: '+48 601 234 567', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(15), lastContact: _dAgo(8),  manager: 'Светлана',  comment: 'Обещала перезвонить' },
       { id: 2, name: 'Дмитрий Петров',    phone: '+48 602 345 678', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(45), lastContact: _dAgo(3),  manager: 'Александр', comment: '' },
       { id: 3, name: 'Марта Вишневска',   phone: '+48 603 456 789', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(30), lastContact: null,       manager: '',          comment: '' },
       { id: 4, name: 'Игорь Сидоренко',   phone: '+48 604 567 890', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(20), lastContact: _dAgo(12), manager: 'Мария',     comment: 'Не берёт трубку' },
       { id: 5, name: 'Светлана Бондарь',  phone: '+48 605 678 901', group: 'Вт 17 КЛе Младшая', type: 'group',      paid: true,  expelled: _dAgo(8),  lastContact: _dAgo(0),  manager: 'Артём',     comment: 'Заинтересована, ждёт' },
-      { id: 6, name: 'Александр Новак',   phone: '+48 606 789 012', group: 'Пт 19 АНа Старшая', type: 'individual', paid: false, expelled: _dAgo(60), lastContact: _dAgo(20), manager: 'Светлана',  comment: 'Рассматривает варианты' },
-      { id: 7, name: 'Наталья Романова',  phone: '+48 607 890 123', group: 'Ср 15 ПИе Младшая', type: 'group',      paid: true,  expelled: _dAgo(12), lastContact: _dAgo(5),  manager: '',          comment: '' },
-      { id: 8, name: 'Павел Мартиненко', phone: '+48 608 901 234', group: 'Чт 18 МАр Средняя', type: 'group',      paid: false, expelled: _dAgo(4),  lastContact: null,       manager: 'Александр', comment: 'Первый звонок провален' },
     ];
 
     if (search) {
@@ -1140,76 +1135,19 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       );
     }
 
-    const withHistory = items.map(s => ({
-      ...s,
-      history: [
-        { event: 'Выписан из группы',     date: s.expelled,     detail: `Группа: ${s.group}`,                                                      color: '#ef4444' },
-        { event: 'Передан отделу продаж', date: s.expelled,     detail: 'Начало работы по дозакрытию',                                             color: '#f59e0b' },
-        ...(s.lastContact ? [{ event: 'Последний контакт', date: s.lastContact, detail: `Ответственный: ${s.manager || '—'} · ${s.comment || 'без комментария'}`, color: '#4f6ef7' }] : []),
-      ],
-    }));
-
-    const total = withHistory.length;
-    const sliced = withHistory.slice((page - 1) * perPage, page * perPage);
+    const total = items.length;
+    const sliced = items.slice((page - 1) * perPage, page * perPage);
 
     return ok(config, {
       data: sliced,
       meta: {
         total,
-        hot:    sliced.filter(s => daysBetween(s.lastContact) > 7).length,
-        none:   sliced.filter(s => !s.lastContact).length,
-        unpaid: sliced.filter(s => !s.paid).length,
         current_page: page,
         last_page: Math.ceil(total / perPage) || 1,
         per_page: perPage,
       },
     });
   }
-
-
-  // PATCH expelled-students/:id
-  if (method === 'patch' && /^expelled-students\/\d+$/.test(url)) {
-    console.log(`[MOCK] PATCH /expelled-students/${url.split('/')[1]}`);
-    return ok(config, {
-      id: parseInt(url.split('/')[1]),
-      updatedAt: new Date().toISOString(),
-    });
-  }
-
-  // POST expelled-students/:id/archive
-  if (method === 'post' && /^expelled-students\/\d+\/archive$/.test(url)) {
-    console.log(`[MOCK] POST /expelled-students/${url.split('/')[1]}/archive`);
-    return ok(config, {
-      id: parseInt(url.split('/')[1]),
-      archivedAt: new Date().toISOString(),
-    });
-  }
-
-  // POST expelled-students/:id/transfer
-  if (method === 'post' && /^expelled-students\/\d+\/transfer$/.test(url)) {
-    const body = JSON.parse(config.data || '{}');
-    console.log(`[MOCK] POST /expelled-students/${url.split('/')[1]}/transfer, newGroup: ${body.group_id}`);
-    return ok(config, {
-      id: parseInt(url.split('/')[1]),
-      newGroup: body.group_id,
-    });
-  }
-
-  // POST expelled-students/bulk-assign
-  if (method === 'post' && url === 'expelled-students/bulk-assign') {
-    const body = JSON.parse(config.data || '{}');
-    console.log(`[MOCK] POST /expelled-students/bulk-assign, ids: ${body.ids?.length}`);
-    return ok(config, { updated: (body.ids || []).length });
-  }
-
-  // POST expelled-students/bulk-archive
-  if (method === 'post' && url === 'expelled-students/bulk-archive') {
-    const body = JSON.parse(config.data || '{}');
-    console.log(`[MOCK] POST /expelled-students/bulk-archive, ids: ${body.ids?.length}`);
-    return ok(config, { archived: (body.ids || []).length });
-  }
-
-  // ── END EXPELLED STUDENTS ──────────────────────────────────────────────────
 
   // ── ARCHIVED STUDENTS ──────────────────────────────────────────────────────
 
@@ -1230,34 +1168,20 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
     if (search) {
       items = items.filter(s => 
-        s.name.toLowerCase().includes(search) || 
-        s.phone.includes(search) ||
-        s.archReason.toLowerCase().includes(search) ||
-        s.manager.toLowerCase().includes(search) ||
-        s.comment.toLowerCase().includes(search)
+        String(s.name || '').toLowerCase().includes(search) || 
+        String(s.phone || '').includes(search) ||
+        String(s.manager || '').toLowerCase().includes(search) ||
+        String(s.archReason || '').toLowerCase().includes(search)
       );
     }
 
-    const withHistory = items.map(s => ({
-      ...s,
-      history: [
-        { event: 'Регистрация',           date: s.registered, detail: 'Ученик зарегистрирован в системе',                            color: '#4f6ef7' },
-        { event: 'Выписан из группы',     date: _dAgo(50),    detail: 'Передан в отдел работы с выписанными',                     color: '#ef4444' },
-        ...(s.lastContact ? [{ event: 'Последний контакт', date: s.lastContact, detail: `Ответственный: ${s.manager || '—'} · ${s.comment || 'без комментария'}`, color: '#4f6ef7' }] : []),
-        { event: 'Архивирован',           date: s.expelled,   detail: `Причина: ${s.archReason}${s.archComment ? ' · ' + s.archComment : ''}`, color: '#8b5cf6' },
-      ],
-    }));
-
-    const total = withHistory.length;
-    const sliced = withHistory.slice((page - 1) * perPage, page * perPage);
+    const total = items.length;
+    const sliced = items.slice((page - 1) * perPage, page * perPage);
 
     return ok(config, {
       data: sliced,
       meta: {
         total,
-        month:  sliced.filter(s => s.expelled >= _dAgo(30)).length,
-        none:   sliced.filter(s => !s.lastContact).length,
-        return: sliced.filter(s => s.archReason === 'Не актуально').length,
         current_page: page,
         last_page: Math.ceil(total / perPage) || 1,
         per_page: perPage,
@@ -1265,43 +1189,10 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-
-  // POST archived-students/:id/return-to-new
-  if (method === 'post' && /^archived-students\/\d+\/return-to-new$/.test(url)) {
-    console.log(`[MOCK] POST /archived-students/${url.split('/')[1]}/return-to-new`);
-    return ok(config, { id: parseInt(url.split('/')[1]) });
-  }
-
-  // POST archived-students/:id/transfer
-  if (method === 'post' && /^archived-students\/\d+\/transfer$/.test(url)) {
-    const body = JSON.parse(config.data || '{}');
-    console.log(`[MOCK] POST /archived-students/${url.split('/')[1]}/transfer, newGroup: ${body.group_id}`);
-    return ok(config, {
-      id: parseInt(url.split('/')[1]),
-      newGroup: body.group_id,
-    });
-  }
-
-  // ── END ARCHIVED STUDENTS ─────────────────────────────────────────────────
-
-  // ── RECRUITMENT MOCKS ──────────────────────────────────────────────────────
-  const mockHistory: Record<number, any[]> = (globalThis as any).__mock_new_students_history ?? ((globalThis as any).__mock_new_students_history = {});
-  const newStudentsDb: any[] = (globalThis as any).__mock_new_students ?? ((globalThis as any).__mock_new_students = [
+  // ── NEW STUDENTS DATA ──────────────────────────────────────────────────────
+  const newStudentsDb = [
     { 
-      id: 1, name: 'Артем', surname: 'Волков', nickname: 'Arty', email: 'artem.volkov@gmail.com', dob: '2012-05-14', contract: 'signed', 
-      country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', address: 'ул. Маршалковска 10', apartment: '3', zip: '00-001',
-      parent_name: 'Сергей', parent_surname: 'Волков', parent_phone: '+48 601 111 222', parent_passport: 'ABC 123456',
-      hobbies: 'Robotyka, LEGO', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
-      reg_comment: 'Ребёнок увлекается роботами. Прошу уделить внимание развитию лидерских качеств.',
-      payment: 489, payment_str: '489 zł', group_name: 'Вт 17 КЛе Младшая', group_color: '#4f6ef7', start_date: '2024-02-20', created_at: '2024-02-15', wait_days: 16, manager_name: 'Светлана',
-      document_list: [
-        { id: 'doc1', name: 'Umowa edukacyjna', signed: true, template: 'contract_old' },
-        { id: 'doc2', name: 'Zgoda RODO', signed: true, template: 'rodo_standard' }
-      ],
-      contract_old_new: 'old'
-    },
-    { 
-      id: 2, name: 'Кирилл', surname: 'Морозов', nickname: 'Kiri', dob: '2015-09-22', contract: 'pending', 
+      id: 2, name: 'Кирилл', surname: 'Морозов', nickname: 'Kiri', email: 'kirill.m@example.com', dob: '2015-09-22', contract: 'pending', 
       country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', address: 'ул. Новый Свят 5', apartment: '', zip: '00-400',
       parent_name: 'Анна', parent_surname: 'Морозова', parent_phone: '+48 602 333 444', parent_passport: 'DEF 654321',
       hobbies: 'Шахматы, рисование', photo_consent: 0, marketing_consent: 0, digital_content_consent: 0, data_processing_consent: 1, social_media_consent: 0, internal_quality_consent: 1,
@@ -1310,10 +1201,11 @@ export const mockAdapter: AxiosAdapter = async (config) => {
         { id: 'doc1', name: 'Umowa edukacyjna', signed: false, template: 'contract_new' },
         { id: 'doc2', name: 'Zgoda RODO', signed: false, template: 'rodo_standard' }
       ],
+      payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: '2024-03-20', created_at: '2024-03-10', wait_days: 2, manager_name: 'Артём',
       contract_old_new: 'new'
     },
     { 
-      id: 3, name: 'Даниил', surname: 'Глебов', nickname: 'Dan', dob: '2010-11-03', contract: 'signed', 
+      id: 3, name: 'Даниил', surname: 'Глебов', nickname: 'Dan', email: 'dan.glebov@yahoo.com', dob: '2010-11-03', contract: 'signed', 
       country: 'Польша', voivodeship: 'Małopolskie', city: 'Краков', address: 'ул. Флорианска 20', apartment: '7', zip: '30-001',
       parent_name: 'Ірина', parent_surname: 'Глебова', parent_phone: '+48 603 555 666', parent_passport: 'GHI 987654',
       hobbies: 'Kosmos, książki', photo_consent: 1, marketing_consent: 1, digital_content_consent: 1, data_processing_consent: 1, social_media_consent: 1, internal_quality_consent: 1,
@@ -1322,7 +1214,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       contract_old_new: 'old'
     },
     { 
-      id: 4, name: 'Никита', surname: 'Иванов', nickname: '', dob: '2017-03-19', contract: 'pending', 
+      id: 4, name: 'Никита', surname: 'Иванов', nickname: '', email: 'nikita.iv@outlook.com', dob: '2017-03-19', contract: 'pending', 
       country: 'Польша', voivodeship: 'Mazowieckie', city: 'Варшава', address: 'ул. Пулавска 88', apartment: '12', zip: '02-603',
       parent_name: 'Дмитрий', parent_surname: 'Иванов', parent_phone: '+48 604 777 888', parent_passport: 'JKL 112233',
       hobbies: '', photo_consent: 1, marketing_consent: 0, digital_content_consent: 0, data_processing_consent: 1, social_media_consent: 0, internal_quality_consent: 1,
@@ -1333,22 +1225,10 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       ],
       payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-10', wait_days: 7, manager_name: null
     },
-    { id: 5, name: 'Полина', surname: 'Синяк', nickname: 'Poli', dob: '2014-07-08', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-03', wait_days: 3, manager_name: 'Мария', parent_phone: '+48 605 888 999' },
-    { id: 6, name: 'Аня', surname: 'Белова', nickname: 'Anya', dob: '2016-02-14', contract: 'signed', payment: 464, payment_str: '464 zł', group_name: 'Сб 12 ЕЛа Средняя', group_color: '#f59e0b', start_date: '2024-03-07', created_at: '2024-03-01', wait_days: 5, manager_name: 'Мария', parent_phone: '+48 606 111 222' },
-    { id: 7, name: 'Саша', surname: 'Попов', nickname: 'Sash', dob: '2013-11-25', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-02-28', wait_days: 14, manager_name: null, parent_phone: '+48 607 777 000' },
-    { id: 8, name: 'Ева', surname: 'Коваль', nickname: 'Evi', dob: '2018-06-30', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-10', created_at: '2024-03-05', wait_days: 4, manager_name: 'Александр', parent_phone: '+48 608 333 444' },
-    { id: 9, name: 'Марк', surname: 'Левин', nickname: 'Marky', dob: '2012-01-12', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-12', wait_days: 6, manager_name: 'Светлана', parent_phone: '+48 609 999 111' },
-    { id: 10, name: 'Олег', surname: 'Бойко', nickname: 'Oli', dob: '2011-04-19', contract: 'signed', payment: 530, payment_str: '530 zł', group_name: 'Пн 18 ЕЛа Старшая', group_color: '#ef4444', start_date: '2024-03-14', created_at: '2024-03-10', wait_days: 2, manager_name: 'Артём', parent_phone: '+48 610 000 222' },
-    { 
-      id: 11, name: 'Лера', surname: 'Сокол', nickname: '', dob: '2015-12-03', contract: 'pending', 
-      document_list: [
-        { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
-        { id: 'doc2', name: 'Zgoda RODO', signed: true }
-      ],
-      payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-13', wait_days: 9, manager_name: null 
-    },
-    { id: 12, name: 'Мия', surname: 'Янович', nickname: 'Mimi', dob: '2016-10-10', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-18', created_at: '2024-03-15', wait_days: 1, manager_name: 'Мария' },
-  ]);
+    { id: 5, name: 'Полина', surname: 'Синяк', nickname: 'Poli', email: 'poli.sinyak@test.pl', dob: '2014-07-08', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: null, group_color: null, start_date: null, created_at: '2024-03-03', wait_days: 3, manager_name: 'Мария', parent_phone: '+48 605 888 999' },
+    { id: 6, name: 'Аня', surname: 'Белова', nickname: 'Anya', email: 'belova.anya@gmail.com', dob: '2016-02-14', contract: 'signed', payment: 464, payment_str: '464 zł', group_name: 'Сб 12 ЕЛа Средняя', group_color: '#f59e0b', start_date: '2024-03-07', created_at: '2024-03-01', wait_days: 5, manager_name: 'Мария', parent_phone: '+48 606 111 222' },
+    { id: 12, name: 'Мия', surname: 'Янович', nickname: 'Mimi', email: 'mia.yanovich@pl.com', dob: '2016-10-10', contract: 'pending', payment: 0, payment_str: '0 zł', group_name: 'Чт 16 СКо Младшая', group_color: '#06b6d4', start_date: '2024-03-18', created_at: '2024-03-15', wait_days: 1, manager_name: 'Мария', parent_phone: '+48 611 222 333' },
+  ];
 
   // GET new-students
   if (method === 'get' && (url === 'new-students' || url === 'recruitment/new-students')) {
@@ -1366,11 +1246,12 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     let source = forceEmpty ? [] : [...newStudentsDb];
     if (search) {
       source = source.filter(s => 
-        String(s.name ?? '').toLowerCase().includes(search) || 
-        String(s.surname ?? '').toLowerCase().includes(search) ||
-        String(s.phone ?? s.parent_phone ?? '').includes(search) ||
-        String(s.manager_name ?? '').toLowerCase().includes(search) ||
-        String(s.group_name ?? '').toLowerCase().includes(search)
+        String((s as any).name ?? '').toLowerCase().includes(search) || 
+        String((s as any).surname ?? '').toLowerCase().includes(search) ||
+        String((s as any).phone ?? (s as any).parent_phone ?? '').includes(search) ||
+        String((s as any).email ?? '').toLowerCase().includes(search) ||
+        String((s as any).manager_name ?? '').toLowerCase().includes(search) ||
+        String((s as any).group_name ?? '').toLowerCase().includes(search)
       );
     }
 
@@ -1406,6 +1287,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       name: String(body.name || '').split(' ')[0] || 'Новый',
       surname: String(body.name || '').split(' ').slice(1).join(' ') || 'Ученик',
       nickname: body.nickname ?? '',
+      email: body.email ?? '',
+      parent_phone: body.phone ?? '',
       dob: null,
       contract: 'pending',
       payment: 0,
@@ -1417,7 +1300,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       wait_days: 0,
       manager_name: body.manager ?? null,
     };
-    newStudentsDb.unshift(created);
+    newStudentsDb.unshift(created as any);
     console.log(`[MOCK] POST ${url}, body: ${JSON.stringify(body)}`);
     return ok(config, { ok: true, data: created });
   }
