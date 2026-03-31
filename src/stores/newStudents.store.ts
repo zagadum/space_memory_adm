@@ -472,53 +472,24 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     }
   }
 
-  function addStudent(data: Omit<NewStudent, 'id' | 'createdDate' | 'waitDays' | 'payment' | 'paymentStr' | 'group' | 'groupColor' | 'contract' | 'documents' | 'phone' | 'email'> & { phone?: string | null; email?: string | null }, backend?: RecruitmentBackend) {
-    const today = new Date().toISOString().slice(0, 10)
-    const newId = Date.now()
-    const newStudent: NewStudent = {
-      id: newId,
-      contract: 'pending',
-      documents: [
-        { id: 'doc1', name: 'Umowa edukacyjna', signed: false },
-        { id: 'doc2', name: 'Zgoda RODO', signed: false }
-      ],
-      payment: 0,
-      paymentStr: '0 zł',
-      group: null,
-      groupColor: null,
-      createdDate: today,
-      waitDays: 0,
-      phone: data.phone || null,
-      email: data.email || null,
-      ...data,
-    }
-    students.value.unshift(newStudent)
-    pagination.value = {
-      ...pagination.value,
-      total: pagination.value.total + 1,
-      from: 1,
-      to: Math.min(pagination.value.total + 1, Math.max(students.value.length, pagination.value.perPage || students.value.length)),
-    }
-    details.value[newId] = {
-      email: '', password: '', nickname: '', firstName: data.name.split(' ')[0] || '', lastName: data.name.split(' ')[1] || '',
-      birthDate: '', country: 'Польша', voivodeship: '', city: 'Варшава', street: '', apt: '', postCode: '',
-      parentFirst: '', parentLast: '', parentPhone: '', parentPassport: '', 
-      hobbies: '', comment: '',
-      photoConsent: false, marketingConsent: false, digitalContentConsent: false,
-      dataProcessingConsent: false, socialMediaConsent: false, internalQualityConsent: false,
-      currentPrice: '0.00', currentPriceDesc: 'Не выбран',
-    }
-    history.value[newId] = [
-      { event: 'Ученик создан', date: new Date().toLocaleDateString('ru-RU'), detail: `Добавлен менеджером ${data.manager || '—'}`, color: 'var(--blue)' },
-    ]
-
-    resolveApi(backend).createNewStudent({
-      name: data.name,
-      age: data.age,
-      manager: data.manager,
-      startDate: data.startDate,
-    }).catch(() => {
-      // optimistic insert remains in UI even if backend is unavailable
+  async function inviteNewStudent(data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    price: string | number;
+    phone?: string;
+    discount?: string | number;
+  }, backend?: RecruitmentBackend) {
+    // We do NOT add the user to the local `students` array yet.
+    // They will only appear here once they complete registration via the TargetMail link.
+    
+    await resolveApi(backend).inviteNewStudent({
+      first_name: data.firstName,
+      surname: data.lastName,
+      parent_email: data.email,
+      subscription_amount: data.price,
+      phone: data.phone,
+      discount: data.discount
     })
   }
 
@@ -736,7 +707,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     isLoading, error,
     isListLoading, listError, pagination,
     fetchStudentsFromApi, fetchStudentById, fetchStudentHistory, fetchStudentPayments,
-    addStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments, changeStudentPassword,
+    inviteNewStudent, assignGroup, archiveStudent, saveDetails, setPrice, updateStudentPaymentAdjustments, changeStudentPassword,
     downloadDocument, deleteDocument, deleteAllDocuments,
     getDetails, getHistory, filters, applyFilters,
   }

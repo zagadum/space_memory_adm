@@ -220,6 +220,19 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
     return data;
   },
 
+  async inviteNewStudent(payload: {
+    first_name: string;
+    surname: string;
+    parent_email: string;
+    subscription_amount: string | number;
+    phone?: string;
+    discount?: string | number;
+  }) {
+    // This is the new endpoint on the backend that will create a TargetMail and send the email
+    const { data } = await client.post("recruitment/invite", payload);
+    return data;
+  },
+
   async getStudentById(id: number | string) {
     const { data } = await client.get(`recruitment/new-students/${id}`);
     return data;

@@ -12,7 +12,7 @@
           </select>
           <button class="btn btn-ghost" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
         </div>
-        <button class="btn btn-primary" @click="addModalOpen = true">＋ {{ t('newStudents.addStudent') }}</button>
+        <button class="btn btn-primary" @click="addModalOpen = true">✉️ {{ t('newStudents.inviteStudent') }}</button>
       </div>
 
       <!-- STATS GRID -->
@@ -265,8 +265,8 @@
         <div class="modal-backdrop" v-if="addModalOpen" @click.self="addModalOpen = false">
           <div class="modal">
             <div class="modal-close-btn" @click="addModalOpen = false">✕</div>
-            <div class="modal-title">✦ {{ t('newStudents.modal.title') }}</div>
-            <div class="modal-sub">{{ t('newStudents.modal.subtitle') }}</div>
+            <div class="modal-title">✉️ {{ t('newStudents.modal.inviteTitle') }}</div>
+            <div class="modal-sub">{{ t('newStudents.modal.inviteSubtitle') }}</div>
             <div class="modal-grid">
               <div class="modal-field">
                 <div class="modal-label">{{ t('newStudents.modal.firstName') }}</div>
@@ -277,30 +277,29 @@
                 <input class="modal-input" v-model="newForm.lastName" :placeholder="t('newStudents.modal.lastNamePh')" />
               </div>
             </div>
+            <div class="modal-field">
+              <div class="modal-label">{{ t('newStudents.modal.email') }} <span style="color:var(--app-error)">*</span></div>
+              <input class="modal-input" v-model="newForm.email" type="email" :placeholder="t('newStudents.modal.emailPh')" />
+            </div>
             <div class="modal-grid">
               <div class="modal-field">
-                <div class="modal-label">{{ t('newStudents.modal.age') }}</div>
-                <input class="modal-input" v-model.number="newForm.age" type="number" min="3" max="99" />
+                <div class="modal-label">{{ t('newStudents.modal.price') }}</div>
+                <input class="modal-input" v-model="newForm.price" type="number" min="0" step="1" />
               </div>
               <div class="modal-field">
-                <div class="modal-label">{{ t('newStudents.modal.manager') }}</div>
-                <select class="modal-input" v-model="newForm.manager">
-                  <option value="">— {{ t('newStudents.modal.notAssigned') }}</option>
-                  <option v-for="m in ['Светлана','Александр','Мария','Артём']" :key="m">{{ m }}</option>
-                </select>
+                <div class="modal-label">{{ t('newStudents.modal.discount') }}</div>
+                <input class="modal-input" v-model="newForm.discount" type="number" min="0" step="1" />
               </div>
             </div>
             <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.email') }}</div>
-              <input class="modal-input" v-model="newForm.email" :placeholder="t('newStudents.modal.emailPh')" />
-            </div>
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newStudents.modal.startDate') }}</div>
-              <input class="modal-input" v-model="newForm.startDate" type="date" />
+              <div class="modal-label">{{ t('newStudents.modal.phone') }}</div>
+              <input class="modal-input" v-model="newForm.phone" type="tel" :placeholder="t('newStudents.modal.phonePh')" />
             </div>
             <div class="modal-actions">
-              <button class="btn btn-ghost" @click="addModalOpen = false">{{ t('common.cancel') }}</button>
-              <button class="btn btn-primary" @click="submitAdd">✦ {{ t('newStudents.modal.submit') }}</button>
+              <button class="btn btn-ghost" @click="addModalOpen = false" :disabled="isSendingInvite">{{ t('common.cancel') }}</button>
+              <button class="btn btn-primary" @click="submitAdd" :disabled="isSendingInvite">
+                {{ isSendingInvite ? '⏳...' : '✉️ ' + t('newStudents.modal.submitInvite') }}
+              </button>
             </div>
           </div>
         </div>
@@ -549,22 +548,36 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick))
 
 // ─── ADD MODAL ───
 const addModalOpen = ref(false)
-const newForm = ref({ firstName: '', lastName: '', email: '', age: 0, manager: '', startDate: '' })
+const isSendingInvite = ref(false)
+const newForm = ref({ firstName: '', lastName: '', email: '', price: 0, discount: 0, phone: '' })
 
-function submitAdd() {
+async function submitAdd() {
   const firstName = newForm.value.firstName.trim()
   const lastName  = newForm.value.lastName.trim()
+  const email = newForm.value.email.trim()
+
   if (!firstName) { notif.addToast(`⚠️ ${t('newStudents.modal.nameRequired')}`, 'error'); return }
-  store.addStudent({
-    name: [firstName, lastName].filter(Boolean).join(' '),
-    email: newForm.value.email.trim() || null,
-    age: newForm.value.age || 0,
-    manager: newForm.value.manager || null,
-    startDate: newForm.value.startDate || null,
-  }, recruitmentBackend.value)
-  newForm.value = { firstName: '', lastName: '', email: '', age: 0, manager: '', startDate: '' }
-  addModalOpen.value = false
-  notif.addToast(`✅ ${t('newStudents.studentAdded')}`, 'success')
+  if (!email) { notif.addToast(`⚠️ ${t('newStudents.modal.emailRequired')}`, 'error'); return }
+
+  try {
+    isSendingInvite.value = true
+    await store.inviteNewStudent({
+      firstName,
+      lastName,
+      email,
+      price: newForm.value.price || 0,
+      discount: newForm.value.discount || 0,
+      phone: newForm.value.phone.trim() || undefined
+    }, recruitmentBackend.value)
+    
+    newForm.value = { firstName: '', lastName: '', email: '', price: 0, discount: 0, phone: '' }
+    addModalOpen.value = false
+    notif.addToast(`✅ ${t('newStudents.inviteSent')}`, 'success')
+  } catch (err: any) {
+    notif.addToast(`❌ ${err.message || t('common.error')}`, 'error')
+  } finally {
+    isSendingInvite.value = false
+  }
 }
 
 // ─── GROUP PICKER ───
