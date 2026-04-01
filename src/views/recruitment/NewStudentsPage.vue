@@ -92,6 +92,17 @@
 
       <!-- TABLE -->
       <div class="table-container">
+        <div class="table-search-row">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              v-model="searchStore.query"
+              type="text"
+              :placeholder="t('newStudents.searchPlaceholder')"
+            >
+          </div>
+        </div>
+
         <div v-if="store.isListLoading" class="list-state loading">
           <div class="list-state-icon">⏳</div>
           <div class="list-state-title">{{ t('newStudents.loading') }}</div>
@@ -987,6 +998,13 @@ async function onPanelDeleteAllDocs() {
 
 /* TABLE */
 .table-container { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px; overflow: hidden; overflow-x: auto; }
+.table-search-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--app-border);
+  background: var(--app-surface);
+}
 table { width: 100%; border-collapse: collapse; min-width: 1100px; }
 thead tr { background: var(--app-surface); border-bottom: 1px solid var(--app-border); }
 th { padding: 11px 14px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--app-text-dim); white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.15s; }

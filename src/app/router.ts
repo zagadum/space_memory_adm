@@ -47,7 +47,7 @@ export const router = createRouter({
           path: "recruitment/space/new-students",
           name: "new-students",
           component: () => import("../views/recruitment/NewStudentsPage.vue"),
-          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'default', searchPlaceholder: 'search.newStudents' }
+          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'default' }
         },
         {
           path: "recruitment/space/leads",
@@ -90,7 +90,7 @@ export const router = createRouter({
           path: "recruitment/indigo/new-students",
           name: "new-students-indigo",
           component: () => import("../views/recruitment/NewStudentsPage.vue"),
-          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'indigo', searchPlaceholder: 'search.newStudents' }
+          meta: { title: 'newStudents.pageTitle', icon: '🌟', recruitmentBackend: 'indigo' }
         },
         {
           path: "recruitment/indigo/leads",
