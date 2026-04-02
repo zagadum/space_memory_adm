@@ -1469,6 +1469,8 @@
       "documents": "Документы",
       "signedStatus": "Подписано {n} из {total}",
       "payment": "Оплата",
+      "paid": "Оплачено",
+      "noPayment": "0 zł",
       "group": "Группа",
       "startDate": "Старт",
       "createdDate": "Дата создания",

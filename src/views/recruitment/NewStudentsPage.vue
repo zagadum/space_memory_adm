@@ -200,8 +200,11 @@
               </td>
               <!-- Payment -->
               <td>
-                <span v-if="s.payment > 0" class="payment-mono">{{ s.paymentStr }}</span>
-                <span v-else class="payment-zero">0 zł</span>
+                <span v-if="s.payment > 0 || s.isPaid" class="payment-mono" :class="{ 'payment-paid': s.isPaid }">
+                  {{ s.displayPayment }}
+                  <template v-if="s.isPaid"> · {{ t('newStudents.table.paid') }}</template>
+                </span>
+                <span v-else class="payment-zero">{{ t('newStudents.table.noPayment') }}</span>
               </td>
               <!-- Group -->
               <td>
@@ -1028,7 +1031,13 @@ td { padding: 12px 14px; font-size: 13.5px; vertical-align: middle; white-space:
 .contract-pending { background: rgba(136,146,176,0.1); color: var(--app-text-dim); border: 1px solid rgba(136,146,176,0.2); }
 
 .payment-mono { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--app-text-main); }
-.payment-zero { color: var(--app-text-dim); font-style: italic; font-family: 'Space Mono', monospace; font-size: 13px; }
+.payment-paid {
+  color: var(--status-success) !important;
+  font-weight: 600;
+}
+
+.payment-zero {
+ color: var(--app-text-dim); font-style: italic; font-family: 'Space Mono', monospace; font-size: 13px; }
 
 .group-cell { display: flex; align-items: center; gap: 8px; }
 .group-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }

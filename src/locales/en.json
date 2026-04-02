@@ -1464,6 +1464,8 @@
       "documents": "Documents",
       "signedStatus": "Signed {n} of {total}",
       "payment": "Payment",
+      "paid": "Paid",
+      "noPayment": "0 zł",
       "group": "Group",
       "startDate": "Start",
       "createdDate": "Created",

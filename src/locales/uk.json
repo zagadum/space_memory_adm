@@ -1460,6 +1460,8 @@
       "documents": "Документи",
       "signedStatus": "Підписано {n} з {total}",
       "payment": "Оплата",
+      "paid": "Оплачено",
+      "noPayment": "0 zł",
       "group": "Група",
       "startDate": "Старт",
       "createdDate": "Дата створення",

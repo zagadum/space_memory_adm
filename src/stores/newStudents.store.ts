@@ -52,6 +52,8 @@ export interface NewStudent {
   secondChildExternalId?: string | number | null;
   balance_overpayment?: string | number | null;
   referralDiscountNote?: string | null;
+  isPaid: boolean;
+  displayPayment: string;
 }
 
 export interface StudentDetails extends Partial<NewStudent> {
@@ -340,6 +342,10 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
       documents: docs,
       payment,
       paymentStr: row.paymentStr ?? row.payment_str ?? `${payment} zł`,
+      isPaid: String(row.paymentStr ?? row.payment_str ?? '').toLowerCase().includes('оплачено'),
+      displayPayment: String(row.paymentStr ?? row.payment_str ?? `${payment} zł`)
+        .replace(/·?\s*оплачено/gi, '')
+        .trim(),
       group: groupName,
       groupColor,
       startDate,

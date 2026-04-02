@@ -1464,6 +1464,8 @@
       "documents": "Dokumenty",
       "signedStatus": "Podpisano {n} z {total}",
       "payment": "Płatność",
+      "paid": "Opłacone",
+      "noPayment": "0 zł",
       "group": "Grupa",
       "startDate": "Start",
       "createdDate": "Data utworzenia",
