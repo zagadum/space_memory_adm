@@ -141,15 +141,10 @@ const searchStore = useGlobalSearchStore()
 const selectedTeacherId = ref(0)
 const groups = computed(() => listStore.groups)
 const teacherOptions = computed(() => {
-  const defaults = [
-    { id: 1, name: 'Anna Kowalska' },
-    { id: 2, name: 'Ewa Lewandowska' },
-    { id: 3, name: 'Tomasz Wiśniewski' },
-    { id: 4, name: 'Maria Nowak' },
-  ]
+  const options = [...listStore.teachersFilterOptions]
 
-  if (selectedTeacherId.value > 0 && !defaults.some(t => t.id === selectedTeacherId.value)) {
-    defaults.unshift({
+  if (selectedTeacherId.value > 0 && !options.some(t => t.id === selectedTeacherId.value)) {
+    options.unshift({
       id: selectedTeacherId.value,
       name: typeof route.query.teacherName === 'string' && route.query.teacherName.trim()
         ? route.query.teacherName
@@ -157,7 +152,7 @@ const teacherOptions = computed(() => {
     })
   }
 
-  return defaults
+  return options
 })
 
 // Дебаунс поиск через global search
@@ -282,6 +277,8 @@ watch(
 )
 
 onMounted(async () => {
+  await listStore.fetchTeacherFilterOptions()
+
   if (route.query.teacherId) {
     await applyRouteTeacherFilter()
     return

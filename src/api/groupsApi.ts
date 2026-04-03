@@ -1,5 +1,9 @@
 import { http } from './http'
 
+function isNotFoundError(error: any): boolean {
+  return Number(error?.response?.status) === 404
+}
+
 export interface GroupListParams {
   search?: string
   page?: number
@@ -61,3 +65,22 @@ export async function getGroups(params: GroupListParams = {}): Promise<GroupList
   const res = await http.get('groups', { params })
   return res.data as GroupListResponse
 }
+
+export async function getGroupsTeacherFilter(params: Pick<GroupListParams, 'search'> = {}) {
+  try {
+    const res = await http.get('groups/teacher-filter', { params })
+    return res.data as { items: Array<{ id: number; name: string }> }
+  } catch (error) {
+    if (!isNotFoundError(error)) throw error
+  }
+
+  try {
+    const res = await http.get('students/teacher-filter', { params })
+    return res.data as { items: Array<{ id: number; name: string }> }
+  } catch (error) {
+    if (!isNotFoundError(error)) throw error
+    const fallback = await http.get('student/teacher-filter', { params })
+    return fallback.data as { items: Array<{ id: number; name: string }> }
+  }
+}
+

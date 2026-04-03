@@ -2,6 +2,11 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { getGroups, type GroupListParams, type GroupListItem } from '../api/groupsApi'
 
+export interface SelectOption {
+  id: number
+  name: string
+}
+
 export interface GroupsListRow {
   id: number
   name: string
@@ -87,6 +92,7 @@ export const useGroupsListStore = defineStore('groupsList', () => {
   const groups = ref<GroupsListRow[]>([])
   const loading = ref(false)
   const error = ref('')
+  const teachersFilterOptions = ref<SelectOption[]>([])
 
   const pagination = ref({
     currentPage: 1,
@@ -148,6 +154,18 @@ export const useGroupsListStore = defineStore('groupsList', () => {
     await fetchGroups(1)
   }
 
+  async function fetchTeacherFilterOptions() {
+    try {
+      const groupsApi = await import('../api/groupsApi')
+      const res = await (groupsApi as any).getGroupsTeacherFilter({
+        search: filters.value.search || undefined,
+      })
+      teachersFilterOptions.value = res.items || []
+    } catch (e) {
+      console.error('Failed to load groups teacher filter options', e)
+    }
+  }
+
   function setSort(orderBy: string) {
     if (sorting.value.orderBy === orderBy) {
       sorting.value.orderDirection = sorting.value.orderDirection === 'asc' ? 'desc' : 'asc'
@@ -167,11 +185,13 @@ export const useGroupsListStore = defineStore('groupsList', () => {
     groups,
     loading,
     error,
+    teachersFilterOptions,
     pagination,
     filters,
     sorting,
     totalGroups,
     fetchGroups,
+    fetchTeacherFilterOptions,
     applyFilters,
     setSort,
     setPage,
