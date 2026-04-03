@@ -51,12 +51,14 @@ export function clearAllCaches() {
   // 5. Очистка IndexedDB
   if ('indexedDB' in window) {
     try {
-      const dbNames = [];
       const request = indexedDB.databases?.();
       if (request) {
         request.then((dbs) => {
           dbs.forEach((db) => {
-            indexedDB.deleteDatabase(db.name);
+            // В некоторых браузерах имя БД может отсутствовать
+            if (db.name) {
+              indexedDB.deleteDatabase(db.name);
+            }
           });
         });
       }
