@@ -21,9 +21,11 @@ export function useCanAccess() {
   const accessStore = useAccessStore()
 
   /** Нормализованная роль текущего пользователя (или null) */
-  const role = computed<AppRole | null>(() =>
-    normalizeRole(authStore.user?.role)
-  )
+  const role = computed<AppRole | null>(() => {
+    const fromAuth = normalizeRole(authStore.user?.role)
+    if (fromAuth) return fromAuth
+    return normalizeRole(accessStore.role)
+  })
 
   /**
    * Проверяет, является ли текущая роль одной из указанных.

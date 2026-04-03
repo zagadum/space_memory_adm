@@ -1592,7 +1592,15 @@
       "confirmDeleteAll": "Вы уверены, что хотите удалить ВСЕ документы этого ученика?",
       "transactionsTitle": "Оплаты",
       "transactionStatus": "Статус",
-      "transactionsEmpty": "Транзакции не найдены"
+      "transactionsEmpty": "Транзакции не найдены",
+      "adjustmentsTitle": "Корректировки",
+      "discountLabel": "Скидка",
+      "discountPlaceholder": "0.00",
+      "discountSaved": "Скидка сохранена",
+      "overpaymentLabel": "Переплата",
+      "overpaymentPlaceholder": "0.00",
+      "overpaymentSaved": "Переплата сохранена",
+      "save": "Сохранить"
     }
   },
   "targetMail": {

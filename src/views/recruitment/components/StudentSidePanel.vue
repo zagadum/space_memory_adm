@@ -33,6 +33,9 @@
               {{ tab.icon }} {{ tab.label }}
             </div>
           </div>
+          <div v-if="isDev" class="sp-debug-badge" :class="{ error: !showPayments }">
+            <span>{{ debugAccessBadge }}</span>
+          </div>
         </div>
 
         <!-- BODY -->
@@ -329,12 +332,24 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const { canAny } = useCanAccess()
+const { canAny, canAccess, role } = useCanAccess()
 
 // Права доступа — reactive computed-значения
 const canDelete    = computed(() => canAny(['super-admin', 'admin']))                           // удаление — только admin+
 const canEditPrice = computed(() => canAny(['super-admin', 'admin', 'sales', 'finance']))       // цена — не для teacher
-const showPayments = computed(() => canAny(['super-admin', 'admin', 'sales', 'finance', 'secretariat'])) // вкладка оплат
+const showPayments = computed(() =>
+  canAny(['super-admin', 'admin', 'sales', 'finance', 'secretariat']) || canAccess('new-students')
+) // вкладка оплат
+const isDev = import.meta.env.DEV
+const debugAccessBadge = computed(() => {
+  const roleInfo = `role=${String(role.value ?? 'unknown')}`
+  const byRole = canAny(['super-admin', 'admin', 'sales', 'finance', 'secretariat'])
+  const byMenu = canAccess('new-students')
+  if (showPayments.value) {
+    return `DEV ACCESS OK | ${roleInfo} | role:${byRole ? 'yes' : 'no'} menu:${byMenu ? 'yes' : 'no'}`
+  }
+  return `DEV NO ACCESS: вкладка Оплаты скрыта | ${roleInfo} | role:${byRole ? 'yes' : 'no'} menu:${byMenu ? 'yes' : 'no'}`
+})
 
 const activeTab = ref<'info' | 'history' | 'payments'>('info')
 const priceListOpen = ref(false)
@@ -590,6 +605,21 @@ function formatTxDate(dateText: string) {
 }
 .sp-tab:hover { color: var(--app-text-main); }
 .sp-tab.active { color: #4f6ef7; border-bottom-color: #4f6ef7; }
+.sp-debug-badge {
+  margin: 8px 0 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+  font-family: 'Space Mono', monospace;
+}
+.sp-debug-badge.error {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  border-color: rgba(220, 38, 38, 0.3);
+}
 
 .sp-body { flex: 1; overflow-y: auto; }
 .sp-body::-webkit-scrollbar { width: 4px; }
