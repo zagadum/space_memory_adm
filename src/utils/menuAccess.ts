@@ -55,9 +55,9 @@ export function isMenuBlocked(_menuKey: string): boolean {
 }
 
 export function isSectionVisible(sectionKey: string): boolean {
-  if (!isMenuVisible(sectionKey)) return false;
   const items = MENU_SECTION_ITEMS[sectionKey] ?? [];
-  if (!items.length) return true;
+  if (!items.length) return isMenuVisible(sectionKey);
+  if (isMenuVisible(sectionKey)) return true;
   return items.some((itemKey) => isMenuVisible(itemKey));
 }
 

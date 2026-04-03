@@ -26,6 +26,14 @@ export const ROLE_ALIASES: Record<string, AppRole> = {
   // admin
   "admin":  "admin",
   "Admin":  "admin",
+  "administrator": "admin",
+  "Administrator": "admin",
+
+  // common normalized variants
+  "super_admin": "super-admin",
+  "super admin": "super-admin",
+  "SUPER-ADMIN": "super-admin",
+  "ADMIN": "admin",
 
   // teacher
   "teacher":            "teacher",
@@ -63,11 +71,29 @@ export const ROLE_ALIASES: Record<string, AppRole> = {
   "HR": "hr",
 };
 
+const ROLE_ALIASES_LOWER: Record<string, AppRole> = Object.fromEntries(
+  Object.entries(ROLE_ALIASES).map(([k, v]) => [k.toLowerCase(), v])
+) as Record<string, AppRole>;
+
 /** Normalises any raw role string coming from the backend into an AppRole.
  *  Returns null when the string is unknown / empty. */
 export function normalizeRole(raw: string | null | undefined): AppRole | null {
   if (!raw) return null;
-  return ROLE_ALIASES[raw] ?? null;
+  const value = String(raw).trim();
+  if (!value) return null;
+
+  const direct = ROLE_ALIASES[value];
+  if (direct) return direct;
+
+  const lower = value.toLowerCase();
+  const byLower = ROLE_ALIASES_LOWER[lower];
+  if (byLower) return byLower;
+
+  const slug = lower.replace(/_/g, "-");
+  if (slug === "admin") return "admin";
+  if (slug === "super-admin" || slug === "super admin") return "super-admin";
+
+  return null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

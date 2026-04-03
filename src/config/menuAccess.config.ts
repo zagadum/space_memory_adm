@@ -69,7 +69,7 @@ export const MENU_ROUTE_KEY_MAP: Record<string, string> = {
 
    "new-students": "new-students",
    "new-students-indigo": "new-students",
-   leads: "leads",
+   "leads": "leads",
    "leads-indigo": "leads",
    "target-mail": "target-mail",
    "target-mail-indigo": "target-mail",
