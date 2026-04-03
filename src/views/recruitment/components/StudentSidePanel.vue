@@ -372,7 +372,18 @@ const defaultForm = {
   internalQualityConsent: false,
 }
 
+type FormState = typeof defaultForm
+
 const form = ref({ ...defaultForm })
+
+function mapDetailsToForm(details: StudentDetails): FormState {
+  return {
+    ...defaultForm,
+    ...details,
+    // Backend/model may return nullable email, but input model requires string.
+    email: details.email ?? '',
+  }
+}
 
 function resetForm() {
   form.value = { ...defaultForm }
@@ -386,7 +397,7 @@ watch(() => props.details, (d) => {
     return
   }
 
-  form.value = { ...defaultForm, ...d }
+  form.value = mapDetailsToForm(d)
   selectedPrice.value = d.currentPrice || null
   priceListOpen.value = false
 }, { immediate: true })
