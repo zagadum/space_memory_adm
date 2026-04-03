@@ -17,6 +17,8 @@ export interface TeacherListItem {
   email: string
   groupLessonsCount: number
   individualLessonsCount: number
+  groupsCount?: number
+  studentsCount?: number
   city: string
   comment: string | null
 }

@@ -10,16 +10,39 @@ export interface GroupListParams {
   orderDirection?: 'asc' | 'desc'
 }
 
+export interface GroupListTeacher {
+  id: number
+  firstName?: string
+  lastName?: string
+  name?: string
+}
+
 export interface GroupListItem {
   id: number
   name: string
-  type: 'group' | 'individual' | 'mini'
-  studentsCount: number
-  teacherName: string
-  lastCommentDate: string | null
-  lastComment: string | null
-  durationDays: number
-  startDate: string
+  type?: 'group' | 'individual' | 'mini' | string | null
+  studentsCount?: number
+  students_count?: number
+  teacherId?: number
+  teacher_id?: number
+  teacherName?: string
+  teacher?: GroupListTeacher | null
+  startDate?: string
+  start_day?: string | null
+  startTime?: string | null
+  start_time?: string | null
+  age?: string | null
+  lastComment?: string | null
+  last_comment?: string | null
+  lastCommentDate?: string | null
+  last_comment_date?: string | null
+  workday1?: number | boolean
+  workday2?: number | boolean
+  workday3?: number | boolean
+  workday4?: number | boolean
+  workday5?: number | boolean
+  workday6?: number | boolean
+  workday7?: number | boolean
 }
 
 export interface GroupListResponse {

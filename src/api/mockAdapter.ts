@@ -656,8 +656,16 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   if (method === "get" && (url === "students/teacher-filter" || url === "student/teacher-filter")) {
     return ok(config, {
       items: [
-        { id: 1, name: "Клара Левит" },
-        { id: 2, name: "Ханна Боян" }
+        { id: 1, name: "Anna Kowalska" },
+        { id: 2, name: "Ewa Lewandowska" },
+        { id: 3, name: "Tomasz Wiśniewski" },
+        { id: 4, name: "Maria Nowak" },
+        { id: 5, name: "Katarzyna Zielińska" },
+        { id: 6, name: "Piotr Kamiński" },
+        { id: 7, name: "Aleksandra Wójcik" },
+        { id: 8, name: "Michał Szymański" },
+        { id: 9, name: "Joanna Dąbrowska" },
+        { id: 10, name: "Łukasz Jankowski" }
       ]
     });
   }
@@ -736,7 +744,20 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     if (p.teacher_id) {
       // Прямая фильтрация по teacherId (совпадает с mock-пользователями)
       const tid = Number(p.teacher_id)
-      items = items.filter(g => g.teacherId === tid)
+      const teacherIdMap: Record<number, number> = {
+        1: 101,
+        2: 102,
+        3: 103,
+        4: 104,
+        5: 42,
+        6: 42,
+        7: 102,
+        8: 103,
+        9: 104,
+        10: 101,
+      }
+      const normalizedTid = teacherIdMap[tid] ?? tid
+      items = items.filter(g => g.teacherId === normalizedTid)
     }
 
     // Сортировка
@@ -773,16 +794,16 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   if (method === 'get' && url === 'teachers') {
     console.log('[MOCK] HIT teachers, url:', url);
     const mockTeachersList = [
-      { id: 1, firstName: 'Anna', lastName: 'Kowalska', phone: '+48 601 111 222', email: 'anna.kowalska@gls.pl', groupLessonsCount: 5, individualLessonsCount: 2, city: 'Warszawa', comment: 'Doświadczony trener Space Memory' },
-      { id: 2, firstName: 'Ewa', lastName: 'Lewandowska', phone: '+48 602 333 444', email: 'ewa.lewandowska@gls.pl', groupLessonsCount: 4, individualLessonsCount: 0, city: 'Warszawa', comment: 'Specjalizacja: INDIGO' },
-      { id: 3, firstName: 'Tomasz', lastName: 'Wiśniewski', phone: '+48 603 555 666', email: 'tomasz.w@gls.pl', groupLessonsCount: 2, individualLessonsCount: 3, city: 'Kraków', comment: null },
-      { id: 4, firstName: 'Maria', lastName: 'Nowak', phone: '+48 604 777 888', email: 'maria.nowak@gls.pl', groupLessonsCount: 3, individualLessonsCount: 1, city: 'Warszawa', comment: 'Przygotowuje uczniów do olimpiad' },
-      { id: 5, firstName: 'Katarzyna', lastName: 'Zielińska', phone: '+48 605 999 000', email: 'k.zielinska@gls.pl', groupLessonsCount: 6, individualLessonsCount: 0, city: 'Gdańsk', comment: 'Nowa w zespole — в trakcie szkolenia' },
-      { id: 6, firstName: 'Piotr', lastName: 'Kamiński', phone: '+48 606 111 333', email: 'piotr.k@gls.pl', groupLessonsCount: 3, individualLessonsCount: 2, city: 'Wrocław', comment: 'Prowadzi grupy weekendowe' },
-      { id: 7, firstName: 'Aleksandra', lastName: 'Wójcik', phone: '+48 607 222 444', email: 'a.wojcik@gls.pl', groupLessonsCount: 4, individualLessonsCount: 4, city: 'Warszawa', comment: null },
-      { id: 8, firstName: 'Michał', lastName: 'Szymański', phone: '+48 608 333 555', email: 'michal.sz@gls.pl', groupLessonsCount: 2, individualLessonsCount: 1, city: 'Poznań', comment: 'Urlop do końca marca' },
-      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, city: 'Kraków', comment: 'Najwyższy wynik QA w lutом' },
-      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indyвидualne' },
+      { id: 1, firstName: 'Anna', lastName: 'Kowalska', phone: '+48 601 111 222', email: 'anna.kowalska@gls.pl', groupLessonsCount: 5, individualLessonsCount: 2, groupsCount: 7, studentsCount: 31, city: 'Warszawa', comment: 'Doświadczony trener Space Memory' },
+      { id: 2, firstName: 'Ewa', lastName: 'Lewandowska', phone: '+48 602 333 444', email: 'ewa.lewandowska@gls.pl', groupLessonsCount: 4, individualLessonsCount: 0, groupsCount: 4, studentsCount: 24, city: 'Warszawa', comment: 'Specjalizacja: INDIGO' },
+      { id: 3, firstName: 'Tomasz', lastName: 'Wiśniewski', phone: '+48 603 555 666', email: 'tomasz.w@gls.pl', groupLessonsCount: 2, individualLessonsCount: 3, groupsCount: 5, studentsCount: 18, city: 'Kraków', comment: null },
+      { id: 4, firstName: 'Maria', lastName: 'Nowak', phone: '+48 604 777 888', email: 'maria.nowak@gls.pl', groupLessonsCount: 3, individualLessonsCount: 1, groupsCount: 4, studentsCount: 20, city: 'Warszawa', comment: 'Przygotowuje uczniów do olimpiad' },
+      { id: 5, firstName: 'Katarzyna', lastName: 'Zielińska', phone: '+48 605 999 000', email: 'k.zielinska@gls.pl', groupLessonsCount: 6, individualLessonsCount: 0, groupsCount: 6, studentsCount: 28, city: 'Gdańsk', comment: 'Nowa w zespole — в trakcie szkolenia' },
+      { id: 6, firstName: 'Piotr', lastName: 'Kamiński', phone: '+48 606 111 333', email: 'piotr.k@gls.pl', groupLessonsCount: 3, individualLessonsCount: 2, groupsCount: 5, studentsCount: 22, city: 'Wrocław', comment: 'Prowadzi grupy weekendowe' },
+      { id: 7, firstName: 'Aleksandra', lastName: 'Wójcik', phone: '+48 607 222 444', email: 'a.wojcik@gls.pl', groupLessonsCount: 4, individualLessonsCount: 4, groupsCount: 8, studentsCount: 30, city: 'Warszawa', comment: null },
+      { id: 8, firstName: 'Michał', lastName: 'Szymański', phone: '+48 608 333 555', email: 'michal.sz@gls.pl', groupLessonsCount: 2, individualLessonsCount: 1, groupsCount: 3, studentsCount: 12, city: 'Poznań', comment: 'Urlop do końca marca' },
+      { id: 9, firstName: 'Joanna', lastName: 'Dąbrowska', phone: '+48 609 444 666', email: 'joanna.d@gls.pl', groupLessonsCount: 5, individualLessonsCount: 0, groupsCount: 5, studentsCount: 21, city: 'Kraków', comment: 'Najwyższy wynik QA w lutом' },
+      { id: 10, firstName: 'Łukasz', lastName: 'Jankowski', phone: '+48 610 555 777', email: 'lukasz.j@gls.pl', groupLessonsCount: 1, individualLessonsCount: 5, groupsCount: 6, studentsCount: 17, city: 'Warszawa', comment: 'Specjalizacja: zajęcia indyвидualne' },
     ]
 
     let items = [...mockTeachersList]
@@ -959,7 +980,20 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     // Фильтрация: по teacherId (для роли teacher) и поиску
     let filtered = [...mockStudentsList];
     if (teacherIdFilter) {
-      filtered = filtered.filter(s => s.teacherId === teacherIdFilter);
+      const teacherIdMap: Record<number, number> = {
+        1: 42,
+        2: 99,
+        3: 42,
+        4: 99,
+        5: 42,
+        6: 99,
+        7: 42,
+        8: 99,
+        9: 42,
+        10: 99,
+      }
+      const normalizedTid = teacherIdMap[teacherIdFilter] ?? teacherIdFilter
+      filtered = filtered.filter(s => s.teacherId === normalizedTid);
     }
     if (searchFilter) {
       filtered = filtered.filter(s =>

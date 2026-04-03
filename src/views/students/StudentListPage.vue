@@ -170,12 +170,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useStudentsListStore } from '../../stores/studentsList.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 
 const router = useRouter()
+const route = useRoute()
 const { t } = useI18n()
 // Инициализируем стор
 const listStore = useStudentsListStore()
@@ -218,6 +219,24 @@ async function applySelectFilters() {
   listStore.filters.groupId = selectedGroupId.value > 0 ? selectedGroupId.value : null;
   listStore.filters.teacherId = selectedTeacherId.value > 0 ? selectedTeacherId.value : null;
   await listStore.applyFilters();
+}
+
+function parsePositiveInt(value: unknown): number {
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : 0
+}
+
+async function applyRouteFilters() {
+  const routeGroupId = parsePositiveInt(route.query.groupId)
+  const routeTeacherId = parsePositiveInt(route.query.teacherId)
+
+  selectedGroupId.value = routeGroupId
+  selectedTeacherId.value = routeTeacherId
+
+  listStore.filters.groupId = routeGroupId > 0 ? routeGroupId : null
+  listStore.filters.teacherId = routeTeacherId > 0 ? routeTeacherId : null
+
+  await listStore.applyFilters()
 }
 
 async function toggleWithoutContact() {
@@ -299,10 +318,24 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
-onMounted(() => {
+watch(
+  () => [route.query.groupId, route.query.teacherId],
+  async ([nextGroupId, nextTeacherId], [prevGroupId, prevTeacherId]) => {
+    if (nextGroupId === prevGroupId && nextTeacherId === prevTeacherId) return
+    await applyRouteFilters()
+  }
+)
+
+onMounted(async () => {
   window.addEventListener('click', handleClickOutside)
-  listStore.fetchStudents()
-  listStore.fetchFilterOptions()
+  await listStore.fetchFilterOptions()
+
+  if (route.query.groupId || route.query.teacherId) {
+    await applyRouteFilters()
+    return
+  }
+
+  await listStore.fetchStudents()
 })
 
 onUnmounted(() => {

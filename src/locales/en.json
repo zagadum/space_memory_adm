@@ -1810,13 +1810,24 @@
     },
     "table": {
       "name": "Group name",
-      "type": "Type",
       "studentsCount": "Students",
       "teacher": "Teacher",
+      "startDate": "Start date",
+      "startTime": "Start time",
+      "workdays": "Workdays",
+      "age": "Age (type)",
       "lastCommentDate": "Comment date",
       "lastComment": "Last comment",
-      "duration": "Duration",
-      "startDate": "Start date"
+      "duration": "Duration"
+    },
+    "days": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
     },
     "types": {
       "group": "Group",
@@ -1841,6 +1852,8 @@
       "groupLessons": "Group",
       "individualLessons": "Individual",
       "city": "City",
+      "groupsCount": "Total groups",
+      "studentsCount": "Total students",
       "comment": "Comment"
     },
     "noTeachers": "No teachers match the current filters"

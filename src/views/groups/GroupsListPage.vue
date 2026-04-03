@@ -24,10 +24,7 @@
       <div class="toolbar-right">
         <select class="dropdown-filter-btn" v-model.number="selectedTeacherId" @change="applyTeacherFilter">
           <option :value="0">{{ t('groupsList.toolbar.teacher') }}</option>
-          <option :value="1">Anna Kowalska</option>
-          <option :value="2">Ewa Lewandowska</option>
-          <option :value="3">Tomasz Wiśniewski</option>
-          <option :value="4">Maria Nowak</option>
+          <option v-for="teacher in teacherOptions" :key="teacher.id" :value="teacher.id">{{ teacher.name }}</option>
         </select>
       </div>
     </div>
@@ -39,25 +36,27 @@
             <th @click="sortBy('name')" style="cursor:pointer; user-select:none">
               {{ t('groupsList.table.name') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'name' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'name' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('type')" style="cursor:pointer; user-select:none; width: 100px;">
-              {{ t('groupsList.table.type') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'type' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'type' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('students_count')" style="cursor:pointer; user-select:none; width: 80px;">
+              {{ t('groupsList.table.studentsCount') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'students_count' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'students_count' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('studentsCount')" style="cursor:pointer; user-select:none; width: 80px;">
-              {{ t('groupsList.table.studentsCount') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'studentsCount' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'studentsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('teacher_id')" style="cursor:pointer; user-select:none; width: 160px;">
+              {{ t('groupsList.table.teacher') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'teacher_id' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'teacher_id' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('teacherName')" style="cursor:pointer; user-select:none; width: 160px;">
-              {{ t('groupsList.table.teacher') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'teacherName' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'teacherName' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('start_day')" style="cursor:pointer; user-select:none; width: 130px;">
+              {{ t('groupsList.table.startDate') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'start_day' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'start_day' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('lastCommentDate')" style="cursor:pointer; user-select:none; width: 120px;">
-              {{ t('groupsList.table.lastCommentDate') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'lastCommentDate' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'lastCommentDate' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('start_time')" style="cursor:pointer; user-select:none; width: 110px;">
+              {{ t('groupsList.table.startTime') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'start_time' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'start_time' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th style="width: 200px;">{{ t('groupsList.table.lastComment') }}</th>
-            <th @click="sortBy('durationDays')" style="cursor:pointer; user-select:none; width: 100px;">
-              {{ t('groupsList.table.duration') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'durationDays' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'durationDays' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th style="width: 180px;">{{ t('groupsList.table.workdays') }}</th>
+            <th @click="sortBy('age')" style="cursor:pointer; user-select:none; width: 120px;">
+              {{ t('groupsList.table.age') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'age' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'age' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('startDate')" style="cursor:pointer; user-select:none; width: 120px;">
-              {{ t('groupsList.table.startDate') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'startDate' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'startDate' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('last_comment_date')" style="cursor:pointer; user-select:none; width: 120px;">
+              {{ t('groupsList.table.lastCommentDate') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'last_comment_date' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'last_comment_date' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
+            <th style="width: 220px;">{{ t('groupsList.table.lastComment') }}</th>
+            <th style="width: 110px;">{{ t('groupsList.table.duration') }}</th>
           </tr>
         </thead>
         <tbody v-if="!listStore.loading">
@@ -68,17 +67,24 @@
               </div>
             </td>
             <td>
-              <span class="type-badge" :class="group.type">
-                {{ t(`groupsList.types.${group.type}`) }}
-              </span>
-            </td>
-            <td>
               <div class="timer-cell">
-                <span class="timer-days">{{ group.studentsCount }}</span>
+                <button class="students-count-link" @click.stop="openStudentsByGroup(group.id)">{{ group.studentsCount }}</button>
               </div>
             </td>
             <td>
               <span class="person-name">{{ group.teacherName }}</span>
+            </td>
+            <td>
+              <span class="date-mono">{{ formatDate(group.startDate) }}</span>
+            </td>
+            <td>
+              <span class="date-mono">{{ formatTime(group.startTime) }}</span>
+            </td>
+            <td>
+              <span class="person-name">{{ formatWorkdays(group.workdays) }}</span>
+            </td>
+            <td>
+              <span class="person-name">{{ group.age || '—' }}</span>
             </td>
             <td>
               <span class="date-mono">{{ formatDate(group.lastCommentDate) }}</span>
@@ -87,17 +93,11 @@
               <div class="comment-text">{{ group.lastComment || t('groupsList.noComment') }}</div>
             </td>
             <td>
-              <div class="timer-cell">
-                <span class="timer-days" :class="getDurationClass(group.durationDays)">{{ group.durationDays }}</span>
-                <span class="timer-label">{{ t('groupsList.duration', { n: '' }).replace(/\d+/, '').trim() }}</span>
-              </div>
-            </td>
-            <td>
-              <span class="date-mono">{{ formatDate(group.startDate) }}</span>
+              <span class="date-mono">{{ formatDuration(group.startDate) }}</span>
             </td>
           </tr>
           <tr v-if="groups.length === 0">
-            <td colspan="8" style="text-align: center; padding: 40px; color: var(--app-text-dim);">
+            <td colspan="10" style="text-align: center; padding: 40px; color: var(--app-text-dim);">
               {{ t('groupsList.noGroups') }}
             </td>
           </tr>
@@ -106,7 +106,7 @@
         <!-- Loading Skeletons -->
         <tbody v-else>
           <tr v-for="i in 10" :key="i" class="skeleton-row">
-            <td colspan="8"><div class="skeleton-line"></div></td>
+            <td colspan="10"><div class="skeleton-line"></div></td>
           </tr>
         </tbody>
       </table>
@@ -127,18 +127,38 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGroupsListStore } from '../../stores/groupsList.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 
 const router = useRouter()
+const route = useRoute()
 const { t } = useI18n()
 const listStore = useGroupsListStore()
 const searchStore = useGlobalSearchStore()
 
 const selectedTeacherId = ref(0)
 const groups = computed(() => listStore.groups)
+const teacherOptions = computed(() => {
+  const defaults = [
+    { id: 1, name: 'Anna Kowalska' },
+    { id: 2, name: 'Ewa Lewandowska' },
+    { id: 3, name: 'Tomasz Wiśniewski' },
+    { id: 4, name: 'Maria Nowak' },
+  ]
+
+  if (selectedTeacherId.value > 0 && !defaults.some(t => t.id === selectedTeacherId.value)) {
+    defaults.unshift({
+      id: selectedTeacherId.value,
+      name: typeof route.query.teacherName === 'string' && route.query.teacherName.trim()
+        ? route.query.teacherName
+        : `Teacher #${selectedTeacherId.value}`,
+    })
+  }
+
+  return defaults
+})
 
 // Дебаунс поиск через global search
 let searchDebounce: ReturnType<typeof setTimeout> | null = null
@@ -153,6 +173,25 @@ watch(() => searchStore.query, (val) => {
 function openGroup(id: number) {
   // Будущая навигация на детальную страницу группы
   console.log('Open group:', id)
+}
+
+function openStudentsByGroup(groupId: number) {
+  router.push({
+    name: 'students-list',
+    query: { groupId: groupId.toString() },
+  })
+}
+
+function parsePositiveInt(value: unknown): number {
+  const parsed = Number(value)
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : 0
+}
+
+async function applyRouteTeacherFilter() {
+  const routeTeacherId = parsePositiveInt(route.query.teacherId)
+  selectedTeacherId.value = routeTeacherId
+  listStore.filters.teacherId = routeTeacherId > 0 ? routeTeacherId : null
+  await listStore.applyFilters()
 }
 
 async function sortBy(col: string) {
@@ -181,20 +220,74 @@ async function goNextPage() {
 function formatDate(dateStr: string | null): string {
   if (!dateStr) return '—'
   const date = new Date(dateStr)
+  if (Number.isNaN(date.getTime())) return '—'
   const day = String(date.getDate()).padStart(2, '0')
   const month = String(date.getMonth() + 1).padStart(2, '0')
   const year = date.getFullYear()
   return `${day}.${month}.${year}`
 }
 
-function getDurationClass(days: number): string {
-  if (days > 300) return 'high-duration'
-  if (days < 60) return 'low-duration'
-  return ''
+function formatTime(timeStr: string | null): string {
+  if (!timeStr) return '—'
+  return String(timeStr).slice(0, 5)
 }
 
-onMounted(() => {
-  listStore.fetchGroups()
+function formatWorkdays(workdays: number[]): string {
+  if (!workdays.length) return '—'
+  const map: Record<number, string> = {
+    1: t('groupsList.days.mon'),
+    2: t('groupsList.days.tue'),
+    3: t('groupsList.days.wed'),
+    4: t('groupsList.days.thu'),
+    5: t('groupsList.days.fri'),
+    6: t('groupsList.days.sat'),
+    7: t('groupsList.days.sun'),
+  }
+  return workdays.map(day => map[day]).join(', ')
+}
+
+function formatDuration(startDate: string | null): string {
+  if (!startDate) return '—'
+
+  const start = new Date(startDate)
+  if (Number.isNaN(start.getTime())) return '—'
+
+  const end = new Date()
+  let years = end.getFullYear() - start.getFullYear()
+  let months = end.getMonth() - start.getMonth()
+  let days = end.getDate() - start.getDate()
+
+  if (days < 0) {
+    months -= 1
+    const daysInPrevMonth = new Date(end.getFullYear(), end.getMonth(), 0).getDate()
+    days += daysInPrevMonth
+  }
+
+  if (months < 0) {
+    years -= 1
+    months += 12
+  }
+
+  if (years < 0) return '0д / 0м / 0г'
+
+  return `${days}д / ${months}м / ${years}г`
+}
+
+watch(
+  () => route.query.teacherId,
+  async (nextTeacherId, prevTeacherId) => {
+    if (nextTeacherId === prevTeacherId) return
+    await applyRouteTeacherFilter()
+  }
+)
+
+onMounted(async () => {
+  if (route.query.teacherId) {
+    await applyRouteTeacherFilter()
+    return
+  }
+
+  await listStore.fetchGroups()
 })
 </script>
 
@@ -246,27 +339,25 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 
 .timer-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
 .timer-days { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; }
-.timer-days.high-duration { color: var(--green); }
-.timer-days.low-duration { color: var(--amber); }
 .timer-label { font-size: 10px; color: #8892b0; text-transform: uppercase; }
+
+.students-count-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--blue);
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.students-count-link:hover {
+  text-decoration: underline;
+}
 
 .sort-icon { margin-left: 4px; }
 
-/* Type badges */
-.type-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 600;
-}
-.type-badge.group { background: rgba(79,110,247,0.1); color: var(--blue); border: 1px solid rgba(79,110,247,0.2); }
-.type-badge.individual { background: rgba(139,92,246,0.1); color: var(--purple); border: 1px solid rgba(139,92,246,0.2); }
-.type-badge.mini { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
-
-/* Comment truncate */
 .comment-text {
   max-width: 220px;
   white-space: nowrap;
@@ -275,4 +366,5 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
   font-size: 12px;
   color: var(--app-text-dim);
 }
+
 </style>

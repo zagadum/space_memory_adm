@@ -33,6 +33,8 @@
             <th @click="sortBy('city')" style="cursor:pointer; user-select:none; width: 120px;">
               {{ t('teachersList.table.city') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'city' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'city' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
+            <th style="width: 90px; text-align: center;">{{ t('teachersList.table.groupsCount') }}</th>
+            <th style="width: 100px; text-align: center;">{{ t('teachersList.table.studentsCount') }}</th>
             <th style="width: 250px;">{{ t('teachersList.table.comment') }}</th>
           </tr>
         </thead>
@@ -58,12 +60,30 @@
             <td>
               <span class="city-text">{{ teacher.city }}</span>
             </td>
+            <td style="text-align: center;">
+              <button
+                class="count-link"
+                type="button"
+                @click.stop="openGroupsByTeacher(teacher.id, teacher.firstName, teacher.lastName)"
+              >
+                {{ teacher.groupsCount ?? (teacher.groupLessonsCount + teacher.individualLessonsCount) }}
+              </button>
+            </td>
+            <td style="text-align: center;">
+              <button
+                class="count-link"
+                type="button"
+                @click.stop="openStudentsByTeacher(teacher.id)"
+              >
+                {{ teacher.studentsCount ?? 0 }}
+              </button>
+            </td>
             <td>
               <div class="comment-text">{{ teacher.comment || '—' }}</div>
             </td>
           </tr>
           <tr v-if="teachers.length === 0">
-            <td colspan="7" style="text-align: center; padding: 40px; color: var(--app-text-dim);">
+            <td colspan="9" style="text-align: center; padding: 40px; color: var(--app-text-dim);">
               {{ t('teachersList.noTeachers') }}
             </td>
           </tr>
@@ -72,7 +92,7 @@
         <!-- Loading Skeletons -->
         <tbody v-else>
           <tr v-for="i in 10" :key="i" class="skeleton-row">
-            <td colspan="7"><div class="skeleton-line"></div></td>
+            <td colspan="9"><div class="skeleton-line"></div></td>
           </tr>
         </tbody>
       </table>
@@ -123,6 +143,23 @@ const uniqueCities = computed(() => {
 
 function openTeacher(id: number) {
   console.log('Open teacher:', id)
+}
+
+function openStudentsByTeacher(teacherId: number) {
+  router.push({
+    name: 'students-list',
+    query: { teacherId: teacherId.toString() },
+  })
+}
+
+function openGroupsByTeacher(teacherId: number, firstName: string, lastName: string) {
+  router.push({
+    name: 'groups-list',
+    query: {
+      teacherId: teacherId.toString(),
+      teacherName: `${lastName} ${firstName}`,
+    },
+  })
 }
 
 async function sortBy(col: string) {
@@ -184,6 +221,22 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 .date-mono { font-family: 'Space Mono', monospace; color: var(--app-text-main); font-size: 12.5px; }
 
 .timer-days { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; }
+
+.count-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: var(--blue);
+  font-family: 'Space Mono', monospace;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.count-link:hover {
+  text-decoration: underline;
+}
 
 .sort-icon { margin-left: 4px; }
 

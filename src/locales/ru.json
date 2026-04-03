@@ -1807,13 +1807,24 @@
     },
     "table": {
       "name": "Название группы",
-      "type": "Тип",
       "studentsCount": "Учеников",
       "teacher": "Учитель",
+      "startDate": "Дата старта",
+      "startTime": "Время старта",
+      "workdays": "Дни занятий",
+      "age": "Возраст (тип)",
       "lastCommentDate": "Дата комм.",
       "lastComment": "Последний комментарий",
-      "duration": "Длительность",
-      "startDate": "Дата старта"
+      "duration": "Длительность"
+    },
+    "days": {
+      "mon": "Пн",
+      "tue": "Вт",
+      "wed": "Ср",
+      "thu": "Чт",
+      "fri": "Пт",
+      "sat": "Сб",
+      "sun": "Вс"
     },
     "types": {
       "group": "Группа",
@@ -1838,6 +1849,8 @@
       "groupLessons": "Групповые",
       "individualLessons": "Индивид.",
       "city": "Город",
+      "groupsCount": "Всего групп",
+      "studentsCount": "Всего учеников",
       "comment": "Комментарий"
     },
     "noTeachers": "Нет преподавателей по заданным фильтрам"

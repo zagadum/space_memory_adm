@@ -1810,13 +1810,24 @@
     },
     "table": {
       "name": "Nazwa grupy",
-      "type": "Typ",
       "studentsCount": "Uczniów",
       "teacher": "Nauczyciel",
+      "startDate": "Data startu",
+      "startTime": "Godzina startu",
+      "workdays": "Dni zajęć",
+      "age": "Wiek (typ)",
       "lastCommentDate": "Data kom.",
       "lastComment": "Ostatni komentarz",
-      "duration": "Czas trwania",
-      "startDate": "Data startu"
+      "duration": "Czas trwania"
+    },
+    "days": {
+      "mon": "Pn",
+      "tue": "Wt",
+      "wed": "Sr",
+      "thu": "Czw",
+      "fri": "Pt",
+      "sat": "Sob",
+      "sun": "Nd"
     },
     "types": {
       "group": "Grupa",
@@ -1841,6 +1852,8 @@
       "groupLessons": "Grupowe",
       "individualLessons": "Indyw.",
       "city": "Miasto",
+      "groupsCount": "Liczba grup",
+      "studentsCount": "Liczba uczniów",
       "comment": "Komentarz"
     },
     "noTeachers": "Brak nauczycieli dla wybranych filtrów"

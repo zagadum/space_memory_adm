@@ -1806,13 +1806,24 @@
     },
     "table": {
       "name": "Назва групи",
-      "type": "Тип",
       "studentsCount": "Учнів",
       "teacher": "Вчитель",
+      "startDate": "Дата старту",
+      "startTime": "Час старту",
+      "workdays": "Дні занять",
+      "age": "Вік (тип)",
       "lastCommentDate": "Дата ком.",
       "lastComment": "Останній коментар",
-      "duration": "Тривалість",
-      "startDate": "Дата старту"
+      "duration": "Тривалість"
+    },
+    "days": {
+      "mon": "Пн",
+      "tue": "Вт",
+      "wed": "Ср",
+      "thu": "Чт",
+      "fri": "Пт",
+      "sat": "Сб",
+      "sun": "Нд"
     },
     "types": {
       "group": "Група",
@@ -1837,6 +1848,8 @@
       "groupLessons": "Групові",
       "individualLessons": "Індив.",
       "city": "Місто",
+      "groupsCount": "Всього груп",
+      "studentsCount": "Всього учнів",
       "comment": "Коментар"
     },
     "noTeachers": "Немає вчителів за обраними фільтрами"
