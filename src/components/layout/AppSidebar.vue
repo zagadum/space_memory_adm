@@ -126,19 +126,19 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('hr')" class="nav-children" :class="{ open: openSections.hr }">
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-active' }" @click="navigateTo('hr-active', '/hr/active')">
+        <div v-if="isVisible('hr-active')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-active' }" @click="navigateTo('hr-active', '/hr/active')">
           <span class="nav-icon">👨‍🏫</span> {{ t('sidebar.hrActive') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-training' }" @click="navigateTo('hr-training', '/hr/training')">
+        <div v-if="isVisible('hr-training')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-training' }" @click="navigateTo('hr-training', '/hr/training')">
           <span class="nav-icon">📚</span> {{ t('sidebar.hrTraining') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-pipeline' }" @click="navigateTo('hr-pipeline', '/hr/pipeline')">
+        <div v-if="isVisible('hr-pipeline')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-pipeline' }" @click="navigateTo('hr-pipeline', '/hr/pipeline')">
           <span class="nav-icon">🚀</span> {{ t('sidebar.hrPipeline') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-personal' }" @click="navigateTo('hr-personal', '/hr/personal')">
+        <div v-if="isVisible('hr-personal')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-personal' }" @click="navigateTo('hr-personal', '/hr/personal')">
           <span class="nav-icon">📋</span> {{ t('sidebar.hrPersonal') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-analytics' }" @click="navigateTo('hr-analytics', '/hr/analytics')">
+        <div v-if="isVisible('hr-analytics')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'hr-analytics' }" @click="navigateTo('hr-analytics', '/hr/analytics')">
           <span class="nav-icon">📊</span> {{ t('sidebar.hrAnalytics') }}
         </div>
       </div>
@@ -320,46 +320,46 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('quality')" class="nav-children" :class="{ open: openSections.quality }">
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
+        <div v-if="isVisible('rezygnacje')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
           <span class="nav-icon">🚪</span> {{ t('sidebar.rezygnacje') }}
           <span class="nav-badge" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'holidays-return' }" @click="navigateTo('holidays-return', '/quality/holidays-return')">
+        <div v-if="isVisible('holidays-return')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'holidays-return' }" @click="navigateTo('holidays-return', '/quality/holidays-return')">
           <span class="nav-icon">🌙</span> {{ t('sidebar.holidaysReturn') }}
           <span class="nav-badge amber">4</span>
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-monitoring' }" @click="navigateTo('quality-monitoring', '/quality/monitoring')">
+        <div v-if="isVisible('quality-monitoring')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-monitoring' }" @click="navigateTo('quality-monitoring', '/quality/monitoring')">
           <span class="nav-icon">🔍</span> {{ t('sidebar.qualityMonitoring') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-analytics' }" @click="navigateTo('quality-analytics', '/quality/analytics')">
+        <div v-if="isVisible('quality-analytics')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-analytics' }" @click="navigateTo('quality-analytics', '/quality/analytics')">
           <span class="nav-icon">📊</span> {{ t('sidebar.qualityAnalytics') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trial-lessons-qd' }" @click="navigateTo('trial-lessons-qd', '/quality/trial-lessons')">
+        <div v-if="isVisible('trial-lessons-qd')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trial-lessons-qd' }" @click="navigateTo('trial-lessons-qd', '/quality/trial-lessons')">
           <span class="nav-icon">⭐</span> {{ t('sidebar.trialLessonsQd') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-zaliczenia' }" @click="navigateTo('quality-zaliczenia', '/quality/zaliczenia')">
+        <div v-if="isVisible('quality-zaliczenia')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-zaliczenia' }" @click="navigateTo('quality-zaliczenia', '/quality/zaliczenia')">
           <span class="nav-icon">✔️</span> {{ t('sidebar.qualityZaliczenia') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-olimpiad' }" @click="navigateTo('quality-olimpiad', '/quality/olimpiad')">
+        <div v-if="isVisible('quality-olimpiad')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-olimpiad' }" @click="navigateTo('quality-olimpiad', '/quality/olimpiad')">
           <span class="nav-icon">🏆</span> {{ t('sidebar.qualityOlimpiad') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'spotkania' }" @click="navigateTo('spotkania', '/quality/spotkania')">
+        <div v-if="isVisible('spotkania')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'spotkania' }" @click="navigateTo('spotkania', '/quality/spotkania')">
           <span class="nav-icon">🤝</span> {{ t('sidebar.spotkania') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'sciezka' }" @click="navigateTo('sciezka', '/quality/sciezka')">
+        <div v-if="isVisible('sciezka')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'sciezka' }" @click="navigateTo('sciezka', '/quality/sciezka')">
           <span class="nav-icon">🛤️</span> {{ t('sidebar.sciezka') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-materials' }" @click="navigateTo('quality-materials', '/quality/materials')">
+        <div v-if="isVisible('quality-materials')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-materials' }" @click="navigateTo('quality-materials', '/quality/materials')">
           <span class="nav-icon">📚</span> {{ t('sidebar.qualityMaterials') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'zaliczenia-calendar' }" @click="navigateTo('zaliczenia-calendar', '/quality/zaliczenia-calendar')">
+        <div v-if="isVisible('zaliczenia-calendar')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'zaliczenia-calendar' }" @click="navigateTo('zaliczenia-calendar', '/quality/zaliczenia-calendar')">
           <span class="nav-icon">📅</span> {{ t('sidebar.zaliczeniaCalendar') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'all-tasks' }" @click="navigateTo('all-tasks', '/quality/all-tasks')">
+        <div v-if="isVisible('all-tasks')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'all-tasks' }" @click="navigateTo('all-tasks', '/quality/all-tasks')">
           <span class="nav-icon">📋</span> {{ t('sidebar.allTasks') }}
           <span class="nav-badge blue">8</span>
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-stats' }" @click="navigateTo('quality-stats', '/quality/stats')">
+        <div v-if="isVisible('quality-stats')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'quality-stats' }" @click="navigateTo('quality-stats', '/quality/stats')">
           <span class="nav-icon">📉</span> {{ t('sidebar.qualityStats') }}
         </div>
       </div>
@@ -371,20 +371,20 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('settings-section')" class="nav-children" :class="{ open: openSections.settings }">
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'indigo-techniques' }" @click="setActive('indigo-techniques')">
+        <div v-if="isVisible('indigo-techniques')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'indigo-techniques' }" @click="setActive('indigo-techniques')">
           <span class="nav-icon">🧩</span> {{ t('sidebar.indigoTechniques') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
+        <div v-if="isVisible('school-settings')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
           <span class="nav-icon">🏫</span> {{ t('sidebar.schoolSettings') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="setActive('access-control')">
+        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="navigateTo('access-control', '/settings/access-control')">
           <span class="nav-icon">🔐</span> {{ t('sidebar.accessControl') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">
+        <div v-if="isVisible('integrations')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">
           <span class="nav-icon">🔌</span> {{ t('sidebar.integrations') }}
           <span class="nav-badge blue">KSeF</span>
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'reports' }" @click="setActive('reports')">
+        <div v-if="isVisible('reports')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'reports' }" @click="setActive('reports')">
           <span class="nav-icon">📄</span> {{ t('sidebar.reports') }}
         </div>
       </div>
@@ -648,7 +648,12 @@ function canOpen(menuKey: string): boolean {
 }
 
 const toggleSection = (section: string) => {
-  if (!isSectionAllowed(section)) return
+  const permissionKey = section === 'settings'
+    ? 'settings-section'
+    : section === 'recruitmentIndigo'
+      ? 'recruitment'
+      : section
+  if (!isSectionAllowed(permissionKey)) return
   openSections.value[section] = !openSections.value[section]
 }
 

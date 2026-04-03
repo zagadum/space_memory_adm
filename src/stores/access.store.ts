@@ -1,8 +1,24 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
 import { accessControlApi, type AccessMatrix, type AccessMode } from "../api/accessControlApi";
+import { ROLE_MENU_ACCESS, normalizeRole } from "../config/roleMenuAccess.config";
 
 const DEFAULT_MODE: AccessMode = "hidden";
+
+const LEGACY_RESOURCE_ALIASES: Record<string, string> = {
+  "student-list": "students",
+  "group-list": "groups",
+  "settings-access-control": "access-control",
+};
+
+function normalizeMatrix(raw: AccessMatrix): AccessMatrix {
+  const result: AccessMatrix = {};
+  for (const [key, mode] of Object.entries(raw || {})) {
+    const canonical = LEGACY_RESOURCE_ALIASES[key] ?? key;
+    result[canonical] = mode;
+  }
+  return result;
+}
 
 export const useAccessStore = defineStore("access", () => {
   const matrix = ref<AccessMatrix>({});
@@ -18,7 +34,7 @@ export const useAccessStore = defineStore("access", () => {
     loading.value = true;
     try {
       const data = await accessControlApi.getMyAccessControl();
-      matrix.value = data.matrix ?? {};
+      matrix.value = normalizeMatrix(data.matrix ?? {});
       role.value = data.role ?? "";
       version.value = Number(data.version || 0);
       initialized.value = true;
@@ -39,7 +55,18 @@ export const useAccessStore = defineStore("access", () => {
   }
 
   function getMode(resource: string): AccessMode {
-    return matrix.value[resource] ?? DEFAULT_MODE;
+    const canonical = LEGACY_RESOURCE_ALIASES[resource] ?? resource;
+    const direct = matrix.value[canonical];
+    if (direct) return direct;
+
+    // Если backend прислал неполную матрицу, берём безопасный fallback из role-конфига.
+    const normalized = normalizeRole(role.value);
+    if (normalized) {
+      const fallback = ROLE_MENU_ACCESS[normalized]?.[canonical]?.mode;
+      if (fallback === "active") return "active";
+    }
+
+    return DEFAULT_MODE;
   }
 
   function canAccess(resource: string): boolean {
@@ -55,7 +82,7 @@ export const useAccessStore = defineStore("access", () => {
   }
 
   function applyMatrix(next: AccessMatrix, nextVersion?: number) {
-    matrix.value = next;
+    matrix.value = normalizeMatrix(next);
     if (typeof nextVersion === "number") version.value = nextVersion;
     initialized.value = true;
   }
