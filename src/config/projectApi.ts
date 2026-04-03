@@ -1,3 +1,5 @@
+import { APP_ENV } from './env'
+
 export type ProjectCode = 'space' | 'indigo' | 'space_ua'
 
 export interface ProjectOption {
@@ -39,34 +41,33 @@ export function isProjectCode(value: unknown): value is ProjectCode {
   return VALID_PROJECTS.includes(value as ProjectCode)
 }
 
-const env = (import.meta as any).env ?? {}
-
 export const PROJECT_API_URLS: Record<ProjectCode, string> = {
-  space: normalizeProjectApiUrl(env.VITE_API_URL_SPACE, 'https://pl.memory.firm.kiev.ua'),
-  indigo: normalizeProjectApiUrl(env.VITE_API_URL_INDIGO, 'https://memory-pl.firm.kiev.ua/api/v1/'),
-  space_ua: normalizeProjectApiUrl(env.VITE_API_URL_SPACE_UA || env.VITE_API_URL, 'https://memory.firm.kiev.ua/api/v1/'),
+  space: normalizeProjectApiUrl(APP_ENV.apiUrlSpace, 'https://pl.memory.firm.kiev.ua'),
+  indigo: normalizeProjectApiUrl(APP_ENV.apiUrlIndigo, 'https://memory-pl.firm.kiev.ua/api/v1/'),
+  space_ua: normalizeProjectApiUrl(APP_ENV.apiUrlSpaceUa || APP_ENV.apiUrl, 'https://memory.firm.kiev.ua/api/v1/'),
 }
 
 export const PROJECT_OPTIONS: ProjectOption[] = [
   {
     code: 'space',
-    label: 'Space Memory PL',
-    shortLabel: 'Space PL',
+    label: APP_ENV.projectLabelSpace,
+    shortLabel: APP_ENV.projectShortLabelSpace,
     dotClass: 'dot-space',
-    publicUrl: 'https://space-memory.pl',
+    publicUrl: APP_ENV.projectPublicUrlSpace || undefined,
   },
   {
     code: 'space_ua',
-    label: 'Space Memory UA',
-    shortLabel: 'Space UA',
+    label: APP_ENV.projectLabelSpaceUa,
+    shortLabel: APP_ENV.projectShortLabelSpaceUa,
     dotClass: 'dot-space-ua',
+    publicUrl: APP_ENV.projectPublicUrlSpaceUa || undefined,
   },
   {
     code: 'indigo',
-    label: 'Indigo',
-    shortLabel: 'Indigo',
+    label: APP_ENV.projectLabelIndigo,
+    shortLabel: APP_ENV.projectShortLabelIndigo,
     dotClass: 'dot-indigo',
-    publicUrl: 'https://indigomental.pl',
+    publicUrl: APP_ENV.projectPublicUrlIndigo || undefined,
   },
 ]
 
@@ -80,8 +81,8 @@ export function getStoredProjectCode(): ProjectCode {
     if (isProjectCode(stored)) return stored
   }
 
-  if (isProjectCode(env.VITE_DEFAULT_PROJECT)) {
-    return env.VITE_DEFAULT_PROJECT
+  if (isProjectCode(APP_ENV.defaultProject)) {
+    return APP_ENV.defaultProject
   }
 
   return 'space_ua'

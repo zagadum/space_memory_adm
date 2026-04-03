@@ -1,8 +1,4 @@
-function parseBooleanEnv(value: string | undefined, defaultValue = false): boolean {
-  if (value == null) return defaultValue;
-  const normalized = value.trim().toLowerCase();
-  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
-}
+import { APP_ENV } from './env'
 
 // Temporary bypass: when enabled, all authenticated users get full app access.
-export const AUTHZ_BYPASS = parseBooleanEnv(import.meta.env.VITE_AUTHZ_BYPASS, true);
+export const AUTHZ_BYPASS = APP_ENV.authzBypass;

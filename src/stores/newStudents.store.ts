@@ -9,6 +9,7 @@ import {
 } from '../api/recruitmentApi'
 import type { RecruitmentBackend } from '../api/http'
 import { parseApiError } from '../api/errorHelper'
+import { APP_ENV } from '../config/env'
 
 export interface StudentDocumentItem {
   id: number | string
@@ -179,8 +180,7 @@ const MOCK_HISTORY: Record<number, HistoryEvent[]> = {
   ],
 }
 
-const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? 'false').toLowerCase()
-const USE_MOCK_BY_DEFAULT = rawUseMock !== 'false'
+const USE_MOCK_BY_DEFAULT = APP_ENV.useMock
 
 export const useNewStudentsStore = defineStore('newStudents', () => {
   const currentBackend = ref<RecruitmentBackend>('default')

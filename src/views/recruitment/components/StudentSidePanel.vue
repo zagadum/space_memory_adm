@@ -540,7 +540,7 @@ function formatTxDate(dateText: string) {
   backdrop-filter: blur(4px); z-index: 300;
   opacity: 0; pointer-events: none; transition: opacity 0.3s;
 }
-//:root:not(.dark) .sp-overlay { background: rgba(160,170,220,0.50); }
+:root:not(.dark) .sp-overlay { background: rgba(160,170,220,0.50); }
 .sp-overlay.active { opacity: 1; pointer-events: all; }
 
 .sp-panel {

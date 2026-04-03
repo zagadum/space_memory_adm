@@ -3,26 +3,18 @@ import { mockAdapter } from "./mockAdapter";
 import { useAppStore } from "../stores/app.store";
 import { useNotificationStore } from "../stores/notification.store";
 import { getActiveProjectApiUrl, PROJECT_API_URLS } from "../config/projectApi";
+import { APP_ENV } from "../config/env";
 
-const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? "false").toLowerCase();
-const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
+const USE_MOCK_BY_DEFAULT = APP_ENV.useMock;
 
 const API_URL = getActiveProjectApiUrl();
-const RECRUITMENT_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_API_URL || API_URL;
-const RECRUITMENT_INDIGO_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_INDIGO_API_URL || RECRUITMENT_API_URL;
+const RECRUITMENT_API_URL = APP_ENV.recruitmentApiUrl || API_URL;
+const RECRUITMENT_INDIGO_API_URL = APP_ENV.recruitmentIndigoApiUrl || RECRUITMENT_API_URL;
 
 export type RecruitmentBackend = "default" | "indigo";
 
-function parsePrefixList(value: unknown): string[] {
-  return String(value ?? "")
-    .split(",")
-    .map((x) => x.trim())
-    .filter(Boolean)
-    .map((x) => x.replace(/^\//, ""));
-}
-
-const MOCK_ONLY_PREFIXES = parsePrefixList((import.meta as any).env?.VITE_MOCK_ONLY);
-const REAL_ONLY_PREFIXES = parsePrefixList((import.meta as any).env?.VITE_REAL_ONLY);
+const MOCK_ONLY_PREFIXES = APP_ENV.mockOnlyPrefixes;
+const REAL_ONLY_PREFIXES = APP_ENV.realOnlyPrefixes;
 
 function normalizeRequestUrl(config: InternalAxiosRequestConfig): string {
   const rawUrl = String(config.url || "");
