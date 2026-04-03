@@ -156,28 +156,28 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('trainer')" class="nav-children" :class="{ open: openSections.trainer }">
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-dashboard' }" @click="navigateTo('trainer-dashboard', '/trainer/dashboard')">
+        <div v-if="isVisible('trainer-dashboard')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-dashboard' }" @click="navigateTo('trainer-dashboard', '/trainer/dashboard')">
           <span class="nav-icon">📊</span> {{ t('sidebar.trainerDashboard') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-students' }" @click="navigateTo('trainer-students', '/trainer/students')">
+        <div v-if="isVisible('trainer-students')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-students' }" @click="navigateTo('trainer-students', '/trainer/students')">
           <span class="nav-icon">👩‍🎓</span> {{ t('sidebar.trainerStudents') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-groups' }" @click="navigateTo('trainer-groups', '/trainer/groups')">
+        <div v-if="isVisible('trainer-groups')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-groups' }" @click="navigateTo('trainer-groups', '/trainer/groups')">
           <span class="nav-icon">🎓</span> {{ t('sidebar.trainerGroups') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'lesson-tracker' }" @click="navigateTo('lesson-tracker', '/trainer/lesson-tracker')">
+        <div v-if="isVisible('lesson-tracker')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'lesson-tracker' }" @click="navigateTo('lesson-tracker', '/trainer/lesson-tracker')">
           <span class="nav-icon">📝</span> {{ t('sidebar.trainerLessonTracker') }}
         </div>
         <div v-if="isVisible('salary-demo')" class="nav-item" :class="[{ active: activeItem === 'salary-demo' }, accessClass('salary-demo')]" @click="navigateTo('salary-demo', '/teacher/salary')">
           <span class="nav-icon">💰</span> {{ t('sidebar.trainerSalary') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-materials' }" @click="navigateTo('trainer-materials', '/trainer/materials')">
+        <div v-if="isVisible('trainer-materials')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-materials' }" @click="navigateTo('trainer-materials', '/trainer/materials')">
           <span class="nav-icon">📚</span> {{ t('sidebar.trainerMaterials') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-exam' }" @click="navigateTo('trainer-exam', '/trainer/exam')">
+        <div v-if="isVisible('trainer-exam')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-exam' }" @click="navigateTo('trainer-exam', '/trainer/exam')">
           <span class="nav-icon">📜</span> {{ t('sidebar.trainerExam') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-mail' }" @click="navigateTo('trainer-mail', '/trainer/mail')">
+        <div v-if="isVisible('trainer-mail')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-mail' }" @click="navigateTo('trainer-mail', '/trainer/mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.trainerMail') }}
           <span class="nav-badge blue">7</span>
         </div>
@@ -265,14 +265,14 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('finance')" class="nav-children" :class="{ open: openSections.finance }">
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
+        <div v-if="isVisible('student-finance')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
           <span class="nav-icon">💰</span> {{ t('sidebar.studentFinance') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
+        <div v-if="isVisible('debtors')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
           <span class="nav-icon">🔴</span> {{ t('sidebar.debtors') }}
           <span class="nav-badge" v-if="debtors > 0">{{ debtors }}</span>
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
+        <div v-if="isVisible('nadplaty')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
           <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
           <span class="nav-badge cyan">3</span>
         </div>
@@ -294,7 +294,7 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('accounting')" class="nav-children" :class="{ open: openSections.accounting }">
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
+        <div v-if="isVisible('faktury')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
           <span class="nav-icon">🧾</span> {{ t('sidebar.faktury') }}
         </div>
         <div v-if="isVisible('returns')" class="nav-item" :class="[{ active: activeItem === 'returns' }, accessClass('returns')]" @click="navigateTo('returns', '/finance/returns')">
@@ -307,7 +307,7 @@
         <div v-if="isVisible('salary-calculator')" class="nav-item" :class="[{ active: activeItem === 'salary-calculator' }, accessClass('salary-calculator')]" @click="navigateTo('salary-calculator', '/finance/salary-calculator')">
           <span class="nav-icon">🧮</span> {{ t('sidebar.salaryCalculator') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia')">
+        <div v-if="isVisible('finance-ustawienia')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia', 'finance-ustawienia')">
           <span class="nav-icon">🔧</span> {{ t('sidebar.ustawienia') }}
         </div>
       </div>
@@ -377,7 +377,7 @@
         <div v-if="isVisible('school-settings')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
           <span class="nav-icon">🏫</span> {{ t('sidebar.schoolSettings') }}
         </div>
-        <div class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="navigateTo('access-control', '/settings/access-control')">
+        <div v-if="isVisible('access-control')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="navigateTo('access-control', '/settings/access-control')">
           <span class="nav-icon">🔐</span> {{ t('sidebar.accessControl') }}
         </div>
         <div v-if="isVisible('integrations')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">

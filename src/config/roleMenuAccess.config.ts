@@ -140,10 +140,10 @@ export const ROLE_MENU_ACCESS: Record<AppRole, MenuAccessMap> = {
     FINANCE, ACCOUNTING, HR, TRAINER, QUALITY, SETTINGS_SECTION,
   ),
 
-  // Full operational access — no admin settings panel
+  // Full operational access including settings panel
   "admin": allow(
     ALWAYS, SECRETARIAT, RECRUITMENT,
-    FINANCE, ACCOUNTING, HR, TRAINER, QUALITY,
+    FINANCE, ACCOUNTING, HR, TRAINER, QUALITY, SETTINGS_SECTION,
   ),
 
   // Only own trainer panel + salary; no student management, no finance

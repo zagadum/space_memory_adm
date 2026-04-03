@@ -129,14 +129,13 @@ set access_mode = 'active'
 from gls_role r
 where ra.gls_role_id = r.id and r.code = 'super-admin';
 
--- Шаг C: admin (без settings-section)
+-- Шаг C: admin (полный доступ, включая settings-section)
 update gls_role_access ra
 set access_mode = 'active'
 from gls_role r
 join gls_access_resource ar on ar.id = ra.gls_access_resource_id
 where ra.gls_role_id = r.id
-  and r.code = 'admin'
-  and ar.resource_key not in ('settings-section', 'access-control', 'integrations', 'reports');
+  and r.code = 'admin';
 
 -- Пример read-only для finance на students
 update gls_role_access ra
@@ -232,4 +231,9 @@ Response:
 ```json
 { "ok": true, "version": 13, "savedAt": "2026-04-03T10:30:00Z" }
 ```
+
+## 8) Frontend runtime rules
+
+- `admin` и `super-admin` на фронте принудительно получают `active` для всех menu `resource_key` (защита от неполного ответа `/me/access-control`).
+- В `dev` режиме фронт пишет warning в консоль, если в `/me/access-control` отсутствуют ожидаемые `resource_key`.
 
