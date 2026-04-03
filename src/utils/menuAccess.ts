@@ -1,32 +1,11 @@
 import {
   MENU_ROUTE_KEY_MAP,
   MENU_SECTION_ITEMS,
-  type MenuAccessEntry,
-  type MenuAccessMap,
   type MenuAccessMode,
 } from "../config/menuAccess.config";
 import { AUTHZ_BYPASS } from "../config/featureFlags";
-import { normalizeRole, ROLE_MENU_ACCESS } from "../config/roleMenuAccess.config";
 import { useAuthStore } from "../stores/auth.store";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Dev-only localStorage overrides
-// Usage in browser console:
-//   import { setMenuAccessOverrides } from '@/utils/menuAccess'
-//   setMenuAccessOverrides({ quality: { mode: 'active' } })
-// ─────────────────────────────────────────────────────────────────────────────
-const OVERRIDES_KEY = "menu_access_overrides";
-
-function readOverrides(): MenuAccessMap {
-  try {
-    const raw = localStorage.getItem(OVERRIDES_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as MenuAccessMap;
-    return parsed && typeof parsed === "object" ? parsed : {};
-  } catch {
-    return {};
-  }
-}
+import { useAccessStore } from "../stores/access.store";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Core resolver — priority order:
@@ -34,38 +13,33 @@ function readOverrides(): MenuAccessMap {
 //   2. Role-based config (ROLE_MENU_ACCESS) — normal operation
 //   3. Hidden                               — safe fallback (deny by default)
 // ─────────────────────────────────────────────────────────────────────────────
-function resolveEntry(menuKey: string): MenuAccessEntry {
+function resolveMode(menuKey: string): MenuAccessMode {
   const auth = useAuthStore();
+  const access = useAccessStore();
 
   // Temporary mode: keep auth checks, but skip role-based restrictions.
   if (AUTHZ_BYPASS && auth.isAuthenticated) {
-    return { mode: "active" };
+    return "active";
   }
 
-  // 1. Dev override
-  const overrides = readOverrides();
-  if (overrides[menuKey]) return overrides[menuKey];
+  // Пока не загружена матрица после refresh — не блокируем навигацию преждевременно.
+  if (!access.initialized) return "active";
 
-  // 2. Role-based lookup
-  const role = normalizeRole(auth.user?.role);
-  if (role) {
-    const roleMap = ROLE_MENU_ACCESS[role];
-    return roleMap[menuKey] ?? { mode: "hidden" };
-  }
-
-  // 3. No user / unknown role → deny everything
-  return { mode: "hidden" };
+  return access.getMode(menuKey) as MenuAccessMode;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Public API (same surface as before — no changes needed in consumers)
 // ─────────────────────────────────────────────────────────────────────────────
 export function getMenuAccessMode(menuKey: string): MenuAccessMode {
-  return resolveEntry(menuKey).mode;
+  return resolveMode(menuKey);
 }
 
 export function getMenuAccessReason(menuKey: string): string {
-  return resolveEntry(menuKey).reason ?? "";
+  if (getMenuAccessMode(menuKey) === "hidden") {
+    return "Раздел недоступен по текущим правам";
+  }
+  return "";
 }
 
 export function isMenuVisible(menuKey: string): boolean {
@@ -73,11 +47,11 @@ export function isMenuVisible(menuKey: string): boolean {
 }
 
 export function isMenuAllowed(menuKey: string): boolean {
-  return getMenuAccessMode(menuKey) === "active";
+  return getMenuAccessMode(menuKey) !== "hidden";
 }
 
-export function isMenuBlocked(menuKey: string): boolean {
-  return getMenuAccessMode(menuKey) === "blocked";
+export function isMenuBlocked(_menuKey: string): boolean {
+  return false;
 }
 
 export function isSectionVisible(sectionKey: string): boolean {
@@ -106,11 +80,3 @@ export function getFirstAllowedFallbackPath(): string {
   return found?.path ?? "/auth/sign-in";
 }
 
-// Optional helper for runtime overrides in browser devtools.
-export function setMenuAccessOverrides(overrides: MenuAccessMap): void {
-  localStorage.setItem(OVERRIDES_KEY, JSON.stringify(overrides));
-}
-
-export function clearMenuAccessOverrides(): void {
-  localStorage.removeItem(OVERRIDES_KEY);
-}

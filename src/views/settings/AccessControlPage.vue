@@ -61,7 +61,7 @@
             <!-- Группа-заголовок -->
             <tr class="section-row">
               <td :colspan="ROLES.length + 1" class="section-label">
-                {{ section.icon }} {{ t(`accessControl.section.${section.key}`) }}
+                {{ section.icon }} {{ t(`accessControl.section.${section.key}`, section.key) }}
               </td>
             </tr>
             <!-- Строки секции -->
@@ -96,19 +96,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCanAccess } from '../../composables/useCanAccess'
+import { accessControlApi, type RoleMatrix } from '../../api/accessControlApi'
+import { ROLE_MENU_ACCESS } from '../../config/roleMenuAccess.config'
 
 const { t } = useI18n()
-const { isRole } = useCanAccess()
 
 // ─── Типы ───────────────────────────────────────────────────────────────────
 type AppRole = 'super-admin' | 'admin' | 'teacher' | 'sales' | 'quality' | 'finance' | 'secretariat' | 'hr'
 type AccessMode = 'active' | 'read-only' | 'hidden'
 
 interface MatrixRow { [role: string]: AccessMode }
-interface Matrix   { [itemKey: string]: MatrixRow }
+interface Matrix extends RoleMatrix {}
 
 // ─── Роли (порядок колонок) ──────────────────────────────────────────────────
 const ROLES: AppRole[] = ['super-admin', 'admin', 'teacher', 'sales', 'quality', 'finance', 'secretariat', 'hr']
@@ -116,53 +116,110 @@ const ROLES: AppRole[] = ['super-admin', 'admin', 'teacher', 'sales', 'quality',
 // ─── Секции матрицы ──────────────────────────────────────────────────────────
 const SECTIONS = [
   {
-    key: 'students',
-    icon: '👨‍🎓',
+    key: 'common',
+    icon: '🧭',
     items: [
-      { key: 'student-list' },
-      { key: 'student-profile' },
-      { key: 'student-payments' },
-      { key: 'student-delete' },
-      { key: 'student-price-change' },
+      { key: 'dashboard' },
+      { key: 'my-cabinet' },
     ],
   },
   {
-    key: 'groups',
-    icon: '👥',
+    key: 'secretariat',
+    icon: '🗂',
     items: [
-      { key: 'group-list' },
-      { key: 'group-edit' },
-      { key: 'group-delete' },
+      { key: 'secretariat' },
+      { key: 'students' },
+      { key: 'groups' },
+      { key: 'teachers' },
+      { key: 'course-endings' },
     ],
   },
   {
     key: 'recruitment',
     icon: '📋',
     items: [
-      { key: 'leads-view' },
-      { key: 'leads-edit' },
-      { key: 'new-students-panel' },
+      { key: 'recruitment' },
+      { key: 'new-students' },
+      { key: 'leads' },
+      { key: 'target-mail' },
+      { key: 'expelled' },
+      { key: 'new-groups' },
+      { key: 'archived' },
+      { key: 'import-db' },
     ],
   },
   {
     key: 'finance',
     icon: '💳',
     items: [
-      { key: 'finance-view' },
-      { key: 'finance-edit' },
-      { key: 'debtors-view' },
-      { key: 'salary-view' },
-      { key: 'salary-confirm' },
+      { key: 'finance' },
+      { key: 'student-finance' },
+      { key: 'debtors' },
+      { key: 'nadplaty' },
+      { key: 'settings' },
+      { key: 'accounting' },
+      { key: 'faktury' },
+      { key: 'returns' },
+      { key: 'projects' },
+      { key: 'salary-calculator' },
+      { key: 'finance-ustawienia' },
+    ],
+  },
+  {
+    key: 'trainer',
+    icon: '🎓',
+    items: [
+      { key: 'trainer' },
+      { key: 'trainer-dashboard' },
+      { key: 'trainer-students' },
+      { key: 'trainer-groups' },
+      { key: 'lesson-tracker' },
+      { key: 'salary-demo' },
+      { key: 'trainer-materials' },
+      { key: 'trainer-exam' },
+      { key: 'trainer-mail' },
+    ],
+  },
+  {
+    key: 'quality',
+    icon: '🔎',
+    items: [
+      { key: 'quality' },
+      { key: 'rezygnacje' },
+      { key: 'holidays-return' },
+      { key: 'quality-monitoring' },
+      { key: 'quality-analytics' },
+      { key: 'trial-lessons-qd' },
+      { key: 'quality-zaliczenia' },
+      { key: 'quality-olimpiad' },
+      { key: 'spotkania' },
+      { key: 'sciezka' },
+      { key: 'quality-materials' },
+      { key: 'zaliczenia-calendar' },
+      { key: 'all-tasks' },
+      { key: 'quality-stats' },
+    ],
+  },
+  {
+    key: 'hr',
+    icon: '🧑',
+    items: [
+      { key: 'hr' },
+      { key: 'hr-active' },
+      { key: 'hr-training' },
+      { key: 'hr-pipeline' },
+      { key: 'hr-personal' },
+      { key: 'hr-analytics' },
     ],
   },
   {
     key: 'settings',
-    icon: '⚙️',
+    icon: '⚙',
     items: [
-      { key: 'settings-users' },
-      { key: 'settings-access-control' },
-      { key: 'settings-school' },
-      { key: 'settings-integrations' },
+      { key: 'settings-section' },
+      { key: 'access-control' },
+      { key: 'integrations' },
+      { key: 'reports' },
     ],
   },
 ]
@@ -180,62 +237,59 @@ const CYCLE_ORDER: AccessMode[] = ['active', 'read-only', 'hidden']
 function buildDefaults(): Matrix {
   const m: Matrix = {}
 
-  const full: AppRole[]   = ['super-admin', 'admin']
-  const finance: AppRole[] = ['super-admin', 'admin', 'finance']
-  const all: AppRole[]    = ROLES
-
-  function set(key: string, active: AppRole[], readonly: AppRole[] = []) {
-    m[key] = {}
-    for (const role of all) {
-      if (active.includes(role))       m[key][role] = 'active'
-      else if (readonly.includes(role)) m[key][role] = 'read-only'
-      else                              m[key][role] = 'hidden'
-    }
+  const readonlyByRole: Partial<Record<AppRole, string[]>> = {
+    teacher: ['students', 'groups'],
+    sales: ['students', 'groups'],
+    quality: ['students', 'groups'],
+    finance: ['students'],
   }
 
-  set('student-list',      ['super-admin', 'admin', 'sales', 'quality', 'finance', 'secretariat'], ['teacher'])
-  set('student-profile',   ['super-admin', 'admin', 'sales', 'secretariat'], ['quality', 'finance'])
-  set('student-payments',  finance, ['secretariat'])
-  set('student-delete',    full)
-  set('student-price-change', finance)
+  const resourceKeys = Array.from(new Set(SECTIONS.flatMap((section) => section.items.map((item) => item.key))))
 
-  set('group-list',   ['super-admin', 'admin', 'teacher', 'quality', 'secretariat'], ['sales'])
-  set('group-edit',   ['super-admin', 'admin', 'secretariat'])
-  set('group-delete', full)
-
-  set('leads-view',         ['super-admin', 'admin', 'sales', 'quality'])
-  set('leads-edit',         ['super-admin', 'admin', 'sales'])
-  set('new-students-panel', ['super-admin', 'admin', 'sales', 'secretariat'])
-
-  set('finance-view',    finance, ['secretariat'])
-  set('finance-edit',    finance)
-  set('debtors-view',    finance)
-  set('salary-view',     ['super-admin', 'admin', 'finance', 'teacher'], [])
-  set('salary-confirm',  ['super-admin', 'admin', 'finance'])
-
-  set('settings-users',          full)
-  set('settings-access-control', ['super-admin'])
-  set('settings-school',         full)
-  set('settings-integrations',   ['super-admin'])
+  for (const resourceKey of resourceKeys) {
+    m[resourceKey] = {}
+    for (const role of ROLES) {
+      const isActive = ROLE_MENU_ACCESS[role]?.[resourceKey]?.mode === 'active'
+      if (!isActive) {
+        m[resourceKey][role] = 'hidden'
+        continue
+      }
+      const roleReadOnlyKeys = readonlyByRole[role] ?? []
+      m[resourceKey][role] = roleReadOnlyKeys.includes(resourceKey) ? 'read-only' : 'active'
+    }
+  }
 
   return m
 }
 
 // ─── Состояние ───────────────────────────────────────────────────────────────
-const LS_KEY = 'gls_access_matrix_v1'
-
-function loadMatrix(): Matrix {
-  try {
-    const raw = localStorage.getItem(LS_KEY)
-    if (raw) return JSON.parse(raw)
-  } catch {}
-  return buildDefaults()
-}
-
-const matrix = reactive<Matrix>(loadMatrix())
+const matrix = reactive<Matrix>(buildDefaults())
+const version = ref(0)
 const saving = ref(false)
 const showApiContract = ref(false)
 const toast = ref<{ message: string; type: 'success' | 'error' } | null>(null)
+
+function applyMatrix(next: Matrix) {
+  const nextKeys = new Set(Object.keys(next))
+  for (const key of Object.keys(matrix)) {
+    if (!nextKeys.has(key)) delete matrix[key]
+  }
+  for (const key of nextKeys) {
+    matrix[key] = next[key]
+  }
+}
+
+async function loadMatrixFromApi() {
+  try {
+    const data = await accessControlApi.getAccessMatrix()
+    applyMatrix((data?.matrix as Matrix) || buildDefaults())
+    version.value = Number(data?.version || 0)
+  } catch {
+    applyMatrix(buildDefaults())
+    version.value = 0
+    showToast(t('accessControl.savedError'), 'error')
+  }
+}
 
 // ─── Хелперы ─────────────────────────────────────────────────────────────────
 function getMode(role: AppRole, key: string): AccessMode {
@@ -267,11 +321,9 @@ function roleEmoji(role: AppRole): string {
 async function saveMatrix() {
   saving.value = true
   try {
-    // localStorage — источник правды на фронте (до подключения реального API)
-    localStorage.setItem(LS_KEY, JSON.stringify(matrix))
-
-    // TODO: когда бэкенд готов — снять комментарий:
-    // await http.post('settings/access-control', { matrix })
+    const payload = JSON.parse(JSON.stringify(matrix)) as Matrix
+    const res = await accessControlApi.saveAccessMatrix({ matrix: payload, version: version.value })
+    version.value = Number(res?.version || version.value)
 
     showToast(t('accessControl.savedOk'), 'success')
   } catch {
@@ -282,11 +334,7 @@ async function saveMatrix() {
 }
 
 function resetToDefaults() {
-  const defaults = buildDefaults()
-  for (const key of Object.keys(defaults)) {
-    matrix[key] = defaults[key]
-  }
-  localStorage.removeItem(LS_KEY)
+  applyMatrix(buildDefaults())
   showToast(t('accessControl.resetOk'), 'success')
 }
 
@@ -296,26 +344,43 @@ function showToast(message: string, type: 'success' | 'error') {
 }
 
 // ─── API Contract (для разработчика) ─────────────────────────────────────────
-const apiContractExample = `POST /v1/settings/access-control
+const apiContractExample = `GET /v1/me/access-control
+Authorization: Bearer <token>
+
+Response 200:
+{
+  "role": "finance",
+  "version": 12,
+  "matrix": {
+    "dashboard": "active",
+    "students": "read-only",
+    "settings": "hidden"
+  }
+}
+
+POST /v1/settings/access-control
 Authorization: Bearer <token>   (super-admin only)
 Content-Type: application/json
 
 {
   "matrix": {
-    "student-list":     { "admin": "active", "teacher": "read-only", "sales": "active", ... },
-    "student-payments": { "admin": "active", "finance": "active",    "teacher": "hidden", ... },
-    "student-delete":   { "admin": "active", "super-admin": "active", ... },
-    ...
+    "students": { "super-admin": "active", "admin": "active", "finance": "read-only", ... },
+    "groups":   { "super-admin": "active", "admin": "active", "sales": "read-only", ... },
+    "reports":  { "super-admin": "active", "admin": "hidden", ... }
   }
 }
 
 Response 200:
-{ "ok": true, "savedAt": "2026-03-30T18:00:00Z" }
+{ "ok": true, "version": 13, "savedAt": "2026-03-30T18:00:00Z" }
 
 Режимы:
   "active"    — полный доступ + редактирование
   "read-only" — только просмотр (UI отключает кнопки мутации)
   "hidden"    — не видно в меню и недоступно через роут`
+
+onMounted(() => {
+  loadMatrixFromApi()
+})
 </script>
 
 <style scoped>

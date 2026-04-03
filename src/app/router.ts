@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useAuthStore } from "../stores/auth.store";
+import { useAccessStore } from "../stores/access.store";
 import { useNotificationStore } from "../stores/notification.store";
 import { useGlobalSearchStore } from "../stores/globalSearch.store";
-import { getMenuAccessReason, getMenuKeyByRouteName, isMenuAllowed } from "../utils/menuAccess";
+import { getMenuAccessMode, getMenuAccessReason, getMenuKeyByRouteName } from "../utils/menuAccess";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -256,7 +257,7 @@ export const router = createRouter({
   ],
 });
 
-router.beforeEach((to, from) => {
+router.beforeEach(async (to, from) => {
   // Очищаем глобальный поиск при навигации между страницами
   if (to.name !== from.name) {
     try {
@@ -279,6 +280,15 @@ router.beforeEach((to, from) => {
     };
   }
 
+  const accessStore = useAccessStore();
+  if (!accessStore.initialized) {
+    if (!auth.user) {
+      await auth.loadMe();
+    } else {
+      await accessStore.initAfterLogin();
+    }
+  }
+
   // Если пользователь должен сменить пароль — пропускаем только /change-password
   if ((auth.user as any)?.forcePasswordChange && to.name !== 'change-password' && to.name !== 'access-denied') {
     return { name: 'change-password' };
@@ -288,7 +298,7 @@ router.beforeEach((to, from) => {
   if (to.name === 'access-denied' || to.name === 'change-password') return true;
 
   const menuKey = getMenuKeyByRouteName(String(to.name || ""));
-  if (menuKey && !isMenuAllowed(menuKey)) {
+  if (menuKey && getMenuAccessMode(menuKey) === "hidden") {
     // Показываем причину отказа через тост
     const reason = getMenuAccessReason(menuKey);
     try {

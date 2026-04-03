@@ -1,8 +1,12 @@
 import type { AxiosAdapter, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import { mockNewGroups, mockGroupStudents, mockMasterStudents, mockTeachers, mockManagers } from "./mockNewGroupsDb";
 import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes, StudentProfile, Program, MonthStatus, PayStatus, KsefStatus } from "./mockDb";
+import { MENU_ROUTE_KEY_MAP, MENU_SECTION_ITEMS } from "../config/menuAccess.config";
+import { ROLE_MENU_ACCESS, normalizeRole, type AppRole } from "../config/roleMenuAccess.config";
 
 type Json = any;
+type AccessMode = "active" | "read-only" | "hidden";
+type RoleCode = AppRole;
 
 function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
@@ -35,6 +39,69 @@ function readBody(config: InternalAxiosRequestConfig): any {
     try { return JSON.parse(d); } catch { return d; }
   }
   return d;
+}
+
+const ACCESS_ROLES: RoleCode[] = ["super-admin", "admin", "teacher", "sales", "quality", "finance", "secretariat", "hr"];
+
+function getAllResourceKeys(): string[] {
+  const fromRoutes = Object.values(MENU_ROUTE_KEY_MAP);
+  const fromSections = Object.entries(MENU_SECTION_ITEMS).flatMap(([section, items]) => [section, ...items]);
+  return Array.from(new Set(["dashboard", "my-cabinet", ...fromRoutes, ...fromSections]));
+}
+
+function readOnlyKeysForRole(role: RoleCode): Set<string> {
+  if (role === "teacher") return new Set(["students", "groups"]);
+  if (role === "sales") return new Set(["students", "groups"]);
+  if (role === "quality") return new Set(["students", "groups"]);
+  if (role === "finance") return new Set(["students"]);
+  return new Set<string>();
+}
+
+function buildRoleMatrix(): Record<string, Record<RoleCode, AccessMode>> {
+  const resources = getAllResourceKeys();
+  const matrix: Record<string, Record<RoleCode, AccessMode>> = {};
+
+  for (const resourceKey of resources) {
+    matrix[resourceKey] = {} as Record<RoleCode, AccessMode>;
+    for (const role of ACCESS_ROLES) {
+      const active = ROLE_MENU_ACCESS[role]?.[resourceKey]?.mode === "active";
+      const isReadOnly = readOnlyKeysForRole(role).has(resourceKey);
+      matrix[resourceKey][role] = active ? (isReadOnly ? "read-only" : "active") : "hidden";
+    }
+  }
+
+  return matrix;
+}
+
+function getAccessState() {
+  const g = globalThis as any;
+  if (!g.__mock_access_control_state) {
+    g.__mock_access_control_state = {
+      version: 1,
+      matrix: buildRoleMatrix(),
+      savedAt: new Date().toISOString(),
+    };
+  }
+  return g.__mock_access_control_state as {
+    version: number;
+    matrix: Record<string, Record<RoleCode, AccessMode>>;
+    savedAt: string;
+  };
+}
+
+function extractRoleFromToken(config: InternalAxiosRequestConfig): RoleCode {
+  const authHeader = String((config.headers as any)?.Authorization || "");
+  const token = authHeader.replace("Bearer ", "").trim();
+  const rawRole = token.split(".").pop() || "";
+  return normalizeRole(rawRole) || "admin";
+}
+
+function buildMyMatrixByRole(role: RoleCode, roleMatrix: Record<string, Record<RoleCode, AccessMode>>) {
+  const matrix: Record<string, AccessMode> = {};
+  for (const [resourceKey, row] of Object.entries(roleMatrix)) {
+    matrix[resourceKey] = row[role] ?? "hidden";
+  }
+  return matrix;
 }
 
 export const mockAdapter: AxiosAdapter = async (config) => {
@@ -120,6 +187,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const user = MOCK_USERS[token];
     if (!user) return err(config, 401, "Invalid token");
     return ok(config, user);
+  }
+
+  if (method === "get" && (url === "me/access-control" || url === "v1/me/access-control")) {
+    const state = getAccessState();
+    const role = extractRoleFromToken(config);
+    return ok(config, {
+      role,
+      version: state.version,
+      matrix: buildMyMatrixByRole(role, state.matrix),
+      overrides: {},
+    });
   }
 
   // POST /auth/change-password — снимает флаг forcePasswordChange в mock
@@ -709,6 +787,27 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
   if (method === "delete" && /^settings\/users\//.test(url)) {
     return ok(config, { success: true });
+  }
+
+  if (method === "get" && (url === "settings/access-control" || url === "v1/settings/access-control")) {
+    const state = getAccessState();
+    return ok(config, {
+      version: state.version,
+      matrix: state.matrix,
+      savedAt: state.savedAt,
+    });
+  }
+
+  if (method === "post" && (url === "settings/access-control" || url === "v1/settings/access-control")) {
+    const body = readBody(config) || {};
+    const state = getAccessState();
+    if (!body?.matrix || typeof body.matrix !== "object") {
+      return err(config, 400, "matrix is required");
+    }
+    state.matrix = body.matrix;
+    state.version = Number(state.version || 0) + 1;
+    state.savedAt = new Date().toISOString();
+    return ok(config, { ok: true, version: state.version, savedAt: state.savedAt });
   }
 
 

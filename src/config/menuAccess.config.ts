@@ -1,4 +1,4 @@
-export type MenuAccessMode = "active" | "blocked" | "hidden";
+export type MenuAccessMode = "active" | "read-only" | "blocked" | "hidden";
 
 export interface MenuAccessEntry {
   mode: MenuAccessMode;

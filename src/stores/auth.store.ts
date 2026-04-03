@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { authApi } from "../api/authApi";
 import { useProjectStore } from "./project.store";
+import { useAccessStore } from "./access.store";
 import type { ProjectCode } from "../config/projectApi";
 
 export interface User {
@@ -54,6 +55,7 @@ export const useAuthStore = defineStore("auth", () => {
         res.user.initials = res.user.email.substring(0, 2).toUpperCase();
       }
       user.value = res.user as User;
+      await useAccessStore().initAfterLogin();
 
       // Если поставлен флаг — router guard сам сделает редирект на /change-password
       return true;
@@ -73,6 +75,7 @@ export const useAuthStore = defineStore("auth", () => {
         u.initials = u.email.substring(0, 2).toUpperCase();
       }
       user.value = u;
+      await useAccessStore().initAfterLogin();
     } catch {
       logout();
     }
@@ -82,6 +85,7 @@ export const useAuthStore = defineStore("auth", () => {
     token.value = null;
     user.value = null;
     localStorage.removeItem("token");
+    useAccessStore().clear();
   }
 
   return {

@@ -1,8 +1,8 @@
 import { computed } from 'vue'
 import { useAuthStore } from '../stores/auth.store'
+import { useAccessStore } from '../stores/access.store'
 import { AUTHZ_BYPASS } from '../config/featureFlags'
 import { normalizeRole, type AppRole } from '../config/roleMenuAccess.config'
-import { isMenuAllowed } from '../utils/menuAccess'
 
 /**
  * Composable для компонентного контроля доступа.
@@ -18,6 +18,7 @@ import { isMenuAllowed } from '../utils/menuAccess'
  */
 export function useCanAccess() {
   const authStore = useAuthStore()
+  const accessStore = useAccessStore()
 
   /** Нормализованная роль текущего пользователя (или null) */
   const role = computed<AppRole | null>(() =>
@@ -43,7 +44,15 @@ export function useCanAccess() {
    * @example canAccess('finance')
    */
   function canAccess(menuKey: string): boolean {
-    return isMenuAllowed(menuKey)
+    return AUTHZ_BYPASS ? authStore.isAuthenticated : accessStore.canAccess(menuKey)
+  }
+
+  function canEdit(resource: string): boolean {
+    return AUTHZ_BYPASS ? authStore.isAuthenticated : accessStore.canEdit(resource)
+  }
+
+  function isHidden(resource: string): boolean {
+    return AUTHZ_BYPASS ? false : accessStore.isHidden(resource)
   }
 
   /**
@@ -75,6 +84,8 @@ export function useCanAccess() {
     isRole,
     canAny,
     canAccess,
+    canEdit,
+    isHidden,
     hideFor,
   }
 }

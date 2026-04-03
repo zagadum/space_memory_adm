@@ -305,7 +305,7 @@ test.describe('6. Страница Access Control', () => {
     await logout(page);
   });
 
-  test('Кнопка "Сохранить" сохраняет в localStorage', async ({ page }) => {
+  test('Кнопка "Сохранить" отправляет матрицу в API', async ({ page }) => {
     await loginAs(page, 'superadmin@demo.local');
     await page.goto('/settings/access-control');
 
@@ -315,18 +315,13 @@ test.describe('6. Страница Access Control', () => {
     await page.locator('.btn-save').click();
     await page.waitForTimeout(500);
 
-    // localStorage должен содержать матрицу
-    const saved = await page.evaluate(() => localStorage.getItem('gls_access_matrix_v1'));
-    expect(saved).not.toBeNull();
-
-    const parsed = JSON.parse(saved!);
-    expect(typeof parsed).toBe('object');
-    expect(Object.keys(parsed).length).toBeGreaterThan(0);
+    // После сохранения должна появиться success-индикация (toast)
+    await expect(page.locator('.ac-toast.success')).toBeVisible({ timeout: 3000 });
 
     await logout(page);
   });
 
-  test('Кнопка "Сбросить" очищает localStorage', async ({ page }) => {
+  test('Кнопка "Сбросить" возвращает дефолтную матрицу', async ({ page }) => {
     await loginAs(page, 'superadmin@demo.local');
     await page.goto('/settings/access-control');
 
@@ -340,8 +335,7 @@ test.describe('6. Страница Access Control', () => {
     await page.locator('.btn-reset').click();
     await page.waitForTimeout(300);
 
-    const saved = await page.evaluate(() => localStorage.getItem('gls_access_matrix_v1'));
-    expect(saved).toBeNull();
+    await expect(page.locator('.ac-toast.success')).toBeVisible({ timeout: 3000 });
 
     await logout(page);
   });
