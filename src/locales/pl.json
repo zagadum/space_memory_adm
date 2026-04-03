@@ -170,6 +170,7 @@
   },
   "auth": {
     "title": "Logowanie",
+    "project": "Projekt",
     "email": "Email",
     "password": "Hasło",
     "submit": "Zaloguj się",

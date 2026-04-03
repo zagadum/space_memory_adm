@@ -1,5 +1,7 @@
 import { defineStore } from "pinia";
 import { authApi } from "../api/authApi";
+import { useProjectStore } from "./project.store";
+import type { ProjectCode } from "../config/projectApi";
 
 export interface User {
   id: string;
@@ -38,10 +40,14 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
-  async function signIn(email: string, password: string) {
+  async function signIn(email: string, password: string, project?: ProjectCode) {
     loading.value = true;
     error.value = "";
     try {
+      if (project) {
+        useProjectStore().setProject(project);
+      }
+
       const res = await authApi.signIn({ email, password });
       setToken(res.token);
       if (!res.user.initials && res.user.email) {

@@ -170,6 +170,7 @@
   },
   "auth": {
     "title": "Sign In",
+    "project": "Project",
     "email": "Email",
     "password": "Password",
     "submit": "Log In",

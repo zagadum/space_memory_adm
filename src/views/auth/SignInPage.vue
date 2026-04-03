@@ -8,6 +8,19 @@
     <p class="login-subtitle">Witaj ponownie! Zaloguj się do swojego konta.</p>
 
     <form @submit.prevent="onSubmit" class="login-form">
+      <div class="project-field">
+        <label for="project-select" class="project-label">{{ t('auth.project') }}</label>
+        <select id="project-select" v-model="selectedProject" class="project-select">
+          <option
+            v-for="project in projectOptions"
+            :key="project.code"
+            :value="project.code"
+          >
+            {{ project.label }}
+          </option>
+        </select>
+      </div>
+
       <UiInput
         v-model="email"
         :label="t('auth.email')"
@@ -51,23 +64,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useAuthStore } from "../../stores/auth.store";
+import { useProjectStore } from "../../stores/project.store";
 import UiInput from "../../components/ui/UiInput.vue";
 import UiButton from "../../components/ui/UiButton.vue";
+import { isProjectCode } from "../../config/projectApi";
 
 const { t } = useI18n();
+const route = useRoute();
 const router = useRouter();
 const auth = useAuthStore();
+const projectStore = useProjectStore();
 
 const email = ref("admin@demo.local");
 const password = ref("demo");
+const projectOptions = projectStore.projectOptions;
+
+const requestedProject = route.query.project;
+if (isProjectCode(requestedProject)) {
+  projectStore.setProject(requestedProject);
+}
+
+const selectedProject = computed({
+  get: () => projectStore.activeProject,
+  set: (project) => projectStore.setProject(project),
+});
+
+const redirectTarget = computed(() => {
+  const redirect = route.query.redirect;
+  return typeof redirect === 'string' && redirect.startsWith('/') ? redirect : '/';
+});
 
 async function onSubmit() {
-  const ok = await auth.signIn(email.value, password.value);
-  if (ok) router.push("/");
+  const ok = await auth.signIn(email.value, password.value, selectedProject.value);
+  if (ok) router.push(redirectTarget.value);
 }
 </script>
 
@@ -112,6 +145,35 @@ async function onSubmit() {
   flex-direction: column;
   gap: 16px;
   margin-bottom: 40px;
+}
+
+.project-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--white, #e8eeff);
+}
+
+.project-select {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  border: 1px solid rgba(100, 120, 255, 0.2);
+  background: rgba(17, 24, 39, 0.75);
+  color: var(--white, #e8eeff);
+  padding: 0 14px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.project-select:focus {
+  border-color: rgba(79, 110, 247, 0.8);
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.18);
 }
 
 .login-submit {

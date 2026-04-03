@@ -175,6 +175,7 @@
   },
   "auth": {
     "title": "Вход в систему",
+    "project": "Проект",
     "email": "Email",
     "password": "Пароль",
     "submit": "Войти",

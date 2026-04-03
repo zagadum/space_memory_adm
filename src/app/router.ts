@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useAuthStore } from "../stores/auth.store";
 import { useNotificationStore } from "../stores/notification.store";
 import { useGlobalSearchStore } from "../stores/globalSearch.store";
-import { getFirstAllowedFallbackPath, getMenuAccessReason, getMenuKeyByRouteName, isMenuAllowed } from "../utils/menuAccess";
+import { getMenuAccessReason, getMenuKeyByRouteName, isMenuAllowed } from "../utils/menuAccess";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -270,7 +270,14 @@ router.beforeEach((to, from) => {
   if (to.meta.public) return true;
 
   const auth = useAuthStore();
-  if (!auth.isAuthenticated) return { name: "sign-in" };
+  if (!auth.isAuthenticated) {
+    return {
+      name: "sign-in",
+      query: {
+        redirect: to.fullPath,
+      },
+    };
+  }
 
   // Если пользователь должен сменить пароль — пропускаем только /change-password
   if ((auth.user as any)?.forcePasswordChange && to.name !== 'change-password' && to.name !== 'access-denied') {

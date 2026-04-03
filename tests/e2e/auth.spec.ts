@@ -36,6 +36,31 @@ test.describe('Флоу Авторизации', () => {
     expect(token).toBeTruthy();
   });
 
+  test('После логина возвращает на исходную закладку /groups', async ({ page }) => {
+    await page.goto('/groups');
+    await expect(page).toHaveURL(/\/auth\/sign-in\?redirect=%2Fgroups/);
+
+    await page.getByPlaceholder('admin@demo.local').fill('admin@demo.local');
+    await page.getByPlaceholder('••••••••').fill('demo');
+    await page.locator('button[type="submit"]').click();
+
+    await expect(page).toHaveURL(/\/groups$/);
+  });
+
+  test('Выбранный проект сохраняется перед входом', async ({ page }) => {
+    await page.goto('/auth/sign-in');
+
+    await page.locator('#project-select').selectOption('indigo');
+    await page.getByPlaceholder('admin@demo.local').fill('admin@demo.local');
+    await page.getByPlaceholder('••••••••').fill('demo');
+    await page.locator('button[type="submit"]').click();
+
+    await expect(page).not.toHaveURL(/\/auth\/sign-in/);
+
+    const activeProject = await page.evaluate(() => localStorage.getItem('gls_active_project'));
+    expect(activeProject).toBe('indigo');
+  });
+
   test('Logout (Выход из системы)', async ({ page }) => {
     // 1. Сначала логинимся
     await page.goto('/auth/sign-in');

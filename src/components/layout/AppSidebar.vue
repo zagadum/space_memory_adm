@@ -12,7 +12,7 @@
       </div>
       <div class="project-selector-container">
         <div class="school-pill" @click="toggleProjectDropdown" :class="{ 'dropdown-open': isProjectDropdownOpen }">
-          <div class="school-dot" :class="{ 'dot-indigo': projectStore.isIndigo }"></div>
+          <div class="school-dot" :class="projectStore.activeProjectMeta.dotClass"></div>
           <div class="project-info">
             <div class="school-name">{{ projectStore.projectName }}</div>
             <div class="school-city">GLS Network</div>
@@ -21,21 +21,15 @@
         </div>
         
         <div v-if="isProjectDropdownOpen" class="project-dropdown">
-          <div 
-            class="dropdown-item" 
-            :class="{ active: projectStore.isSpace }"
-            @click="selectProject('space')"
+          <div
+            v-for="project in projectStore.projectOptions"
+            :key="project.code"
+            class="dropdown-item"
+            :class="{ active: projectStore.activeProject === project.code }"
+            @click="selectProject(project.code)"
           >
-            <div class="school-dot"></div>
-            <span>Space Memory</span>
-          </div>
-          <div 
-            class="dropdown-item" 
-            :class="{ active: projectStore.isIndigo }"
-            @click="selectProject('indigo')"
-          >
-            <div class="school-dot dot-indigo"></div>
-            <span>Indigo</span>
+            <div class="school-dot" :class="project.dotClass"></div>
+            <span>{{ project.label }}</span>
           </div>
         </div>
       </div>
@@ -191,7 +185,7 @@
 
       <!-- RECRUITMENT (SPACE) -->
       <div
-        v-if="isSectionAllowed('recruitment') && projectStore.isSpace"
+        v-if="isSectionAllowed('recruitment') && projectStore.usesDefaultRecruitment"
         class="nav-section"
         :class="{ open: openSections.recruitment }"
         @click="toggleSection('recruitment')"
@@ -200,7 +194,7 @@
         <span class="nav-section-label">{{ t('sidebar.recruitment') }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
-      <div v-if="isSectionAllowed('recruitment') && projectStore.isSpace" class="nav-children" :class="{ open: openSections.recruitment }">
+      <div v-if="isSectionAllowed('recruitment') && projectStore.usesDefaultRecruitment" class="nav-children" :class="{ open: openSections.recruitment }">
         <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students' }, accessClass('new-students')]" @click="navigateTo('new-students', '/recruitment/space/new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
         </div>
@@ -432,6 +426,7 @@ import { useI18n } from 'vue-i18n'
 import { setLocale } from '../../app/i18n'
 import { useNotificationStore } from '../../stores/notification.store'
 import { getMenuAccessReason, isMenuBlocked, isMenuVisible, isSectionVisible } from '../../utils/menuAccess'
+import type { ProjectCode } from '../../config/projectApi'
 
 // Подключаем сторы
 import { useStudentsListStore } from '../../stores/studentsList.store'
@@ -460,7 +455,7 @@ function toggleProjectDropdown() {
   isProjectDropdownOpen.value = !isProjectDropdownOpen.value
 }
 
-function selectProject(project: 'space' | 'indigo') {
+function selectProject(project: ProjectCode) {
   projectStore.setProject(project)
   isProjectDropdownOpen.value = false
   
@@ -704,6 +699,8 @@ const navigateTo = (item: string, path: string, menuKey = item) => {
 .school-pill:hover { background: rgba(79,110,247,0.12); border-color: rgba(79,110,247,0.3); }
 .school-pill.dropdown-open { background: var(--status-info-bg); border-color: var(--blue); }
 .school-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
+.school-dot.dot-space { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.school-dot.dot-space-ua { background: #3b82f6; box-shadow: 0 0 6px #3b82f6; }
 .school-dot.dot-indigo { background: #8b5cf6; box-shadow: 0 0 6px #8b5cf6; }
 .project-info { flex: 1; }
 .school-name { font-size: 11.5px; font-weight: 600; color: var(--app-text-main); }

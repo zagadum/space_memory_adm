@@ -2,11 +2,12 @@ import axios, { AxiosAdapter, AxiosRequestConfig, AxiosResponse, InternalAxiosRe
 import { mockAdapter } from "./mockAdapter";
 import { useAppStore } from "../stores/app.store";
 import { useNotificationStore } from "../stores/notification.store";
+import { getActiveProjectApiUrl, PROJECT_API_URLS } from "../config/projectApi";
 
 const rawUseMock = String((import.meta as any).env?.VITE_USE_MOCK ?? "false").toLowerCase();
 const USE_MOCK_BY_DEFAULT = rawUseMock !== "false";
 
-const API_URL = (import.meta as any).env?.VITE_API_URL || "https://memory.firm.kiev.ua/api/v1/";
+const API_URL = getActiveProjectApiUrl();
 const RECRUITMENT_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_API_URL || API_URL;
 const RECRUITMENT_INDIGO_API_URL = (import.meta as any).env?.VITE_RECRUITMENT_INDIGO_API_URL || RECRUITMENT_API_URL;
 
@@ -57,12 +58,18 @@ function createHttpClient(baseURL: string) {
   });
 }
 
-function attachInterceptors(client: ReturnType<typeof axios.create>) {
+function attachInterceptors(client: ReturnType<typeof axios.create>, resolveBaseUrl?: () => string) {
   // Request interceptor: attach token + start global loading indicator
   client.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    if (resolveBaseUrl) {
+      config.baseURL = resolveBaseUrl();
+    }
+
+    const normalizedUrl = normalizeRequestUrl(config);
+    const isSignInRequest = normalizedUrl === "auth/sign-in" || normalizedUrl === "v1/auth/sign-in";
     const token = localStorage.getItem("token");
-    if (token) {
+    if (token && !isSignInRequest) {
       config.headers.set("Authorization", `Bearer ${token}`);
     }
     
@@ -142,7 +149,7 @@ export const http = createHttpClient(API_URL);
 export const httpRecruitment = createHttpClient(RECRUITMENT_API_URL);
 export const httpRecruitmentIndigo = createHttpClient(RECRUITMENT_INDIGO_API_URL);
 
-attachInterceptors(http);
+attachInterceptors(http, getActiveProjectApiUrl);
 attachInterceptors(httpRecruitment);
 attachInterceptors(httpRecruitmentIndigo);
 attachAdapterRouting(http);
@@ -155,6 +162,7 @@ export function getRecruitmentHttpClient(backend: RecruitmentBackend = "default"
 
 console.log("API routing config:", {
   baseURL: API_URL,
+  projectApiUrls: PROJECT_API_URLS,
   recruitmentBaseURL: RECRUITMENT_API_URL,
   recruitmentIndigoBaseURL: RECRUITMENT_INDIGO_API_URL,
   defaultMock: USE_MOCK_BY_DEFAULT,
