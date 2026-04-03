@@ -60,6 +60,9 @@
             <div class="chip" :class="{ active: chips.signed }" @click="toggleChip('signed')">
               <span class="chip-dot green" />{{ t('newStudents.chipSigned') }}
             </div>
+            <div class="chip" :class="{ active: chips.debtors }" @click="toggleChip('debtors')">
+              <span class="chip-dot red" />{{ t('newStudents.chipDebtors') }}
+            </div>
           </div>
         </div>
         <div class="toolbar-right">
@@ -211,6 +214,14 @@
                 <div v-if="s.group" class="group-cell">
                   <div class="group-dot" :style="{ background: s.groupColor! }" />
                   <span class="group-name">{{ s.group }}</span>
+                  <button
+                    v-if="!s.groupId"
+                    class="change-group-btn"
+                    @click="openGroupPicker(s.id)"
+                    :title="t('newStudents.changeGroup')"
+                  >
+                    🔄
+                  </button>
                 </div>
                 <button v-else class="add-group-btn" @click="openGroupPicker(s.id)" :title="t('newStudents.addToGroup')">+</button>
               </td>
@@ -330,6 +341,7 @@ const chips = computed(() => ({
   mine:      store.filters.onlyMine,
   noManager: store.filters.noManager,
   signed:    store.filters.signed,
+  debtors:   store.filters.debtors,
 }))
 
 const groupFilter = computed(() => store.filters.group)
@@ -353,6 +365,7 @@ function toggleChip(k: keyof typeof chips.value) {
   if (k === 'mine')      store.filters.onlyMine = !store.filters.onlyMine
   if (k === 'noManager') store.filters.noManager = !store.filters.noManager
   if (k === 'signed')    store.filters.signed = !store.filters.signed
+  if (k === 'debtors')   store.filters.debtors = !store.filters.debtors
   store.applyFilters()
 }
 function setGroupFilter(v: string)   { store.filters.group = v;   openDf.value = null; store.applyFilters(); }
@@ -983,6 +996,7 @@ async function onPanelDeleteAllDocs() {
 .chip-dot.blue  { background: #4f6ef7; }
 .chip-dot.grey  { background: var(--app-text-dim); }
 .chip-dot.green { background: #10b981; }
+.chip-dot.red   { background: #ef4444; }
 
 .dropdown-filter { position: relative; }
 .dropdown-filter-btn {
@@ -1042,6 +1056,13 @@ td { padding: 12px 14px; font-size: 13.5px; vertical-align: middle; white-space:
 .group-cell { display: flex; align-items: center; gap: 8px; }
 .group-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .group-name { font-size: 13px; color: var(--app-text-main); }
+.change-group-btn {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: rgba(79,110,247,0.10); color: #4f6ef7;
+  border: 1px solid rgba(79,110,247,0.25); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.15s; font-size: 13px; line-height: 1; flex-shrink: 0;
+}
+.change-group-btn:hover { background: rgba(79,110,247,0.18); box-shadow: 0 0 10px rgba(79,110,247,0.22); transform: scale(1.06); }
 
 .add-group-btn {
   width: 32px; height: 32px; border-radius: 50%; background: rgba(16,185,129,0.12); color: #10b981;

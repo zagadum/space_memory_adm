@@ -11,18 +11,22 @@
         </div>
       </div>
       <div class="project-selector-container">
-        <div class="school-pill" @click="toggleProjectDropdown" :class="{ 'dropdown-open': isProjectDropdownOpen }">
+        <div
+          class="school-pill"
+          :class="{ 'dropdown-open': isProjectDropdownOpen, 'no-switch': visibleProjectOptions.length <= 1 }"
+          @click="visibleProjectOptions.length > 1 && toggleProjectDropdown()"
+        >
           <div class="school-dot" :class="projectStore.activeProjectMeta.dotClass"></div>
           <div class="project-info">
             <div class="school-name">{{ projectStore.projectName }}</div>
             <div class="school-city">GLS Network</div>
           </div>
-          <span class="selector-arrow">▼</span>
+          <span v-if="visibleProjectOptions.length > 1" class="selector-arrow">▼</span>
         </div>
         
-        <div v-if="isProjectDropdownOpen" class="project-dropdown">
+        <div v-if="isProjectDropdownOpen && visibleProjectOptions.length > 1" class="project-dropdown">
           <div
-            v-for="project in projectStore.projectOptions"
+            v-for="project in visibleProjectOptions"
             :key="project.code"
             class="dropdown-item"
             :class="{ active: projectStore.activeProject === project.code }"
@@ -420,13 +424,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '../../app/i18n'
 import { useNotificationStore } from '../../stores/notification.store'
 import { getMenuAccessReason, isMenuBlocked, isMenuVisible, isSectionVisible } from '../../utils/menuAccess'
 import type { ProjectCode } from '../../config/projectApi'
+import { normalizeRole } from '../../config/roleMenuAccess.config'
 
 // Подключаем сторы
 import { useStudentsListStore } from '../../stores/studentsList.store'
@@ -435,6 +440,7 @@ import { useTeachersListStore } from '../../stores/teachersList.store'
 import { useAuthStore } from '../../stores/auth.store'
 import { useAppStore } from '../../stores/app.store'
 import { useProjectStore } from '../../stores/project.store'
+import { useAccessStore } from '../../stores/access.store'
 
 const router = useRouter()
 const route = useRoute()
@@ -448,6 +454,18 @@ const authStore = useAuthStore()
 const notificationStore = useNotificationStore()
 const appStore = useAppStore()
 const projectStore = useProjectStore()
+const accessStore = useAccessStore()
+
+// Показываем только те проекты, которые доступны пользователю по роли
+// admin / super-admin видят все проекты; остальные — только текущий
+const visibleProjectOptions = computed(() => {
+  const role = normalizeRole(accessStore.role)
+  if (role === 'admin' || role === 'super-admin') {
+    return projectStore.projectOptions
+  }
+  // Остальные роли — показываем только активный проект (нет переключения)
+  return projectStore.projectOptions.filter(p => p.code === projectStore.activeProject)
+})
 
 const isProjectDropdownOpen = ref(false)
 
@@ -702,6 +720,8 @@ const navigateTo = (item: string, path: string, menuKey = item) => {
 
 .school-pill { margin-top: 10px; display: flex; align-items: center; gap: 7px; padding: 6px 9px; background: rgba(79,110,247,0.07); border: 1px solid rgba(79,110,247,0.18); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
 .school-pill:hover { background: rgba(79,110,247,0.12); border-color: rgba(79,110,247,0.3); }
+.school-pill.no-switch { cursor: default; }
+.school-pill.no-switch:hover { background: rgba(79,110,247,0.07); border-color: rgba(79,110,247,0.18); }
 .school-pill.dropdown-open { background: var(--status-info-bg); border-color: var(--blue); }
 .school-dot { width: 7px; height: 7px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; flex-shrink: 0; }
 .school-dot.dot-space { background: #10b981; box-shadow: 0 0 6px #10b981; }

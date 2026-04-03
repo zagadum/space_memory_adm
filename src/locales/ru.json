@@ -1430,6 +1430,7 @@
     "chipMine": "Только мои",
     "chipNoManager": "Без ответственного",
     "chipSigned": "Только подписанные",
+    "chipDebtors": "Должники",
     "filterGroup": "Группа",
     "filterManager": "Ответственный",
     "allGroups": "Все группы",
@@ -1437,6 +1438,7 @@
     "noGroup": "Без группы",
     "noManager": "Без ответственного",
     "addToGroup": "Добавить в группу",
+    "changeGroup": "Сменить группу",
     "inDev": "в разработке",
     "archived": "перемещён в архив",
     "deleted": "удалён",
@@ -1885,6 +1887,7 @@
       "contractOldNew": "Тип контракта",
       "balanceOverpayment": "Переплата",
       "discount": "Скидка",
+      "paid": "Оплачено",
       "isSend": "Отправлено",
       "isDone": "Завершено",
       "actions": "Действия"

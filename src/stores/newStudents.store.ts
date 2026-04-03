@@ -20,6 +20,7 @@ export interface StudentDocumentItem {
 
 export interface NewStudent {
   id: number;
+  groupId?: string | number | null;
   externalId?: string | number | null;
   groupExternalId?: string | number | null;
   teacherExternalId?: string | number | null;
@@ -211,6 +212,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     onlyMine: false,
     noManager: false,
     signed: false,
+    debtors: false,
   })
 
   const currentStudentDetails = computed((): StudentDetails | null => {
@@ -308,6 +310,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     const groupObj = rawGroup && typeof rawGroup === 'object' ? (rawGroup as Record<string, any>) : null
     const managerObj = rawManager && typeof rawManager === 'object' ? (rawManager as Record<string, any>) : null
     const groupNameFromObj = groupObj ? groupObj['name'] : null
+    const groupIdFromObj = groupObj ? groupObj['id'] : null
     const groupColorFromObj = groupObj ? groupObj['color'] : null
     const managerNameFromObj = managerObj ? managerObj['name'] : null
     const groupName = typeof row.group === 'string'
@@ -329,6 +332,7 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
 
     return {
       id: Number(row.id),
+      groupId: row.group_id ?? row.groupId ?? groupIdFromObj ?? null,
       externalId: row.external_id ?? row.externalId ?? null,
       groupExternalId: row.group_external_id ?? row.groupExternalId ?? null,
       teacherExternalId: row.teacher_external_id ?? row.teacherExternalId ?? null,
@@ -382,12 +386,12 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
         page,
         perPage: pagination.value.perPage,
         search: filters.value.search,
-        // @ts-ignore - keeping it simple for mock support
         manager: filters.value.manager !== 'all' ? filters.value.manager : undefined,
         group: filters.value.group !== 'all' ? filters.value.group : undefined,
-        only_mine: filters.value.onlyMine ? 1 : 0,
-        no_manager: filters.value.noManager ? 1 : 0,
-        signed: filters.value.signed ? 1 : 0,
+        only_mine: filters.value.onlyMine ? 1 : undefined,
+        no_manager: filters.value.noManager ? 1 : undefined,
+        signed: filters.value.signed ? 1 : undefined,
+        debtors: filters.value.debtors ? 1 : undefined,
       })
       students.value = response.items.map(normalizeStudent)
       pagination.value = response.pagination
@@ -530,12 +534,13 @@ export const useNewStudentsStore = defineStore('newStudents', () => {
     await resolveApi(backend).inviteNewStudent({
       first_name: data.firstName,
       surname: data.lastName,
+      email: data.email,
       parent_email: data.email,
-      student_email: data.studentEmail,
+      nickname: data.studentEmail,
       subscription_amount: data.price,
       phone: data.phone,
       discount: data.discount,
-      contract_type: data.contractType
+      contract_old_new: data.contractType ?? 'contract_489'
     })
   }
 

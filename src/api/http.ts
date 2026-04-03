@@ -50,7 +50,12 @@ function createHttpClient(baseURL: string) {
   });
 }
 
-function attachInterceptors(client: ReturnType<typeof axios.create>, resolveBaseUrl?: () => string) {
+function attachInterceptors(
+  client: ReturnType<typeof axios.create>,
+  resolveBaseUrl?: () => string,
+  opts: { logoutOn401?: boolean; apiLabel?: string } = {}
+) {
+  const { logoutOn401 = true, apiLabel = '' } = opts;
   // Request interceptor: attach token + start global loading indicator
   client.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
@@ -101,11 +106,19 @@ function attachInterceptors(client: ReturnType<typeof axios.create>, resolveBase
       });
     }
 
-    // 401 Unauthorized → automatic logout
+    // 401 Unauthorized → automatic logout only for main API; recruitment shows toast
     if (error.response?.status === 401) {
-      import('../stores/auth.store').then(({ useAuthStore }) => {
-        useAuthStore().logout();
-      });
+      if (logoutOn401) {
+        import('../stores/auth.store').then(({ useAuthStore }) => {
+          useAuthStore().logout();
+        });
+      } else {
+        const label = apiLabel ? `[${apiLabel}] ` : '';
+        useNotificationStore().addToast(
+          `${label}Токен недействителен или истёк — войдите ещё раз в систему рекрутации`,
+          'error'
+        );
+      }
     }
 
     // 403 Forbidden
@@ -141,9 +154,9 @@ export const http = createHttpClient(API_URL);
 export const httpRecruitment = createHttpClient(RECRUITMENT_API_URL);
 export const httpRecruitmentIndigo = createHttpClient(RECRUITMENT_INDIGO_API_URL);
 
-attachInterceptors(http, getActiveProjectApiUrl);
-attachInterceptors(httpRecruitment);
-attachInterceptors(httpRecruitmentIndigo);
+attachInterceptors(http, getActiveProjectApiUrl, { logoutOn401: true });
+attachInterceptors(httpRecruitment, undefined, { logoutOn401: false, apiLabel: 'Recruitment Space' });
+attachInterceptors(httpRecruitmentIndigo, undefined, { logoutOn401: false, apiLabel: 'Recruitment Indigo' });
 attachAdapterRouting(http);
 attachAdapterRouting(httpRecruitment);
 attachAdapterRouting(httpRecruitmentIndigo);

@@ -75,6 +75,7 @@
               <th>{{ t('importDb.table.contractOldNew') }}</th>
               <th>{{ t('importDb.table.balanceOverpayment') }}</th>
               <th>{{ t('importDb.table.discount') }}</th>
+              <th>{{ t('importDb.table.paid') }}</th>
               <th>{{ t('importDb.table.isSend') }}</th>
               <th>{{ t('importDb.table.isDone') }}</th>
               <th>{{ t('importDb.table.actions') }}</th>
@@ -124,6 +125,10 @@
                   inputmode="decimal"
                 />
                 <span v-else>{{ formatAmount(item.discount) }}</span>
+              </td>
+              <td>
+                <span v-if="isTruthy(item.paid ?? item.is_paid)" class="badge badge-success">{{ t('common.yes') }}</span>
+                <span v-else class="badge badge-warning">{{ t('common.no') }}</span>
               </td>
               <td>
                 <span v-if="item.is_send" class="badge badge-success">{{ t('common.yes') }}</span>
@@ -280,6 +285,13 @@ function formatAmount(value: number | string): string {
   return num.toFixed(2);
 }
 
+function isTruthy(value: unknown): boolean {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') return value === 1;
+  if (typeof value === 'string') return ['1', 'true', 'yes', 'paid'].includes(value.trim().toLowerCase());
+  return false;
+}
+
 function applyFilters() {
   // Filter is applied via computed property
 }
@@ -398,6 +410,7 @@ async function onExport() {
         t('importDb.table.contractOldNew'),
         t('importDb.table.balanceOverpayment'),
         t('importDb.table.discount'),
+        t('importDb.table.paid'),
         t('importDb.table.isSend'),
         t('importDb.table.isDone'),
       ],
@@ -411,6 +424,7 @@ async function onExport() {
         item.contract_old_new,
         Number(item.balance_overpayment),
         Number(item.discount),
+        isTruthy(item.paid ?? item.is_paid) ? t('common.yes') : t('common.no'),
         item.is_send ? t('common.yes') : t('common.no'),
         item.is_done ? t('common.yes') : t('common.no'),
       ]),
@@ -425,6 +439,7 @@ async function onExport() {
       { wch: 18 },
       { wch: 16 },
       { wch: 14 },
+      { wch: 12 },
       { wch: 12 },
       { wch: 12 },
     ],

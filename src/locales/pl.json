@@ -1425,6 +1425,7 @@
     "chipMine": "Tylko moi",
     "chipNoManager": "Bez opiekuna",
     "chipSigned": "Tylko podpisani",
+    "chipDebtors": "Dłużnicy",
     "filterGroup": "Grupa",
     "filterManager": "Opiekun",
     "allGroups": "Wszystkie grupy",
@@ -1432,6 +1433,7 @@
     "noGroup": "Bez grupy",
     "noManager": "Bez opiekuna",
     "addToGroup": "Dodaj do grupy",
+    "changeGroup": "Zmień grupę",
     "inDev": "w trakcie realizacji",
     "archived": "przeniesiony do archiwum",
     "deleted": "usunięty",
@@ -1888,6 +1890,7 @@
       "contractOldNew": "Typ kontraktu",
       "balanceOverpayment": "Nadpłata",
       "discount": "Zniżka",
+      "paid": "Opłacone",
       "isSend": "Wysłano",
       "isDone": "Zakończono",
       "actions": "Działania"

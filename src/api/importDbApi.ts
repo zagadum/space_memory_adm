@@ -11,6 +11,8 @@ export interface ImportDbItem {
   contract_old_new: string;
   balance_overpayment: number | string;
   discount: number | string;
+  paid?: boolean | number | string;
+  is_paid?: boolean | number | string;
   is_send: boolean | number;
   is_done: boolean | number;
 }

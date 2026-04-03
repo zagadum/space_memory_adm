@@ -1425,6 +1425,7 @@
     "chipMine": "Mine only",
     "chipNoManager": "No manager",
     "chipSigned": "Signed only",
+    "chipDebtors": "Debtors",
     "filterGroup": "Group",
     "filterManager": "Manager",
     "allGroups": "All groups",
@@ -1888,6 +1889,7 @@
       "contractOldNew": "Contract Type",
       "balanceOverpayment": "Overpayment",
       "discount": "Discount",
+      "paid": "Paid",
       "isSend": "Sent",
       "isDone": "Completed",
       "actions": "Actions"

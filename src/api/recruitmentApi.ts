@@ -75,6 +75,18 @@ export interface RecruitmentListResponse<T> {
   pagination: RecruitmentPagination;
 }
 
+export interface RecruitmentNewStudentsParams {
+  page?: number;
+  perPage?: number;
+  search?: string;
+  manager?: string;
+  group?: string;
+  only_mine?: 0 | 1;
+  no_manager?: 0 | 1;
+  signed?: 0 | 1;
+  debtors?: 0 | 1;
+}
+
 export interface RecruitmentDocumentItem {
   id: number | string;
   name: string;
@@ -216,12 +228,18 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   };
 
   return {
-  async getNewStudents(params: { page?: number; perPage?: number; search?: string } = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
+  async getNewStudents(params: RecruitmentNewStudentsParams = {}): Promise<RecruitmentListResponse<RecruitmentNewStudent>> {
     const { data } = await client.get("recruitment/new-students", {
       params: {
         page: params.page ?? 1,
         per_page: params.perPage ?? 10,
         search: params.search,
+        manager: params.manager,
+        group: params.group,
+        only_mine: params.only_mine,
+        no_manager: params.no_manager,
+        signed: params.signed,
+        debtors: params.debtors,
       },
     });
     const items = pickItems<RecruitmentNewStudent>(data);
