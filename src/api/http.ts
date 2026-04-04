@@ -19,7 +19,21 @@ const REAL_ONLY_PREFIXES = APP_ENV.realOnlyPrefixes;
 function normalizeRequestUrl(config: InternalAxiosRequestConfig): string {
   const rawUrl = String(config.url || "");
   const noOrigin = rawUrl.replace(/^https?:\/\/[^/]+\//i, "");
-  return noOrigin.replace(/^\//, "").split("?")[0];
+  return noOrigin.replace(/^\/+/, "").split("?")[0];
+}
+
+function isAbsoluteUrl(url: string): boolean {
+  return /^(?:[a-z][a-z\d+\-.]*:)?\/\//i.test(url);
+}
+
+function normalizeBaseAndPath(config: InternalAxiosRequestConfig) {
+  if (typeof config.baseURL === "string" && config.baseURL) {
+    config.baseURL = `${config.baseURL.replace(/\/+$/, "")}/`;
+  }
+
+  if (typeof config.url === "string" && config.url && !isAbsoluteUrl(config.url)) {
+    config.url = config.url.replace(/^\/+/, "");
+  }
 }
 
 function hasPrefix(url: string, prefixes: string[]): boolean {
@@ -62,6 +76,8 @@ function attachInterceptors(
     if (resolveBaseUrl) {
       config.baseURL = resolveBaseUrl();
     }
+
+    normalizeBaseAndPath(config);
 
     const normalizedUrl = normalizeRequestUrl(config);
     const isSignInRequest = normalizedUrl === "auth/sign-in" || normalizedUrl === "v1/auth/sign-in";
