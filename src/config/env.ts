@@ -36,11 +36,11 @@ export const APP_ENV = {
 
   projectLabelSpace: normalizeString(import.meta.env.VITE_PROJECT_LABEL_SPACE, 'Space Memory PL'),
   projectShortLabelSpace: normalizeString(import.meta.env.VITE_PROJECT_SHORT_LABEL_SPACE, 'Space PL'),
-  projectPublicUrlSpace: normalizeString(import.meta.env.VITE_PROJECT_PUBLIC_URL_SPACE, 'https://space-memory.pl'),
+  projectPublicUrlSpace: normalizeString(import.meta.env.VITE_PROJECT_PUBLIC_URL_PL, 'https://space-memory.pl'),
 
   projectLabelSpaceUa: normalizeString(import.meta.env.VITE_PROJECT_LABEL_SPACE_UA, 'Space Memory UA'),
   projectShortLabelSpaceUa: normalizeString(import.meta.env.VITE_PROJECT_SHORT_LABEL_SPACE_UA, 'Space UA'),
-  projectPublicUrlSpaceUa: normalizeString(import.meta.env.VITE_PROJECT_PUBLIC_URL_SPACE_UA, ''),
+  projectPublicUrlSpaceUa: normalizeString(import.meta.env.VITE_PROJECT_PUBLIC_URL_UA, ''),
 
   projectLabelIndigo: normalizeString(import.meta.env.VITE_PROJECT_LABEL_INDIGO, 'Indigo'),
   projectShortLabelIndigo: normalizeString(import.meta.env.VITE_PROJECT_SHORT_LABEL_INDIGO, 'Indigo'),

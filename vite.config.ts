@@ -1,4 +1,4 @@
-import { defineConfig, type PluginOption } from 'vite'
+import { defineConfig, loadEnv, type PluginOption } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
@@ -32,6 +32,21 @@ function manualChunks(id: string): string | undefined {
 }
 
 export default defineConfig(async ({ mode }) => {
+  // Загружаем переменные из .env, .env.local и mode-специфичных env-файлов
+  const env = loadEnv(mode, process.cwd(), '')
+
+  // Извлекаем origin из VITE_API_URL для прокси (без пути /api/v1/)
+  let proxyTarget = 'http://127.0.0.1:8001'
+  try {
+    if (env.VITE_API_URL) {
+      proxyTarget = new URL(env.VITE_API_URL).origin
+    }
+  } catch {
+    console.warn('[vite] Invalid VITE_API_URL, using default proxy target:', proxyTarget)
+  }
+
+  console.log(`[vite] Proxy /api/v1 → ${proxyTarget} (from VITE_API_URL=${env.VITE_API_URL})`)
+
   const plugins: PluginOption[] = [vue(), copyHtaccessPlugin]
 
   if (mode === 'analyze') {
@@ -57,9 +72,8 @@ export default defineConfig(async ({ mode }) => {
       port: 5173,
       proxy: {
         '/api/v1': {
-          target: 'http://localhost:3000',
+          target: proxyTarget,
           changeOrigin: true,
-          secure: false,
           // rewrite: (path) => path.replace(/^\/api\/v1/, '/api/v1') // no change needed if backend expects /api/v1
         }
       }
