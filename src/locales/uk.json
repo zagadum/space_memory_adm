@@ -1886,6 +1886,8 @@
       "contractOldNew": "Тип контракту",
       "balanceOverpayment": "Переплата",
       "discount": "Знижка",
+      "groupExternalId": "Група",
+      "teacherExternalId": "Учитель",
       "paid": "Оплачено",
       "isSend": "Відправлено",
       "isDone": "Завершено",

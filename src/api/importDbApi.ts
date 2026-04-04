@@ -15,6 +15,8 @@ export interface ImportDbItem {
   is_paid?: boolean | number | string;
   is_send: boolean | number;
   is_done: boolean | number;
+  group_external_id?: string | number;
+  teacher_external_id?: string | number;
 }
 
 export interface ImportDbPagination {

@@ -1889,6 +1889,8 @@
       "contractOldNew": "Contract Type",
       "balanceOverpayment": "Overpayment",
       "discount": "Discount",
+      "groupExternalId": "Group",
+      "teacherExternalId": "Teacher",
       "paid": "Paid",
       "isSend": "Sent",
       "isDone": "Completed",

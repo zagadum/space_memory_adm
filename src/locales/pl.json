@@ -1890,6 +1890,8 @@
       "contractOldNew": "Typ kontraktu",
       "balanceOverpayment": "Nadpłata",
       "discount": "Zniżka",
+      "groupExternalId": "Grupa",
+      "teacherExternalId": "Nauczyciel",
       "paid": "Opłacone",
       "isSend": "Wysłano",
       "isDone": "Zakończono",
