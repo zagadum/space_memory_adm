@@ -5,7 +5,7 @@ import {
   PROJECT_STORAGE_KEY,
   getProjectOption,
   getStoredProjectCode,
-  isProjectCode,
+  normalizeProjectCode,
   type ProjectCode,
 } from '../config/projectApi'
 
@@ -13,18 +13,18 @@ export const useProjectStore = defineStore('project', () => {
   const activeProject = ref<ProjectCode>(getStoredProjectCode())
 
   const isSpace = computed(() => activeProject.value === 'space')
-  const isSpaceUa = computed(() => activeProject.value === 'space_ua')
   const isIndigo = computed(() => activeProject.value === 'indigo')
-  const usesDefaultRecruitment = computed(() => activeProject.value !== 'indigo')
+  const usesDefaultRecruitment = computed(() => activeProject.value === 'space')
   const activeProjectMeta = computed(() => getProjectOption(activeProject.value))
 
   const projectName = computed(() => activeProjectMeta.value.label)
 
-  function setProject(project: ProjectCode) {
-    if (!isProjectCode(project)) return
+  function setProject(project: ProjectCode | string | null | undefined) {
+    const normalizedProject = normalizeProjectCode(project)
+    if (!normalizedProject) return
 
-    activeProject.value = project
-    localStorage.setItem(PROJECT_STORAGE_KEY, project)
+    activeProject.value = normalizedProject
+    localStorage.setItem(PROJECT_STORAGE_KEY, normalizedProject)
   }
 
   return {
@@ -32,7 +32,6 @@ export const useProjectStore = defineStore('project', () => {
     activeProjectMeta,
     projectOptions: PROJECT_OPTIONS,
     isSpace,
-    isSpaceUa,
     isIndigo,
     usesDefaultRecruitment,
     projectName,

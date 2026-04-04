@@ -28,7 +28,7 @@ export const APP_ENV = {
   recruitmentApiUrl: normalizeString(import.meta.env.VITE_RECRUITMENT_API_URL, ''),
   recruitmentIndigoApiUrl: normalizeString(import.meta.env.VITE_RECRUITMENT_INDIGO_API_URL, ''),
 
-  defaultProject: normalizeString(import.meta.env.VITE_DEFAULT_PROJECT, 'space_ua'),
+  defaultProject: normalizeString(import.meta.env.VITE_DEFAULT_PROJECT, 'space'),
   useMock: parseBooleanEnv(import.meta.env.VITE_USE_MOCK, false),
   mockOnlyPrefixes: parsePrefixList(import.meta.env.VITE_MOCK_ONLY),
   realOnlyPrefixes: parsePrefixList(import.meta.env.VITE_REAL_ONLY),

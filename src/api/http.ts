@@ -80,7 +80,7 @@ function attachInterceptors(
     normalizeBaseAndPath(config);
 
     const normalizedUrl = normalizeRequestUrl(config);
-    const isSignInRequest = normalizedUrl === "auth/sign-in" || normalizedUrl === "v1/auth/sign-in";
+    const isSignInRequest = normalizedUrl === "auth/sign-in";
     const token = localStorage.getItem("token");
     if (token && !isSignInRequest) {
       config.headers.set("Authorization", `Bearer ${token}`);

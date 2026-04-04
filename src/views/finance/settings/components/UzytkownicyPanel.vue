@@ -33,10 +33,8 @@
         </select>
         <select v-model="filterProj" class="tpl-filter-sel">
           <option value="">{{ $t('financeSettings.usersRoles.filterProjAll') }}</option>
-          <option value="space">🚀 Space Memory</option>
-          <option value="indigo">🧠 INDIGO / Speedy Mind</option>
-          <option value="olimp">🏆 Olimpiada</option>
-          <option value="camp">🎓 Warsztaty / Obozy</option>
+          <option value="space">🚀 Space Memory PL</option>
+          <option value="indigo">🧠 Indigo</option>
         </select>
         <select v-model="filterStatus" class="tpl-filter-sel">
           <option value="">Все статусы</option>
@@ -165,7 +163,7 @@ const filteredUsers = computed(() => {
 
 function getProjLabels(projs: string[]) {
   if (projs.includes('all')) return t('financeSettings.usersRoles.projAll')
-  const map: Record<string, string> = { space: 'Space Memory', indigo: 'INDIGO', olimp: 'Olimpiada', camp: 'Warsztaty' }
+  const map: Record<string, string> = { space: 'Space Memory PL', indigo: 'Indigo' }
   return projs.map(p => map[p] || p).join(', ')
 }
 

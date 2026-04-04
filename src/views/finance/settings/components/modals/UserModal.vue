@@ -126,10 +126,8 @@ const APP_ROLES: AppRole[] = [
 ]
 
 const projOptions = [
-  { val: 'space',  label: '🚀 Space Memory' },
-  { val: 'indigo', label: '🧠 INDIGO / Speedy Mind' },
-  { val: 'olimp',  label: '🏆 Olimpiada' },
-  { val: 'camp',   label: '🎓 Warsztaty / Obozy' },
+  { val: 'space',  label: '🚀 Space Memory PL' },
+  { val: 'indigo', label: '🧠 Indigo' },
 ]
 
 const form = ref({

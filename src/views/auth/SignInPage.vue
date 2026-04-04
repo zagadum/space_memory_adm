@@ -71,7 +71,7 @@ import { useAuthStore } from "../../stores/auth.store";
 import { useProjectStore } from "../../stores/project.store";
 import UiInput from "../../components/ui/UiInput.vue";
 import UiButton from "../../components/ui/UiButton.vue";
-import { isProjectCode } from "../../config/projectApi";
+import { normalizeProjectCode } from "../../config/projectApi";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -83,8 +83,8 @@ const email = ref("admin@demo.local");
 const password = ref("demo");
 const projectOptions = projectStore.projectOptions;
 
-const requestedProject = route.query.project;
-if (isProjectCode(requestedProject)) {
+const requestedProject = normalizeProjectCode(route.query.project);
+if (requestedProject) {
   projectStore.setProject(requestedProject);
 }
 

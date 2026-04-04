@@ -1,6 +1,6 @@
 import { APP_ENV } from './env'
 
-export type ProjectCode = 'space' | 'indigo' | 'space_ua'
+export type ProjectCode = 'space' | 'indigo'
 
 export interface ProjectOption {
   code: ProjectCode
@@ -12,7 +12,10 @@ export interface ProjectOption {
 
 export const PROJECT_STORAGE_KEY = 'gls_active_project'
 const DEFAULT_API_SUFFIX = '/api/v1/'
-const VALID_PROJECTS: ProjectCode[] = ['space', 'indigo', 'space_ua']
+const VALID_PROJECTS: ProjectCode[] = ['space', 'indigo']
+const LEGACY_PROJECT_ALIASES: Record<string, ProjectCode> = {
+  space_ua: 'space',
+}
 
 function normalizeProjectApiUrl(value: string | undefined, fallback: string): string {
   const raw = String(value || fallback).trim()
@@ -37,14 +40,26 @@ function normalizeProjectApiUrl(value: string | undefined, fallback: string): st
   }
 }
 
+export function normalizeProjectCode(value: unknown): ProjectCode | null {
+  if (typeof value !== 'string') return null
+
+  const normalized = value.trim()
+  if (!normalized) return null
+
+  if (VALID_PROJECTS.includes(normalized as ProjectCode)) {
+    return normalized as ProjectCode
+  }
+
+  return LEGACY_PROJECT_ALIASES[normalized] ?? null
+}
+
 export function isProjectCode(value: unknown): value is ProjectCode {
   return VALID_PROJECTS.includes(value as ProjectCode)
 }
 
 export const PROJECT_API_URLS: Record<ProjectCode, string> = {
-  space: normalizeProjectApiUrl(APP_ENV.apiUrlSpace, 'https://pl.memory.firm.kiev.ua'),
+  space: normalizeProjectApiUrl(APP_ENV.apiUrlSpace || APP_ENV.apiUrlSpaceUa || APP_ENV.apiUrl, 'https://pl.memory.firm.kiev.ua'),
   indigo: normalizeProjectApiUrl(APP_ENV.apiUrlIndigo, 'https://memory-pl.firm.kiev.ua/api/v1/'),
-  space_ua: normalizeProjectApiUrl(APP_ENV.apiUrlSpaceUa || APP_ENV.apiUrl, 'https://memory.firm.kiev.ua/api/v1/'),
 }
 
 export const PROJECT_OPTIONS: ProjectOption[] = [
@@ -54,13 +69,6 @@ export const PROJECT_OPTIONS: ProjectOption[] = [
     shortLabel: APP_ENV.projectShortLabelSpace,
     dotClass: 'dot-space',
     publicUrl: APP_ENV.projectPublicUrlSpace || undefined,
-  },
-  {
-    code: 'space_ua',
-    label: APP_ENV.projectLabelSpaceUa,
-    shortLabel: APP_ENV.projectShortLabelSpaceUa,
-    dotClass: 'dot-space-ua',
-    publicUrl: APP_ENV.projectPublicUrlSpaceUa || undefined,
   },
   {
     code: 'indigo',
@@ -76,16 +84,14 @@ export function getProjectOption(project: ProjectCode): ProjectOption {
 }
 
 export function getStoredProjectCode(): ProjectCode {
+  const fallbackProject = normalizeProjectCode(APP_ENV.defaultProject) ?? 'space'
+
   if (typeof window !== 'undefined') {
-    const stored = window.localStorage.getItem(PROJECT_STORAGE_KEY)
-    if (isProjectCode(stored)) return stored
+    const stored = normalizeProjectCode(window.localStorage.getItem(PROJECT_STORAGE_KEY))
+    if (stored) return stored
   }
 
-  if (isProjectCode(APP_ENV.defaultProject)) {
-    return APP_ENV.defaultProject
-  }
-
-  return 'space_ua'
+  return fallbackProject
 }
 
 export function getProjectApiUrl(project: ProjectCode): string {

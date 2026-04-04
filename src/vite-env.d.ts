@@ -19,11 +19,11 @@ interface ImportMetaEnv {
 
   readonly VITE_PROJECT_LABEL_SPACE?: string
   readonly VITE_PROJECT_SHORT_LABEL_SPACE?: string
-  readonly VITE_PROJECT_PUBLIC_URL_SPACE?: string
+  readonly VITE_PROJECT_PUBLIC_URL_PL?: string
 
   readonly VITE_PROJECT_LABEL_SPACE_UA?: string
   readonly VITE_PROJECT_SHORT_LABEL_SPACE_UA?: string
-  readonly VITE_PROJECT_PUBLIC_URL_SPACE_UA?: string
+  readonly VITE_PROJECT_PUBLIC_URL_UA?: string
 
   readonly VITE_PROJECT_LABEL_INDIGO?: string
   readonly VITE_PROJECT_SHORT_LABEL_INDIGO?: string
