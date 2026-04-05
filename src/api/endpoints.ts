@@ -141,16 +141,19 @@ export const STUDENT = {
 // NEW GROUPS — Формирование новых групп
 // ═══════════════════════════════════════════════════════════════════════════
 export const NEW_GROUPS = {
-  LIST: 'new-groups',
-  STUDENTS: 'new-groups/students',
-  MASTER_STUDENTS: 'new-groups/master-students',
-  TEACHERS: 'new-groups/teachers',
-  CREATE: 'new-groups/create',
-  START: 'new-groups/start',
-  DELETE: 'new-groups/delete',
-  ADD_STUDENTS: 'new-groups/add-students',
-  REMOVE_STUDENT: 'new-groups/remove-student',
-  GROUP_STUDENTS: (id: number) => `new-groups/${id}/students`,
+  LIST: 'groups/new-groups',
+  STUDENTS: 'groups/students',
+  MASTER_STUDENTS: 'groups/master-students',
+  TEACHERS: 'groups/teachers',
+  CREATE: 'groups/new-groups',
+  EDIT: 'groups/edit-groups',
+  DELETE: 'groups/delete-groups',
+  FULL_INFO: 'groups/full-info',
+  ADD_STUDENTS: 'groups/add-student',
+  REMOVE_STUDENT: 'groups/remove-student',
+  UPDATE_STATUS: 'groups/update-status',
+  START: 'groups/start-group',
+  GROUP_STUDENTS: (id: number) => `groups/new-groups/${id}/students`,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
