@@ -50,6 +50,53 @@ export interface MasterStudent {
     color: string;
 }
 
+type WorkdayKey = 'workday1' | 'workday2' | 'workday3' | 'workday4' | 'workday5' | 'workday6' | 'workday7'
+type WorkdayFlags = Record<WorkdayKey, 0 | 1>
+
+function emptyWorkdayFlags(): WorkdayFlags {
+    return {
+        workday1: 0,
+        workday2: 0,
+        workday3: 0,
+        workday4: 0,
+        workday5: 0,
+        workday6: 0,
+        workday7: 0,
+    }
+}
+
+function normalizeDayToIndex(day: string | number | null | undefined): number | null {
+    if (day === null || day === undefined) return null
+
+    const raw = String(day).trim()
+    if (!raw) return null
+
+    if (/^[1-7]$/.test(raw)) return Number(raw)
+
+    const normalized = raw.toLowerCase().replace(/[.\s]+/g, '')
+    const map: Record<string, number> = {
+        monday: 1, mon: 1, 'понедельник': 1, 'понеділок': 1, 'пн': 1,
+        tuesday: 2, tue: 2, tues: 2, 'вторник': 2, 'вівторок': 2, 'вт': 2,
+        wednesday: 3, wed: 3, 'среда': 3, 'середа': 3, 'ср': 3,
+        thursday: 4, thu: 4, thur: 4, thurs: 4, 'четверг': 4, 'четвер': 4, 'чт': 4,
+        friday: 5, fri: 5, 'пятница': 5, "п'ятниця": 5, 'пт': 5,
+        saturday: 6, sat: 6, 'суббота': 6, 'субота': 6, 'сб': 6,
+        sunday: 7, sun: 7, 'воскресенье': 7, 'неділя': 7, 'вс': 7, 'нд': 7,
+    }
+
+    return map[normalized] ?? null
+}
+
+function buildWorkdayFlags(day: string | number | null | undefined): WorkdayFlags {
+    const flags = emptyWorkdayFlags()
+    const idx = normalizeDayToIndex(day)
+    if (idx === null) return flags
+
+    const key = `workday${idx}` as WorkdayKey
+    flags[key] = 1
+    return flags
+}
+
 function getClient(backend: RecruitmentBackend = "default") {
     return backend === "indigo" ? httpRecruitmentIndigo : http;
 }
@@ -84,15 +131,16 @@ export async function createNewGroup(payload: {
     teacherId: number | null;
     studentIds: number[];
 }, backend: RecruitmentBackend = "default") {
+    const workdays = buildWorkdayFlags(payload.day)
     const body = {
         name: payload.name,
         type_group: payload.type === 'individual' ? 'prv' : 'all',
-        day: payload.day,
         time: payload.time,
         start_date: payload.startDate,
         age_name: payload.age,
         teacher_id: payload.teacherId,
         student_ids: payload.studentIds,
+        ...workdays,
     };
     const res = await getClient(backend).post(NEW_GROUPS.CREATE, body);
     return res.data as { ok: true; group: NewGroup; data?: NewGroup };
@@ -129,7 +177,13 @@ export async function editGroup(payload: {
     day?: string | null;
     time?: string | null;
 }, backend: RecruitmentBackend = "default") {
-    const res = await getClient(backend).post(NEW_GROUPS.EDIT, payload);
+    const body = {
+        ...payload,
+        ...(payload.day !== undefined ? buildWorkdayFlags(payload.day) : {}),
+    }
+    delete (body as { day?: string | null }).day
+
+    const res = await getClient(backend).post(NEW_GROUPS.EDIT, body);
     return res.data as { success: true; data: NewGroup };
 }
 
