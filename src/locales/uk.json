@@ -1401,7 +1401,7 @@
     "description": "Опис / Учень",
     "rateQty": "Ставка / К-сть",
     "amount": "Сума",
-    "totalPayout": "РАЗОМ ДО ВИПЛАТИ"
+    "totalPayout": "РАЗОМ ДО СПЛАТИ"
   },
   "newStudents": {
     "pageTitle": "Нові учні",
@@ -1860,6 +1860,9 @@
     "pageTitle": "Import DB",
     "pageSubtitle": "Управління імпортованими даними",
     "searchPlaceholder": "Пошук за ім'ям, email, телефоном...",
+    "teacherSearchPlaceholder": "Пошук за вчителем...",
+    "groupSearchPlaceholder": "Пошук за групою...",
+    "teacherFilterAll": "Всі вчителі",
     "listTitle": "Список імпорту",
     "itemsWord": "записів",
     "loading": "Завантажуємо список...",
@@ -1883,6 +1886,7 @@
       "phone": "Телефон",
       "nickname": "Нікнейм",
       "subscriptionAmount": "Сума подписки",
+      "subscriptionEndDate": "Кінець підписки",
       "contractOldNew": "Тип контракту",
       "balanceOverpayment": "Переплата",
       "discount": "Знижка",
@@ -1902,6 +1906,10 @@
       "deleteSuccess": "Запис успішно видалено",
       "updateSuccess": "Дані оновлено",
       "resendSuccess": "Запрошення успішно надіслано"
+    },
+    "paidStatus": {
+      "paid": "Оплачено",
+      "unpaid": "Не оплачено"
     },
     "showing": "Показано {shown} з {total} записів"
   },

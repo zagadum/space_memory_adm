@@ -7,6 +7,18 @@
           <span class="search-icon">🔍</span>
           <input v-model="searchQ" :placeholder="t('importDb.searchPlaceholder')" @input="applyFilters" />
         </div>
+        <div class="search-box">
+          <span class="search-icon">👩‍🏫</span>
+          <input v-model="teacherSearchQ" :placeholder="t('importDb.teacherSearchPlaceholder')" @input="applyFilters" />
+        </div>
+        <div class="search-box">
+          <span class="search-icon">👥</span>
+          <input v-model="groupSearchQ" :placeholder="t('importDb.groupSearchPlaceholder')" @input="applyFilters" />
+        </div>
+        <select v-model="selectedTeacher" class="teacher-filter" @change="applyFilters">
+          <option value="">{{ t('importDb.teacherFilterAll') }}</option>
+          <option v-for="teacher in availableTeachers" :key="teacher" :value="teacher">{{ teacher }}</option>
+        </select>
         <button class="btn btn-ghost" @click="onExport">⬇ {{ t('common.export') }}</button>
       </div>
 
@@ -72,12 +84,28 @@
               <th>{{ t('importDb.table.phone') }}</th>
               <th>{{ t('importDb.table.nickname') }}</th>
               <th>{{ t('importDb.table.subscriptionAmount') }}</th>
+              <th>{{ t('importDb.table.subscriptionEndDate') }}</th>
               <th>{{ t('importDb.table.contractOldNew') }}</th>
               <th>{{ t('importDb.table.balanceOverpayment') }}</th>
               <th>{{ t('importDb.table.discount') }}</th>
-              <th>{{ t('importDb.table.groupExternalId') }}</th>
-              <th>{{ t('importDb.table.teacherExternalId') }}</th>
-              <th>{{ t('importDb.table.paid') }}</th>
+              <th>
+                <button class="th-sort-btn" type="button" @click="toggleSort('group_external_id')">
+                  {{ t('importDb.table.groupExternalId') }}
+                  <span class="sort-indicator">{{ getSortIndicator('group_external_id') }}</span>
+                </button>
+              </th>
+              <th>
+                <button class="th-sort-btn" type="button" @click="toggleSort('teacher_external_id')">
+                  {{ t('importDb.table.teacherExternalId') }}
+                  <span class="sort-indicator">{{ getSortIndicator('teacher_external_id') }}</span>
+                </button>
+              </th>
+              <th>
+                <button class="th-sort-btn" type="button" @click="toggleSort('paid')">
+                  {{ t('importDb.table.paid') }}
+                  <span class="sort-indicator">{{ getSortIndicator('paid') }}</span>
+                </button>
+              </th>
               <th>{{ t('importDb.table.isSend') }}</th>
               <th>{{ t('importDb.table.isDone') }}</th>
               <th>{{ t('importDb.table.actions') }}</th>
@@ -107,6 +135,7 @@
                 <span v-else>{{ item.nickname || '—' }}</span>
               </td>
               <td class="text-right">{{ formatAmount(item.subscription_amount) }}</td>
+              <td>{{ formatDate(item.subscription_end_date) }}</td>
               <td>{{ item.contract_old_new }}</td>
               <td class="text-right">
                 <input
@@ -131,8 +160,8 @@
                <td>{{ item.group_external_id || '—' }}</td>
                <td>{{ item.teacher_external_id || '—' }}</td>
                <td>
-                 <span v-if="isTruthy(item.paid ?? item.is_paid)" class="badge badge-success">{{ t('common.yes') }}</span>
-                <span v-else class="badge badge-warning">{{ t('common.no') }}</span>
+                 <span v-if="isTruthy(item.paid ?? item.is_paid)" class="badge badge-success">{{ t('importDb.paidStatus.paid') }}</span>
+                <span v-else class="badge badge-warning">{{ t('importDb.paidStatus.unpaid') }}</span>
               </td>
               <td>
                 <span v-if="item.is_send" class="badge badge-success">{{ t('common.yes') }}</span>
@@ -144,6 +173,7 @@
               </td>
               <td class="actions-cell">
                 <button
+                  v-if="canResendImportDbInvitation"
                   class="action-icon-btn action-icon-btn--primary"
                   type="button"
                   :title="t('importDb.actions.resendInvitation')"
@@ -154,7 +184,7 @@
                   ✉️
                 </button>
                 <button
-                  v-if="editingRowId !== item.id"
+                  v-if="canUpdateImportDb && editingRowId !== item.id"
                   class="action-icon-btn action-icon-btn--neutral"
                   type="button"
                   :title="t('importDb.actions.edit')"
@@ -165,7 +195,7 @@
                   ✏️
                 </button>
                 <button
-                  v-else
+                  v-if="canUpdateImportDb && editingRowId === item.id"
                   class="action-icon-btn action-icon-btn--success"
                   type="button"
                   :title="t('common.save')"
@@ -176,7 +206,7 @@
                   ✅
                 </button>
                 <button
-                  v-if="editingRowId === item.id"
+                  v-if="canUpdateImportDb && editingRowId === item.id"
                   class="action-icon-btn action-icon-btn--neutral"
                   type="button"
                   :title="t('common.cancel')"
@@ -187,6 +217,7 @@
                   ✖️
                 </button>
                 <button
+                  v-if="canDeleteImportDb"
                   class="action-icon-btn action-icon-btn--danger"
                   type="button"
                   :title="t('importDb.actions.delete')"
@@ -249,13 +280,18 @@ import { useRoute } from 'vue-router';
 import { useImportDbStore } from '../../stores/importDb.store';
 import { useNotificationStore } from '../../stores/notification.store';
 import type { RecruitmentBackend } from '../../api/http';
+import { useCanAccess } from '../../composables/useCanAccess';
 
 const { t } = useI18n();
 const route = useRoute();
 const store = useImportDbStore();
 const notificationStore = useNotificationStore();
+const { canEdit } = useCanAccess();
 
 const searchQ = ref('');
+const teacherSearchQ = ref('');
+const groupSearchQ = ref('');
+const selectedTeacher = ref('');
 const deleteConfirmId = ref<number | string | null>(null);
 const resendConfirmId = ref<number | string | null>(null);
 const editingRowId = ref<number | string | null>(null);
@@ -271,17 +307,51 @@ const backend = computed(() => {
   return (meta?.recruitmentBackend ?? 'default') as RecruitmentBackend;
 });
 
-const filteredItems = computed(() => {
-  const query = searchQ.value.toLowerCase();
-  if (!query) return store.items;
+type SortField = 'paid' | 'group_external_id' | 'teacher_external_id';
+type SortDirection = 'asc' | 'desc';
 
-  return store.items.filter(item =>
-    item.surname.toLowerCase().includes(query) ||
-    item.first_name.toLowerCase().includes(query) ||
-    item.parent_email.toLowerCase().includes(query) ||
-    item.phone.includes(query)
-  );
+const sortBy = ref<SortField>('paid');
+const sortDir = ref<SortDirection>('desc');
+
+const availableTeachers = computed(() => {
+  return [...new Set(
+    store.items
+      .map(item => String(item.teacher_external_id ?? '').trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
 });
+
+const filteredItems = computed(() => {
+  const query = searchQ.value.trim().toLowerCase();
+  const teacherQuery = teacherSearchQ.value.trim().toLowerCase();
+  const groupQuery = groupSearchQ.value.trim().toLowerCase();
+  const teacherFilter = selectedTeacher.value.trim().toLowerCase();
+
+  const filtered = store.items.filter(item => {
+    const teacherValue = String(item.teacher_external_id ?? '').toLowerCase();
+    const groupValue = String(item.group_external_id ?? '').toLowerCase();
+
+    const matchGlobal = !query ||
+      item.surname.toLowerCase().includes(query) ||
+      item.first_name.toLowerCase().includes(query) ||
+      item.parent_email.toLowerCase().includes(query) ||
+      item.phone.includes(query) ||
+      teacherValue.includes(query) ||
+      groupValue.includes(query);
+
+    const matchTeacherSearch = !teacherQuery || teacherValue.includes(teacherQuery);
+    const matchGroupSearch = !groupQuery || groupValue.includes(groupQuery);
+    const matchTeacherFilter = !teacherFilter || teacherValue === teacherFilter;
+
+    return matchGlobal && matchTeacherSearch && matchGroupSearch && matchTeacherFilter;
+  });
+
+  return [...filtered].sort((a, b) => compareBySort(a, b));
+});
+
+const canUpdateImportDb = computed(() => canEdit('import-db-update'));
+const canDeleteImportDb = computed(() => canEdit('import-db-delete'));
+const canResendImportDbInvitation = computed(() => canEdit('import-db-resend-invitation'));
 
 function formatAmount(value: number | string): string {
   const num = Number(value);
@@ -296,6 +366,39 @@ function isTruthy(value: unknown): boolean {
   return false;
 }
 
+function compareBySort(a: any, b: any): number {
+  const direction = sortDir.value === 'asc' ? 1 : -1;
+
+  if (sortBy.value === 'paid') {
+    const left = Number(isTruthy(a.paid ?? a.is_paid));
+    const right = Number(isTruthy(b.paid ?? b.is_paid));
+    return (left - right) * direction;
+  }
+
+  const left = String(a[sortBy.value] ?? '').toLowerCase();
+  const right = String(b[sortBy.value] ?? '').toLowerCase();
+  return left.localeCompare(right) * direction;
+}
+
+function toggleSort(field: SortField) {
+  if (sortBy.value === field) {
+    sortDir.value = sortDir.value === 'asc' ? 'desc' : 'asc';
+    return;
+  }
+  sortBy.value = field;
+  sortDir.value = 'asc';
+}
+
+function getSortIndicator(field: SortField): string {
+  if (sortBy.value !== field) return '↕';
+  return sortDir.value === 'asc' ? '↑' : '↓';
+}
+
+function formatDate(value?: string | null): string {
+  if (!value) return '—';
+  return String(value);
+}
+
 function applyFilters() {
   // Filter is applied via computed property
 }
@@ -305,6 +408,11 @@ async function loadData() {
 }
 
 async function resendInvitation(id: number | string) {
+  if (!canResendImportDbInvitation.value) {
+    notificationStore.addToast(t('common.error'), 'warning');
+    return;
+  }
+
   try {
     const response = await store.resendInvitation(id) as any;
     const successMessage = String(response?.message ?? t('importDb.actions.resendSuccess'));
@@ -362,6 +470,11 @@ function parseNumericField(rawValue: string, label: string): number {
 }
 
 async function saveEdit(id: number | string) {
+  if (!canUpdateImportDb.value) {
+    notificationStore.addToast(t('common.error'), 'warning');
+    return;
+  }
+
   try {
     const balanceOverpayment = parseNumericField(editForm.value.balance_overpayment, t('importDb.table.balanceOverpayment'));
     const discount = parseNumericField(editForm.value.discount, t('importDb.table.discount'));
@@ -381,6 +494,12 @@ async function saveEdit(id: number | string) {
 
 async function confirmDelete() {
   if (!deleteConfirmId.value) return;
+
+  if (!canDeleteImportDb.value) {
+    notificationStore.addToast(t('common.error'), 'warning');
+    deleteConfirmId.value = null;
+    return;
+  }
 
   const id = deleteConfirmId.value;
   deleteConfirmId.value = null;
@@ -411,6 +530,7 @@ async function onExport() {
         t('importDb.table.phone'),
         t('importDb.table.nickname'),
         t('importDb.table.subscriptionAmount'),
+        t('importDb.table.subscriptionEndDate'),
         t('importDb.table.contractOldNew'),
         t('importDb.table.balanceOverpayment'),
         t('importDb.table.discount'),
@@ -427,12 +547,13 @@ async function onExport() {
         item.phone,
         item.nickname || '—',
         Number(item.subscription_amount),
+        formatDate(item.subscription_end_date),
         item.contract_old_new,
         Number(item.balance_overpayment),
         Number(item.discount),
         item.group_external_id || '—',
         item.teacher_external_id || '—',
-        isTruthy(item.paid ?? item.is_paid) ? t('common.yes') : t('common.no'),
+        isTruthy(item.paid ?? item.is_paid) ? t('importDb.paidStatus.paid') : t('importDb.paidStatus.unpaid'),
         item.is_send ? t('common.yes') : t('common.no'),
         item.is_done ? t('common.yes') : t('common.no'),
       ]),
@@ -444,6 +565,7 @@ async function onExport() {
       { wch: 16 },
       { wch: 18 },
       { wch: 18 },
+      { wch: 16 },
       { wch: 18 },
       { wch: 16 },
       { wch: 14 },
@@ -496,6 +618,22 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+}
+
+.teacher-filter {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  color: var(--app-text-main);
+  font-size: 13px;
+  min-width: 220px;
+  padding: 8px 12px;
+}
+
+.teacher-filter:focus {
+  outline: none;
+  border-color: var(--app-border-hi);
+  box-shadow: 0 0 12px rgba(79, 110, 247, 0.1);
 }
 
 .search-box {
@@ -697,6 +835,25 @@ onMounted(() => {
   text-transform: uppercase;
   color: var(--app-text-dim);
   white-space: nowrap;
+}
+
+.th-sort-btn {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  gap: 6px;
+  letter-spacing: inherit;
+  padding: 0;
+  text-transform: inherit;
+}
+
+.sort-indicator {
+  color: var(--app-text-dim);
+  font-size: 11px;
 }
 
 .data-table td {

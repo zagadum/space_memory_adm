@@ -1864,6 +1864,9 @@
     "pageTitle": "Import DB",
     "pageSubtitle": "Zarządzanie zaimportowanymi danymi",
     "searchPlaceholder": "Szukaj po nazwisku, emailu, telefonie...",
+    "teacherSearchPlaceholder": "Szukaj po nauczycielu...",
+    "groupSearchPlaceholder": "Szukaj po grupie...",
+    "teacherFilterAll": "Wszyscy nauczyciele",
     "listTitle": "Lista importu",
     "itemsWord": "rekordów",
     "loading": "Ładowanie listy...",
@@ -1887,6 +1890,7 @@
       "phone": "Telefon",
       "nickname": "Nickname",
       "subscriptionAmount": "Kwota subskrypcji",
+      "subscriptionEndDate": "Koniec subskrypcji",
       "contractOldNew": "Typ kontraktu",
       "balanceOverpayment": "Nadpłata",
       "discount": "Zniżka",
@@ -1906,6 +1910,10 @@
       "deleteSuccess": "Rekord został pomyślnie usunięty",
       "updateSuccess": "Dane zostały zaktualizowane",
       "resendSuccess": "Zaproszenie zostało pomyślnie wysłane"
+    },
+    "paidStatus": {
+      "paid": "Opłacone",
+      "unpaid": "Nieopłacone"
     },
     "showing": "Pokazano {shown} z {total} rekordów"
   },
