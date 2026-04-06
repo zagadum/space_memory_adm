@@ -111,6 +111,12 @@ const RECRUITMENT: string[] = [
   "expelled", "new-groups", "archived", "import-db",
 ];
 
+const IMPORT_DB_ACTIONS: string[] = [
+  "import-db-update",
+  "import-db-delete",
+  "import-db-resend-invitation",
+];
+
 const FINANCE: string[] = [
   "finance", "student-finance", "debtors", "nadplaty", "settings",
 ];
@@ -164,12 +170,14 @@ export const ROLE_MENU_ACCESS: Record<AppRole, MenuAccessMap> = {
   "super-admin": allow(
     ALWAYS, SECRETARIAT, RECRUITMENT,
     FINANCE, ACCOUNTING, HR, TRAINER, QUALITY, SETTINGS_SECTION,
+    IMPORT_DB_ACTIONS,
   ),
 
   // Full operational access including settings panel
   "admin": allow(
     ALWAYS, SECRETARIAT, RECRUITMENT,
     FINANCE, ACCOUNTING, HR, TRAINER, QUALITY, SETTINGS_SECTION,
+    IMPORT_DB_ACTIONS,
   ),
 
   // Only own trainer panel + salary; no student management, no finance

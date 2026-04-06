@@ -144,6 +144,7 @@
               </td>
               <td class="actions-cell">
                 <button
+                  v-if="canResendImportDbInvitation"
                   class="action-icon-btn action-icon-btn--primary"
                   type="button"
                   :title="t('importDb.actions.resendInvitation')"
@@ -154,7 +155,7 @@
                   ✉️
                 </button>
                 <button
-                  v-if="editingRowId !== item.id"
+                  v-if="canUpdateImportDb && editingRowId !== item.id"
                   class="action-icon-btn action-icon-btn--neutral"
                   type="button"
                   :title="t('importDb.actions.edit')"
@@ -165,7 +166,7 @@
                   ✏️
                 </button>
                 <button
-                  v-else
+                  v-if="canUpdateImportDb && editingRowId === item.id"
                   class="action-icon-btn action-icon-btn--success"
                   type="button"
                   :title="t('common.save')"
@@ -176,7 +177,7 @@
                   ✅
                 </button>
                 <button
-                  v-if="editingRowId === item.id"
+                  v-if="canUpdateImportDb && editingRowId === item.id"
                   class="action-icon-btn action-icon-btn--neutral"
                   type="button"
                   :title="t('common.cancel')"
@@ -187,6 +188,7 @@
                   ✖️
                 </button>
                 <button
+                  v-if="canDeleteImportDb"
                   class="action-icon-btn action-icon-btn--danger"
                   type="button"
                   :title="t('importDb.actions.delete')"
@@ -249,11 +251,13 @@ import { useRoute } from 'vue-router';
 import { useImportDbStore } from '../../stores/importDb.store';
 import { useNotificationStore } from '../../stores/notification.store';
 import type { RecruitmentBackend } from '../../api/http';
+import { useCanAccess } from '../../composables/useCanAccess';
 
 const { t } = useI18n();
 const route = useRoute();
 const store = useImportDbStore();
 const notificationStore = useNotificationStore();
+const { canEdit } = useCanAccess();
 
 const searchQ = ref('');
 const deleteConfirmId = ref<number | string | null>(null);
@@ -283,6 +287,10 @@ const filteredItems = computed(() => {
   );
 });
 
+const canUpdateImportDb = computed(() => canEdit('import-db-update'));
+const canDeleteImportDb = computed(() => canEdit('import-db-delete'));
+const canResendImportDbInvitation = computed(() => canEdit('import-db-resend-invitation'));
+
 function formatAmount(value: number | string): string {
   const num = Number(value);
   if (isNaN(num)) return String(value);
@@ -305,6 +313,11 @@ async function loadData() {
 }
 
 async function resendInvitation(id: number | string) {
+  if (!canResendImportDbInvitation.value) {
+    notificationStore.addToast(t('common.error'), 'warning');
+    return;
+  }
+
   try {
     const response = await store.resendInvitation(id) as any;
     const successMessage = String(response?.message ?? t('importDb.actions.resendSuccess'));
@@ -362,6 +375,11 @@ function parseNumericField(rawValue: string, label: string): number {
 }
 
 async function saveEdit(id: number | string) {
+  if (!canUpdateImportDb.value) {
+    notificationStore.addToast(t('common.error'), 'warning');
+    return;
+  }
+
   try {
     const balanceOverpayment = parseNumericField(editForm.value.balance_overpayment, t('importDb.table.balanceOverpayment'));
     const discount = parseNumericField(editForm.value.discount, t('importDb.table.discount'));
@@ -381,6 +399,12 @@ async function saveEdit(id: number | string) {
 
 async function confirmDelete() {
   if (!deleteConfirmId.value) return;
+
+  if (!canDeleteImportDb.value) {
+    notificationStore.addToast(t('common.error'), 'warning');
+    deleteConfirmId.value = null;
+    return;
+  }
 
   const id = deleteConfirmId.value;
   deleteConfirmId.value = null;
