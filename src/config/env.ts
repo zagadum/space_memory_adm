@@ -32,7 +32,7 @@ export const APP_ENV = {
   useMock: parseBooleanEnv(import.meta.env.VITE_USE_MOCK, false),
   mockOnlyPrefixes: parsePrefixList(import.meta.env.VITE_MOCK_ONLY),
   realOnlyPrefixes: parsePrefixList(import.meta.env.VITE_REAL_ONLY),
-  authzBypass: parseBooleanEnv(import.meta.env.VITE_AUTHZ_BYPASS, true),
+  authzBypass: parseBooleanEnv(import.meta.env.VITE_AUTHZ_BYPASS, false),
 
   projectLabelSpace: normalizeString(import.meta.env.VITE_PROJECT_LABEL_SPACE, 'Space Memory PL'),
   projectShortLabelSpace: normalizeString(import.meta.env.VITE_PROJECT_SHORT_LABEL_SPACE, 'Space PL'),

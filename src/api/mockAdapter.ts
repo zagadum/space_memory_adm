@@ -90,7 +90,13 @@ function getAccessState() {
 }
 
 function extractRoleFromToken(config: InternalAxiosRequestConfig): RoleCode {
-  const authHeader = String((config.headers as any)?.Authorization || (config.headers as any)?.authorization || "");
+  let authHeader = "";
+  if (config.headers && typeof config.headers.get === "function") {
+    authHeader = String(config.headers.get("Authorization") || config.headers.get("authorization") || "");
+  }
+  if (!authHeader) {
+    authHeader = String((config.headers as any)?.Authorization || (config.headers as any)?.authorization || "");
+  }
   const token = authHeader.replace("Bearer ", "").trim();
   const rawRole = token.split(".").pop() || "";
   return normalizeRole(rawRole) || "admin";
