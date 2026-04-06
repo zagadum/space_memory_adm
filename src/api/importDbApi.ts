@@ -8,6 +8,7 @@ export interface ImportDbItem {
   phone: string;
   nickname?: string;
   subscription_amount: number | string;
+  subscription_end_date?: string | null;
   contract_old_new: string;
   balance_overpayment: number | string;
   discount: number | string;

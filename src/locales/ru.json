@@ -1286,7 +1286,7 @@
       "substitutions": "Замены (Zastępstwa)",
       "methodical": "Методические встречи",
       "individual": "Индивидуальные занятия",
-      "olympiad": "Олимпиадные занятия",
+      "olympiad": "Олимпiadные занятия",
       "admin3pct": "3% — Админ. обязанности",
       "bonuses": "Премии",
       "trialLessons": "Пробные уроки",
@@ -1376,7 +1376,7 @@
       "substitutions": "Замены (Zastępstwa)",
       "methodical": "Методические встречи",
       "individual": "Индивидуальные",
-      "olympiad": "Олимпиадные",
+      "olympiad": "Олимпiadные",
       "adminDuty": "3% Админ. обязанности",
       "trial": "Пробные уроки",
       "retention": "Бонус за удержание",
@@ -1763,7 +1763,7 @@
       "group": "Предыдущая группа",
       "type": "Тип",
       "paid": "Оплата",
-      "expelled": "Дата выписания",
+      "expelled": "Дата выписки",
       "lastContact": "Последний контакт",
       "manager": "Ответственный",
       "comment": "Комментарий",
@@ -1869,6 +1869,9 @@
     "pageTitle": "Import DB",
     "pageSubtitle": "Управление импортированными данными",
     "searchPlaceholder": "Поиск по имени, email, телефону...",
+    "teacherSearchPlaceholder": "Поиск по учителю...",
+    "groupSearchPlaceholder": "Поиск по группе...",
+    "teacherFilterAll": "Все учителя",
     "listTitle": "Список импорта",
     "itemsWord": "записей",
     "loading": "Загружаем список...",
@@ -1892,6 +1895,7 @@
       "phone": "Телефон",
       "nickname": "Никнейм",
       "subscriptionAmount": "Сумма подписки",
+      "subscriptionEndDate": "Окончание подписки",
       "contractOldNew": "Тип контракта",
       "balanceOverpayment": "Переплата",
       "discount": "Скидка",
@@ -1911,6 +1915,10 @@
       "deleteSuccess": "Запись успешно удалена",
       "updateSuccess": "Данные обновлены",
       "resendSuccess": "Приглашение успешно отправлено"
+    },
+    "paidStatus": {
+      "paid": "Оплачено",
+      "unpaid": "Не оплачено"
     },
     "showing": "Показано {shown} из {total} записей"
   },
@@ -2040,3 +2048,4 @@
     }
   }
 }
+

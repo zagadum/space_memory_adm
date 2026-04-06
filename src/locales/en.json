@@ -1863,6 +1863,9 @@
     "pageTitle": "Import DB",
     "pageSubtitle": "Management of imported data",
     "searchPlaceholder": "Search by name, email, phone...",
+    "teacherSearchPlaceholder": "Search by teacher...",
+    "groupSearchPlaceholder": "Search by group...",
+    "teacherFilterAll": "All teachers",
     "listTitle": "Import list",
     "itemsWord": "records",
     "loading": "Loading list...",
@@ -1886,6 +1889,7 @@
       "phone": "Phone",
       "nickname": "Nickname",
       "subscriptionAmount": "Subscription Amount",
+      "subscriptionEndDate": "Subscription End Date",
       "contractOldNew": "Contract Type",
       "balanceOverpayment": "Overpayment",
       "discount": "Discount",
@@ -1905,6 +1909,10 @@
       "deleteSuccess": "Record deleted successfully",
       "updateSuccess": "Data updated",
       "resendSuccess": "Invitation sent successfully"
+    },
+    "paidStatus": {
+      "paid": "Paid",
+      "unpaid": "Unpaid"
     },
     "showing": "Showing {shown} of {total} records"
   },
@@ -2034,3 +2042,4 @@
     }
   }
 }
+
