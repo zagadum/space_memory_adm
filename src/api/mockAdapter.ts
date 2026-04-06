@@ -720,8 +720,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   // --- TEACHERS PROFILE ---
-  if (method === "get" && /^teachers\/\d+$/.test(url)) {
-    const id = Number(url.split('/')[1]);
+  if (method === "get" && /teachers\/\d+$/.test(url)) {
+    const id = Number(url.split('/').pop());
     const ts: any[] = (globalThis as any).__mock_teachers_list ?? ((globalThis as any).__mock_teachers_list = JSON.parse(JSON.stringify(mockTeachers)));
     const teacherRef = ts.find((t: any) => t.id === id);
     const details = teacherRef ? {
@@ -753,13 +753,13 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, details);
   }
 
-  if (method === "put" && /^teachers\/\d+$/.test(url)) {
-    const id = Number(url.split('/')[1]);
+  if (method === "put" && /teachers\/\d+$/.test(url)) {
+    const id = Number(url.split('/').pop());
     const body = readBody(config);
     return ok(config, { id, ...body });
   }
 
-  if (method === "post" && /^teachers\/\d+\/change-password$/.test(url)) {
+  if (method === "post" && /teachers\/\d+\/change-password$/.test(url)) {
     return ok(config, { success: true });
   }
 
