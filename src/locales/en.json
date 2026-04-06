@@ -1896,6 +1896,7 @@
       "groupExternalId": "Group",
       "teacherExternalId": "Teacher",
       "paid": "Paid",
+      "paidMonths": "Paid Months",
       "isSend": "Sent",
       "isDone": "Completed",
       "actions": "Actions"
@@ -1914,6 +1915,7 @@
       "paid": "Paid",
       "unpaid": "Unpaid"
     },
+    "paidMonthsSuffix": "mo.",
     "showing": "Showing {shown} of {total} records"
   },
   "roles": {

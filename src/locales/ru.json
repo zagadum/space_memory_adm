@@ -1902,6 +1902,7 @@
       "groupExternalId": "Группа",
       "teacherExternalId": "Учитель",
       "paid": "Оплачено",
+      "paidMonths": "Оплачено мес.",
       "isSend": "Отправлено",
       "isDone": "Завершено",
       "actions": "Действия"
@@ -1920,6 +1921,7 @@
       "paid": "Оплачено",
       "unpaid": "Не оплачено"
     },
+    "paidMonthsSuffix": "мес.",
     "showing": "Показано {shown} из {total} записей"
   },
   "roles": {

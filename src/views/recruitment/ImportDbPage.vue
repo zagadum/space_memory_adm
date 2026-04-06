@@ -106,6 +106,12 @@
                   <span class="sort-indicator">{{ getSortIndicator('paid') }}</span>
                 </button>
               </th>
+              <th>
+                <button class="th-sort-btn" type="button" @click="toggleSort('paid_months')">
+                  {{ t('importDb.table.paidMonths') }}
+                  <span class="sort-indicator">{{ getSortIndicator('paid_months') }}</span>
+                </button>
+              </th>
               <th>{{ t('importDb.table.isSend') }}</th>
               <th>{{ t('importDb.table.isDone') }}</th>
               <th>{{ t('importDb.table.actions') }}</th>
@@ -163,6 +169,7 @@
                  <span v-if="isTruthy(item.paid ?? item.is_paid)" class="badge badge-success">{{ t('importDb.paidStatus.paid') }}</span>
                 <span v-else class="badge badge-warning">{{ t('importDb.paidStatus.unpaid') }}</span>
               </td>
+              <td>{{ formatPaidMonths(item.paid_months) }}</td>
               <td>
                 <span v-if="item.is_send" class="badge badge-success">{{ t('common.yes') }}</span>
                 <span v-else class="badge badge-warning">{{ t('common.no') }}</span>
@@ -307,7 +314,7 @@ const backend = computed(() => {
   return (meta?.recruitmentBackend ?? 'default') as RecruitmentBackend;
 });
 
-type SortField = 'paid' | 'group_external_id' | 'teacher_external_id';
+type SortField = 'paid' | 'group_external_id' | 'teacher_external_id' | 'paid_months';
 type SortDirection = 'asc' | 'desc';
 
 const sortBy = ref<SortField>('paid');
@@ -375,6 +382,12 @@ function compareBySort(a: any, b: any): number {
     return (left - right) * direction;
   }
 
+  if (sortBy.value === 'paid_months') {
+    const left = Number(a.paid_months ?? 0);
+    const right = Number(b.paid_months ?? 0);
+    return (left - right) * direction;
+  }
+
   const left = String(a[sortBy.value] ?? '').toLowerCase();
   const right = String(b[sortBy.value] ?? '').toLowerCase();
   return left.localeCompare(right) * direction;
@@ -397,6 +410,12 @@ function getSortIndicator(field: SortField): string {
 function formatDate(value?: string | null): string {
   if (!value) return '—';
   return String(value);
+}
+
+function formatPaidMonths(value?: number | null): string {
+  const months = Number(value ?? 0);
+  if (!Number.isFinite(months) || months <= 0) return '0';
+  return `${months} ${t('importDb.paidMonthsSuffix')}`;
 }
 
 function applyFilters() {
@@ -537,6 +556,7 @@ async function onExport() {
         t('importDb.table.groupExternalId'),
         t('importDb.table.teacherExternalId'),
         t('importDb.table.paid'),
+        t('importDb.table.paidMonths'),
         t('importDb.table.isSend'),
         t('importDb.table.isDone'),
       ],
@@ -554,6 +574,7 @@ async function onExport() {
         item.group_external_id || '—',
         item.teacher_external_id || '—',
         isTruthy(item.paid ?? item.is_paid) ? t('importDb.paidStatus.paid') : t('importDb.paidStatus.unpaid'),
+        Number(item.paid_months ?? 0),
         item.is_send ? t('common.yes') : t('common.no'),
         item.is_done ? t('common.yes') : t('common.no'),
       ]),
@@ -572,6 +593,7 @@ async function onExport() {
       { wch: 18 },
       { wch: 18 },
       { wch: 12 },
+      { wch: 14 },
       { wch: 12 },
       { wch: 12 },
     ],

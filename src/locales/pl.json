@@ -1897,6 +1897,7 @@
       "groupExternalId": "Grupa",
       "teacherExternalId": "Nauczyciel",
       "paid": "Opłacone",
+      "paidMonths": "Opłacone mies.",
       "isSend": "Wysłano",
       "isDone": "Zakończono",
       "actions": "Działania"
@@ -1915,6 +1916,7 @@
       "paid": "Opłacone",
       "unpaid": "Nieopłacone"
     },
+    "paidMonthsSuffix": "mies.",
     "showing": "Pokazano {shown} z {total} rekordów"
   },
   "roles": {

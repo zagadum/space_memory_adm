@@ -1893,6 +1893,7 @@
       "groupExternalId": "Група",
       "teacherExternalId": "Учитель",
       "paid": "Оплачено",
+      "paidMonths": "Оплачено міс.",
       "isSend": "Відправлено",
       "isDone": "Завершено",
       "actions": "Дії"
@@ -1911,6 +1912,7 @@
       "paid": "Оплачено",
       "unpaid": "Не оплачено"
     },
+    "paidMonthsSuffix": "міс.",
     "showing": "Показано {shown} з {total} записів"
   },
   "roles": {
