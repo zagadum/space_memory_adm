@@ -39,3 +39,27 @@ export async function getTeachers(params: TeacherListParams = {}): Promise<Teach
   const res = await http.get('teachers', { params })
   return res.data as TeacherListResponse
 }
+
+export interface TeacherDetails extends TeacherListItem {
+  birthDate?: string | null
+  country?: string | null
+  voivodeship?: string | null
+  street?: string | null
+  apt?: string | null
+  postCode?: string | null
+  passport?: string | null
+}
+
+export async function getTeacher(id: number): Promise<TeacherDetails> {
+  const res = await http.get(`teachers/${id}`)
+  return res.data as TeacherDetails
+}
+
+export async function updateTeacher(id: number, payload: Partial<TeacherDetails>): Promise<TeacherDetails> {
+  const res = await http.put(`teachers/${id}`, payload)
+  return res.data as TeacherDetails
+}
+
+export async function changeTeacherPassword(id: number, password: string): Promise<void> {
+  await http.post(`teachers/${id}/change-password`, { password })
+}

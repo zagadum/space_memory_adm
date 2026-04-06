@@ -299,6 +299,11 @@ router.beforeEach(async (to, from) => {
 
   const menuKey = getMenuKeyByRouteName(String(to.name || ""));
   if (menuKey && getMenuAccessMode(menuKey) === "hidden") {
+    // Если дашборд скрыт, редиректим на учеников вместо 403
+    if (to.name === 'dashboard' || to.path === '/') {
+      return { name: 'students-list' };
+    }
+
     // Показываем причину отказа через тост
     const reason = getMenuAccessReason(menuKey);
     try {

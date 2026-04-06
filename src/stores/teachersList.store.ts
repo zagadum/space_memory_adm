@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getTeachers, type TeacherListParams, type TeacherListItem } from '../api/teachersApi'
+import { getTeachers, getTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails } from '../api/teachersApi'
 
 export const useTeachersListStore = defineStore('teachersList', () => {
   const teachers = ref<TeacherListItem[]>([])
+  const selectedTeacherDetails = ref<TeacherDetails | null>(null)
   const loading = ref(false)
+  const detailsLoading = ref(false)
   const error = ref('')
 
   const pagination = ref({
@@ -77,8 +79,55 @@ export const useTeachersListStore = defineStore('teachersList', () => {
     await fetchTeachers(page)
   }
 
+  async function fetchTeacherDetails(id: number) {
+    detailsLoading.value = true
+    error.value = ''
+    try {
+      selectedTeacherDetails.value = await getTeacher(id)
+    } catch (e: any) {
+      error.value = 'Failed to fetch teacher details'
+    } finally {
+      detailsLoading.value = false
+    }
+  }
+
+  async function updateTeacherDetails(id: number, data: Partial<TeacherDetails>) {
+    loading.value = true
+    error.value = ''
+    try {
+      const updated = await updateTeacher(id, data)
+      if (selectedTeacherDetails.value?.id === id) {
+        selectedTeacherDetails.value = { ...selectedTeacherDetails.value, ...updated }
+      }
+      // Update in list if exists
+      const idx = teachers.value.findIndex(t => t.id === id)
+      if (idx !== -1) {
+        teachers.value[idx] = { ...teachers.value[idx], ...updated }
+      }
+    } catch (e: any) {
+      error.value = 'Failed to update teacher'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function changePassword(id: number, password: string) {
+    loading.value = true
+    error.value = ''
+    try {
+      await changeTeacherPassword(id, password)
+    } catch (e: any) {
+      error.value = 'Failed to change password'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
-    teachers, loading, error, pagination, filters, sorting,
+    teachers, selectedTeacherDetails, loading, detailsLoading, error, pagination, filters, sorting,
     totalTeachers, fetchTeachers, applyFilters, setSort, setPage,
+    fetchTeacherDetails, updateTeacherDetails, changePassword,
   }
 })

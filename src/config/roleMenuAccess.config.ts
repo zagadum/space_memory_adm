@@ -155,6 +155,16 @@ function allow(...groups: string[][]): MenuAccessMap {
   return map;
 }
 
+function block(...groups: string[][]): MenuAccessMap {
+  const map: MenuAccessMap = {};
+  for (const group of groups) {
+    for (const key of group) {
+      map[key] = { mode: "blocked" as MenuAccessMode };
+    }
+  }
+  return map;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Role → menu access matrix
 // ─────────────────────────────────────────────────────────────────────────────
@@ -172,9 +182,9 @@ export const ROLE_MENU_ACCESS: Record<AppRole, MenuAccessMap> = {
     FINANCE, ACCOUNTING, HR, TRAINER, QUALITY, SETTINGS_SECTION,
   ),
 
-  // Only own trainer panel + salary; no student management, no finance
   "teacher": allow(
-    ALWAYS, TRAINER,
+    ["secretariat", "students", "groups"], 
+    ["recruitment", "new-students", "target-mail", "expelled", "new-groups", "archived", "import-db"]
   ),
 
   // Recruitment + read-only student list; no finance, no quality

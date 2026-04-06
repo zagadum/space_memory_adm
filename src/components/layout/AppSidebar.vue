@@ -101,6 +101,7 @@
           <span class="nav-badge blue" v-if="teachersListStore.totalTeachers > 0">{{ teachersListStore.totalTeachers }}</span>
         </div>
         <div
+          v-if="isVisible('inpost')"
           class="nav-item nav-item--stub"
           :class="{ active: activeItem === 'inpost' }"
           @click="setActive('inpost')"

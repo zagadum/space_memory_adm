@@ -90,7 +90,7 @@ function getAccessState() {
 }
 
 function extractRoleFromToken(config: InternalAxiosRequestConfig): RoleCode {
-  const authHeader = String((config.headers as any)?.Authorization || "");
+  const authHeader = String((config.headers as any)?.Authorization || (config.headers as any)?.authorization || "");
   const token = authHeader.replace("Bearer ", "").trim();
   const rawRole = token.split(".").pop() || "";
   return normalizeRole(rawRole) || "admin";
@@ -181,7 +181,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   }
 
   if (method === "get" && (url === "auth/me" || url === "v1/auth/me" || url === "api/auth/me" || url === "api/v1/auth/me")) {
-    const authHeader = String((config.headers as any)?.Authorization || "");
+    const authHeader = String((config.headers as any)?.Authorization || (config.headers as any)?.authorization || "");
     if (!authHeader.startsWith("Bearer ")) return err(config, 401, "Unauthorized");
     const token = authHeader.replace("Bearer ", "").trim();
     const user = MOCK_USERS[token];
@@ -207,7 +207,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       return err(config, 422, "Password too short");
     }
     // В mock просто симулируем успех — реальный API обновит forcePasswordChange в БД
-    const authHeader = String((config.headers as any)?.Authorization || "");
+    const authHeader = String((config.headers as any)?.Authorization || (config.headers as any)?.authorization || "");
     const token = authHeader.replace("Bearer ", "").trim();
     if (MOCK_USERS[token]) {
       (MOCK_USERS[token] as any).forcePasswordChange = false;
@@ -717,6 +717,50 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
     }
     return ok(config, { ok: true });
+  }
+
+  // --- TEACHERS PROFILE ---
+  if (method === "get" && /^teachers\/\d+$/.test(url)) {
+    const id = Number(url.split('/')[1]);
+    const ts: any[] = (globalThis as any).__mock_teachers_list ?? ((globalThis as any).__mock_teachers_list = JSON.parse(JSON.stringify(mockTeachers)));
+    const teacherRef = ts.find((t: any) => t.id === id);
+    const details = teacherRef ? {
+      ...teacherRef,
+      birthDate: "1990-01-01",
+      country: "Польша",
+      city: teacherRef.city || "Варшава",
+      street: "Aleje Jerozolimskie 100",
+      apt: "12",
+      postCode: "00-001",
+      passport: "AB 1234567",
+      comment: teacherRef.comment || ""
+    } : {
+      id,
+      firstName: "Имя " + id,
+      lastName: "Учителя",
+      email: `teacher${id}@test.com`,
+      phone: "+48 111 222 333",
+      city: "Варшава",
+      groupLessonsCount: 0,
+      individualLessonsCount: 0,
+      birthDate: "1985-05-15",
+      country: "Польша",
+      street: "Main St",
+      postCode: "01-234",
+      passport: "XYZ 98765",
+      comment: "Mock payload for missing teacher",
+    };
+    return ok(config, details);
+  }
+
+  if (method === "put" && /^teachers\/\d+$/.test(url)) {
+    const id = Number(url.split('/')[1]);
+    const body = readBody(config);
+    return ok(config, { id, ...body });
+  }
+
+  if (method === "post" && /^teachers\/\d+\/change-password$/.test(url)) {
+    return ok(config, { success: true });
   }
 
   // --- STUDENTS LIST ---

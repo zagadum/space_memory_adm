@@ -108,6 +108,13 @@
         <button class="dropdown-filter-btn" :disabled="listStore.pagination.currentPage >= listStore.pagination.lastPage" @click="goNextPage">→</button>
       </div>
     </div>
+    <TeacherSidePanel
+      :teacher-id="activeTeacherId"
+      :details="listStore.selectedTeacherDetails"
+      @close="closePanel"
+      @save="handleSave"
+      @change-password="handleChangePassword"
+    />
   </div>
 </template>
 
@@ -117,11 +124,16 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useTeachersListStore } from '../../stores/teachersList.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
+import TeacherSidePanel from './components/TeacherSidePanel.vue'
+import { useNotificationStore } from '../../stores/notification.store'
 
 const router = useRouter()
 const { t } = useI18n()
 const listStore = useTeachersListStore()
 const searchStore = useGlobalSearchStore()
+const notify = useNotificationStore()
+
+const activeTeacherId = ref<number | null>(null)
 
 const selectedCity = ref('')
 const teachers = computed(() => listStore.teachers)
@@ -142,7 +154,32 @@ const uniqueCities = computed(() => {
 })
 
 function openTeacher(id: number) {
-  console.log('Open teacher:', id)
+  activeTeacherId.value = id
+  listStore.fetchTeacherDetails(id)
+}
+
+function closePanel() {
+  activeTeacherId.value = null
+}
+
+async function handleSave(data: any) {
+  if (!activeTeacherId.value) return
+  try {
+    await listStore.updateTeacherDetails(activeTeacherId.value, data)
+    notify.addToast(t('newStudents.toast.saved') || 'Изменения сохранены', 'success')
+  } catch {
+    notify.addToast(t('newStudents.toast.error') || 'Ошибка при сохранении', 'error')
+  }
+}
+
+async function handleChangePassword(password: string) {
+  if (!activeTeacherId.value) return
+  try {
+    await listStore.changePassword(activeTeacherId.value, password)
+    notify.addToast(t('newStudents.toast.passwordChanged') || 'Пароль успешно изменён', 'success')
+  } catch {
+    notify.addToast(t('newStudents.toast.error') || 'Ошибка при смене пароля', 'error')
+  }
 }
 
 function openStudentsByTeacher(teacherId: number) {
