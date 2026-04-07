@@ -1,27 +1,6 @@
 <template>
   <div class="import-db-page">
     <div class="idb-content">
-      <!-- PAGE ACTIONS ROW -->
-      <div class="idb-actions-row">
-        <div class="search-box">
-          <span class="search-icon">🔍</span>
-          <input v-model="searchQ" :placeholder="t('importDb.searchPlaceholder')" @input="applyFilters" />
-        </div>
-        <div class="search-box">
-          <span class="search-icon">👩‍🏫</span>
-          <input v-model="teacherSearchQ" :placeholder="t('importDb.teacherSearchPlaceholder')" @input="applyFilters" />
-        </div>
-        <div class="search-box">
-          <span class="search-icon">👥</span>
-          <input v-model="groupSearchQ" :placeholder="t('importDb.groupSearchPlaceholder')" @input="applyFilters" />
-        </div>
-        <select v-model="selectedTeacher" class="teacher-filter" @change="applyFilters">
-          <option value="">{{ t('importDb.teacherFilterAll') }}</option>
-          <option v-for="teacher in availableTeachers" :key="teacher" :value="teacher">{{ teacher }}</option>
-        </select>
-        <button class="btn btn-ghost" @click="onExport">⬇ {{ t('common.export') }}</button>
-      </div>
-
       <!-- STATS GRID -->
       <div class="stats-grid">
         <div class="stat-card blue">
@@ -50,6 +29,26 @@
         </div>
       </div>
 
+      <!-- PAGE ACTIONS ROW -->
+      <div class="idb-actions-row">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input v-model="searchQ" :placeholder="t('importDb.searchPlaceholder')" @input="applyFilters" />
+        </div>
+        <div class="search-box">
+          <span class="search-icon">👩‍🏫</span>
+          <input v-model="teacherSearchQ" :placeholder="t('importDb.teacherSearchPlaceholder')" @input="applyFilters" />
+        </div>
+        <div class="search-box">
+          <span class="search-icon">👥</span>
+          <input v-model="groupSearchQ" :placeholder="t('importDb.groupSearchPlaceholder')" @input="applyFilters" />
+        </div>
+        <select v-model="selectedTeacher" class="teacher-filter" @change="applyFilters">
+          <option value="">{{ t('importDb.teacherFilterAll') }}</option>
+          <option v-for="teacher in availableTeachers" :key="teacher" :value="teacher">{{ teacher }}</option>
+        </select>
+        <button class="btn btn-ghost" @click="onExport">⬇ {{ t('common.export') }}</button>
+      </div>
       <!-- TOOLBAR -->
       <div class="table-toolbar">
         <div class="toolbar-left">
