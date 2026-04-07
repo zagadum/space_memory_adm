@@ -1942,6 +1942,58 @@
     "secretariat": "Секретаріат",
     "hr": "HR"
   },
+  "unlockModal": {
+    "title": "🔓 Розблокувати платформу",
+    "subtitle": "Тимчасовий доступ при відсутності платежу.",
+    "reason": "Причина",
+    "reasonAgreed": "Узгоджений термін",
+    "reasonWaiting": "Очікування платежу",
+    "reasonAdmin": "Рішення адміністратора",
+    "justification": "Обґрунтування",
+    "justificationPlaceholder": "напр. Батьки підтвердили переказ на завтра...",
+    "dateFrom": "Від",
+    "dateTo": "До",
+    "responsible": "Відповідальний",
+    "cancel": "Скасувати",
+    "confirm": "🔓 Розблокувати"
+  },
+  "newGroups": {
+    "listTitle": "Список груп",
+    "groupsCount": "{n} груп",
+    "createBtn": "✦ Створити нову групу",
+    "table": {
+      "name": "Назва групи",
+      "type": "Тип",
+      "createdDate": "Дата створення",
+      "startDate": "Дата старту",
+      "count": "К-сть",
+      "paidContract": "Сплатили / договір",
+      "waiting": "Очікування",
+      "responsible": "Відповідальний",
+      "age": "Вік"
+    },
+    "typeIndividual": "👤 Інд.",
+    "typeGroup": "👥 Груп.",
+    "persons": "осіб",
+    "days": "днів",
+    "notAssigned": "— не призначений",
+    "startBtn": "🚀 Старт",
+    "noGroups": "Групи не знайдено",
+    "shownOf": "Показано {shown} з {total} груп",
+    "toasts": {
+      "created": "Групу створено ✅",
+      "createError": "Помилка створення групи",
+      "started": "Групу запущено 🚀",
+      "startError": "Помилка запуску групи",
+      "deleted": "Групу видалено",
+      "deleteError": "Помилка видалення групи",
+      "studentsAdded": "Учнів додано ✅",
+      "studentsAddError": "Помилка додавання учнів",
+      "studentRemoved": "Учня прибрано з групи",
+      "studentRemoveError": "Помилка видалення учня",
+      "loadError": "Помилка завантаження даних"
+    }
+  },
   "comingSoon": {
     "title": "Розділ у розробці",
     "subtitle": "Ми активно працюємо над цим модулем. Він скоро буде доступний.",

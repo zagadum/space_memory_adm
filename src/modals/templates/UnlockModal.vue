@@ -1,35 +1,35 @@
 <template>
   <BaseModal popupClass="popup-unlock">
-    <div class="popup-title">🔓 Разблокировать платформу</div>
-    <div class="popup-sub" style="margin-bottom: 20px;">Временный доступ при отсутствии платежа.</div>
+    <div class="popup-title">{{ t('unlockModal.title') }}</div>
+    <div class="popup-sub" style="margin-bottom: 20px;">{{ t('unlockModal.subtitle') }}</div>
 
-    <label class="popup-label">Причина</label>
+    <label class="popup-label">{{ t('unlockModal.reason') }}</label>
     <select class="popup-input" v-model="form.reasonCode">
-      <option value="agreed">Согласованный срок</option>
-      <option value="waiting">Ожидание платежа</option>
-      <option value="admin">Решение администратора</option>
+      <option value="agreed">{{ t('unlockModal.reasonAgreed') }}</option>
+      <option value="waiting">{{ t('unlockModal.reasonWaiting') }}</option>
+      <option value="admin">{{ t('unlockModal.reasonAdmin') }}</option>
     </select>
 
-    <label class="popup-label">Обоснование</label>
+    <label class="popup-label">{{ t('unlockModal.justification') }}</label>
     <input 
       type="text" 
       class="popup-input" 
       v-model="form.justification" 
-      placeholder="напр. Родитель подтвердил перевод на завтра..."
+      :placeholder="t('unlockModal.justificationPlaceholder')"
     >
 
     <div class="popup-2col">
       <div>
-        <label class="popup-label">Od</label>
+        <label class="popup-label">{{ t('unlockModal.dateFrom') }}</label>
         <input type="date" class="popup-input" v-model="form.dateFrom" style="margin-bottom: 0">
       </div>
       <div>
-        <label class="popup-label">Do</label>
+        <label class="popup-label">{{ t('unlockModal.dateTo') }}</label>
         <input type="date" class="popup-input" v-model="form.dateTo" style="margin-bottom: 0">
       </div>
     </div>
 
-    <label class="popup-label" style="margin-top: 12px">Ответственный</label>
+    <label class="popup-label" style="margin-top: 12px">{{ t('unlockModal.responsible') }}</label>
     <select class="popup-input" v-model="form.responsibleId">
       <option v-for="staff in staffList" :key="staff.id" :value="staff.id">
         {{ staff.name }} ({{ staff.role }})
@@ -37,18 +37,21 @@
     </select>
 
     <div class="popup-actions" style="margin-top: 24px;">
-      <button class="btn btn-ghost" @click="close">Отмена</button>
-      <button class="btn btn-unlock" :disabled="saving" @click="confirm">🔓 Разблокировать</button>
+      <button class="btn btn-ghost" @click="close">{{ t('unlockModal.cancel') }}</button>
+      <button class="btn btn-unlock" :disabled="saving" @click="confirm">{{ t('unlockModal.confirm') }}</button>
     </div>
   </BaseModal>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
 import { useModalStore } from "../../stores/modal.store";
 import { useAuthStore } from "../../stores/auth.store";
 import { paymentsApi } from "../../api/paymentsApi";
+
+const { t } = useI18n();
 
 const modal = useModalStore();
 const auth = useAuthStore(); // Стор текущего пользователя

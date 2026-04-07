@@ -1945,6 +1945,58 @@
     "secretariat": "Secretariat",
     "hr": "HR"
   },
+  "unlockModal": {
+    "title": "🔓 Unlock Platform",
+    "subtitle": "Temporary access when payment is missing.",
+    "reason": "Reason",
+    "reasonAgreed": "Agreed deadline",
+    "reasonWaiting": "Awaiting payment",
+    "reasonAdmin": "Administrator decision",
+    "justification": "Justification",
+    "justificationPlaceholder": "e.g. Parent confirmed transfer for tomorrow...",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "responsible": "Responsible person",
+    "cancel": "Cancel",
+    "confirm": "🔓 Unlock"
+  },
+  "newGroups": {
+    "listTitle": "Group List",
+    "groupsCount": "{n} groups",
+    "createBtn": "✦ Create New Group",
+    "table": {
+      "name": "Group Name",
+      "type": "Type",
+      "createdDate": "Created Date",
+      "startDate": "Start Date",
+      "count": "Count",
+      "paidContract": "Paid / Contract",
+      "waiting": "Waiting",
+      "responsible": "Responsible",
+      "age": "Age"
+    },
+    "typeIndividual": "👤 Ind.",
+    "typeGroup": "👥 Group",
+    "persons": "pers.",
+    "days": "days",
+    "notAssigned": "— not assigned",
+    "startBtn": "🚀 Start",
+    "noGroups": "No groups found",
+    "shownOf": "Showing {shown} of {total} groups",
+    "toasts": {
+      "created": "Group created ✅",
+      "createError": "Error creating group",
+      "started": "Group started 🚀",
+      "startError": "Error starting group",
+      "deleted": "Group deleted",
+      "deleteError": "Error deleting group",
+      "studentsAdded": "Students added ✅",
+      "studentsAddError": "Error adding students",
+      "studentRemoved": "Student removed from group",
+      "studentRemoveError": "Error removing student",
+      "loadError": "Error loading data"
+    }
+  },
   "comingSoon": {
     "title": "Section Under Development",
     "subtitle": "We are actively working on this module. It will be available soon.",

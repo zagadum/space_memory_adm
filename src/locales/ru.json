@@ -1951,6 +1951,58 @@
     "secretariat": "Секретариат",
     "hr": "HR"
   },
+  "unlockModal": {
+    "title": "🔓 Разблокировать платформу",
+    "subtitle": "Временный доступ при отсутствии платежа.",
+    "reason": "Причина",
+    "reasonAgreed": "Согласованный срок",
+    "reasonWaiting": "Ожидание платежа",
+    "reasonAdmin": "Решение администратора",
+    "justification": "Обоснование",
+    "justificationPlaceholder": "напр. Родитель подтвердил перевод на завтра...",
+    "dateFrom": "Od",
+    "dateTo": "Do",
+    "responsible": "Ответственный",
+    "cancel": "Отмена",
+    "confirm": "🔓 Разблокировать"
+  },
+  "newGroups": {
+    "listTitle": "Список групп",
+    "groupsCount": "{n} групп",
+    "createBtn": "✦ Создать новую группу",
+    "table": {
+      "name": "Название группы",
+      "type": "Тип",
+      "createdDate": "Дата создания",
+      "startDate": "Дата старта",
+      "count": "Кол-во",
+      "paidContract": "Оплатили / договор",
+      "waiting": "Ожидание",
+      "responsible": "Ответственный",
+      "age": "Возраст"
+    },
+    "typeIndividual": "👤 Инд.",
+    "typeGroup": "👥 Групп.",
+    "persons": "чел.",
+    "days": "дней",
+    "notAssigned": "— не назначен",
+    "startBtn": "🚀 Старт",
+    "noGroups": "Группы не найдены",
+    "shownOf": "Показано {shown} из {total} групп",
+    "toasts": {
+      "created": "Группа создана ✅",
+      "createError": "Ошибка создания группы",
+      "started": "Группа запущена 🚀",
+      "startError": "Ошибка запуска группы",
+      "deleted": "Группа удалена",
+      "deleteError": "Ошибка удаления группы",
+      "studentsAdded": "Ученики добавлены ✅",
+      "studentsAddError": "Ошибка добавления учеников",
+      "studentRemoved": "Ученик убран из группы",
+      "studentRemoveError": "Ошибка удаления ученика",
+      "loadError": "Ошибка загрузки данных"
+    }
+  },
   "comingSoon": {
     "title": "Раздел в разработке",
     "subtitle": "Мы активно работаем над этим модулем. Он скоро будет доступен.",

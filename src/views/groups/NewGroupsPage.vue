@@ -4,11 +4,11 @@
     <div class="ng-toolbar">
       <div class="toolbar-left">
         <div class="section-title">
-          Список групп
-          <span class="section-count">{{ filteredGroups.length }} групп</span>
+          {{ t('newGroups.listTitle') }}
+          <span class="section-count">{{ t('newGroups.groupsCount', { n: filteredGroups.length }) }}</span>
         </div>
       </div>
-      <button class="btn btn-primary" @click="openCreateModal">✦ Создать новую группу</button>
+      <button class="btn btn-primary" @click="openCreateModal">{{ t('newGroups.createBtn') }}</button>
     </div>
 
     <!-- TABLE -->
@@ -16,15 +16,15 @@
       <table>
         <thead>
           <tr>
-            <th @click="sort('name')">Название группы <span class="sort-icon">{{ sortIcon('name') }}</span></th>
-            <th @click="sort('type')">Тип <span class="sort-icon">{{ sortIcon('type') }}</span></th>
-            <th @click="sort('createdDate')">Дата создания <span class="sort-icon">{{ sortIcon('createdDate') }}</span></th>
-            <th @click="sort('startDate')">Дата старта <span class="sort-icon">{{ sortIcon('startDate') }}</span></th>
-            <th @click="sort('totalSlots')">Кол-во <span class="sort-icon">{{ sortIcon('totalSlots') }}</span></th>
-            <th @click="sort('paid')">Оплатили / договор <span class="sort-icon">{{ sortIcon('paid') }}</span></th>
-            <th @click="sort('days')">Ожидание <span class="sort-icon">{{ sortIcon('days') }}</span></th>
-            <th @click="sort('manager')">Ответственный <span class="sort-icon">{{ sortIcon('manager') }}</span></th>
-            <th @click="sort('age')">Возраст <span class="sort-icon">{{ sortIcon('age') }}</span></th>
+            <th @click="sort('name')">{{ t('newGroups.table.name') }} <span class="sort-icon">{{ sortIcon('name') }}</span></th>
+            <th @click="sort('type')">{{ t('newGroups.table.type') }} <span class="sort-icon">{{ sortIcon('type') }}</span></th>
+            <th @click="sort('createdDate')">{{ t('newGroups.table.createdDate') }} <span class="sort-icon">{{ sortIcon('createdDate') }}</span></th>
+            <th @click="sort('startDate')">{{ t('newGroups.table.startDate') }} <span class="sort-icon">{{ sortIcon('startDate') }}</span></th>
+            <th @click="sort('totalSlots')">{{ t('newGroups.table.count') }} <span class="sort-icon">{{ sortIcon('totalSlots') }}</span></th>
+            <th @click="sort('paid')">{{ t('newGroups.table.paidContract') }} <span class="sort-icon">{{ sortIcon('paid') }}</span></th>
+            <th @click="sort('days')">{{ t('newGroups.table.waiting') }} <span class="sort-icon">{{ sortIcon('days') }}</span></th>
+            <th @click="sort('manager')">{{ t('newGroups.table.responsible') }} <span class="sort-icon">{{ sortIcon('manager') }}</span></th>
+            <th @click="sort('age')">{{ t('newGroups.table.age') }} <span class="sort-icon">{{ sortIcon('age') }}</span></th>
             <th style="width:110px"></th>
           </tr>
         </thead>
@@ -56,12 +56,12 @@
               </td>
               <td>
                 <span :class="['type-badge', g.type === 'individual' ? 'type-individual' : 'type-group']">
-                  {{ g.type === 'individual' ? '👤 Инд.' : '👥 Групп.' }}
+                  {{ g.type === 'individual' ? t('newGroups.typeIndividual') : t('newGroups.typeGroup') }}
                 </span>
               </td>
               <td><span class="date-mono">{{ fmtDate(g.createdDate) }}</span></td>
               <td><span class="date-mono">{{ fmtDate(g.startDate) }}</span></td>
-              <td><span class="slots-val">{{ g.totalSlots }}</span><span class="slots-label"> чел.</span></td>
+              <td><span class="slots-val">{{ g.totalSlots }}</span><span class="slots-label"> {{ t('newGroups.persons') }}</span></td>
               <td>
                 <div class="payment-ratio">
                   <span class="ratio-text" :style="{ color: ratioColor(g) }">{{ g.paid }}/{{ g.totalSlots }}</span>
@@ -71,7 +71,7 @@
               <td>
                 <div class="timer-cell">
                   <span :class="['timer-days', timerCls(daysDiff(g.createdDate))]">{{ daysDiff(g.createdDate) }}</span>
-                  <span class="timer-label">дней</span>
+                  <span class="timer-label">{{ t('newGroups.days') }}</span>
                 </div>
               </td>
               <td>
@@ -79,7 +79,7 @@
                   <div class="person-dot" :style="{ background: g.manager.color }">{{ g.manager.initials }}</div>
                   <span class="person-name">{{ g.manager.name }}</span>
                 </div>
-                <span v-else class="empty-cell">— не назначен</span>
+                <span v-else class="empty-cell">{{ t('newGroups.notAssigned') }}</span>
               </td>
               <td>
                 <span v-if="ageMap[g.age ?? '']" :class="['age-badge', ageMap[g.age!].cls]">
@@ -88,17 +88,17 @@
                 <span v-else class="empty-cell">—</span>
               </td>
               <td>
-                <button class="btn-start" @click.stop="openStartModal(g)">🚀 Старт</button>
+                <button class="btn-start" @click.stop="openStartModal(g)">{{ t('newGroups.startBtn') }}</button>
               </td>
             </tr>
             <tr v-if="sortedGroups.length === 0">
-              <td colspan="10" style="text-align:center;padding:40px;color:var(--dim)">Группы не найдены</td>
+              <td colspan="10" style="text-align:center;padding:40px;color:var(--dim)">{{ t('newGroups.noGroups') }}</td>
             </tr>
           </template>
         </tbody>
       </table>
       <div class="table-footer">
-        <span style="color:var(--dim);font-size:12.5px">Показано {{ filteredGroups.length }} из {{ groups.length }} групп</span>
+        <span style="color:var(--dim);font-size:12.5px">{{ t('newGroups.shownOf', { shown: filteredGroups.length, total: groups.length }) }}</span>
       </div>
     </div>
 
@@ -286,9 +286,9 @@ async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
     const res = await createNewGroup(payload, recruitmentBackend.value)
     groups.value.unshift(res.group)
     showCreateModal.value = false
-    notify.addToast('Группа создана ✅', 'success')
+    notify.addToast(t('newGroups.toasts.created'), 'success')
   } catch (err: unknown) {
-    notify.addToast(parseApiError(err, 'Ошибка создания группы'), 'error')
+    notify.addToast(parseApiError(err, t('newGroups.toasts.createError')), 'error')
   }
 }
 
@@ -298,9 +298,9 @@ async function onGroupStarted(id: number) {
     groups.value = groups.value.filter(g => g.id !== id)
     startGroup.value = null
     if (panelGroup.value?.id === id) closePanel()
-    notify.addToast('Группа запущена 🚀', 'success')
+    notify.addToast(t('newGroups.toasts.started'), 'success')
   } catch (err: unknown) {
-    notify.addToast(parseApiError(err, 'Ошибка запуска группы'), 'error')
+    notify.addToast(parseApiError(err, t('newGroups.toasts.startError')), 'error')
   }
 }
 
@@ -309,9 +309,9 @@ async function onDeleteGroup(id: number) {
     await deleteNewGroup(id, recruitmentBackend.value)
     groups.value = groups.value.filter(g => g.id !== id)
     closePanel()
-    notify.addToast('Группа удалена', 'warning')
+    notify.addToast(t('newGroups.toasts.deleted'), 'warning')
   } catch (err: unknown) {
-    notify.addToast(parseApiError(err, 'Ошибка удаления группы'), 'error')
+    notify.addToast(parseApiError(err, t('newGroups.toasts.deleteError')), 'error')
   }
 }
 
@@ -320,9 +320,9 @@ async function onStudentsAdded(payload: { groupId: number; studentIds: number[] 
     await addStudentsToGroup(payload, recruitmentBackend.value)
     const res = await getNewGroupStudents(payload.groupId, recruitmentBackend.value)
     panelStudents.value = res.items
-    notify.addToast('Ученики добавлены ✅', 'success')
+    notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
   } catch (err: unknown) {
-    notify.addToast(parseApiError(err, 'Ошибка добавления учеников'), 'error')
+    notify.addToast(parseApiError(err, t('newGroups.toasts.studentsAddError')), 'error')
   }
 }
 
@@ -330,9 +330,9 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
   try {
     await removeStudentFromGroup(payload, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    notify.addToast('Ученик убран из группы', 'warning')
+    notify.addToast(t('newGroups.toasts.studentRemoved'), 'warning')
   } catch (err: unknown) {
-    notify.addToast(parseApiError(err, 'Ошибка удаления ученика'), 'error')
+    notify.addToast(parseApiError(err, t('newGroups.toasts.studentRemoveError')), 'error')
   }
 }
 
@@ -352,7 +352,7 @@ watch(recruitmentBackend, async () => {
     masterStudents.value = sRes.items
     teachers.value = tRes.items
   } catch (err: unknown) {
-    notify.addToast(parseApiError(err, 'Ошибка загрузки данных'), 'error')
+    notify.addToast(parseApiError(err, t('newGroups.toasts.loadError')), 'error')
   } finally {
     isLoading.value = false
   }

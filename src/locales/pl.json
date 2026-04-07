@@ -1946,6 +1946,58 @@
     "secretariat": "Sekretariat",
     "hr": "HR"
   },
+  "unlockModal": {
+    "title": "🔓 Odblokuj platformę",
+    "subtitle": "Tymczasowy dostęp przy braku płatności.",
+    "reason": "Powód",
+    "reasonAgreed": "Uzgodniony termin",
+    "reasonWaiting": "Oczekiwanie na płatność",
+    "reasonAdmin": "Decyzja administratora",
+    "justification": "Uzasadnienie",
+    "justificationPlaceholder": "np. Rodzic potwierdził przelew na jutro...",
+    "dateFrom": "Od",
+    "dateTo": "Do",
+    "responsible": "Odpowiedzialny",
+    "cancel": "Anuluj",
+    "confirm": "🔓 Odblokuj"
+  },
+  "newGroups": {
+    "listTitle": "Lista grup",
+    "groupsCount": "{n} grup",
+    "createBtn": "✦ Utwórz nową grupę",
+    "table": {
+      "name": "Nazwa grupy",
+      "type": "Typ",
+      "createdDate": "Data utworzenia",
+      "startDate": "Data startu",
+      "count": "Ilość",
+      "paidContract": "Zapłacili / umowa",
+      "waiting": "Oczekiwanie",
+      "responsible": "Odpowiedzialny",
+      "age": "Wiek"
+    },
+    "typeIndividual": "👤 Ind.",
+    "typeGroup": "👥 Grup.",
+    "persons": "os.",
+    "days": "dni",
+    "notAssigned": "— nie przypisany",
+    "startBtn": "🚀 Start",
+    "noGroups": "Nie znaleziono grup",
+    "shownOf": "Pokazano {shown} z {total} grup",
+    "toasts": {
+      "created": "Grupa utworzona ✅",
+      "createError": "Błąd tworzenia grupy",
+      "started": "Grupa uruchomiona 🚀",
+      "startError": "Błąd uruchamiania grupy",
+      "deleted": "Grupa usunięta",
+      "deleteError": "Błąd usuwania grupy",
+      "studentsAdded": "Uczniowie dodani ✅",
+      "studentsAddError": "Błąd dodawania uczniów",
+      "studentRemoved": "Uczeń usunięty z grupy",
+      "studentRemoveError": "Błąd usuwania ucznia",
+      "loadError": "Błąd ładowania danych"
+    }
+  },
   "comingSoon": {
     "title": "Sekcja w przygotowaniu",
     "subtitle": "Aktywnie pracujemy nad tym modułem. Wkrótce będzie dostępny.",
