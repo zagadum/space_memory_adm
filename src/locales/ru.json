@@ -1,6 +1,7 @@
 {
   "sidebar": {
     "dashboard": "Дашборд школы",
+    "importDb": "Импорт регистраций",
     "secretariat": "Секретариат",
     "students": "Ученики",
     "groups": "Группы",

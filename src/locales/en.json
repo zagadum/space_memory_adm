@@ -1,6 +1,7 @@
 {
   "sidebar": {
     "dashboard": "School Dashboard",
+    "importDb": "Registrations DB",
     "secretariat": "Secretariat",
     "students": "Students",
     "groups": "Groups",

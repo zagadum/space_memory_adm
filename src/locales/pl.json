@@ -1,6 +1,7 @@
 {
   "sidebar": {
     "dashboard": "Dashboard szkoły",
+    "importDb": "Baza zaproszeń",
     "secretariat": "Sekretariat",
     "students": "Uczniowie",
     "groups": "Grupy",
