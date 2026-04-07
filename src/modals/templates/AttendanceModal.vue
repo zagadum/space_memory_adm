@@ -4,38 +4,41 @@
     <div class="popup-content">
       <div class="popup-close" @click="modalStore.closeModal()">✕</div>
       
-      <div class="p-att-title">Явка · Занятие #{{ modalData?.lessonNum }}</div>
+      <div class="p-att-title">{{ t('attendance.title', { num: modalData?.lessonNum }) }}</div>
       <div class="p-att-subtitle">{{ modalData?.date }} · {{ modalData?.schoolName }}</div>
       
       <div class="p-att-options">
-        <div class="p-att-opt" :class="{ active: tempAttendance === 'Присутствовал' }" @click="tempAttendance = 'Присутствовал'">
+        <div class="p-att-opt" :class="{ active: tempAttendance === 'Присутствовал' }" @click="tempAttendance = t('attendance.present')">
           <div class="p-att-icon att-ok">✓</div>
-          <div class="p-att-label">Присутствовал</div>
+          <div class="p-att-label">{{ t('attendance.present') }}</div>
         </div>
-        <div class="p-att-opt" :class="{ active: tempAttendance === 'Отсутствовал' }" @click="tempAttendance = 'Отсутствовал'">
+        <div class="p-att-opt" :class="{ active: tempAttendance === 'Отсутствовал' }" @click="tempAttendance = t('attendance.absent')">
           <div class="p-att-icon att-no">✕</div>
-          <div class="p-att-label">Отсутствовал</div>
+          <div class="p-att-label">{{ t('attendance.absent') }}</div>
         </div>
       </div>
 
       <div class="p-att-history">
-        <div class="p-att-hist-title">История изменений</div>
+        <div class="p-att-hist-title">{{ t('attendance.history') }}</div>
         <div v-for="h in modalData?.history" :key="h.date" class="p-att-hist-item">
           <div class="p-att-hist-meta">{{ h.author }} · {{ h.date }}</div>
-          <div class="p-att-hist-val">Отмечено: {{ h.action }}</div>
+          <div class="p-att-hist-val">{{ t('attendance.marked', { action: h.action }) }}</div>
         </div>
       </div>
 
-      <button class="p-att-save" @click="saveAttendance">💾 Сохранить</button>
+      <button class="p-att-save" @click="saveAttendance">{{ t('attendance.save') }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useModalStore } from '../../stores/modal.store';
 import { useStudentTabsStore } from '../../stores/studentTabs.store';
 import { storeToRefs } from 'pinia';
+
+const { t } = useI18n();
 
 const modalStore = useModalStore();
 const studentTabsStore = useStudentTabsStore();

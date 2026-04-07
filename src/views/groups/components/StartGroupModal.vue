@@ -2,8 +2,8 @@
   <div class="modal-backdrop active" @click.self="$emit('close')">
     <div class="modal">
       <div class="modal-close-btn" @click="$emit('close')">✕</div>
-      <div class="modal-title">🚀 Старт · {{ group.name }}</div>
-      <div class="modal-sub">{{ group.day }}, {{ group.time }} · Дата старта: {{ fmtDate(group.startDate) }}</div>
+      <div class="modal-title">{{ t('newGroups.start.title', { name: group.name }) }}</div>
+      <div class="modal-sub">{{ t('newGroups.start.subtitle', { day: group.day, time: group.time, date: fmtDate(group.startDate) }) }}</div>
 
       <!-- Readiness -->
       <div class="start-readiness">
@@ -11,7 +11,7 @@
           {{ group.paid }}/{{ group.totalSlots }}
         </div>
         <div class="start-ratio-label">
-          {{ group.paid }} {{ plural(group.paid, 'ученик', 'ученика', 'учеников') }} из {{ group.totalSlots }} готовы к старту
+          {{ group.paid }} {{ plural(group.paid, t('newGroups.start.student1'), t('newGroups.start.student2'), t('newGroups.start.student5')) }} {{ t('newGroups.start.readyLabel', { paid: '', total: group.totalSlots }).replace(/ $/, '') }}
         </div>
         <div class="start-progress-bar">
           <div class="start-progress-fill" :style="{ width: pct + '%' }"></div>
@@ -21,19 +21,19 @@
       <!-- Info grid -->
       <div class="start-info-grid">
         <div class="start-info-item">
-          <div class="start-info-label">Тип группы</div>
-          <div class="start-info-value">{{ group.type === 'individual' ? '👤 Индивидуальная' : '👥 Групповая' }}</div>
+          <div class="start-info-label">{{ t('newGroups.start.groupType') }}</div>
+          <div class="start-info-value">{{ group.type === 'individual' ? t('newGroups.detail.typeIndividualFull') : t('newGroups.detail.typeGroupFull') }}</div>
         </div>
         <div class="start-info-item">
-          <div class="start-info-label">Учитель</div>
-          <div class="start-info-value">{{ group.teacher?.name ?? '— не назначен' }}</div>
+          <div class="start-info-label">{{ t('newGroups.start.teacher') }}</div>
+          <div class="start-info-value">{{ group.teacher?.name ?? t('newGroups.notAssigned') }}</div>
         </div>
         <div class="start-info-item">
-          <div class="start-info-label">Оплатили / подписали</div>
-          <div class="start-info-value" :style="{ color: ratioColor }">{{ group.paid }} из {{ group.totalSlots }}</div>
+          <div class="start-info-label">{{ t('newGroups.start.paidSigned') }}</div>
+          <div class="start-info-value" :style="{ color: ratioColor }">{{ t('newGroups.start.ofTotal', { paid: group.paid, total: group.totalSlots }) }}</div>
         </div>
         <div class="start-info-item">
-          <div class="start-info-label">Возрастная группа</div>
+          <div class="start-info-label">{{ t('newGroups.start.ageGroup') }}</div>
           <div class="start-info-value">{{ ageLabel }}</div>
         </div>
       </div>
@@ -42,34 +42,32 @@
       <div class="start-logic-warning">
         <div class="slw-header">
           <span class="slw-icon">⚡</span>
-          <span class="slw-title">Что произойдёт при запуске</span>
+          <span class="slw-title">{{ t('newGroups.start.whatHappens') }}</span>
         </div>
         <div class="slw-body">
           <div class="slw-row">
             <div class="slw-dot green"></div>
             <div class="slw-text">
-              <strong class="hl-green">{{ group.paid }} {{ plural(group.paid, 'ученик', 'ученика', 'учеников') }}</strong> — оплатили и подписали договор.
-              Их аккаунты будут <strong>активированы</strong> и группа стартует для них немедленно.
+              <strong class="hl-green">{{ group.paid }} {{ plural(group.paid, t('newGroups.start.student1'), t('newGroups.start.student2'), t('newGroups.start.student5')) }}</strong> {{ t('newGroups.start.paidDesc') }}
             </div>
           </div>
           <template v-if="notPaid > 0">
             <div class="slw-row">
               <div class="slw-dot amber"></div>
               <div class="slw-text">
-                <strong class="hl-amber">{{ notPaid }} {{ plural(notPaid, 'ученик', 'ученика', 'учеников') }}</strong> — ещё не оплатили или не подписали договор.
-                Они получат статус <strong>«Ожидание старта»</strong> и будут активированы автоматически после оплаты.
+                <strong class="hl-amber">{{ notPaid }} {{ plural(notPaid, t('newGroups.start.student1'), t('newGroups.start.student2'), t('newGroups.start.student5')) }}</strong> {{ t('newGroups.start.notPaidDesc') }}
               </div>
             </div>
             <div class="slw-row">
               <div class="slw-dot red"></div>
               <div class="slw-text">
-                Занятия начнутся без ожидающих учеников. Как только они оплатят — их аккаунт автоматически присоединится к группе.
+                {{ t('newGroups.start.notPaidWarning') }}
               </div>
             </div>
           </template>
           <div v-else class="slw-row">
             <div class="slw-dot green"></div>
-            <div class="slw-text">Все ученики готовы! Группа стартует в <strong>полном составе</strong>.</div>
+            <div class="slw-text">{{ t('newGroups.start.allReady') }}</div>
           </div>
         </div>
       </div>
@@ -77,14 +75,14 @@
       <!-- Ready students -->
       <div v-if="group.paid > 0" class="start-students-section">
         <div class="sss-header sss-green" @click="showReady = !showReady">
-          <span>✅ Активируются сразу</span>
-          <span class="sss-count">{{ group.paid }} чел.</span>
+          <span>{{ t('newGroups.start.activateNow') }}</span>
+          <span class="sss-count">{{ group.paid }} {{ t('newGroups.persons') }}</span>
         </div>
         <div v-show="showReady" class="sss-list">
           <div v-for="s in readyStudents" :key="s.id" class="sss-item">
             <div class="sss-item-name">{{ s.name }}</div>
-            <div class="sss-item-meta">{{ s.age }} лет</div>
-            <span class="sss-status active">Активируется</span>
+            <div class="sss-item-meta">{{ s.age }} {{ t('newGroups.detail.years') }}</div>
+            <span class="sss-status active">{{ t('newGroups.start.activating') }}</span>
           </div>
         </div>
       </div>
@@ -92,21 +90,21 @@
       <!-- Waiting students -->
       <div v-if="notPaid > 0" class="start-students-section">
         <div class="sss-header sss-amber" @click="showWaiting = !showWaiting">
-          <span>⏳ Ожидание старта</span>
-          <span class="sss-count">{{ notPaid }} чел.</span>
+          <span>{{ t('newGroups.start.waitingStart') }}</span>
+          <span class="sss-count">{{ notPaid }} {{ t('newGroups.persons') }}</span>
         </div>
         <div v-show="showWaiting" class="sss-list">
           <div v-for="s in waitingStudents" :key="s.id" class="sss-item">
             <div class="sss-item-name">{{ s.name }}</div>
-            <div class="sss-item-meta">{{ s.age }} лет</div>
-            <span class="sss-status waiting">Ожидание</span>
+            <div class="sss-item-meta">{{ s.age }} {{ t('newGroups.detail.years') }}</div>
+            <span class="sss-status waiting">{{ t('newGroups.start.waiting') }}</span>
           </div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn btn-ghost" @click="$emit('close')">Отмена</button>
-        <button class="btn btn-primary" @click="$emit('confirmed', group.id)">🚀 Запустить группу</button>
+        <button class="btn btn-ghost" @click="$emit('close')">{{ t('newGroups.start.cancel') }}</button>
+        <button class="btn btn-primary" @click="$emit('confirmed', group.id)">{{ t('newGroups.start.confirm') }}</button>
       </div>
     </div>
   </div>
@@ -114,8 +112,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { NewGroup, MasterStudent, NewGroupStudent } from '../../../api/newGroupsApi'
 import { ageMap, fmtDate } from '../../../utils/newGroupsUtils'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   group: NewGroup

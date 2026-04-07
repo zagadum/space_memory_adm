@@ -2,57 +2,57 @@
   <div class="modal-backdrop active" @click.self="$emit('close')">
     <div class="modal">
       <div class="modal-close-btn" @click="$emit('close')">✕</div>
-      <div class="modal-title">✦ Создать новую группу</div>
-      <div class="modal-sub">Заполните данные для новой учебной группы</div>
+      <div class="modal-title">{{ t('newGroups.create.title') }}</div>
+      <div class="modal-sub">{{ t('newGroups.create.subtitle') }}</div>
 
       <!-- Тип -->
       <div class="modal-field">
-        <div class="modal-label">Тип группы</div>
+        <div class="modal-label">{{ t('newGroups.create.groupType') }}</div>
         <div class="modal-type-toggle">
           <div :class="['type-option', selType === 'individual' ? 'selected' : '']" @click="selType = 'individual'">
-            <span class="type-icon">👤</span>Индивидуальная
+            <span class="type-icon">👤</span>{{ t('newGroups.create.individual') }}
           </div>
           <div :class="['type-option', selType === 'group' ? 'selected' : '']" @click="selType = 'group'">
-            <span class="type-icon">👥</span>Групповая
+            <span class="type-icon">👥</span>{{ t('newGroups.create.group') }}
           </div>
         </div>
       </div>
 
       <!-- Название -->
       <div class="modal-field">
-        <div class="modal-label">Название группы</div>
+        <div class="modal-label">{{ t('newGroups.create.groupName') }}</div>
         <input
           v-model="name"
           :class="['modal-input', nameError ? 'input-error' : '']"
           type="text"
-          placeholder="Например: Пн 18 старшая ЕЛа"
+          :placeholder="t('newGroups.create.namePlaceholder')"
         />
       </div>
 
       <!-- День + Время -->
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div class="modal-field">
-          <div class="modal-label">День занятий</div>
+          <div class="modal-label">{{ t('newGroups.create.lessonDay') }}</div>
           <select v-model="day" :class="['modal-input', dayError ? 'input-error' : '']">
-            <option value="">Выбери день...</option>
+            <option value="">{{ t('newGroups.create.selectDay') }}</option>
             <option v-for="d in days" :key="d" :value="d">{{ d }}</option>
           </select>
         </div>
         <div class="modal-field">
-          <div class="modal-label">Время урока</div>
+          <div class="modal-label">{{ t('newGroups.create.lessonTime') }}</div>
           <input v-model="time" type="time" class="modal-input" />
         </div>
       </div>
 
       <!-- Дата старта -->
       <div class="modal-field">
-        <div class="modal-label">Дата запланированного старта</div>
+        <div class="modal-label">{{ t('newGroups.create.plannedStart') }}</div>
         <input v-model="startDate" type="date" class="modal-input" />
       </div>
 
       <!-- Возраст -->
       <div class="modal-field">
-        <div class="modal-label">Возрастная группа</div>
+        <div class="modal-label">{{ t('newGroups.create.ageGroup') }}</div>
         <div class="age-toggle">
           <div
             v-for="(info, key) in ageMap"
@@ -65,13 +65,13 @@
 
       <!-- Учитель -->
       <div class="modal-field">
-        <div class="modal-label">Учитель <span class="optional">(необязательно)</span></div>
+        <div class="modal-label">{{ t('newGroups.create.teacher') }} <span class="optional">{{ t('newGroups.create.optional') }}</span></div>
         <div class="search-select-wrapper" ref="teacherWrap">
           <input
             v-model="teacherQuery"
             class="modal-input"
             type="text"
-            placeholder="Поиск по имени учителя..."
+            :placeholder="t('newGroups.create.searchTeacher')"
             autocomplete="off"
             @focus="teacherOpen = true"
             @input="onTeacherInput"
@@ -86,7 +86,7 @@
               <div class="mini-dot" :style="{ background: t.color }">{{ t.initials }}</div>
               <span>{{ t.name }}</span>
             </div>
-            <div v-if="!filteredTeachers.length" style="padding:10px 12px;font-size:13px;color:var(--dim)">Не найдено</div>
+            <div v-if="!filteredTeachers.length" style="padding:10px 12px;font-size:13px;color:var(--dim)">{{ t('newGroups.create.notFound') }}</div>
           </div>
         </div>
       </div>
@@ -94,15 +94,15 @@
       <!-- Ученики -->
       <div class="modal-field">
         <div class="modal-label">
-          Добавить учеников
-          <span class="optional">(необязательно)</span>
-          <span v-if="selStudents.size > 0" class="sel-count-pill">{{ selStudents.size }} выбрано</span>
+          {{ t('newGroups.create.addStudents') }}
+          <span class="optional">{{ t('newGroups.create.optional') }}</span>
+          <span v-if="selStudents.size > 0" class="sel-count-pill">{{ t('newGroups.create.selectedCount', { n: selStudents.size }) }}</span>
         </div>
         <input
           v-model="studentQuery"
           class="modal-input"
           type="text"
-          placeholder="🔍 Поиск ученика по имени..."
+          :placeholder="t('newGroups.create.searchStudent')"
           autocomplete="off"
           style="margin-bottom:0"
         />
@@ -119,13 +119,13 @@
               <div class="student-check-meta">{{ s.meta }}</div>
             </div>
           </div>
-          <div v-if="!filteredStudents.length" style="padding:12px;color:var(--dim);font-size:13px;text-align:center">Не найдено</div>
+          <div v-if="!filteredStudents.length" style="padding:12px;color:var(--dim);font-size:13px;text-align:center">{{ t('newGroups.create.notFound') }}</div>
         </div>
       </div>
 
       <div class="modal-actions">
-        <button class="btn btn-ghost" @click="$emit('close')">Отмена</button>
-        <button class="btn btn-primary" @click="submit">✦ Создать группу</button>
+        <button class="btn btn-ghost" @click="$emit('close')">{{ t('newGroups.create.cancel') }}</button>
+        <button class="btn btn-primary" @click="submit">{{ t('newGroups.create.submit') }}</button>
       </div>
     </div>
   </div>
@@ -133,7 +133,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { NewGroupTeacher, MasterStudent } from '../../../api/newGroupsApi'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   teachers: NewGroupTeacher[]
@@ -161,7 +164,15 @@ const nameError = ref(false)
 const dayError = ref(false)
 const teacherWrap = ref<HTMLElement | null>(null)
 
-const days = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье']
+const days = [
+  t('newGroups.weekdays.mon'),
+  t('newGroups.weekdays.tue'),
+  t('newGroups.weekdays.wed'),
+  t('newGroups.weekdays.thu'),
+  t('newGroups.weekdays.fri'),
+  t('newGroups.weekdays.sat'),
+  t('newGroups.weekdays.sun'),
+]
 
 const ageMap: Record<string, { label: string; icon: string }> = {
   junior: { label: '5–7',   icon: '🟢' },
