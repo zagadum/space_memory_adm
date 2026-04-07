@@ -637,7 +637,13 @@ onMounted(() => {
   margin-bottom: 20px;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.idb-actions-row > .teacher-filter,
+.idb-actions-row > .btn-ghost {
+  flex-shrink: 0;
 }
 
 .teacher-filter {
@@ -665,6 +671,8 @@ onMounted(() => {
   border-radius: 8px;
   padding: 7px 12px;
   transition: all 0.2s;
+  flex: 1;
+  min-width: 150px;
 }
 
 .search-box:focus-within {
@@ -684,8 +692,9 @@ onMounted(() => {
   color: var(--app-text-main);
   font-family: 'Outfit', sans-serif;
   font-size: 13px;
-  width: 240px;
+  width: 100%;
   flex: 1;
+  min-width: 0;
 }
 
 .btn {
