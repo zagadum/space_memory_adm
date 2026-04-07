@@ -69,8 +69,7 @@ export const useSettingsFirmyStore = defineStore('settingsFirmy', () => {
     const activeFirmaId = ref<number | null>(null);
 
     const loadFirmy = async () => {
-        // Mock load
-        console.log('Loading firmy from API...');
+        // TODO: replace with actual API call
     };
 
     const addFirma = (firma: Omit<Firma, 'id'>) => {

@@ -67,7 +67,7 @@ const handleDownload = (id: string) => {
         </template>
         
         <div class="discount-selector">
-          <UiButton variant="ghost" @click="console.log('Open discount selector')">
+          <UiButton variant="ghost">
             + {{ t('studentPayments.addDiscount') }}
           </UiButton>
         </div>

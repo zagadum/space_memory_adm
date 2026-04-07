@@ -181,15 +181,17 @@ export function getRecruitmentHttpClient(backend: RecruitmentBackend = "default"
   return backend === "indigo" ? httpRecruitmentIndigo : httpRecruitment;
 }
 
-console.log("API routing config:", {
-  baseURL: API_URL,
-  projectApiUrls: PROJECT_API_URLS,
-  recruitmentBaseURL: RECRUITMENT_API_URL,
-  recruitmentIndigoBaseURL: RECRUITMENT_INDIGO_API_URL,
-  defaultMock: USE_MOCK_BY_DEFAULT,
-  mockOnly: MOCK_ONLY_PREFIXES,
-  realOnly: REAL_ONLY_PREFIXES,
-});
+if (import.meta.env.DEV) {
+  console.log("API routing config:", {
+    baseURL: API_URL,
+    projectApiUrls: PROJECT_API_URLS,
+    recruitmentBaseURL: RECRUITMENT_API_URL,
+    recruitmentIndigoBaseURL: RECRUITMENT_INDIGO_API_URL,
+    defaultMock: USE_MOCK_BY_DEFAULT,
+    mockOnly: MOCK_ONLY_PREFIXES,
+    realOnly: REAL_ONLY_PREFIXES,
+  });
+}
 
 export type ApiResponse<T> = AxiosResponse<T>;
 export type ApiConfig = AxiosRequestConfig;

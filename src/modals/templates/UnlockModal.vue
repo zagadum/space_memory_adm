@@ -98,7 +98,7 @@ async function confirm() {
     };
 
     // Выводим в консоль, чтобы бэкендер видел, какие данные мы отправляем
-    console.log("🚀 [API REQUEST] POST /api/v1/payments/unlock", payload);
+    if (import.meta.env.DEV) console.log("🚀 [API REQUEST] POST /api/v1/payments/unlock", payload);
 
     // Временно оставляем вызов старого мока, чтобы проект не упал с ошибкой
     await paymentsApi.unlock({ programId }); 

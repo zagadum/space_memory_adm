@@ -95,7 +95,7 @@ function handleProjChange(projectId: number, event: Event) {
   const val = target.value
   if (val === 'new') {
     // Handle new firma modal or similar
-    console.log('Open new firma modal')
+    // TODO: open new firma modal
     return
   }
   projStore.updateFirmaAssignment(projectId, Number(val))

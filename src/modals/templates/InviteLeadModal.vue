@@ -168,7 +168,7 @@ async function submit() {
   loading.value = true;
   error.value = null;
   try {
-    console.log('[InviteLeadModal] backend:', backend.value, '| route.meta:', route.meta?.recruitmentBackend, '| payload.backend:', payload.value?.backend);
+    if (import.meta.env.DEV) console.log('[InviteLeadModal] backend:', backend.value, '| route.meta:', route.meta?.recruitmentBackend, '| payload.backend:', payload.value?.backend);
     await leadsStore.inviteLead({
       first_name: form.firstName,
       surname: form.lastName,

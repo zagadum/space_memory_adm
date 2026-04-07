@@ -167,7 +167,7 @@ watch(() => searchStore.query, (val) => {
 
 function openGroup(id: number) {
   // Будущая навигация на детальную страницу группы
-  console.log('Open group:', id)
+  // TODO: navigate to group detail page
 }
 
 function openStudentsByGroup(groupId: number) {

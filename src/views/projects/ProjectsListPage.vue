@@ -98,7 +98,7 @@ const handleNewProject = () => {
 };
 
 const handleEditProject = (project: Project) => {
-  console.log('Edit project', project);
+  // TODO: open project edit modal
 };
 </script>
 

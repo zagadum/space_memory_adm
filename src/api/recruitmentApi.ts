@@ -195,7 +195,7 @@ function pickPagination(payload: any, itemCount: number): RecruitmentPagination 
 
 function createRecruitmentApi(backend: RecruitmentBackend = "default") {
   const client = getRecruitmentHttpClient(backend);
-  console.log(`[recruitmentApi] createRecruitmentApi backend="${backend}" baseURL="${(client.defaults as any).baseURL}`);
+  if (import.meta.env.DEV) console.log(`[recruitmentApi] createRecruitmentApi backend="${backend}" baseURL="${(client.defaults as any).baseURL}`);
 
   const getByAliases = async (aliases: string[]) => {
     let lastError: unknown = null;

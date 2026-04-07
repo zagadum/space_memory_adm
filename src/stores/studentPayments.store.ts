@@ -109,7 +109,7 @@ export const useStudentPaymentsStore = defineStore('studentPayments', () => {
         error.value = null;
         try {
             await new Promise(resolve => setTimeout(resolve, 800));
-            console.log('Applying discount:', discountId);
+            // TODO: apply discount via API
         } catch (e) {
             error.value = 'Failed to apply discount';
         } finally {
@@ -122,7 +122,7 @@ export const useStudentPaymentsStore = defineStore('studentPayments', () => {
     ]);
 
     const downloadInvoice = async (transactionId: string) => {
-        console.log('Downloading invoice for:', transactionId);
+        // TODO: download invoice via API
     };
 
     // Initial fill if active
