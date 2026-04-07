@@ -3,18 +3,6 @@
 
     <div class="ns-content">
 
-      <!-- PAGE ACTIONS ROW -->
-      <div class="ns-actions-row">
-        <div class="ns-actions-left">
-          <select v-model="exportFormat" class="format-select" :disabled="store.isListLoading || !sortedStudents.length">
-            <option value="xlsx">XLSX</option>
-            <option value="xls">XLS</option>
-          </select>
-          <button class="btn btn-ghost" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
-        </div>
-        <button class="btn btn-primary" @click="modal.open('invite-lead', { backend: recruitmentBackend })">✉️ {{ t('newStudents.inviteStudent') }}</button>
-      </div>
-
       <!-- STATS GRID -->
       <div class="stats-grid">
         <div class="stat-card blue">
@@ -41,6 +29,26 @@
           <div class="stat-sub">{{ t('newStudents.stats.noManagerSub') }}</div>
           <div class="stat-icon">⚠️</div>
         </div>
+      </div>
+
+      <!-- PAGE ACTIONS ROW -->
+      <div class="ns-actions-row">
+        <div class="ns-actions-left">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input
+              v-model="searchStore.query"
+              type="text"
+              :placeholder="t('newStudents.searchPlaceholder')"
+            >
+          </div>
+          <select v-model="exportFormat" class="format-select shrink-0" :disabled="store.isListLoading || !sortedStudents.length">
+            <option value="xlsx">XLSX</option>
+            <option value="xls">XLS</option>
+          </select>
+          <button class="btn btn-ghost shrink-0" :disabled="store.isListLoading || !sortedStudents.length" @click="exportToExcel">⬇ {{ t('newStudents.export.exportExcel') }}</button>
+        </div>
+        <button class="btn btn-primary shrink-0" @click="modal.open('invite-lead', { backend: recruitmentBackend })">✉️ {{ t('newStudents.inviteStudent') }}</button>
       </div>
 
       <!-- TOOLBAR -->
@@ -95,17 +103,6 @@
 
       <!-- TABLE -->
       <div class="table-container">
-        <div class="table-search-row">
-          <div class="search-box">
-            <span class="search-icon">🔍</span>
-            <input
-              v-model="searchStore.query"
-              type="text"
-              :placeholder="t('newStudents.searchPlaceholder')"
-            >
-          </div>
-        </div>
-
         <div v-if="store.isListLoading" class="list-state loading">
           <div class="list-state-icon">⏳</div>
           <div class="list-state-title">{{ t('newStudents.loading') }}</div>
@@ -704,9 +701,13 @@ async function onPanelDeleteAllDocs() {
 /* ACTIONS ROW */
 .ns-actions-row {
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
-  margin-bottom: 20px; flex-wrap: wrap;
+  margin-bottom: 20px; flex-wrap: nowrap; overflow-x: auto;
 }
-.ns-actions-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ns-actions-row > .shrink-0,
+.ns-actions-left > .shrink-0 {
+  flex-shrink: 0;
+}
+.ns-actions-left { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; flex: 1; }
 .format-select {
   background: var(--app-surface); border: 1px solid var(--app-border); border-radius: 8px;
   color: var(--app-text-main); font-size: 13px; font-weight: 500; font-family: 'Outfit', sans-serif;
@@ -718,10 +719,11 @@ async function onPanelDeleteAllDocs() {
 .search-box {
   display: flex; align-items: center; gap: 8px; background: var(--app-surface);
   border: 1px solid var(--app-border); border-radius: 8px; padding: 7px 12px; transition: all 0.2s;
+  flex: 1; min-width: 150px;
 }
 .search-box:focus-within { border-color: var(--app-border-hi); box-shadow: 0 0 12px rgba(79,110,247,0.1); }
 .search-icon { color: var(--app-text-dim); font-size: 14px; }
-.search-box input { background: none; border: none; outline: none; color: var(--app-text-main); font-family: 'Outfit', sans-serif; font-size: 13px; width: 200px; }
+.search-box input { background: none; border: none; outline: none; color: var(--app-text-main); font-family: 'Outfit', sans-serif; font-size: 13px; width: 100%; min-width: 0; }
 .search-box input::placeholder { color: var(--app-text-dim); }
  
 /* NAME COLUMN SUB INFO */
@@ -1014,17 +1016,19 @@ async function onPanelDeleteAllDocs() {
 .df-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
 /* TABLE */
-.table-container { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px; overflow: hidden; overflow-x: auto; }
-.table-search-row {
-  display: flex;
-  justify-content: flex-end;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--app-border);
-  background: var(--app-surface);
-}
+.table-container { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px; overflow: auto; max-height: calc(100vh - 280px); }
+
 table { width: 100%; border-collapse: collapse; min-width: 1100px; }
-thead tr { background: var(--app-surface); border-bottom: 1px solid var(--app-border); }
+thead th { position: sticky; top: 0; z-index: 10; background: var(--app-surface); box-shadow: 0 1px 0 var(--app-border); }
 th { padding: 11px 14px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--app-text-dim); white-space: nowrap; cursor: pointer; user-select: none; transition: color 0.15s; }
+
+/* Sticky First Column */
+th:nth-child(1), td:nth-child(1) { position: sticky; left: 0; z-index: 5; background: var(--app-card); box-shadow: inset -1px 0 0 rgba(0,0,0,0.05); }
+th:nth-child(1) { z-index: 20; background: var(--app-surface); }
+tbody tr { background: var(--app-card); }
+tbody tr:hover { background: rgba(79, 110, 247, 0.04); }
+tbody tr:hover td:nth-child(1) { background: #f8fafe; }
+[data-theme="dark"] tbody tr:hover td:nth-child(1) { background: rgba(79, 110, 247, 0.08); }
 th:hover { color: var(--app-text-main); background: rgba(79,110,247,0.04); }
 th.no-sort { cursor: default; }
 th.no-sort:hover { background: none; color: var(--app-text-dim); }
