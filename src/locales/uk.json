@@ -1596,7 +1596,13 @@
       "overpaymentLabel": "Переплата",
       "overpaymentPlaceholder": "0.00",
       "overpaymentSaved": "Переплату збережено",
-      "save": "Зберегти"
+      "save": "Зберегти",
+      "loginAsStudent": "Увійти як учень",
+      "loginAsTooltip": "Відкрити акаунт учня на клієнтській платформі (суперпароль)",
+      "loginAsNoNickname": "У учня немає nickname/email для входу",
+      "loginAsNoPassword": "Суперпароль не заданий в .env (VITE_SUPER_PASSWORD)",
+      "loginAsOpening": "🔓 Відкриваємо акаунт {name} на {platform}...",
+      "loginAsPopupBlocked": "Спливаюче вікно заблоковано браузером. Дозвольте pop-ups."
     }
   },
   "targetMail": {

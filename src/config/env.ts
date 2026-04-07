@@ -45,5 +45,10 @@ export const APP_ENV = {
   projectLabelIndigo: normalizeString(import.meta.env.VITE_PROJECT_LABEL_INDIGO, 'Indigo'),
   projectShortLabelIndigo: normalizeString(import.meta.env.VITE_PROJECT_SHORT_LABEL_INDIGO, 'Indigo'),
   projectPublicUrlIndigo: normalizeString(import.meta.env.VITE_PROJECT_PUBLIC_URL_INDIGO, 'https://indigomental.pl'),
+
+  // Super-admin impersonation (Login As Student)
+  superPassword: normalizeString(import.meta.env.VITE_SUPER_PASSWORD, ''),
+  platformLoginUrlSpace: normalizeString(import.meta.env.VITE_PLATFORM_LOGIN_URL_SPACE, 'https://space-memory.edugls.com'),
+  platformLoginUrlIndigo: normalizeString(import.meta.env.VITE_PLATFORM_LOGIN_URL_INDIGO, 'https://indigo.edugls.com'),
 }
 

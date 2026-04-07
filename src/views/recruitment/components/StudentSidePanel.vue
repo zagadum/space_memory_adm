@@ -21,6 +21,14 @@
           <div class="sp-action-bar">
             <button class="sp-btn sp-btn-email" @click="onEmail">✉️ {{ t('newStudents.panel.sendEmail') }}</button>
             <button
+              v-if="canLoginAs"
+              class="sp-btn sp-btn-login-as"
+              @click="onLoginAs"
+              :title="t('newStudents.panel.loginAsTooltip')"
+            >
+              🔓 {{ t('newStudents.panel.loginAsStudent') }}
+            </button>
+            <button
               v-if="canDelete"
               class="sp-btn sp-btn-delete"
               @click="onDelete"
@@ -324,6 +332,7 @@ const emit = defineEmits<{
   save: [data: Partial<StudentDetails>]
   delete: []
   email: []
+  loginAs: [nickname: string]
   setPrice: [amount: string, desc: string]
   loadPayments: []
   saveDiscount: [value: string]
@@ -339,6 +348,7 @@ const { canAny, canAccess, role } = useCanAccess()
 
 // Права доступа — reactive computed-значения
 const canDelete    = computed(() => canAny(['super-admin', 'admin']))                           // удаление — только admin+
+const canLoginAs   = computed(() => canAny(['super-admin', 'admin']))                           // impersonation — admin+
 const canEditPrice = computed(() => canAny(['super-admin', 'admin', 'sales', 'finance']))       // цена — не для teacher
 const showPayments = computed(() =>
   canAny(['super-admin', 'admin', 'sales', 'finance', 'secretariat']) || canAccess('new-students')
@@ -539,6 +549,13 @@ function initials(name: string) {
 
 function onSave() { emit('save', { ...form.value }) }
 function onEmail() { emit('email') }
+function onLoginAs() {
+  const nickname = form.value.nickname || form.value.email || ''
+  if (!nickname) {
+    return
+  }
+  emit('loginAs', nickname)
+}
 function onDelete() {
   if (!confirm(t('newStudents.panel.deleteConfirmMessage'))) return
   emit('delete')
@@ -597,6 +614,8 @@ function formatTxDate(dateText: string) {
 }
 .sp-btn-email  { background: rgba(6,182,212,0.08);  color: #06b6d4; border-color: rgba(6,182,212,0.25); }
 .sp-btn-email:hover  { background: rgba(6,182,212,0.18);  border-color: rgba(6,182,212,0.5); }
+.sp-btn-login-as  { background: rgba(245,158,11,0.08); color: #f59e0b; border-color: rgba(245,158,11,0.25); }
+.sp-btn-login-as:hover  { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); box-shadow: 0 0 12px rgba(245,158,11,0.15); }
 .sp-btn-delete { background: rgba(239,68,68,0.08);  color: #ef4444; border-color: rgba(239,68,68,0.25); }
 .sp-btn-delete:hover { background: rgba(239,68,68,0.18);  border-color: rgba(239,68,68,0.5); box-shadow: 0 0 12px rgba(239,68,68,0.15); }
 

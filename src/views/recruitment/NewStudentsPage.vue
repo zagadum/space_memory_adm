@@ -308,6 +308,7 @@
       @save="onPanelSave"
       @delete="onPanelDelete"
       @email="onPanelEmail"
+      @login-as="onPanelLoginAs"
       @set-price="onPanelSetPrice"
       @load-payments="onPanelLoadPayments"
       @save-discount="onPanelSaveDiscount"
@@ -332,6 +333,7 @@ import { useModalStore } from '../../stores/modal.store'
 import type { RecruitmentBackend } from '../../api/http'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
+import { useLoginAsStudent } from '../../composables/useLoginAsStudent'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -339,6 +341,7 @@ const store = useNewStudentsStore()
 const notif = useNotificationStore()
 const searchStore = useGlobalSearchStore()
 const modal = useModalStore()
+const { loginAsStudent } = useLoginAsStudent()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 
 // ─── FILTERS ───
@@ -623,6 +626,10 @@ function onPanelDelete() {
 }
 function onPanelEmail() {
   notif.addToast(`✉️ Email — ${t('newStudents.inDev')}`, 'info')
+}
+function onPanelLoginAs(nickname: string) {
+  if (!activeStudent.value) return
+  loginAsStudent(nickname, activeStudent.value.name, recruitmentBackend.value)
 }
 function onPanelSetPrice(amount: string, desc: string) {
   if (!activeStudent.value) return

@@ -1600,7 +1600,13 @@
       "overpaymentLabel": "Nadpłata",
       "overpaymentPlaceholder": "0.00",
       "overpaymentSaved": "Nadpłata zapisana",
-      "save": "Zapisz"
+      "save": "Zapisz",
+      "loginAsStudent": "Zaloguj jako uczeń",
+      "loginAsTooltip": "Otwórz konto ucznia na platformie klienta (super hasło)",
+      "loginAsNoNickname": "Uczeń nie ma nicku/emaila do logowania",
+      "loginAsNoPassword": "Super hasło nie jest ustawione w .env (VITE_SUPER_PASSWORD)",
+      "loginAsOpening": "🔓 Otwieramy konto {name} na {platform}...",
+      "loginAsPopupBlocked": "Wyskakujące okno zablokowane przez przeglądarkę. Zezwól na pop-upy."
     }
   },
   "targetMail": {

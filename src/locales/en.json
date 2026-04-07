@@ -1599,7 +1599,13 @@
       "overpaymentLabel": "Overpayment",
       "overpaymentPlaceholder": "0.00",
       "overpaymentSaved": "Overpayment saved",
-      "save": "Save"
+      "save": "Save",
+      "loginAsStudent": "Login as student",
+      "loginAsTooltip": "Open student account on client platform (super password)",
+      "loginAsNoNickname": "Student has no nickname/email for login",
+      "loginAsNoPassword": "Super password is not set in .env (VITE_SUPER_PASSWORD)",
+      "loginAsOpening": "🔓 Opening {name}'s account on {platform}...",
+      "loginAsPopupBlocked": "Pop-up blocked by the browser. Please allow pop-ups."
     }
   },
   "targetMail": {
