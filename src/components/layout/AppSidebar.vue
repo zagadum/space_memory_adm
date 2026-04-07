@@ -382,7 +382,12 @@
         <div v-if="isVisible('school-settings')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'school-settings' }" @click="setActive('school-settings')">
           <span class="nav-icon">🏫</span> {{ t('sidebar.schoolSettings') }}
         </div>
-        <div v-if="isVisible('access-control')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'access-control' }" @click="navigateTo('access-control', '/settings/access-control')">
+        <div 
+          v-if="isVisible('access-control')" 
+          class="nav-item" 
+          :class="[{ active: activeItem === 'access-control' }, accessClass('access-control')]" 
+          @click="navigateTo('access-control', '/settings/access-control')"
+        >
           <span class="nav-icon">🔐</span> {{ t('sidebar.accessControl') }}
         </div>
         <div v-if="isVisible('integrations')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'integrations' }" @click="setActive('integrations')">
@@ -520,7 +525,7 @@ const openSections = ref<Record<string, boolean>>({
   trainer: false,
   accounting: false,
   quality: false,
-  settings: false,
+  settings: authStore.user?.role === 'super-admin' || authStore.user?.role === 'admin',
 })
 
 const activeItem = ref('students')
@@ -635,7 +640,13 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/trainer/exam'))     { activeItem.value = 'trainer-exam';      openSections.value.trainer = true }
   else if (path.startsWith('/trainer/mail'))     { activeItem.value = 'trainer-mail';      openSections.value.trainer = true }
   // Мой кабинет
-  else if (path.startsWith('/my-cabinet'))  { activeItem.value = 'my-cabinet' }
+}, { immediate: true })
+
+// Автоматически раскрываем раздел настроек для админов, когда данные пользователя загружены
+watch(() => authStore.user?.role, (newRole) => {
+  if (newRole === 'super-admin' || newRole === 'admin') {
+    openSections.value.settings = true
+  }
 }, { immediate: true })
 
 function isVisible(menuKey: string) {
@@ -684,7 +695,7 @@ const setActive = (item: string) => {
   } else if (item === 'students') {
     router.push('/students')
   } else if (item === 'settings') {
-    router.push('/finance/settings')
+    router.push('/settings')
   }
 }
 
@@ -693,6 +704,7 @@ const navigateTo = (item: string, path: string, menuKey = item) => {
   activeItem.value = item
   router.push(path)
 }
+
 </script>
 
 <style scoped>

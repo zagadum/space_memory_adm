@@ -236,6 +236,12 @@ export const router = createRouter({
         { path: 'quality/zaliczenia-calendar', name: 'quality-zcalendar', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'quality/all-tasks', name: 'quality-all-tasks', component: () => import('../views/dashboard/DashboardIndex.vue') },
         { path: 'quality/stats', name: 'quality-stats', component: () => import('../views/dashboard/DashboardIndex.vue') },
+        // ─── Settings ───
+        {
+          path: 'settings',
+          name: 'settings-root',
+          redirect: { name: 'access-control' }
+        },
         // ─── SuperAdmin: Access Control ───
         {
           path: 'settings/access-control',

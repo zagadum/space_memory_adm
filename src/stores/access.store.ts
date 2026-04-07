@@ -24,6 +24,8 @@ function withPrivilegedFullAccess(input: AccessMatrix, role: string): AccessMatr
   const normalized = normalizeRole(role);
   if (normalized !== "admin" && normalized !== "super-admin") return input;
 
+  // Admin/super-admin: ensure all known resource keys are "active"
+  // The backend should already return full access, but this is a safety net
   const next: AccessMatrix = { ...input };
   for (const key of getExpectedResourceKeys()) {
     next[key] = "active";
@@ -73,12 +75,16 @@ export const useAccessStore = defineStore("access", () => {
     loading.value = true;
     try {
       const data = await accessControlApi.getMyAccessControl();
+      
       const normalizedMatrix = normalizeMatrix(data.matrix ?? {});
       logMissingResourceKeysDev(normalizedMatrix, data.role ?? "");
+      
       matrix.value = withPrivilegedFullAccess(normalizedMatrix, data.role ?? "");
       role.value = data.role ?? "";
       version.value = Number(data.version || 0);
       initialized.value = true;
+    } catch (err) {
+      console.error('[AccessStore] Failed to init:', err);
     } finally {
       loading.value = false;
     }

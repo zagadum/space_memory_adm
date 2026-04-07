@@ -5,6 +5,14 @@ export type AccessMode = "active" | "read-only" | "hidden";
 export type AccessMatrix = Record<string, AccessMode>;
 export type RoleMatrix = Record<string, Record<string, AccessMode>>;
 
+export interface UserEntry {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  overrides: AccessMatrix;
+}
+
 export interface MeAccessControlResponse {
   role: string;
   version: number;
@@ -61,6 +69,36 @@ export const accessControlApi = {
       const { data } = await http.post<{ ok: boolean; version: number; savedAt: string }>(
         "v1/settings/access-control",
         payload,
+      );
+      return data;
+    }
+  },
+
+  /** List all users for admin management */
+  async getUsersList(): Promise<{ items: UserEntry[] }> {
+    try {
+      const { data } = await http.get<{ items: UserEntry[] }>("settings/users");
+      return data;
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+      const { data } = await http.get<{ items: UserEntry[] }>("v1/settings/users");
+      return data;
+    }
+  },
+
+  /** Save per-user overrides */
+  async saveUserOverrides(userId: number, overrides: AccessMatrix): Promise<{ ok: boolean }> {
+    try {
+      const { data } = await http.put<{ ok: boolean }>(
+        `settings/users/${userId}/overrides`,
+        { overrides },
+      );
+      return data;
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+      const { data } = await http.put<{ ok: boolean }>(
+        `v1/settings/users/${userId}/overrides`,
+        { overrides },
       );
       return data;
     }

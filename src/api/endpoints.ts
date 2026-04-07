@@ -170,7 +170,8 @@ export const SALARY = {
 // ═══════════════════════════════════════════════════════════════════════════
 export const SETTINGS = {
   USERS: 'settings/users',
-  USER_BY_ID: (id: string) => `settings/users/${id}`,
+  USER_BY_ID: (id: string | number) => `settings/users/${id}`,
+  USER_OVERRIDES: (id: string | number) => `settings/users/${id}/overrides`,
   MY_ACCESS_CONTROL: 'me/access-control',
   ACCESS_CONTROL: 'settings/access-control',
 } as const;

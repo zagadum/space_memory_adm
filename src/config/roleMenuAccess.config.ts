@@ -190,19 +190,20 @@ export const ROLE_MENU_ACCESS: Record<AppRole, MenuAccessMap> = {
     IMPORT_DB_ACTIONS,
   ),
 
+  // Teacher — only import-db page (recruitment section)
   "teacher": allow(
-    ["secretariat", "students", "groups"], 
-    ["recruitment", "new-students", "target-mail", "expelled", "new-groups", "archived", "import-db"]
+    ["recruitment", "import-db"],
   ),
 
-  // Recruitment + read-only student list; no finance, no quality
+  // Sales / Recruitment department — only recruitment pages
   "sales": allow(
-    ALWAYS, RECRUITMENT, SECRETARIAT,
+    ["recruitment", "new-students", "leads", "target-mail",
+     "expelled", "new-groups", "archived", "import-db"],
   ),
 
-  // Quality monitoring + read-only students; no finance, no recruitment
+  // Quality department — secretariat + recruitment + quality + import-db actions
   "quality": allow(
-    ALWAYS, QUALITY, ["secretariat", "students", "groups"],
+    SECRETARIAT, RECRUITMENT, IMPORT_DB_ACTIONS, QUALITY,
   ),
 
   // Finance & accounting + read-only students; no recruitment, no quality
@@ -215,8 +216,9 @@ export const ROLE_MENU_ACCESS: Record<AppRole, MenuAccessMap> = {
     ALWAYS, SECRETARIAT,
   ),
 
-  // HR panel only
+  // HR — groups, teachers + HR panel
   "hr": allow(
-    ALWAYS, HR,
+    ["secretariat", "groups", "teachers"],
+    HR,
   ),
 };

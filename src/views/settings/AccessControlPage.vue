@@ -9,82 +9,215 @@
           <p class="page-sub">{{ t('accessControl.subtitle') }}</p>
         </div>
       </div>
-      <div class="header-actions">
-        <button class="btn-reset" @click="resetToDefaults">
-          ↺ {{ t('accessControl.resetDefaults') }}
-        </button>
-        <button class="btn-save" :class="{ saving }" @click="saveMatrix" :disabled="saving">
-          {{ saving ? '⏳' : '💾' }} {{ t('accessControl.save') }}
-        </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'roles' }"
+        @click="activeTab = 'roles'"
+      >
+        🛡 {{ t('accessControl.tabRoles') }}
+      </button>
+      <button
+        class="tab-btn"
+        :class="{ active: activeTab === 'users' }"
+        @click="activeTab = 'users'"
+      >
+        👤 {{ t('accessControl.tabUsers') }}
+      </button>
+    </div>
+
+    <!-- ═══ TAB 1: Дефолты ролей (read-only) ═══ -->
+    <div v-if="activeTab === 'roles'" class="tab-content">
+      <div class="info-banner">
+        <span class="info-icon">ℹ️</span>
+        <span class="info-text">{{ t('accessControl.rolesInfoBanner') }}</span>
       </div>
-    </div>
 
-    <!-- Инфо-баннер -->
-    <div class="info-banner">
-      <span class="info-icon">ℹ️</span>
-      <span class="info-text">{{ t('accessControl.infoBanner') }}</span>
-      <span class="info-contract" @click="showApiContract = !showApiContract">
-        {{ t('accessControl.apiContractToggle') }} ▾
-      </span>
-    </div>
-
-    <!-- API Contract (для разработчика) -->
-    <div v-if="showApiContract" class="api-contract">
-      <div class="contract-title">📋 API Contract — POST /v1/settings/access-control</div>
-      <pre class="contract-code">{{ apiContractExample }}</pre>
-    </div>
-
-    <!-- Легенда -->
-    <div class="legend">
-      <div v-for="st in statusModes" :key="st.mode" class="legend-item">
-        <div class="legend-dot" :class="st.mode"></div>
-        <span>{{ t(`accessControl.mode.${st.mode}`) }}</span>
+      <!-- Легенда -->
+      <div class="legend">
+        <div v-for="st in statusModes" :key="st.mode" class="legend-item">
+          <div class="legend-dot" :class="st.mode"></div>
+          <span>{{ t(`accessControl.mode.${st.mode}`) }}</span>
+        </div>
       </div>
-    </div>
 
-    <!-- Матрица прав -->
-    <div class="matrix-wrapper">
-      <table class="matrix-table">
-        <thead>
-          <tr>
-            <th class="col-section">{{ t('accessControl.colSection') }}</th>
-            <th v-for="role in ROLES" :key="role" class="col-role">
-              <div class="role-header">
-                <span class="role-emoji">{{ roleEmoji(role) }}</span>
-                <span class="role-name">{{ t(`accessControl.role.${role}`) }}</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="section in SECTIONS" :key="section.key">
-            <!-- Группа-заголовок -->
-            <tr class="section-row">
-              <td :colspan="ROLES.length + 1" class="section-label">
-                {{ section.icon }} {{ t(`accessControl.section.${section.key}`, section.key) }}
-              </td>
-            </tr>
-            <!-- Строки секции -->
-            <tr v-for="item in section.items" :key="item.key" class="item-row">
-              <td class="col-item">
-                <span class="item-name">{{ t(`accessControl.item.${item.key}`, item.key) }}</span>
-              </td>
-              <td
-                v-for="role in ROLES"
-                :key="role"
-                class="col-cell"
-                :title="t(`accessControl.mode.${getMode(role, item.key)}`)"
-                @click="cycleMode(role, item.key)"
-              >
-                <div class="cell-dot" :class="getMode(role, item.key)">
-                  <span class="cell-icon">{{ modeIcon(getMode(role, item.key)) }}</span>
+      <!-- Матрица дефолтов (read-only) -->
+      <div class="matrix-wrapper">
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th class="col-section">{{ t('accessControl.colSection') }}</th>
+              <th v-for="role in ROLES" :key="role" class="col-role">
+                <div class="role-header">
+                  <span class="role-emoji">{{ roleEmoji(role) }}</span>
+                  <span class="role-name">{{ t(`accessControl.role.${role}`) }}</span>
                 </div>
-              </td>
+              </th>
             </tr>
-          </template>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <template v-for="section in SECTIONS" :key="section.key">
+              <tr class="section-row">
+                <td :colspan="ROLES.length + 1" class="section-label">
+                  {{ section.icon }} {{ t(`accessControl.section.${section.key}`, section.key) }}
+                </td>
+              </tr>
+              <tr v-for="item in section.items" :key="item.key" class="item-row">
+                <td class="col-item">
+                  <span class="item-name">{{ t(`accessControl.item.${item.key}`, item.key) }}</span>
+                </td>
+                <td
+                  v-for="role in ROLES"
+                  :key="role"
+                  class="col-cell"
+                  :title="t(`accessControl.mode.${getDefaultMode(role, item.key)}`)"
+                >
+                  <div class="cell-dot" :class="getDefaultMode(role, item.key)">
+                    <span class="cell-icon">{{ modeIcon(getDefaultMode(role, item.key)) }}</span>
+                  </div>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
     </div>
+
+    <!-- ═══ TAB 2: Пользователи ═══ -->
+    <div v-if="activeTab === 'users'" class="tab-content">
+      <div class="info-banner">
+        <span class="info-icon">👤</span>
+        <span class="info-text">{{ t('accessControl.usersInfoBanner') }}</span>
+      </div>
+
+      <!-- Поиск -->
+      <div class="search-bar">
+        <input
+          v-model="userSearch"
+          type="text"
+          class="search-input"
+          :placeholder="t('accessControl.searchUsers')"
+        />
+      </div>
+
+      <!-- Загрузка -->
+      <div v-if="usersLoading" class="loading-state">
+        ⏳ {{ t('accessControl.loadingUsers') }}
+      </div>
+
+      <!-- Список пользователей -->
+      <div v-else class="users-list">
+        <div
+          v-for="user in filteredUsers"
+          :key="user.id"
+          class="user-card"
+          :class="{ selected: selectedUser?.id === user.id }"
+          @click="selectUser(user)"
+        >
+          <div class="user-avatar">{{ userInitials(user.name) }}</div>
+          <div class="user-info">
+            <div class="user-name">{{ user.name }}</div>
+            <div class="user-email">{{ user.email }}</div>
+          </div>
+          <div class="user-role-badge" :class="user.role">
+            {{ roleEmoji(user.role as AppRole) }} {{ t(`accessControl.role.${user.role}`) }}
+          </div>
+          <div class="user-overrides-count" v-if="Object.keys(user.overrides).length > 0">
+            <span class="overrides-badge">
+              {{ Object.keys(user.overrides).length }} {{ t('accessControl.overridesCount') }}
+            </span>
+          </div>
+          <span class="user-arrow">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ Slide-out панель для overrides ═══ -->
+    <transition name="slide">
+      <div v-if="selectedUser" class="override-panel">
+        <div class="panel-header">
+          <div class="panel-user">
+            <div class="panel-avatar">{{ userInitials(selectedUser.name) }}</div>
+            <div>
+              <div class="panel-name">{{ selectedUser.name }}</div>
+              <div class="panel-email">{{ selectedUser.email }}</div>
+              <div class="panel-role">
+                {{ roleEmoji(selectedUser.role as AppRole) }}
+                {{ t(`accessControl.role.${selectedUser.role}`) }}
+              </div>
+            </div>
+          </div>
+          <button class="panel-close" @click="selectedUser = null">✕</button>
+        </div>
+
+        <div class="panel-body">
+          <!-- Секции -->
+          <template v-for="section in SECTIONS" :key="section.key">
+            <div class="override-section-title">
+              {{ section.icon }} {{ t(`accessControl.section.${section.key}`, section.key) }}
+            </div>
+            <div
+              v-for="item in section.items"
+              :key="item.key"
+              class="override-row"
+            >
+              <div class="override-label">
+                {{ t(`accessControl.item.${item.key}`, item.key) }}
+              </div>
+              <div class="override-status">
+                <!-- Дефолт роли -->
+                <span class="default-mode-tag" :class="getDefaultMode(selectedUser.role as AppRole, item.key)">
+                  {{ t('accessControl.roleDefault') }}: {{ t(`accessControl.mode.${getDefaultMode(selectedUser.role as AppRole, item.key)}`) }}
+                </span>
+              </div>
+              <div class="override-actions">
+                <button
+                  class="override-btn grant"
+                  :class="{ active: editOverrides[item.key] === 'active' }"
+                  @click="toggleOverride(item.key, 'active')"
+                  :title="t('accessControl.grantAccess')"
+                >
+                  ✓
+                </button>
+                <button
+                  class="override-btn revoke"
+                  :class="{ active: editOverrides[item.key] === 'hidden' }"
+                  @click="toggleOverride(item.key, 'hidden')"
+                  :title="t('accessControl.revokeAccess')"
+                >
+                  ✕
+                </button>
+                <button
+                  v-if="editOverrides[item.key]"
+                  class="override-btn reset"
+                  @click="clearOverride(item.key)"
+                  :title="t('accessControl.resetToDefault')"
+                >
+                  ↺
+                </button>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <div class="panel-footer">
+          <button class="btn-cancel" @click="selectedUser = null">
+            {{ t('accessControl.cancel') }}
+          </button>
+          <button class="btn-save" :disabled="saving" @click="saveOverrides">
+            {{ saving ? '⏳' : '💾' }} {{ t('accessControl.save') }}
+          </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Overlay -->
+    <transition name="fade">
+      <div v-if="selectedUser" class="overlay" @click="selectedUser = null"></div>
+    </transition>
 
     <!-- Toast -->
     <transition name="toast">
@@ -96,19 +229,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { accessControlApi, type RoleMatrix } from '../../api/accessControlApi'
-import { ROLE_MENU_ACCESS } from '../../config/roleMenuAccess.config'
+import { accessControlApi, type AccessMode, type UserEntry } from '../../api/accessControlApi'
+import { ROLE_MENU_ACCESS, type AppRole } from '../../config/roleMenuAccess.config'
 
 const { t } = useI18n()
 
-// ─── Типы ───────────────────────────────────────────────────────────────────
-type AppRole = 'super-admin' | 'admin' | 'teacher' | 'sales' | 'quality' | 'finance' | 'secretariat' | 'hr'
-type AccessMode = 'active' | 'read-only' | 'hidden'
-
-interface MatrixRow { [role: string]: AccessMode }
-interface Matrix extends RoleMatrix {}
+// ─── Tabs ────────────────────────────────────────────────────────────────────
+const activeTab = ref<'roles' | 'users'>('users')
 
 // ─── Роли (порядок колонок) ──────────────────────────────────────────────────
 const ROLES: AppRole[] = ['super-admin', 'admin', 'teacher', 'sales', 'quality', 'finance', 'secretariat', 'hr']
@@ -234,78 +363,10 @@ const statusModes: { mode: AccessMode }[] = [
   { mode: 'hidden' },
 ]
 
-const CYCLE_ORDER: AccessMode[] = ['active', 'read-only', 'hidden']
-
-// ─── Умолчания матрицы ───────────────────────────────────────────────────────
-function buildDefaults(): Matrix {
-  const m: Matrix = {}
-
-  const readonlyByRole: Partial<Record<AppRole, string[]>> = {
-    teacher: ['students', 'groups'],
-    sales: ['students', 'groups'],
-    quality: ['students', 'groups'],
-    finance: ['students'],
-  }
-
-  const resourceKeys = Array.from(new Set(SECTIONS.flatMap((section) => section.items.map((item) => item.key))))
-
-  for (const resourceKey of resourceKeys) {
-    m[resourceKey] = {}
-    for (const role of ROLES) {
-      const isActive = ROLE_MENU_ACCESS[role]?.[resourceKey]?.mode === 'active'
-      if (!isActive) {
-        m[resourceKey][role] = 'hidden'
-        continue
-      }
-      const roleReadOnlyKeys = readonlyByRole[role] ?? []
-      m[resourceKey][role] = roleReadOnlyKeys.includes(resourceKey) ? 'read-only' : 'active'
-    }
-  }
-
-  return m
-}
-
-// ─── Состояние ───────────────────────────────────────────────────────────────
-const matrix = reactive<Matrix>(buildDefaults())
-const version = ref(0)
-const saving = ref(false)
-const showApiContract = ref(false)
-const toast = ref<{ message: string; type: 'success' | 'error' } | null>(null)
-
-function applyMatrix(next: Matrix) {
-  const nextKeys = new Set(Object.keys(next))
-  for (const key of Object.keys(matrix)) {
-    if (!nextKeys.has(key)) delete matrix[key]
-  }
-  for (const key of nextKeys) {
-    matrix[key] = next[key]
-  }
-}
-
-async function loadMatrixFromApi() {
-  try {
-    const data = await accessControlApi.getAccessMatrix()
-    applyMatrix((data?.matrix as Matrix) || buildDefaults())
-    version.value = Number(data?.version || 0)
-  } catch {
-    applyMatrix(buildDefaults())
-    version.value = 0
-    showToast(t('accessControl.savedError'), 'error')
-  }
-}
-
 // ─── Хелперы ─────────────────────────────────────────────────────────────────
-function getMode(role: AppRole, key: string): AccessMode {
-  return matrix[key]?.[role] ?? 'hidden'
-}
-
-function cycleMode(role: AppRole, key: string) {
-  // Super-Admin всегда active — нельзя изменить
-  if (role === 'super-admin') return
-  const cur  = getMode(role, key)
-  const next = CYCLE_ORDER[(CYCLE_ORDER.indexOf(cur) + 1) % CYCLE_ORDER.length]
-  if (!matrix[key]) matrix[key] = {}
-  matrix[key][role] = next
+function getDefaultMode(role: AppRole, key: string): AccessMode {
+  const entry = ROLE_MENU_ACCESS[role]?.[key]
+  return entry?.mode === 'active' ? 'active' : 'hidden'
 }
 
 function modeIcon(mode: AccessMode): string {
@@ -320,15 +381,79 @@ function roleEmoji(role: AppRole): string {
   return map[role] ?? '👤'
 }
 
-// ─── Сохранение / сброс ──────────────────────────────────────────────────────
-async function saveMatrix() {
+function userInitials(name: string): string {
+  return name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase()
+}
+
+// ─── Users state ─────────────────────────────────────────────────────────────
+const users = ref<UserEntry[]>([])
+const usersLoading = ref(false)
+const userSearch = ref('')
+const selectedUser = ref<UserEntry | null>(null)
+const editOverrides = reactive<Record<string, AccessMode>>({})
+const saving = ref(false)
+const toast = ref<{ message: string; type: 'success' | 'error' } | null>(null)
+
+const filteredUsers = computed(() => {
+  if (!userSearch.value) return users.value
+  const q = userSearch.value.toLowerCase()
+  return users.value.filter(u =>
+    u.name.toLowerCase().includes(q) ||
+    u.email.toLowerCase().includes(q) ||
+    u.role.toLowerCase().includes(q)
+  )
+})
+
+// ─── Load users ──────────────────────────────────────────────────────────────
+async function loadUsers() {
+  usersLoading.value = true
+  try {
+    const data = await accessControlApi.getUsersList()
+    users.value = data.items
+  } catch {
+    showToast(t('accessControl.savedError'), 'error')
+  } finally {
+    usersLoading.value = false
+  }
+}
+
+// ─── Select user → open panel ────────────────────────────────────────────────
+function selectUser(user: UserEntry) {
+  selectedUser.value = user
+  // Populate edit overrides from existing user overrides
+  const keys = Object.keys(editOverrides)
+  keys.forEach(k => delete editOverrides[k])
+  if (user.overrides) {
+    Object.assign(editOverrides, { ...user.overrides })
+  }
+}
+
+// ─── Override toggle logic ───────────────────────────────────────────────────
+function toggleOverride(key: string, mode: AccessMode) {
+  if (editOverrides[key] === mode) {
+    // Toggle off = reset to role default
+    delete editOverrides[key]
+  } else {
+    editOverrides[key] = mode
+  }
+}
+
+function clearOverride(key: string) {
+  delete editOverrides[key]
+}
+
+// ─── Save overrides ──────────────────────────────────────────────────────────
+async function saveOverrides() {
+  if (!selectedUser.value) return
   saving.value = true
   try {
-    const payload = JSON.parse(JSON.stringify(matrix)) as Matrix
-    const res = await accessControlApi.saveAccessMatrix({ matrix: payload, version: version.value })
-    version.value = Number(res?.version || version.value)
-
+    const payload = JSON.parse(JSON.stringify(editOverrides))
+    await accessControlApi.saveUserOverrides(selectedUser.value.id, payload)
+    // Update local state
+    const user = users.value.find(u => u.id === selectedUser.value!.id)
+    if (user) user.overrides = { ...payload }
     showToast(t('accessControl.savedOk'), 'success')
+    selectedUser.value = null
   } catch {
     showToast(t('accessControl.savedError'), 'error')
   } finally {
@@ -336,60 +461,27 @@ async function saveMatrix() {
   }
 }
 
-function resetToDefaults() {
-  applyMatrix(buildDefaults())
-  showToast(t('accessControl.resetOk'), 'success')
-}
-
 function showToast(message: string, type: 'success' | 'error') {
   toast.value = { message, type }
   setTimeout(() => { toast.value = null }, 3000)
 }
 
-// ─── API Contract (для разработчика) ─────────────────────────────────────────
-const apiContractExample = `GET /v1/me/access-control
-Authorization: Bearer <token>
-
-Response 200:
-{
-  "role": "finance",
-  "version": 12,
-  "matrix": {
-    "dashboard": "active",
-    "students": "read-only",
-    "settings": "hidden"
-  }
-}
-
-POST /v1/settings/access-control
-Authorization: Bearer <token>   (super-admin only)
-Content-Type: application/json
-
-{
-  "matrix": {
-    "students": { "super-admin": "active", "admin": "active", "finance": "read-only", ... },
-    "groups":   { "super-admin": "active", "admin": "active", "sales": "read-only", ... },
-    "reports":  { "super-admin": "active", "admin": "hidden", ... }
-  }
-}
-
-Response 200:
-{ "ok": true, "version": 13, "savedAt": "2026-03-30T18:00:00Z" }
-
-Режимы:
-  "active"    — полный доступ + редактирование
-  "read-only" — только просмотр (UI отключает кнопки мутации)
-  "hidden"    — не видно в меню и недоступно через роут`
-
+// ─── Init ────────────────────────────────────────────────────────────────────
 onMounted(() => {
-  loadMatrixFromApi()
+  loadUsers()
+})
+
+// Reload users when switching to users tab
+watch(activeTab, (tab) => {
+  if (tab === 'users' && !users.value.length) loadUsers()
 })
 </script>
 
 <style scoped>
 .ac-page {
   padding: 24px 28px;
-  max-width: 1100px;
+  max-width: 1200px;
+  position: relative;
 }
 
 /* ── Шапка ── */
@@ -421,39 +513,39 @@ onMounted(() => {
   margin: 0;
 }
 
-.header-actions { display: flex; gap: 10px; align-items: center; }
+/* ── Tabs ── */
+.tabs-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  padding: 4px;
+}
 
-.btn-reset {
-  padding: 8px 18px;
-  border-radius: 10px;
+.tab-btn {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--app-text-dim);
   font-size: 13px;
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
-  border: 1px solid var(--app-border);
-  background: var(--app-surface);
-  color: var(--app-text-dim);
   transition: all 0.2s;
 }
-.btn-reset:hover { border-color: var(--app-border-hi); color: var(--app-text-main); }
 
-.btn-save {
-  padding: 8px 20px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: linear-gradient(135deg, #4f6ef7, #8b5cf6);
-  color: #fff;
-  transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(79, 110, 247, 0.3);
+.tab-btn:hover { background: rgba(79, 110, 247, 0.06); color: var(--app-text-main); }
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(79, 110, 247, 0.12), rgba(139, 92, 246, 0.12));
+  color: var(--app-text-main);
+  box-shadow: 0 2px 8px rgba(79, 110, 247, 0.15);
 }
-.btn-save:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(79, 110, 247, 0.5); transform: translateY(-1px); }
-.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
 
-/* ── Инфо-баннер ── */
+/* ── Info Banner ── */
 .info-banner {
   display: flex;
   align-items: center;
@@ -462,61 +554,12 @@ onMounted(() => {
   background: rgba(79, 110, 247, 0.07);
   border: 1px solid rgba(79, 110, 247, 0.2);
   border-radius: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
   font-size: 13px;
 }
-
 .info-text { flex: 1; color: var(--app-text-dim); }
 
-.info-contract {
-  cursor: pointer;
-  color: var(--blue);
-  font-weight: 600;
-  white-space: nowrap;
-  font-size: 12px;
-  transition: opacity 0.15s;
-}
-.info-contract:hover { opacity: 0.75; }
-
-/* ── API Contract ── */
-.api-contract {
-  background: var(--app-surface);
-  border: 1px solid var(--app-border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-  animation: slideDown 0.2s ease;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.contract-title {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--app-text-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  margin-bottom: 10px;
-}
-
-.contract-code {
-  font-family: 'Space Mono', monospace;
-  font-size: 11.5px;
-  color: #10b981;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  margin: 0;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 12px;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-/* ── Легенда ── */
+/* ── Legend ── */
 .legend {
   display: flex;
   gap: 20px;
@@ -542,7 +585,7 @@ onMounted(() => {
   font-size: 12px;
 }
 
-/* ── Матрица ── */
+/* ── Matrix ── */
 .matrix-wrapper {
   overflow-x: auto;
   border-radius: 14px;
@@ -555,7 +598,6 @@ onMounted(() => {
   font-size: 12.5px;
 }
 
-/* Заголовок */
 .matrix-table thead {
   background: var(--app-surface);
   position: sticky;
@@ -592,7 +634,6 @@ onMounted(() => {
 .role-emoji { font-size: 16px; }
 .role-name  { font-size: 10px; font-weight: 700; color: var(--app-text-dim); white-space: nowrap; }
 
-/* Строка-разделитель секции */
 .section-row { background: var(--app-surface); }
 
 .section-label {
@@ -606,7 +647,6 @@ onMounted(() => {
   border-bottom: 1px solid rgba(100, 120, 255, 0.07);
 }
 
-/* Строка данных */
 .item-row { border-bottom: 1px solid rgba(100, 120, 255, 0.06); }
 .item-row:last-child { border-bottom: none; }
 .item-row:hover { background: rgba(79, 110, 247, 0.03); }
@@ -618,15 +658,10 @@ onMounted(() => {
 
 .item-name { font-size: 12.5px; font-weight: 500; }
 
-/* Ячейка матрицы */
 .col-cell {
   text-align: center;
   padding: 8px 4px;
-  cursor: pointer;
-  transition: background 0.15s;
 }
-
-.col-cell:hover { background: rgba(79, 110, 247, 0.06); }
 
 .cell-dot {
   width: 32px;
@@ -665,6 +700,364 @@ onMounted(() => {
 .legend-dot.active    { background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.35); color: #10b981; }
 .legend-dot.read-only { background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.3);  color: #f59e0b; }
 .legend-dot.hidden    { background: rgba(136, 146, 176, 0.08); border: 1px solid rgba(136, 146, 176, 0.2); color: var(--app-text-dim); }
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* USERS TAB                                                                */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+.search-bar {
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-surface);
+  color: var(--app-text-main);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus {
+  border-color: rgba(79, 110, 247, 0.5);
+}
+.search-input::placeholder {
+  color: var(--app-text-dim);
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px;
+  color: var(--app-text-dim);
+  font-size: 14px;
+}
+
+.users-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-surface);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.user-card:hover {
+  border-color: rgba(79, 110, 247, 0.35);
+  background: rgba(79, 110, 247, 0.04);
+}
+.user-card.selected {
+  border-color: rgba(79, 110, 247, 0.5);
+  background: rgba(79, 110, 247, 0.07);
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(79, 110, 247, 0.15), rgba(139, 92, 246, 0.15));
+  color: var(--app-text-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--app-text-main);
+}
+
+.user-email {
+  font-size: 11.5px;
+  color: var(--app-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role-badge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  background: rgba(79, 110, 247, 0.1);
+  color: var(--app-text-dim);
+}
+
+.overrides-badge {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  white-space: nowrap;
+}
+
+.user-arrow {
+  font-size: 14px;
+  color: var(--app-text-dim);
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* OVERRIDE PANEL (Slide-out)                                               */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 998;
+}
+
+.override-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 520px;
+  max-width: 90vw;
+  background: var(--app-bg, #0f1117);
+  border-left: 1px solid var(--app-border);
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.3);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--app-border);
+  flex-shrink: 0;
+}
+
+.panel-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.panel-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #4f6ef7, #8b5cf6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.panel-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--app-text-main);
+}
+
+.panel-email {
+  font-size: 12px;
+  color: var(--app-text-dim);
+}
+
+.panel-role {
+  font-size: 11px;
+  color: var(--app-text-dim);
+  margin-top: 2px;
+}
+
+.panel-close {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.panel-close:hover {
+  border-color: var(--app-border-hi);
+  color: var(--app-text-main);
+}
+
+.panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+}
+
+.override-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--app-text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(100, 120, 255, 0.08);
+}
+
+.override-section-title:first-child {
+  margin-top: 0;
+}
+
+.override-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(100, 120, 255, 0.04);
+}
+
+.override-label {
+  flex: 1;
+  font-size: 12.5px;
+  color: var(--app-text-main);
+  font-weight: 500;
+}
+
+.override-status {
+  flex-shrink: 0;
+}
+
+.default-mode-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.default-mode-tag.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+}
+
+.default-mode-tag.hidden {
+  background: rgba(136, 146, 176, 0.08);
+  color: var(--app-text-dim);
+}
+
+.override-actions {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.override-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.override-btn:hover { border-color: var(--app-border-hi); }
+
+.override-btn.grant.active {
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.4);
+  color: #10b981;
+}
+
+.override-btn.revoke.active {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.override-btn.reset {
+  color: var(--app-text-dim);
+  font-size: 11px;
+}
+.override-btn.reset:hover {
+  color: #f59e0b;
+}
+
+.panel-footer {
+  display: flex;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--app-border);
+  flex-shrink: 0;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  transition: all 0.2s;
+}
+.btn-cancel:hover { border-color: var(--app-border-hi); color: var(--app-text-main); }
+
+.btn-save {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: linear-gradient(135deg, #4f6ef7, #8b5cf6);
+  color: #fff;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px rgba(79, 110, 247, 0.3);
+}
+.btn-save:hover:not(:disabled) { box-shadow: 0 6px 20px rgba(79, 110, 247, 0.5); transform: translateY(-1px); }
+.btn-save:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Transitions ── */
+.slide-enter-active, .slide-leave-active { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.slide-enter-from, .slide-leave-to { transform: translateX(100%); }
+
+.fade-enter-active, .fade-leave-active { transition: opacity 0.25s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 
 /* ── Toast ── */
 .ac-toast {

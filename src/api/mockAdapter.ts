@@ -110,6 +110,51 @@ function buildMyMatrixByRole(role: RoleCode, roleMatrix: Record<string, Record<R
   return matrix;
 }
 
+// ─── Per-user override storage ─────────────────────────────────────────────
+function getUserOverridesState(): Record<string, Record<string, AccessMode>> {
+  const g = globalThis as any;
+  if (!g.__mock_user_overrides) {
+    g.__mock_user_overrides = {} as Record<string, Record<string, AccessMode>>;
+  }
+  return g.__mock_user_overrides;
+}
+
+function mergeOverrides(
+  baseMatrix: Record<string, AccessMode>,
+  overrides: Record<string, AccessMode> | undefined,
+): Record<string, AccessMode> {
+  if (!overrides || !Object.keys(overrides).length) return baseMatrix;
+  return { ...baseMatrix, ...overrides };
+}
+
+function extractUserIdFromToken(config: InternalAxiosRequestConfig): string {
+  let authHeader = "";
+  if (config.headers && typeof config.headers.get === "function") {
+    authHeader = String(config.headers.get("Authorization") || config.headers.get("authorization") || "");
+  }
+  if (!authHeader) {
+    authHeader = String((config.headers as any)?.Authorization || (config.headers as any)?.authorization || "");
+  }
+  const token = authHeader.replace("Bearer ", "").trim();
+  // Token format: mock.jwt.token.<role> — use the whole token as user identifier
+  const id = token;
+  console.log('[MOCK] Extracting ID/Role from token:', { token, id });
+  return id;
+}
+
+// Mock users database for the admin user management UI
+const MOCK_USERS_DB: Array<{ id: number; name: string; email: string; role: string; token: string }> = [
+  { id: 1, name: "Super Admin",      email: "superadmin@demo.local",  role: "super-admin", token: "mock.jwt.token.super-admin" },
+  { id: 2, name: "Demo Admin",       email: "admin@demo.local",       role: "admin",       token: "mock.jwt.token.admin" },
+  { id: 3, name: "Jan Kowalski",     email: "teacher@demo.local",     role: "teacher",     token: "mock.jwt.token.teacher" },
+  { id: 4, name: "Anna Nowak",       email: "sales@demo.local",       role: "sales",       token: "mock.jwt.token.sales" },
+  { id: 5, name: "Maria Wiśniewska", email: "quality@demo.local",     role: "quality",     token: "mock.jwt.token.quality" },
+  { id: 6, name: "Piotr Zając",      email: "finance@demo.local",     role: "finance",     token: "mock.jwt.token.finance" },
+  { id: 7, name: "Katarzyna Lis",    email: "secretariat@demo.local", role: "secretariat", token: "mock.jwt.token.secretariat" },
+  { id: 8, name: "Tomasz Wróbel",    email: "hr@demo.local",          role: "hr",          token: "mock.jwt.token.hr" },
+  { id: 9, name: "Dawid Frymus",     email: "dawidfrymus@gmail.com",  role: "teacher",     token: "mock.jwt.token.teacher" },
+];
+
 export const mockAdapter: AxiosAdapter = async (config) => {
   await sleep(240);
 
@@ -165,7 +210,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   // Token format: "mock.jwt.token.<role>"
   const MOCK_USERS: Record<string, { id: string; email: string; name: string; role: string; initials: string; teacherId?: number; forcePasswordChange?: boolean }> = {
     "mock.jwt.token.super-admin": { id: "1", email: "superadmin@demo.local",  name: "Super Admin",       role: "super-admin", initials: "SA" },
-    "mock.jwt.token.admin":       { id: "2", email: "admin@demo.local",        name: "Demo Admin",        role: "admin",       initials: "DA", forcePasswordChange: true },
+    "mock.jwt.token.admin":       { id: "2", email: "admin@demo.local",        name: "Demo Admin",        role: "admin",       initials: "DA" },
     "mock.jwt.token.teacher":     { id: "3", email: "teacher@demo.local",      name: "Jan Kowalski",      role: "teacher",     initials: "JK", teacherId: 42 },
     "mock.jwt.token.sales":       { id: "4", email: "sales@demo.local",        name: "Anna Nowak",        role: "sales",       initials: "AN" },
     "mock.jwt.token.quality":     { id: "5", email: "quality@demo.local",      name: "Maria Wiśniewska",  role: "quality",     initials: "MW" },
@@ -198,11 +243,16 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   if (method === "get" && (url === "me/access-control" || url === "v1/me/access-control")) {
     const state = getAccessState();
     const role = extractRoleFromToken(config);
+    const userId = extractUserIdFromToken(config);
+    const overridesState = getUserOverridesState();
+    const baseMatrix = buildMyMatrixByRole(role, state.matrix);
+    const userOverrides = overridesState[userId] ?? {};
+    const finalMatrix = mergeOverrides(baseMatrix, userOverrides);
     return ok(config, {
       role,
       version: state.version,
-      matrix: buildMyMatrixByRole(role, state.matrix),
-      overrides: {},
+      matrix: finalMatrix,
+      overrides: userOverrides,
     });
   }
 
@@ -831,12 +881,43 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     };
     return ok(config, newUser);
   }
-  if (method === "patch" && /^settings\/users\//.test(url)) {
+  if (method === "patch" && /^settings\/users\//.test(url) && !url.includes("/overrides")) {
     const body = readBody(config);
     return ok(config, { ...body, id: url.split("/")[2] });
   }
   if (method === "delete" && /^settings\/users\//.test(url)) {
     return ok(config, { success: true });
+  }
+
+  // --- SETTINGS: Users list with overrides ---
+  if (method === "get" && (url === "settings/users" || url === "v1/settings/users")) {
+    const overridesState = getUserOverridesState();
+    const items = MOCK_USERS_DB.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email,
+      role: u.role,
+      overrides: overridesState[u.token] ?? {},
+    }));
+    return ok(config, { items });
+  }
+
+  // --- SETTINGS: Save per-user overrides ---
+  if (method === "put" && /^(v1\/)?settings\/users\/\d+\/overrides$/.test(url)) {
+    const body = readBody(config);
+    const userId = Number(url.match(/users\/(\d+)/)?.[1]);
+    const user = MOCK_USERS_DB.find(u => u.id === userId);
+    if (!user) return err(config, 404, "User not found");
+    const overridesState = getUserOverridesState();
+    // Clean out entries that match role defaults (no override needed)
+    const cleanOverrides: Record<string, AccessMode> = {};
+    if (body?.overrides && typeof body.overrides === "object") {
+      for (const [key, mode] of Object.entries(body.overrides)) {
+        cleanOverrides[key] = mode as AccessMode;
+      }
+    }
+    overridesState[user.token] = cleanOverrides;
+    return ok(config, { ok: true });
   }
 
   if (method === "get" && (url === "settings/access-control" || url === "v1/settings/access-control")) {
