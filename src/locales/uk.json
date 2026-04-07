@@ -266,6 +266,7 @@
       "future": "Майбутнє"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "month": "Місяць",
       "status": "Статус",
       "amount": "Сума",
@@ -843,6 +844,7 @@
       "teacher": "Вчитель"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "name": "ІМ'Я ПРІЗВИЩЕ",
       "startDate": "ДАТА СТАРТУ",
       "trainingTerm": "ТЕРМІН НАВЧАННЯ",
@@ -1305,6 +1307,7 @@
       "qaConfirmed": "Підтверджено Відділом Якості"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "group": "Група",
       "dayTime": "День/час",
       "kids": "Дітей",
@@ -1452,6 +1455,7 @@
       "noManagerSub": "потребують призначення"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "name": "Ім'я Прізвище",
       "email": "Email",
       "age": "Вік",
@@ -1618,6 +1622,7 @@
       }
     },
     "table": {
+      "studentDetails": "Дані учня",
       "surname": "Прізвище",
       "name": "Ім'я",
       "parentEmail": "Email батьків",
@@ -1665,6 +1670,7 @@
       "regAsc": "За датою реєстрації ↑"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "name": "Ім'я Прізвище (Телефон)",
       "registered": "Дата реєстрації",
       "expelled": "Дата виписки",
@@ -1751,6 +1757,7 @@
       "title": "СПИСОК УЧНІВ"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "name": "Ім'я учня",
       "group": "Попередня група",
       "type": "Тип",
@@ -1808,6 +1815,7 @@
       "teacher": "Вчитель"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "name": "Назва групи",
       "studentsCount": "Учнів",
       "teacher": "Вчитель",
@@ -1845,6 +1853,7 @@
       "allCities": "Всі міста"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "name": "Ім'я Прізвище",
       "phone": "Телефон",
       "email": "Email",
@@ -1881,6 +1890,7 @@
       "pendingSub": "дій"
     },
     "table": {
+      "studentDetails": "Дані учня",
       "surname": "Прізвище",
       "firstName": "Ім'я",
       "parentEmail": "Email батьків",

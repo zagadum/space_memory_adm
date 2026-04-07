@@ -272,6 +272,7 @@
       "future": "Будущее"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "month": "Месяц",
       "status": "Статус",
       "amount": "Сумма",
@@ -849,6 +850,7 @@
       "teacher": "Учитель"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "name": "ИМЯ ФАМИЛИЯ",
       "startDate": "ДАТА СТАРТА",
       "trainingTerm": "СРОК ОБУЧЕНИЯ",
@@ -1314,6 +1316,7 @@
       "qaConfirmed": "Подтверждено Отделом Качества"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "group": "Группа",
       "dayTime": "День/время",
       "kids": "Детей",
@@ -1461,6 +1464,7 @@
       "noManagerSub": "требуют назначения"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "name": "Имя Фамилия",
       "email": "Email",
       "age": "Возраст",
@@ -1627,6 +1631,7 @@
       }
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "surname": "Фамилия",
       "name": "Имя",
       "parentEmail": "Email родителя",
@@ -1674,6 +1679,7 @@
       "regAsc": "По дате регистрации ↑"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "name": "Имя Фамилия (Телефон)",
       "registered": "Дата регистрации",
       "expelled": "Дата выписания",
@@ -1760,6 +1766,7 @@
       "title": "СПИСОК УЧЕНИКОВ"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "name": "Имя ученика",
       "group": "Предыдущая группа",
       "type": "Тип",
@@ -1817,6 +1824,7 @@
       "teacher": "Учитель"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "name": "Название группы",
       "studentsCount": "Учеников",
       "teacher": "Учитель",
@@ -1854,6 +1862,7 @@
       "allCities": "Все города"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "name": "Имя Фамилия",
       "phone": "Телефон",
       "email": "Email",
@@ -1890,6 +1899,7 @@
       "pendingSub": "действий"
     },
     "table": {
+      "studentDetails": "Данные ученика",
       "surname": "Фамилия",
       "firstName": "Имя",
       "parentEmail": "Email родителя",

@@ -267,6 +267,7 @@
       "future": "Przyszłość"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "month": "Miesiąc",
       "status": "Status",
       "amount": "Kwota",
@@ -844,6 +845,7 @@
       "teacher": "Nauczyciel"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "name": "IMIĘ NAZWISKO",
       "startDate": "DATA STARTU",
       "trainingTerm": "OKRES NAUKI",
@@ -1309,6 +1311,7 @@
       "qaConfirmed": "Potwierdzone przez Dział Jakości"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "group": "Grupa",
       "dayTime": "Dzień/godz",
       "kids": "Dzieci",
@@ -1456,6 +1459,7 @@
       "noManagerSub": "wymagają przypisania"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "name": "Imię i nazwisko",
       "email": "Email",
       "age": "Wiek",
@@ -1622,6 +1626,7 @@
       }
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "surname": "Nazwisko",
       "name": "Imię",
       "parentEmail": "Email rodzica",
@@ -1669,6 +1674,7 @@
       "regAsc": "Według daty rejestracji ↑"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "name": "Imię Nazwisko (Telefon)",
       "registered": "Data rejestracji",
       "expelled": "Data wypisania",
@@ -1755,6 +1761,7 @@
       "title": "LISTA UCZNIÓW"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "name": "Imię ucznia",
       "group": "Poprzednia grupa",
       "type": "Typ",
@@ -1812,6 +1819,7 @@
       "teacher": "Nauczyciel"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "name": "Nazwa grupy",
       "studentsCount": "Uczniów",
       "teacher": "Nauczyciel",
@@ -1849,6 +1857,7 @@
       "allCities": "Wszystkie miasta"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "name": "Imię Nazwisko",
       "phone": "Telefon",
       "email": "Email",
@@ -1885,6 +1894,7 @@
       "pendingSub": "działań"
     },
     "table": {
+      "studentDetails": "Dane ucznia",
       "surname": "Nazwisko",
       "firstName": "Imię",
       "parentEmail": "Email rodzica",

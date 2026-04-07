@@ -78,10 +78,8 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th>{{ t('importDb.table.surname') }}</th>
-              <th>{{ t('importDb.table.firstName') }}</th>
+              <th>{{ t('importDb.table.studentDetails') }}</th>
               <th>{{ t('importDb.table.parentEmail') }}</th>
-              <th>{{ t('importDb.table.phone') }}</th>
               <th>{{ t('importDb.table.nickname') }}</th>
               <th>{{ t('importDb.table.subscriptionAmount') }}</th>
               <th>{{ t('importDb.table.subscriptionEndDate') }}</th>
@@ -119,8 +117,10 @@
           </thead>
           <tbody>
             <tr v-for="item in filteredItems" :key="item.id">
-              <td>{{ item.surname }}</td>
-              <td>{{ item.first_name }}</td>
+              <td class="student-details-cell">
+                <div class="sd-name">{{ item.first_name }} {{ item.surname }}</div>
+                <div class="sd-phone">{{ item.phone || '—' }}</div>
+              </td>
               <td>
                 <input
                   v-if="editingRowId === item.id"
@@ -130,7 +130,6 @@
                 />
                 <span v-else>{{ item.parent_email }}</span>
               </td>
-              <td>{{ item.phone }}</td>
               <td>
                 <input
                   v-if="editingRowId === item.id"
@@ -832,8 +831,24 @@ onMounted(() => {
   background: var(--app-card);
   border: 1px solid var(--app-border);
   border-radius: 14px;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: auto;
+  max-height: calc(100vh - 250px);
+}
+
+.student-details-cell {
+  position: relative;
+}
+
+.sd-name {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #4f6ef7;
+  margin-bottom: 2px;
+}
+
+.sd-phone {
+  font-size: 12px;
+  color: var(--app-text-dim);
 }
 
 .data-table {
@@ -857,6 +872,46 @@ onMounted(() => {
   text-transform: uppercase;
   color: var(--app-text-dim);
   white-space: nowrap;
+}
+
+/* Sticky Headers */
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--app-surface);
+  /* Optional bottom border visually for the header */
+  box-shadow: 0 1px 0 var(--app-border);
+}
+
+/* Sticky First Column */
+.data-table th:nth-child(1),
+.data-table td:nth-child(1) {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background: var(--app-card);
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.05); /* subtle separator */
+}
+
+/* Make top-left corner above both sticky col and sticky header */
+.data-table th:nth-child(1) {
+  z-index: 20;
+  background: var(--app-surface);
+}
+
+/* explicitly fix background for all rows to prevent bleed-through behind sticky column */
+.data-table tbody tr {
+  background: var(--app-card);
+}
+.data-table tbody tr:hover {
+  background: rgba(79, 110, 247, 0.04);
+}
+.data-table tbody tr:hover td:nth-child(1) {
+  background: #f8fafe; /* fallback a slightly tinted background since inherit doesn't easily work with sticky hover */
+}
+[data-theme="dark"] .data-table tbody tr:hover td:nth-child(1) {
+  background: rgba(79, 110, 247, 0.08); /* adjust for dark mode if present */
 }
 
 .th-sort-btn {

@@ -267,6 +267,7 @@
       "future": "Future"
     },
     "table": {
+      "studentDetails": "Student details",
       "month": "Month",
       "status": "Status",
       "amount": "Amount",
@@ -844,6 +845,7 @@
       "teacher": "Teacher"
     },
     "table": {
+      "studentDetails": "Student details",
       "name": "NAME SURNAME",
       "startDate": "START DATE",
       "trainingTerm": "TRAINING TERM",
@@ -1309,6 +1311,7 @@
       "qaConfirmed": "Confirmed by QA Dept"
     },
     "table": {
+      "studentDetails": "Student details",
       "group": "Group",
       "dayTime": "Day/Time",
       "kids": "Students",
@@ -1455,6 +1458,7 @@
       "noManagerSub": "need assignment"
     },
     "table": {
+      "studentDetails": "Student details",
       "name": "Name",
       "email": "Email",
       "age": "Age",
@@ -1621,6 +1625,7 @@
       }
     },
     "table": {
+      "studentDetails": "Student details",
       "surname": "Surname",
       "name": "Name",
       "parentEmail": "Parent email",
@@ -1668,6 +1673,7 @@
       "regAsc": "By registration date ↑"
     },
     "table": {
+      "studentDetails": "Student details",
       "name": "First Last (Phone)",
       "registered": "Registration date",
       "expelled": "Expulsion date",
@@ -1754,6 +1760,7 @@
       "title": "STUDENT LIST"
     },
     "table": {
+      "studentDetails": "Student details",
       "name": "Student name",
       "group": "Previous group",
       "type": "Type",
@@ -1811,6 +1818,7 @@
       "teacher": "Teacher"
     },
     "table": {
+      "studentDetails": "Student details",
       "name": "Group name",
       "studentsCount": "Students",
       "teacher": "Teacher",
@@ -1848,6 +1856,7 @@
       "allCities": "All cities"
     },
     "table": {
+      "studentDetails": "Student details",
       "name": "Name",
       "phone": "Phone",
       "email": "Email",
@@ -1884,6 +1893,7 @@
       "pendingSub": "actions"
     },
     "table": {
+      "studentDetails": "Student details",
       "surname": "Surname",
       "firstName": "First Name",
       "parentEmail": "Parent Email",
