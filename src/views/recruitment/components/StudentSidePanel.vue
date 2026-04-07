@@ -202,7 +202,10 @@
 
             <div class="sp-status-row">
               <div class="sp-status-label">{{ t('newStudents.panel.payment') }}</div>
-              <span v-if="student.payment > 0" class="payment-value">{{ student.paymentStr }}</span>
+              <span v-if="student.payment > 0 || student.isPaid" class="payment-value" :class="{ 'payment-paid': student.isPaid }">
+                {{ student.displayPayment || student.paymentStr }}
+                <template v-if="student.isPaid"> · {{ t('newStudents.table.paid') }}</template>
+              </span>
               <span v-else class="payment-zero">{{ t('newStudents.panel.notPaid') }}</span>
             </div>
 
@@ -289,7 +292,7 @@
                   <span class="sp-row-main">{{ formatTxDate(tx.date) }}</span>
                   <span class="payment-value">{{ tx.amount.toFixed(2) }} {{ tx.currency }}</span>
                 </div>
-                <div class="sp-row-sub">{{ t('newStudents.panel.transactionStatus') }}: {{ tx.status }}</div>
+                <div class="sp-row-sub">{{ t('newStudents.panel.transactionStatus') }}: {{ t(`payments.status.${tx.status}`) || tx.status }}</div>
               </div>
             </div>
             <div v-else class="sp-empty-state">{{ t('newStudents.panel.transactionsEmpty') }}</div>
