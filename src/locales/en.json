@@ -1945,6 +1945,15 @@
     "secretariat": "Secretariat",
     "hr": "HR"
   },
+  "comingSoon": {
+    "title": "Section Under Development",
+    "subtitle": "We are actively working on this module. It will be available soon.",
+    "backButton": "Go Back"
+  },
+  "notFound": {
+    "subtitle": "Page not found. Please check the URL or return to the homepage.",
+    "homeButton": "Go to Homepage"
+  },
   "accessDenied": {
     "title": "Access Denied",
     "message": "You don't have permission to view this section. Contact your administrator or choose another section.",

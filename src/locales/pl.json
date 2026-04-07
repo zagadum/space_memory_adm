@@ -1946,6 +1946,15 @@
     "secretariat": "Sekretariat",
     "hr": "HR"
   },
+  "comingSoon": {
+    "title": "Sekcja w przygotowaniu",
+    "subtitle": "Aktywnie pracujemy nad tym modułem. Wkrótce będzie dostępny.",
+    "backButton": "Wróć"
+  },
+  "notFound": {
+    "subtitle": "Nie znaleziono strony. Sprawdź adres URL lub wróć na stronę główną.",
+    "homeButton": "Strona główna"
+  },
   "accessDenied": {
     "title": "Brak dostępu",
     "message": "Nie masz uprawnień do wyświetlenia tej sekcji. Skontaktuj się z administratorem lub wybierz inną sekcję.",
