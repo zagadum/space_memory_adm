@@ -20,21 +20,21 @@
                 <span>{{ group.teacher.name }}</span>
               </template>
               <span class="sep">·</span>
-              <span>Старт: {{ fmtDate(group.startDate) }}</span>
+              <span>{{ t('newGroups.detail.start') }} {{ fmtDate(group.startDate) }}</span>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
-            <button class="gp-btn-delete" @click="confirmDelete">🗑 Удалить группу</button>
+            <button class="gp-btn-delete" @click="confirmDelete">{{ t('newGroups.detail.deleteGroup') }}</button>
             <div class="gp-close" @click="$emit('close')">✕</div>
           </div>
         </div>
         <div class="gp-chips">
-          <span :class="['gp-chip', 'blue']">{{ group.type === 'individual' ? '👤 Индивидуальная' : '👥 Групповая' }}</span>
+          <span :class="['gp-chip', 'blue']">{{ group.type === 'individual' ? t('newGroups.detail.typeIndividualFull') : t('newGroups.detail.typeGroupFull') }}</span>
           <span v-if="ageInfo" :class="['gp-chip', 'purple']">{{ ageInfo.icon }} {{ ageInfo.label }}</span>
-          <span class="gp-chip">📅 Создана {{ fmtDate(group.createdDate) }}</span>
-          <span :class="['gp-chip', daysDiff(group.createdDate) > 14 ? 'amber' : 'green']">⏱ {{ daysDiff(group.createdDate) }} дней ожидания</span>
+          <span class="gp-chip">{{ t('newGroups.detail.createdOn', { date: fmtDate(group.createdDate) }) }}</span>
+          <span :class="['gp-chip', daysDiff(group.createdDate) > 14 ? 'amber' : 'green']">{{ t('newGroups.detail.daysWaiting', { n: daysDiff(group.createdDate) }) }}</span>
           <span v-if="group.manager" class="gp-chip">👤 {{ group.manager.name }}</span>
-          <span v-else class="gp-chip amber">⚠️ Без ответственного</span>
+          <span v-else class="gp-chip amber">{{ t('newGroups.detail.noResponsible') }}</span>
         </div>
       </div>
 
@@ -46,50 +46,50 @@
               {{ actualPaid }}/{{ actualTotal }}
             </div>
             <div class="gp-ratio-sub">
-              <span :style="{ color: 'var(--green)' }">{{ actualPaid }} активируются</span>
-              <template v-if="notPaid > 0"> · <span :style="{ color: 'var(--amber)' }">{{ notPaid }} ожидают</span></template>
+              <span :style="{ color: 'var(--green)' }">{{ t('newGroups.detail.willActivate', { n: actualPaid }) }}</span>
+              <template v-if="notPaid > 0"> · <span :style="{ color: 'var(--amber)' }">{{ t('newGroups.detail.willWait', { n: notPaid }) }}</span></template>
             </div>
           </div>
           <div class="gp-mini-bars">
             <div class="gp-bar-row">
-              <span class="gp-bar-label">Подписали договор</span>
+              <span class="gp-bar-label">{{ t('newGroups.detail.signedContract') }}</span>
               <div class="gp-bar-track"><div class="gp-bar-fill green" :style="{ width: contractPct + '%' }"></div></div>
               <span class="gp-bar-val" style="color:var(--green)">{{ contractCount }}</span>
             </div>
             <div class="gp-bar-row">
-              <span class="gp-bar-label">Оплатили</span>
+              <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
               <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
               <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">{{ actualPaid }}</span>
             </div>
           </div>
         </div>
-        <button class="gp-start-btn" @click="$emit('start')">🚀 Старт группы</button>
+        <button class="gp-start-btn" @click="$emit('start')">{{ t('newGroups.detail.startGroup') }}</button>
       </div>
 
       <!-- BODY -->
       <div class="gp-body">
         <div class="gp-section-label">
           <div style="display:flex;align-items:center;gap:8px">
-            <span>Список учеников</span>
-            <span class="gp-count-pill" v-if="!loadingStudents">{{ students.length }} чел.</span>
+            <span>{{ t('newGroups.detail.studentList') }}</span>
+            <span class="gp-count-pill" v-if="!loadingStudents">{{ students.length }} {{ t('newGroups.persons') }}</span>
           </div>
-          <button class="gp-btn-add" @click="addPanelOpen = true">➕ Добавить учеников</button>
+          <button class="gp-btn-add" @click="addPanelOpen = true">{{ t('newGroups.detail.addStudents') }}</button>
         </div>
 
-        <div v-if="loadingStudents" style="text-align:center;padding:40px;color:var(--dim)">Загрузка...</div>
+        <div v-if="loadingStudents" style="text-align:center;padding:40px;color:var(--dim)">{{ t('newGroups.detail.loading') }}</div>
 
         <div v-else class="gp-table-wrap">
           <table class="gp-table">
             <thead>
               <tr>
-                <th>Имя Фамилия</th>
-                <th>Возраст</th>
-                <th>Договор</th>
-                <th>Оплата</th>
-                <th>Дата записи</th>
-                <th>Ожидание</th>
-                <th>Ответственный</th>
-                <th style="width:130px;text-align:center">Действия</th>
+                <th>{{ t('newGroups.detail.thName') }}</th>
+                <th>{{ t('newGroups.detail.thAge') }}</th>
+                <th>{{ t('newGroups.detail.thContract') }}</th>
+                <th>{{ t('newGroups.detail.thPayment') }}</th>
+                <th>{{ t('newGroups.detail.thEnrollDate') }}</th>
+                <th>{{ t('newGroups.detail.thWaiting') }}</th>
+                <th>{{ t('newGroups.detail.thResponsible') }}</th>
+                <th style="width:130px;text-align:center">{{ t('newGroups.detail.thActions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -97,7 +97,7 @@
                 <td colspan="8">
                   <div class="gp-empty">
                     <div class="gp-empty-icon">👤</div>
-                    Ученики не добавлены
+                    {{ t('newGroups.detail.noStudents') }}
                   </div>
                 </td>
               </tr>
@@ -114,11 +114,11 @@
                 </td>
                 <td>
                   <span class="age-mono">{{ s.age }}</span>
-                  <span style="color:var(--dim);font-size:11px"> лет</span>
+                  <span style="color:var(--dim);font-size:11px"> {{ t('newGroups.detail.years') }}</span>
                 </td>
                 <td>
                   <span :class="['contract-badge', s.contract === 'signed' ? 'contract-signed' : 'contract-pending']">
-                    {{ s.contract === 'signed' ? '✓ Подписан' : '⏳ Ожидает' }}
+                    {{ s.contract === 'signed' ? t('newGroups.detail.contractSigned') : t('newGroups.detail.contractPending') }}
                   </span>
                 </td>
                 <td>
@@ -128,7 +128,7 @@
                 <td>
                   <div class="timer-cell">
                     <span :class="['timer-days', timerCls(daysDiff(s.createdDate))]">{{ daysDiff(s.createdDate) }}</span>
-                    <span class="timer-label">дн.</span>
+                    <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
                   </div>
                 </td>
                 <td>
@@ -137,10 +137,10 @@
                 </td>
                 <td>
                   <div class="row-actions">
-                    <div class="ra-btn archive" data-tip="В архив" @click="notify.addToast('📦 ' + s.name + ' перемещён в архив', 'warning')">📦</div>
-                    <div class="ra-btn remove"  data-tip="Убрать из группы" @click="removeStudent(s.id, s.name)">✕</div>
-                    <div class="ra-btn transfer" data-tip="Перенести в группу" @click="notify.addToast('🔀 Перенос ' + s.name + ' — выберите группу', 'warning')">🔀</div>
-                    <div class="ra-btn email" data-tip="Отправить Email" @click="notify.addToast('✉ Email отправлен: ' + s.name, 'success')">✉</div>
+                    <div class="ra-btn archive" :data-tip="t('newGroups.detail.tipArchive')" @click="notify.addToast(t('newGroups.toasts.archivedToast', { name: s.name }), 'warning')">📦</div>
+                    <div class="ra-btn remove"  :data-tip="t('newGroups.detail.tipRemove')" @click="removeStudent(s.id, s.name)">✕</div>
+                    <div class="ra-btn transfer" :data-tip="t('newGroups.detail.tipTransfer')" @click="notify.addToast(t('newGroups.toasts.transferToast', { name: s.name }), 'warning')">🔀</div>
+                    <div class="ra-btn email" :data-tip="t('newGroups.detail.tipEmail')" @click="notify.addToast(t('newGroups.toasts.emailToast', { name: s.name }), 'success')">✉</div>
                   </div>
                 </td>
               </tr>
@@ -154,15 +154,15 @@
     <div v-if="addPanelOpen" :class="['asp-panel', 'open']">
       <div class="asp-header">
         <div>
-          <div class="asp-title">➕ Добавить учеников</div>
-          <div class="asp-sub">Выберите учеников для добавления в группу</div>
+          <div class="asp-title">{{ t('newGroups.detail.addStudentsTitle') }}</div>
+          <div class="asp-sub">{{ t('newGroups.detail.addStudentsSub') }}</div>
         </div>
         <div class="gp-close" @click="addPanelOpen = false">✕</div>
       </div>
       <div class="asp-search-wrap">
         <div class="asp-search-box">
           <span style="color:var(--dim);font-size:14px">🔍</span>
-          <input v-model="aspQuery" type="text" placeholder="Поиск ученика по имени..." style="flex:1;background:none;border:none;outline:none;color:var(--text-main);font-family:'Outfit',sans-serif;font-size:13px" />
+          <input v-model="aspQuery" type="text" :placeholder="t('newGroups.detail.searchStudent')" style="flex:1;background:none;border:none;outline:none;color:var(--text-main);font-family:'Outfit',sans-serif;font-size:13px" />
         </div>
       </div>
       <div class="asp-list">
@@ -179,17 +179,17 @@
             <div class="asp-name">{{ s.name }}</div>
             <div class="asp-meta">{{ s.meta }}</div>
           </div>
-          <span v-if="alreadyInGroup.has(s.name)" class="asp-status already">Уже в группе</span>
-          <span v-else-if="aspSelected.has(s.id)" class="asp-status new">Выбран</span>
+          <span v-if="alreadyInGroup.has(s.name)" class="asp-status already">{{ t('newGroups.detail.alreadyInGroup') }}</span>
+          <span v-else-if="aspSelected.has(s.id)" class="asp-status new">{{ t('newGroups.detail.selected') }}</span>
         </div>
       </div>
       <div class="asp-footer">
         <span :class="['asp-sel-info', aspSelected.size > 0 ? 'has-sel' : '']">
-          {{ aspSelected.size > 0 ? aspSelected.size + ' ' + (aspSelected.size === 1 ? 'ученик выбран' : aspSelected.size < 5 ? 'ученика выбрано' : 'учеников выбрано') : 'Никто не выбран' }}
+          {{ aspSelected.size > 0 ? (aspSelected.size === 1 ? t('newGroups.detail.selectedCount1', { n: aspSelected.size }) : aspSelected.size < 5 ? t('newGroups.detail.selectedCount2', { n: aspSelected.size }) : t('newGroups.detail.selectedCount5', { n: aspSelected.size })) : t('newGroups.detail.noneSelected') }}
         </span>
         <div style="display:flex;gap:10px">
-          <button class="btn btn-ghost" style="font-size:13px;padding:8px 16px" @click="addPanelOpen = false">Отмена</button>
-          <button class="btn btn-primary" style="font-size:13px;padding:8px 18px" @click="confirmAdd">✅ Добавить выбранных</button>
+          <button class="btn btn-ghost" style="font-size:13px;padding:8px 16px" @click="addPanelOpen = false">{{ t('newGroups.detail.cancel') }}</button>
+          <button class="btn btn-primary" style="font-size:13px;padding:8px 18px" @click="confirmAdd">{{ t('newGroups.detail.addSelected') }}</button>
         </div>
       </div>
     </div>
@@ -198,11 +198,11 @@
     <div v-if="deleteConfirm" class="dc-overlay" @click.self="deleteConfirm = false">
       <div class="dc-box">
         <div class="dc-icon">🗑️</div>
-        <div class="dc-title">Удалить группу?</div>
-        <div class="dc-sub">Вы уверены, что хотите удалить группу<br><strong>{{ group.name }}</strong>?<br>Это действие нельзя отменить.</div>
+        <div class="dc-title">{{ t('newGroups.detail.deleteTitle') }}</div>
+        <div class="dc-sub">{{ t('newGroups.detail.deleteConfirm') }}<br><strong>{{ group.name }}</strong>?<br>{{ t('newGroups.detail.deleteWarning') }}</div>
         <div class="dc-actions">
-          <button class="btn btn-ghost" style="padding:9px 20px" @click="deleteConfirm = false">Отмена</button>
-          <button class="btn" style="background:var(--red);color:white;padding:9px 20px;border:none;box-shadow:0 0 16px rgba(239,68,68,0.3)" @click="doDelete">🗑 Удалить</button>
+          <button class="btn btn-ghost" style="padding:9px 20px" @click="deleteConfirm = false">{{ t('newGroups.detail.cancel') }}</button>
+          <button class="btn" style="background:var(--red);color:white;padding:9px 20px;border:none;box-shadow:0 0 16px rgba(239,68,68,0.3)" @click="doDelete">{{ t('newGroups.detail.deleteBtn') }}</button>
         </div>
       </div>
     </div>
@@ -213,10 +213,12 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { NewGroup, NewGroupStudent, MasterStudent } from '../../../api/newGroupsApi'
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
 
+const { t } = useI18n()
 const notify = useNotificationStore()
 
 const props = defineProps<{
@@ -278,19 +280,19 @@ function toggleAsp(id: number) {
 
 async function confirmAdd() {
   if (aspSelected.value.size === 0) {
-    notify.addToast('⚠️ Выберите хотя бы одного ученика', 'warning')
+    notify.addToast(t('newGroups.toasts.selectAtLeastOne'), 'warning')
     return
   }
   emit('students-added', { groupId: props.group.id, studentIds: [...aspSelected.value] })
   addPanelOpen.value = false
   aspSelected.value = new Set()
   aspQuery.value = ''
-  notify.addToast('Ученики добавлены ✅', 'success')
+  notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
 }
 
 function removeStudent(studentId: number | string, name: string) {
   emit('student-removed', { groupId: props.group.id, studentId: Number(studentId) })
-  notify.addToast('✕ ' + name + ' убран из группы', 'warning')
+  notify.addToast(t('newGroups.toasts.removedToast', { name }), 'warning')
 }
 
 function confirmDelete() {
