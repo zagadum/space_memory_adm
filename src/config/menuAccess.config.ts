@@ -62,11 +62,14 @@ export const MENU_SECTION_ITEMS: Record<string, string[]> = {
 export const MENU_ROUTE_KEY_MAP: Record<string, string> = {
    "dashboard": "dashboard",
    "my-cabinet": "my-cabinet",
+
+   // ── Secretariat ──
    "students-list": "students",
    "groups-list": "groups",
    "teachers-list": "teachers",
    "course-endings": "course-endings",
 
+   // ── Recruitment (Space + Indigo) ──
    "new-students": "new-students",
    "new-students-indigo": "new-students",
    "leads": "leads",
@@ -82,11 +85,67 @@ export const MENU_ROUTE_KEY_MAP: Record<string, string> = {
    "import-db": "import-db",
    "import-db-indigo": "import-db",
 
+   // ── Finance ──
+   "finance-students": "student-finance",
+   "finance-debtors": "debtors",
+   "finance-nadplaty": "nadplaty",
    "finance-returns": "returns",
+   "settings": "settings",
+   "finance-ustawienia": "finance-ustawienia",
+
+   // ── Accounting ──
+   "accounting-faktury": "faktury",
    "projects-list": "projects",
    "project-detail": "projects",
    "salary-calculator": "salary-calculator",
+
+   // ── HR ──
+   "hr-active": "hr-active",
+   "hr-training": "hr-training",
+   "hr-pipeline": "hr-pipeline",
+   "hr-personal": "hr-personal",
+   "hr-analytics": "hr-analytics",
+
+   // ── Trainer ──
+   "trainer-dashboard": "trainer-dashboard",
+   "trainer-students": "trainer-students",
+   "trainer-groups": "trainer-groups",
+   "lesson-tracker": "lesson-tracker",
    "teacher-salary": "salary-demo",
-   "settings": "settings",
+   "trainer-tasks": "trainer",
+   "trial-lesson": "trainer",
+   "trial-month": "trainer",
+   "trainer-zaliczenia": "trainer",
+   "trainer-olimpiad": "trainer",
+   "trainer-materials": "trainer-materials",
+   "trainer-exam": "trainer-exam",
+   "trainer-mail": "trainer-mail",
+
+   // ── Quality ──
+   "quality-rezygnacje": "rezygnacje",
+   "quality-holidays": "holidays-return",
+   "quality-monitoring": "quality-monitoring",
+   "quality-analytics": "quality-analytics",
+   "quality-trial": "trial-lessons-qd",
+   "quality-zaliczenia": "quality-zaliczenia",
+   "quality-olimpiad": "quality-olimpiad",
+   "quality-spotkania": "spotkania",
+   "quality-sciezka": "sciezka",
+   "quality-materials": "quality-materials",
+   "quality-zcalendar": "zaliczenia-calendar",
+   "quality-all-tasks": "all-tasks",
+   "quality-stats": "quality-stats",
+
+   // ── Student profile tabs ──
+   "student-payments": "students",
+   "student-groups": "students",
+   "student-info": "students",
+   "student-attendance": "students",
+   "student-progress": "students",
+   "student-notes": "students",
+
+   // ── Settings ──
+   "settings-root": "settings-section",
+   "access-control": "access-control",
 };
 
