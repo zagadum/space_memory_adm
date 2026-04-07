@@ -3,7 +3,7 @@
     <div class="sidebar-logo">
       <div class="logo-badge">
         <div class="logo-icon">
-          <img src="http://indigomental-sklep.pl/wp-content/uploads/2026/03/Edugls-logo.png" alt="GLS Logo" class="brand-logo" />
+          <img src="/favicon/apple-touch-icon.png" alt="GLS Logo" class="brand-logo" />
         </div>
         <div>
           <div class="logo-text">GLS Admin</div>
