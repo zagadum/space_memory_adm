@@ -103,9 +103,9 @@ const getStatusIcon = (status: string) => {
       <div class="month-bar">
         <span class="month-label">{{ t('teacherSalary.period') }}:</span>
         <select class="month-select" v-model="currentMonth" @change="salaryStore.fetchSalary(currentMonth)">
-          <option value="2026-02">Лютий 2026 / Luty 2026</option>
-          <option value="2026-01">Січень 2026 / Styczeń 2026</option>
-          <option value="2025-12">Грудень 2025 / Grudzień 2025</option>
+          <option value="2026-02">{{ t('teacherSalary.months.2026-02') }}</option>
+          <option value="2026-01">{{ t('teacherSalary.months.2026-01') }}</option>
+          <option value="2025-12">{{ t('teacherSalary.months.2025-12') }}</option>
         </select>
         <span v-if="salaryData" class="st-pill" :class="getStatusClass(salaryData.status)">
           {{ getStatusIcon(salaryData.status) }} {{ t(`teacherSalary.status.${salaryData.status}`) }}
@@ -114,7 +114,7 @@ const getStatusIcon = (status: string) => {
 
       <div v-if="salaryStore.isLoading" class="salary-loading">
         <div class="loading-spinner">⏳</div>
-        <div class="loading-text">Загрузка...</div>
+        <div class="loading-text">{{ t('teacherSalary.loading') }}</div>
       </div>
 
       <div v-else-if="salaryStore.error" class="salary-error">
@@ -183,7 +183,7 @@ const getStatusIcon = (status: string) => {
               </thead>
               <tbody>
                 <tr v-for="(row, idx) in salaryData.substitutions.rows" :key="idx">
-                  <td>{{ row.child }}<br><span class="dim fs-11">за {{ row.forTrainer }} · {{ row.date }}</span></td>
+                  <td>{{ row.child }}<br><span class="dim fs-11">{{ t('teacherSalary.forTrainer', { name: row.forTrainer }) }} · {{ row.date }}</span></td>
                   <td><span class="chip chip-blue">{{ row.group }}</span></td>
                   <td class="mono val-blue">{{ formatCurrency(row.salary) }}</td>
                 </tr>
@@ -215,8 +215,8 @@ const getStatusIcon = (status: string) => {
                 <tr v-for="(row, idx) in salaryData.methodical.rows" :key="idx">
                   <td>{{ row.name }}<br><span class="dim fs-11">{{ row.date }}</span></td>
                   <td>
-                    <span v-if="row.present" class="chip chip-green">✅ Present</span>
-                    <span v-else class="chip chip-amber">❌ Absent</span>
+                    <span v-if="row.present" class="chip chip-green">{{ t('teacherSalary.present') }}</span>
+                    <span v-else class="chip chip-amber">{{ t('teacherSalary.absent') }}</span>
                   </td>
                   <td class="mono val-purple">{{ formatCurrency(row.total) }}</td>
                 </tr>
@@ -307,7 +307,7 @@ const getStatusIcon = (status: string) => {
               <tbody>
                 <tr v-for="(row, idx) in salaryData.bonuses.rows" :key="idx">
                   <td>{{ row.reason }}<br><span class="dim fs-11">{{ row.comment }}</span></td>
-                  <td><span class="chip chip-green">✅ Approved</span></td>
+                  <td><span class="chip chip-green">{{ t('teacherSalary.approved') }}</span></td>
                   <td class="mono val-green">{{ formatCurrency(row.total) }}</td>
                 </tr>
               </tbody>
@@ -420,7 +420,7 @@ const getStatusIcon = (status: string) => {
       </template>
 
       <div v-else class="salary-loading">
-        <div class="loading-text">Выберите месяц или нет данных</div>
+        <div class="loading-text">{{ t('teacherSalary.noData') }}</div>
       </div>
 
     </div>

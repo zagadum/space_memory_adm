@@ -1336,7 +1336,18 @@
       "disputeLabel": "Opisz uwagi:"
     },
     "history": "Poprzednie miesiące",
-    "generatedAt": "Rozliczenie wygenerowane"
+    "generatedAt": "Rozliczenie wygenerowane",
+    "loading": "Ładowanie...",
+    "noData": "Wybierz miesiąc lub brak danych",
+    "forTrainer": "za {name}",
+    "present": "✅ Obecny",
+    "absent": "❌ Nieobecny",
+    "approved": "✅ Zatwierdzono",
+    "months": {
+      "2026-02": "Luty 2026",
+      "2026-01": "Styczeń 2026",
+      "2025-12": "Grudzień 2025"
+    }
   },
   "studentPayments": {
     "title": "Abonamenty i Płatności",

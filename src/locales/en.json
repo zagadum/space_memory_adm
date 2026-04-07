@@ -1336,7 +1336,18 @@
       "disputeLabel": "Describe remarks:"
     },
     "history": "Previous months",
-    "generatedAt": "Calculation generated"
+    "generatedAt": "Calculation generated",
+    "loading": "Loading...",
+    "noData": "Select a month or no data available",
+    "forTrainer": "for {name}",
+    "present": "✅ Present",
+    "absent": "❌ Absent",
+    "approved": "✅ Approved",
+    "months": {
+      "2026-02": "February 2026",
+      "2026-01": "January 2026",
+      "2025-12": "December 2025"
+    }
   },
   "studentPayments": {
     "title": "Subscriptions & Payments",
