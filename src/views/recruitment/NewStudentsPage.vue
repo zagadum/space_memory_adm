@@ -6,27 +6,35 @@
       <!-- STATS GRID -->
       <div class="stats-grid">
         <div class="stat-card blue">
-          <div class="stat-label">{{ t('newStudents.stats.total') }}</div>
           <div class="stat-value">{{ store.totalCount }}</div>
-          <div class="stat-sub">{{ t('newStudents.stats.totalSub') }}</div>
+          <div class="stat-info">
+            <div class="stat-label">{{ t('newStudents.stats.total') }}</div>
+            <div class="stat-sub">{{ t('newStudents.stats.totalSub') }}</div>
+          </div>
           <div class="stat-icon">🎓</div>
         </div>
         <div class="stat-card green">
-          <div class="stat-label">{{ t('newStudents.stats.signed') }}</div>
           <div class="stat-value">{{ store.signedCount }}</div>
-          <div class="stat-sub"><span class="up">↑ {{ t('newStudents.stats.signedSub') }}</span></div>
+          <div class="stat-info">
+            <div class="stat-label">{{ t('newStudents.stats.signed') }}</div>
+            <div class="stat-sub"><span class="up">↑ {{ t('newStudents.stats.signedSub') }}</span></div>
+          </div>
           <div class="stat-icon">✅</div>
         </div>
         <div class="stat-card amber">
-          <div class="stat-label">{{ t('newStudents.stats.avgWait') }}</div>
           <div class="stat-value">{{ store.avgWaitDays }}</div>
-          <div class="stat-sub"><span class="warn">{{ t('newStudents.stats.avgWaitSub') }}</span></div>
+          <div class="stat-info">
+            <div class="stat-label">{{ t('newStudents.stats.avgWait') }}</div>
+            <div class="stat-sub"><span class="warn">{{ t('newStudents.stats.avgWaitSub') }}</span></div>
+          </div>
           <div class="stat-icon">⏱</div>
         </div>
         <div class="stat-card cyan">
-          <div class="stat-label">{{ t('newStudents.stats.noManager') }}</div>
           <div class="stat-value">{{ store.noManagerCount }}</div>
-          <div class="stat-sub">{{ t('newStudents.stats.noManagerSub') }}</div>
+          <div class="stat-info">
+            <div class="stat-label">{{ t('newStudents.stats.noManager') }}</div>
+            <div class="stat-sub">{{ t('newStudents.stats.noManagerSub') }}</div>
+          </div>
           <div class="stat-icon">⚠️</div>
         </div>
       </div>
@@ -955,29 +963,32 @@ async function onPanelDeleteAllDocs() {
 }
 
 /* STATS */
-.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px; }
-@media (max-width: 1024px) {
+.stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 20px; }
+@media (max-width: 1200px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 768px) {
+@media (max-width: 600px) {
   .stats-grid { grid-template-columns: 1fr; }
 }
 .stat-card {
-  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px;
-  padding: 20px; position: relative; overflow: hidden; transition: all 0.3s; cursor: default;
+  background: var(--app-card); border: 1px solid var(--app-border); border-radius: 12px;
+  padding: 12px 16px; position: relative; overflow: hidden; transition: all 0.25s; cursor: default;
+  display: flex; align-items: center; gap: 14px;
 }
-.stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; border-radius: 14px 14px 0 0; }
-.stat-card.blue::before  { background: linear-gradient(90deg,#4f6ef7,#8b5cf6); }
-.stat-card.green::before { background: linear-gradient(90deg,#10b981,#06b6d4); }
-.stat-card.amber::before { background: linear-gradient(90deg,#f59e0b,#f97316); }
-.stat-card.cyan::before  { background: linear-gradient(90deg,#06b6d4,#4f6ef7); }
-.stat-card:hover { border-color: var(--app-border-hi); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
-.stat-label { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--app-text-dim); margin-bottom: 10px; }
-.stat-value { font-size: 26px; font-weight: 700; font-family: 'Space Mono', monospace; color: var(--app-text-main); line-height: 1; margin-bottom: 6px; }
-.stat-sub { font-size: 11.5px; color: var(--app-text-dim); }
-.stat-sub .up   { color: #10b981; }
-.stat-sub .warn { color: #f59e0b; }
-.stat-icon { position: absolute; top: 16px; right: 16px; font-size: 22px; opacity: 0.4; }
+.stat-card::before { content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 3px; border-radius: 12px 0 0 12px; }
+.stat-card.blue::before  { background: linear-gradient(180deg,#4f6ef7,#8b5cf6); }
+.stat-card.green::before { background: linear-gradient(180deg,#10b981,#06b6d4); }
+.stat-card.amber::before { background: linear-gradient(180deg,#f59e0b,#f97316); }
+.stat-card.cyan::before  { background: linear-gradient(180deg,#06b6d4,#4f6ef7); }
+.stat-card:hover { border-color: var(--app-border-hi); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+
+.stat-value { font-size: 24px; font-weight: 700; font-family: 'Space Mono', monospace; color: var(--app-text-main); line-height: 1; min-width: 30px; text-align: center; }
+.stat-info { display: flex; flex-direction: column; gap: 1px; }
+.stat-label { font-size: 9.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--app-text-dim); }
+.stat-sub { font-size: 11px; color: var(--app-text-dim); line-height: 1.2; }
+.stat-sub .up   { color: #10b981; font-weight: 600; }
+.stat-sub .warn { color: #f59e0b; font-weight: 600; }
+.stat-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; opacity: 0.25; filter: grayscale(0.5); }
 
 /* TOOLBAR */
 .table-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
