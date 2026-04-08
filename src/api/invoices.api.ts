@@ -115,8 +115,8 @@ export const invoicesApi = {
   /**
    * Send/Resend invoice email to student
    */
-  sendEmail(id: number | string): Promise<void> {
-    return http.post(`${endpoints.INVOICES.BY_ID(id)}/email`);
+  sendEmail(id: number | string, data?: { subject?: string; body?: string }): Promise<void> {
+    return http.post(`${endpoints.INVOICES.BY_ID(id)}/email`, data);
   },
 
   /**
@@ -145,6 +145,11 @@ export const invoicesApi = {
   async getStats(params: InvoiceFilters = {}): Promise<any> {
     const { data } = await http.get(`/v1/invoices/stats`, { params });
     return data;
+  },
+
+  async createCorrection(id: number, data: { reason: string; amount_gross: number }): Promise<Invoice> {
+    const { data: res } = await http.post(`${endpoints.INVOICES.BY_ID(id)}/correct`, data);
+    return res;
   },
 
   async sendBulkToKsef(ids: number[]): Promise<{ message: string }> {

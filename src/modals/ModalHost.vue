@@ -19,6 +19,8 @@
   <InviteLeadModal v-else-if="openId==='invite-lead'" />
   <CreateTeacherModal v-else-if="openId==='create-teacher'" />
   <InvoiceCreateModal v-else-if="openId==='invoice-create'" />
+  <InvoiceCorrectModal v-else-if="openId==='invoice-correct'" :invoice="modal.payload.invoice" />
+  <SendEmailModal v-else-if="openId==='invoice-email'" :invoice="modal.payload.invoice" />
   <InvoicePreviewModal v-else-if="openId==='invoice-preview'" />
 </template>
 
@@ -45,6 +47,9 @@ import ConsentConfirmModal from "./templates/ConsentConfirmModal.vue";
 import InviteLeadModal from "./templates/InviteLeadModal.vue";
 import CreateTeacherModal from "./templates/CreateTeacherModal.vue";
 import InvoiceCreateModal from "./templates/InvoiceCreateModal.vue";
+import InvoiceCorrectModal from "./templates/InvoiceCorrectModal.vue";
+import SendEmailModal from "./templates/SendEmailModal.vue";
+import InvoiceSidePanel from "../views/accounting/components/InvoiceSidePanel.vue"; // Though usually it's not a modal, but checking if it's there
 import InvoicePreviewModal from "./templates/InvoicePreviewModal.vue";
 
 const modal = useModalStore();

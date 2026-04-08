@@ -2421,7 +2421,17 @@
       "error": "Ошибка KSeF"
     },
     "sendToKsef": "Отправить в KSeF",
-    "downloadZip": "Скачать ZIP (PDF)"
+    "downloadZip": "Скачать ZIP (PDF)",
+    "correctionReason": "Причина корректировки",
+    "issueCorrection": "Выставить корректировку",
+    "difference": "разница",
+    "relation": {
+      "corrects": "Корректирует"
+    },
+    "emailSubject": "Тема письма",
+    "emailBody": "Текст сообщения",
+    "placeholdersHint": "Доступные переменные (нажмите, чтобы вставить):",
+    "emailNote": "PDF-счет будет прикреплен автоматически."
   }
 }
 

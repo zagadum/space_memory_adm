@@ -161,6 +161,33 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function issueCorrection(id: number, data: { reason: string; amount_gross: number }) {
+    isLoading.value = true;
+    try {
+      const correction = await invoicesApi.createCorrection(id, data);
+      await fetchInvoices();
+      return correction;
+    } catch (err: any) {
+      error.value = 'Failed to create correction';
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function sendInvoiceEmail(id: number, content?: { subject?: string; body?: string }) {
+    isLoading.value = true;
+    try {
+      await invoicesApi.sendEmail(id, content);
+      return true;
+    } catch (err: any) {
+      error.value = 'Failed to send email';
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function convertProforma(id: number) {
     isLoading.value = true;
     try {
@@ -217,6 +244,8 @@ export const useInvoicesStore = defineStore('invoices', () => {
     bulkDownloadPDFs,
     exportFilteredExcel,
     convertProforma,
+    issueCorrection,
+    sendInvoiceEmail,
     fetchAuditLogs,
     fetchStats
   };

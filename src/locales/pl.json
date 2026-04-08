@@ -2417,6 +2417,16 @@
     "selected": "Wybrano",
     "sendToKsef": "Wyślij do KSeF",
     "downloadZip": "Pobierz ZIP (PDF)",
+    "correctionReason": "Przyczyna korekty",
+    "issueCorrection": "Wystaw korektę",
+    "difference": "różnica",
+    "relation": {
+      "corrects": "Koryguje"
+    },
+    "emailSubject": "Temat e-maila",
+    "emailBody": "Treść wiadomości",
+    "placeholdersHint": "Dostępne zmienne (kliknij, aby wstawić):",
+    "emailNote": "Faktura PDF zostanie dołączona automatycznie.",
     "ksefBulkConfirm": "Potwierdź wysyłkę KSeF"
   }
 }

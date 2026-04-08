@@ -2412,6 +2412,16 @@
     },
     "sendToKsef": "Відправити в KSeF",
     "downloadZip": "Завантажити ZIP (PDF)",
+    "correctionReason": "Причина коригування",
+    "issueCorrection": "Виставити коригування",
+    "difference": "різниця",
+    "relation": {
+      "corrects": "Коригує"
+    },
+    "emailSubject": "Тема листа",
+    "emailBody": "Текст повідомлення",
+    "placeholdersHint": "Доступні змінні (натисніть, щоб вставити):",
+    "emailNote": "PDF-рахунок буде додано автоматично.",
     "selected": "Вибрано"
   }
 }

@@ -2409,6 +2409,16 @@
     },
     "sendToKsef": "Send to KSeF",
     "downloadZip": "Download ZIP (PDF)",
+    "correctionReason": "Correction Reason",
+    "issueCorrection": "Issue Correction",
+    "difference": "difference",
+    "relation": {
+      "corrects": "Corrects"
+    },
+    "emailSubject": "Email Subject",
+    "emailBody": "Message Body",
+    "placeholdersHint": "Available variables (click to insert):",
+    "emailNote": "The PDF invoice will be attached automatically.",
     "ksefBulkConfirm": "Send selected invoices to KSeF?"
   }
 }

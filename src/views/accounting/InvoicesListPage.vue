@@ -189,6 +189,7 @@
       @convert="handleConvert"
       @send-to-ksef="sendToKsef"
       @refresh="invoicesStore.fetchInvoices"
+      @select="handleSelect"
     />
   </div>
 </template>
@@ -247,6 +248,11 @@ async function handleConvert(id: number) {
 function handleRowClick(invoice: any) {
   selectedInvoice.value = invoice;
   invoicesStore.fetchAuditLogs(invoice.id);
+}
+
+async function handleSelect(id: number) {
+  const invoice = await invoicesApi.getById(id);
+  handleRowClick(invoice);
 }
 
 function handleExport() {

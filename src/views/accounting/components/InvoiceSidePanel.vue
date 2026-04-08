@@ -24,7 +24,10 @@
             <UiButton variant="ghost" size="sm" @click="downloadPdf">
               📄 {{ t('faktury.downloadPdf') }}
             </UiButton>
-            <UiButton variant="ghost" size="sm" @click="sendEmail">
+            <UiButton variant="amber" block @click="handleCorrect">
+              🔧 {{ t('faktury.correct') }}
+            </UiButton>
+            <UiButton variant="ghost" block @click="handleSendEmail">
               📧 {{ t('faktury.sendEmail') }}
             </UiButton>
             <UiButton 
@@ -34,14 +37,6 @@
               @click="onConvert"
             >
               🔄 {{ t('faktury.convertToFa') }}
-            </UiButton>
-            <UiButton 
-              v-if="invoice.document_type === 'FA'" 
-              variant="amber" 
-              size="sm" 
-              @click="onCorrect"
-            >
-              ✏️ {{ t('faktury.correct') }}
             </UiButton>
           </div>
 
@@ -101,12 +96,22 @@
             <div class="sp-section">
               <div class="sp-section-title">KSeF</div>
               <div class="info-card" :class="invoice.ksef_status">
-                <div class="info-row">
-                  <span class="info-label">{{ t('faktury.status') }}</span>
-                  <UiBadge :variant="getStatusVariant(invoice.ksef_status)">
-                    {{ t(`faktury.statuses.${invoice.ksef_status}`) }}
-                  </UiBadge>
+                <div class="info-item">
+                  <div class="info-label">{{ t('faktury.status') }}</div>
+                  <div class="info-value">
+                    <UiBadge :variant="getStatusVariant(invoice.ksef_status)">{{ t(`faktury.statuses.${invoice.ksef_status}`) }}</UiBadge>
+                  </div>
                 </div>
+
+                <div v-if="invoice.parent_id" class="info-item">
+                  <div class="info-label">{{ t('faktury.relation.corrects') || 'Corrects' }}</div>
+                  <div class="info-value">
+                    <a href="#" @click.prevent="$emit('select', invoice.parent_id)">
+                      #{{ invoice.parent?.number || invoice.parent_id }}
+                    </a>
+                  </div>
+                </div>
+
                 <div class="info-row" v-if="invoice.ksef_reference">
                   <span class="info-label">ID KSeF</span>
                   <span class="info-value mono">{{ invoice.ksef_reference }}</span>
@@ -155,6 +160,7 @@ import { useI18n } from 'vue-i18n';
 import UiButton from '../../../components/ui/UiButton.vue';
 import UiBadge from '../../../components/ui/UiBadge.vue';
 import { invoicesApi } from '../../../api/invoices.api';
+import { useModalStore } from '../../../stores/modal.store';
 
 const props = defineProps<{
   invoice: any | null;
@@ -167,9 +173,11 @@ const emit = defineEmits<{
   convert: [id: number];
   correct: [invoice: any];
   sendToKsef: [id: number];
+  select: [id: number];
 }>();
 
 const { t } = useI18n();
+const modal = useModalStore();
 const activeTab = ref<'info' | 'logs'>('info');
 
 const tabs = computed(() => [
@@ -231,9 +239,13 @@ function downloadPdf() {
   window.open(url, '_blank');
 }
 
-function sendEmail() {
+async function handleCorrect() {
+  modal.open('invoice-correct', { invoice: props.invoice });
+}
+
+async function handleSendEmail() {
   if (!props.invoice) return;
-  emit('refresh'); // Just a placeholder for real action in store
+  modal.open('invoice-email', { invoice: props.invoice });
 }
 
 function onConvert() {

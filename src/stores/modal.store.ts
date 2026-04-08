@@ -21,6 +21,8 @@ export type ModalId =
   | "invite-lead"
   | "create-teacher"
   | "invoice-create"
+  | "invoice-correct"
+  | "invoice-email"
   | "invoice-preview";
 
 export const useModalStore = defineStore("modal", {
