@@ -1080,6 +1080,38 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     })
   }
 
+  if (method === 'post' && url === 'teachers') {
+    const body = readBody(config)
+    const ts: any[] = (globalThis as any).__mock_teachers_list ?? ((globalThis as any).__mock_teachers_list = [
+      { id: 1, firstName: 'Anna', lastName: 'Kowalska', phone: '+48 601 111 222', email: 'anna.kowalska@gls.pl', groupLessonsCount: 5, individualLessonsCount: 2, groupsCount: 7, studentsCount: 31, city: 'Warszawa', comment: 'Doświadczony trener Space Memory' },
+      { id: 2, firstName: 'Ewa', lastName: 'Lewandowska', phone: '+48 602 333 444', email: 'ewa.lewandowska@gls.pl', groupLessonsCount: 4, individualLessonsCount: 0, groupsCount: 4, studentsCount: 24, city: 'Warszawa', comment: 'Specjalizacja: INDIGO' },
+    ])
+    
+    const newTeacher = {
+      id: ts.length + 1,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      email: body.email,
+      phone: body.phone,
+      city: body.city,
+      groupLessonsCount: 0,
+      individualLessonsCount: 0,
+      groupsCount: 0,
+      studentsCount: 0,
+      comment: body.comment || null,
+      birthDate: body.birthDate || null,
+      country: body.country,
+      voivodeship: body.voivodeship,
+      street: body.street,
+      apt: body.apt,
+      postCode: body.postCode,
+      availability: body.availability || []
+    }
+    
+    ts.unshift(newTeacher)
+    return ok(config, newTeacher)
+  }
+
   if (method === "get" && url === "students") {
     // Генерируем mock данные для списка студентов
     // teacherId 42 = Jan Kowalski (teacher@demo.local), 99 = Hanna Boyan

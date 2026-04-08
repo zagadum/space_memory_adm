@@ -123,7 +123,16 @@
     "searchHint": "Пошук за ім'ям, телефоном...",
     "welcome": "Привіт, {name}! 👋",
     "retry": "Спробувати ще раз",
-    "search": "Пошук"
+    "search": "Пошук",
+    "days": {
+      "monday": "Понеділок",
+      "tuesday": "Вівторок",
+      "wednesday": "Середа",
+      "thursday": "Четвер",
+      "friday": "П'ятниця",
+      "saturday": "Субота",
+      "sunday": "Неділя"
+    }
   },
   "search": {
     "students": "Пошук за учнями...",
@@ -1867,7 +1876,35 @@
     "pageSubTitle": "Секретаріат — список вчителів",
     "toolbar": {
       "listTitle": "СПИСОК ВЧИТЕЛІВ",
-      "allCities": "Всі міста"
+      "allCities": "Всі міста",
+      "addBtn": "Додати вчителя"
+    },
+    "modal": {
+      "title": "Створення нового викладача",
+      "success": "Вчителя успішно створено",
+      "error": "Помилка при створенні вчителя",
+      "sections": {
+        "account": "Дані аккаунта",
+        "personal": "Особисті дані",
+        "other": "Інше"
+      },
+      "fields": {
+        "loginEmail": "Email для логіна",
+        "personalEmail": "Email особистий",
+        "password": "Пароль",
+        "firstName": "Ім'я",
+        "lastName": "Прізвище",
+        "phone": "Телефон",
+        "country": "Країна",
+        "voivodeship": "Область / Регіон",
+        "city": "Місто",
+        "postCode": "Поштовий індекс",
+        "street": "Вулиця та номер будинку",
+        "apt": "Квартира",
+        "comment": "Коментар",
+        "commentPlaceholder": "Додайте замітку про вчителя...",
+        "availability": "Доступність (дні тижня)"
+      }
     },
     "table": {
       "studentDetails": "Дані учня",

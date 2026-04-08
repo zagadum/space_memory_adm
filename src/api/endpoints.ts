@@ -177,6 +177,15 @@ export const SETTINGS = {
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
+// TEACHERS
+// ═══════════════════════════════════════════════════════════════════════════
+export const TEACHERS = {
+  LIST: 'teachers',
+  BY_ID: (id: number | string) => `teachers/${id}`,
+  PASSWORD: (id: number | string) => `teachers/${id}/change-password`,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Backwards compatible export (для существующих импортов)
 // ═══════════════════════════════════════════════════════════════════════════
 export const API_ENDPOINTS = {

@@ -124,7 +124,16 @@
     "export": "Eksport",
     "searchHint": "Szukaj po imieniu, telefonie...",
     "welcome": "Cześć, {name}! 👋",
-    "search": "Szukaj"
+    "search": "Szukaj",
+    "days": {
+      "monday": "Poniedziałek",
+      "tuesday": "Wtorek",
+      "wednesday": "Środa",
+      "thursday": "Czwartek",
+      "friday": "Piątek",
+      "saturday": "Sobota",
+      "sunday": "Niedziela"
+    }
   },
   "search": {
     "students": "Szukaj uczniów...",
@@ -1871,7 +1880,35 @@
     "pageSubTitle": "Sekretariat — lista nauczycieli",
     "toolbar": {
       "listTitle": "LISTA NAUCZYCIELI",
-      "allCities": "Wszystkie miasta"
+      "allCities": "Wszystkie miasta",
+      "addBtn": "Dodaj nauczyciela"
+    },
+    "modal": {
+      "title": "Tworzenie nowego nauczyciela",
+      "success": "Nauczyciel został pomyślnie utworzony",
+      "error": "Błąd podczas tworzenia nauczyciela",
+      "sections": {
+        "account": "Dane konta",
+        "personal": "Dane osobowe",
+        "other": "Inne"
+      },
+      "fields": {
+        "loginEmail": "Email do logowania",
+        "personalEmail": "Email prywatny",
+        "password": "Hasło",
+        "firstName": "Imię",
+        "lastName": "Nazwisko",
+        "phone": "Telefon",
+        "country": "Kraj",
+        "voivodeship": "Województwo",
+        "city": "Miasto",
+        "postCode": "Kod pocztowy",
+        "street": "Ulica i numer domu",
+        "apt": "Mieszkanie",
+        "comment": "Komentarz",
+        "commentPlaceholder": "Dodaj notatkę o nauczycielu...",
+        "availability": "Dostępność (dni tygodnia)"
+      }
     },
     "table": {
       "studentDetails": "Dane ucznia",

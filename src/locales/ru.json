@@ -129,7 +129,16 @@
     "select": "— Выберите —",
     "yes": "Да",
     "no": "Нет",
-    "error": "Ошибка"
+    "error": "Ошибка",
+    "days": {
+      "monday": "Понедельник",
+      "tuesday": "Вторник",
+      "wednesday": "Среда",
+      "thursday": "Четверг",
+      "friday": "Пятница",
+      "saturday": "Суббота",
+      "sunday": "Воскресенье"
+    }
   },
   "search": {
     "students": "Поиск по ученикам...",
@@ -1876,7 +1885,35 @@
     "pageSubTitle": "Секретариат — список учителей",
     "toolbar": {
       "listTitle": "СПИСОК ПРЕПОДАВАТЕЛЕЙ",
-      "allCities": "Все города"
+      "allCities": "Все города",
+      "addBtn": "Добавить учителя"
+    },
+    "modal": {
+      "title": "Создание нового преподавателя",
+      "success": "Учитель успешно создан",
+      "error": "Ошибка при создании учителя",
+      "sections": {
+        "account": "Данные аккаунта",
+        "personal": "Личные данные",
+        "other": "Прочее"
+      },
+      "fields": {
+        "loginEmail": "Email для логина",
+        "personalEmail": "Email личный",
+        "password": "Пароль",
+        "firstName": "Имя",
+        "lastName": "Фамилия",
+        "phone": "Телефон",
+        "country": "Страна",
+        "voivodeship": "Область / Регион",
+        "city": "Город",
+        "postCode": "Почтовый индекс",
+        "street": "Улица и номер дома",
+        "apt": "Квартира",
+        "comment": "Комментарий",
+        "commentPlaceholder": "Добавьте заметку об учителе...",
+        "availability": "Доступность (дни недели)"
+      }
     },
     "table": {
       "studentDetails": "Данные ученика",

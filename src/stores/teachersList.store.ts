@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getTeachers, getTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails } from '../api/teachersApi'
+import { getTeachers, getTeacher, createTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails } from '../api/teachersApi'
 
 export const useTeachersListStore = defineStore('teachersList', () => {
   const teachers = ref<TeacherListItem[]>([])
@@ -125,9 +125,23 @@ export const useTeachersListStore = defineStore('teachersList', () => {
     }
   }
 
+  async function addTeacher(payload: any) {
+    loading.value = true
+    error.value = ''
+    try {
+      await createTeacher(payload)
+      await fetchTeachers(1) // Refresh to page 1
+    } catch (e: any) {
+      error.value = 'Failed to create teacher'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     teachers, selectedTeacherDetails, loading, detailsLoading, error, pagination, filters, sorting,
     totalTeachers, fetchTeachers, applyFilters, setSort, setPage,
-    fetchTeacherDetails, updateTeacherDetails, changePassword,
+    fetchTeacherDetails, updateTeacherDetails, changePassword, addTeacher,
   }
 })

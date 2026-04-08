@@ -124,7 +124,16 @@
     "export": "Export",
     "searchHint": "Search by name, phone...",
     "welcome": "Hi, {name}! 👋",
-    "search": "Search"
+    "search": "Search",
+    "days": {
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday",
+      "sunday": "Sunday"
+    }
   },
   "search": {
     "students": "Search students...",
@@ -1870,7 +1879,35 @@
     "pageSubTitle": "Secretariat — teachers list",
     "toolbar": {
       "listTitle": "TEACHERS LIST",
-      "allCities": "All cities"
+      "allCities": "All cities",
+      "addBtn": "Add Teacher"
+    },
+    "modal": {
+      "title": "Create New Teacher",
+      "success": "Teacher created successfully",
+      "error": "Error creating teacher",
+      "sections": {
+        "account": "Account Data",
+        "personal": "Personal Data",
+        "other": "Other"
+      },
+      "fields": {
+        "loginEmail": "Login Email",
+        "personalEmail": "Personal Email",
+        "password": "Password",
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "phone": "Phone",
+        "country": "Country",
+        "voivodeship": "Region / Voivodeship",
+        "city": "City",
+        "postCode": "Post Code",
+        "street": "Street & House number",
+        "apt": "Apartment",
+        "comment": "Comment",
+        "commentPlaceholder": "Add a note about the teacher...",
+        "availability": "Availability (days of week)"
+      }
     },
     "table": {
       "studentDetails": "Student details",

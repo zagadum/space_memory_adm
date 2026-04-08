@@ -1,4 +1,5 @@
 import { http } from './http'
+import { TEACHERS } from './endpoints'
 
 export interface TeacherListParams {
   search?: string
@@ -36,7 +37,7 @@ export interface TeacherListResponse {
 }
 
 export async function getTeachers(params: TeacherListParams = {}): Promise<TeacherListResponse> {
-  const res = await http.get('teachers', { params })
+  const res = await http.get(TEACHERS.LIST, { params })
   return res.data as TeacherListResponse
 }
 
@@ -50,16 +51,38 @@ export interface TeacherDetails extends TeacherListItem {
   passport?: string | null
 }
 
+export interface TeacherCreatePayload {
+  email: string         // login email
+  personalEmail: string // personal email
+  password: string      // account password
+  firstName: string
+  lastName: string
+  phone: string
+  country: string
+  voivodeship: string    // region
+  city: string
+  postCode: string
+  street: string
+  apt: string
+  comment?: string | null
+  availability?: string[] // days of the week, e.g. ['monday', 'tuesday']
+}
+
 export async function getTeacher(id: number): Promise<TeacherDetails> {
-  const res = await http.get(`teachers/${id}`)
+  const res = await http.get(TEACHERS.BY_ID(id))
+  return res.data as TeacherDetails
+}
+
+export async function createTeacher(payload: TeacherCreatePayload): Promise<TeacherDetails> {
+  const res = await http.post(TEACHERS.LIST, payload)
   return res.data as TeacherDetails
 }
 
 export async function updateTeacher(id: number, payload: Partial<TeacherDetails>): Promise<TeacherDetails> {
-  const res = await http.put(`teachers/${id}`, payload)
+  const res = await http.put(TEACHERS.BY_ID(id), payload)
   return res.data as TeacherDetails
 }
 
 export async function changeTeacherPassword(id: number, password: string): Promise<void> {
-  await http.post(`teachers/${id}/change-password`, { password })
+  await http.post(TEACHERS.PASSWORD(id), { password })
 }

@@ -8,6 +8,14 @@
         </div>
       </div>
       <div class="toolbar-right">
+        <UiButton
+          variant="primary"
+          @click="openCreateModal"
+          class="add-teacher-btn"
+        >
+          <span class="btn-icon">+</span>
+          {{ t('teachersList.toolbar.addBtn') }}
+        </UiButton>
         <select class="dropdown-filter-btn" v-model="selectedCity" @change="applyCityFilter">
           <option value="">{{ t('teachersList.toolbar.allCities') }}</option>
           <option v-for="city in uniqueCities" :key="city" :value="city">{{ city }}</option>
@@ -126,14 +134,21 @@ import { useTeachersListStore } from '../../stores/teachersList.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import TeacherSidePanel from './components/TeacherSidePanel.vue'
 import { useNotificationStore } from '../../stores/notification.store'
+import { useModalStore } from '../../stores/modal.store'
+import UiButton from '../../components/ui/UiButton.vue'
 
 const router = useRouter()
 const { t } = useI18n()
 const listStore = useTeachersListStore()
 const searchStore = useGlobalSearchStore()
 const notify = useNotificationStore()
+const modal = useModalStore()
 
 const activeTeacherId = ref<number | null>(null)
+
+function openCreateModal() {
+  modal.open('create-teacher')
+}
 
 const selectedCity = ref('')
 const teachers = computed(() => listStore.teachers)
@@ -305,5 +320,19 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 .count-zero {
   color: var(--app-text-dim);
   opacity: 0.5;
+}
+
+.add-teacher-btn {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  gap: 6px;
+}
+
+.btn-icon {
+  font-size: 16px;
+  font-weight: 300;
+  line-height: 1;
+  margin-top: -1px;
 }
 </style>
