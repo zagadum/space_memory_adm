@@ -301,9 +301,6 @@
       "error": "✕ Error",
       "conflict": "! Conflict"
     },
-    "korekta": {
-      "forInvoice": "Invoice Correction"
-    },
     "refund": {
       "forInvoice": "Invoice Refund"
     },

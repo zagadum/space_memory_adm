@@ -306,9 +306,6 @@
       "error": "✕ Ошибка",
       "conflict": "! Конфликт"
     },
-    "korekta": {
-      "forInvoice": "Корректировка к счету"
-    },
     "refund": {
       "forInvoice": "Возврат по счету"
     },

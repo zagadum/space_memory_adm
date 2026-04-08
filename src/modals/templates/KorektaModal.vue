@@ -17,7 +17,9 @@
         </div>
         <div class="tx-info-item">
           <span class="tx-info-label">KSeF</span>
-          <span class="kb" :class="'kb-' + ksefStatus">{{ KL[ksefStatus] }}</span>
+          <UiBadge :variant="getStatusVariant(ksefStatus)">
+            {{ t(`faktury.statuses.${ksefStatus}`) }}
+          </UiBadge>
         </div>
       </div>
     </div>
@@ -111,11 +113,11 @@
 
     <!-- ── Actions ── -->
     <div class="popup-actions">
-      <button class="btn btn-ghost" @click="close">{{ t("modals.korekta.cancel") }}</button>
+      <UiButton variant="ghost" @click="close">{{ t("modals.korekta.cancel") }}</UiButton>
       <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
-      <button class="btn btn-primary-grad" :disabled="saving || !isValid" @click="save">
+      <UiButton variant="primary" :disabled="saving || !isValid" @click="save">
         {{ saving ? t('common.sending') : t('modals.korekta.submit') }}
-      </button>
+      </UiButton>
     </div>
   </BaseModal>
 </template>
@@ -124,6 +126,8 @@
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
+import UiButton from "../../components/ui/UiButton.vue";
+import UiBadge from "../../components/ui/UiBadge.vue";
 import { useInvoicesStore } from "../../stores/invoices.store";
 import { useModalStore } from "../../stores/modal.store";
 import { invoicesApi } from "../../api/invoices.api";
@@ -154,14 +158,20 @@ const diffAmount = computed(() => {
   return newAmount.value - origAmount;
 });
 
-// KSeF labels (fallback)
-const KL: Record<string, string> = {
-  draft: "Черновик",
-  wystawiona: "Выставлена",
-  sent: "Отправлена",
-  paid: "Оплачена",
-  cancelled: "Аннулирована"
-};
+// getStatusVariant (replicated from ListPage for consistency)
+function getStatusVariant(status: string) {
+  switch (status) {
+    case 'paid': return 'success';
+    case 'cancelled': return 'danger';
+    case 'draft': return 'warning';
+    case 'wystawiona':
+    case 'sent': return 'info';
+    case 'sending':
+    case 'pending': return 'warning';
+    case 'error': return 'danger';
+    default: return 'default';
+  }
+}
 
 const isValid = computed(() => {
   if (!reasonId.value) return false;
