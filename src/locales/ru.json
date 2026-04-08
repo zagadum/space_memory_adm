@@ -2383,6 +2383,13 @@
     }
   },
   "faktury": {
+    "stats": {
+      "monthlyTurnover": "Оборот (Месяц)",
+      "paidSum": "Оплачено",
+      "unpaidCount": "Неоплачено",
+      "needAttention": "Требуют внимания",
+      "errorsDetected": "Обнаружены ошибки"
+    },
     "documentList": "Список счетов",
     "exportXlsx": "Экспорт XLSX",
     "createInvoice": "Создать счет",

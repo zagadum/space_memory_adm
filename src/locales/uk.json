@@ -2373,6 +2373,13 @@
     }
   },
   "faktury": {
+    "stats": {
+      "monthlyTurnover": "Оборот (Місяць)",
+      "paidSum": "Оплачено",
+      "unpaidCount": "Неоплачено",
+      "needAttention": "Потребують уваги",
+      "errorsDetected": "Виявлено помилки"
+    },
     "documentList": "Список рахунків",
     "exportXlsx": "Експорт XLSX",
     "createInvoice": "Створити рахунок",

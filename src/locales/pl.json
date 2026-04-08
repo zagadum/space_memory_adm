@@ -2377,6 +2377,13 @@
     }
   },
   "faktury": {
+    "stats": {
+      "monthlyTurnover": "Obrót (Miesiąc)",
+      "paidSum": "Opłacone",
+      "unpaidCount": "Nieopłacone",
+      "needAttention": "Wymagają uwagi",
+      "errorsDetected": "Wykryto błęды"
+    },
     "documentList": "Lista faktur",
     "exportXlsx": "Eksport XLSX",
     "createInvoice": "Wystaw fakturę",

@@ -1,5 +1,6 @@
-<template>
   <div class="content">
+    <InvoicesStatsHeader :stats="invoicesStore.stats" />
+
     <!-- Toolbar -->
     <div class="table-toolbar">
       <div class="toolbar-left">
@@ -201,9 +202,9 @@ import { useGlobalSearchStore } from '../../stores/globalSearch.store';
 import { useModalStore } from '../../stores/modal.store';
 import { useInvoicePermissions } from '../../composables/useInvoicePermissions';
 import UiButton from '../../components/ui/UiButton.vue';
-import UiBadge from '../../components/ui/UiBadge.vue';
 import { invoicesApi } from '../../api/invoices.api';
 import InvoiceSidePanel from './components/InvoiceSidePanel.vue';
+import InvoicesStatsHeader from './components/InvoicesStatsHeader.vue';
 
 const { t } = useI18n();
 const invoicesStore = useInvoicesStore();
@@ -309,6 +310,16 @@ watch(() => searchStore.query, (val) => {
     invoicesStore.fetchInvoices();
   }, 400);
 });
+
+onMounted(async () => {
+  await projectsStore.fetchProjects();
+  await invoicesStore.fetchInvoices();
+  await invoicesStore.fetchStats();
+});
+
+watch(() => invoicesStore.filters, () => {
+  invoicesStore.fetchStats();
+}, { deep: true });
 
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;

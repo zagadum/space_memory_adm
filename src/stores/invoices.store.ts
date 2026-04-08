@@ -11,6 +11,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const error = ref<string | null>(null);
   const selectedIds = ref<number[]>([]);
   const auditLogs = ref<any[]>([]);
+  const stats = ref<any>(null);
   
   const pagination = reactive({
     currentPage: 1,
@@ -185,6 +186,14 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function fetchStats() {
+    try {
+      stats.value = await invoicesApi.getStats(filters);
+    } catch (err) {
+      console.error('Failed to fetch stats', err);
+    }
+  }
+
   return {
     invoices,
     isLoading,
@@ -193,6 +202,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     filters,
     selectedIds,
     auditLogs,
+    stats,
     fetchInvoices,
     setPage,
     resetFilters,
@@ -207,6 +217,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     bulkDownloadPDFs,
     exportFilteredExcel,
     convertProforma,
-    fetchAuditLogs
+    fetchAuditLogs,
+    fetchStats
   };
 });

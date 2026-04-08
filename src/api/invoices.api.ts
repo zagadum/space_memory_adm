@@ -142,6 +142,11 @@ export const invoicesApi = {
     return data;
   },
 
+  async getStats(params: InvoiceFilters = {}): Promise<any> {
+    const { data } = await http.get(`/v1/invoices/stats`, { params });
+    return data;
+  },
+
   async sendBulkToKsef(ids: number[]): Promise<{ message: string }> {
     const { data } = await http.post('/v1/invoices/bulk-ksef', { ids });
     return data;
