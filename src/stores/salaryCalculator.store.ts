@@ -24,11 +24,13 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     const isLoading = ref(false)
     const error = ref<string | null>(null)
     const status = ref<'draft' | 'confirmed' | 'paid'>('draft')
+    const hasCalculation = ref(false)
 
     const teachers = ref<Teacher[]>([])
 
     const selectedTeacherId = ref<number | null>(null)
-    const selectedMonth = ref('2026-02')
+    // Default to current month
+    const selectedMonth = ref(new Date().toISOString().slice(0, 7))
     const currentSalaryId = ref<string | number | null>(null)
 
     // Mock data for Anna Kowalska
@@ -114,26 +116,17 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
 
     // Actions
     async function fetchTrainerData(id: number | null, month: string) {
+        if (!id) return
+
         isLoading.value = true
         error.value = null
         currentSalaryId.value = null
+        hasCalculation.value = false
+        selectedTeacherId.value = id
+        selectedMonth.value = month
+
         try {
-            if (!teachers.value.length) {
-                await loadTeachers()
-            }
-
-            const teacherId = typeof id === 'number' && id > 0
-                ? id
-                : (selectedTeacherId.value ?? teachers.value[0]?.id ?? null)
-
-            if (!teacherId) {
-                throw new Error('Teacher is not selected')
-            }
-
-            selectedTeacherId.value = teacherId
-            selectedMonth.value = month
-
-            const data = await salaryApi.getTeacherSalary(teacherId, month, 1)
+            const data = await salaryApi.getTeacherSalary(id, month, 1)
 
             salaryData.value = {
                 subscriptions: data.subscriptions.amount,
@@ -157,11 +150,26 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
 
             currentSalaryId.value = data.id
             status.value = data.status === 'disputed' ? 'draft' : data.status
+            hasCalculation.value = true
         } catch (e: any) {
-            error.value = parseApiError(e, 'Failed to fetch data')
+            // 404 = расчёт не существует ещё → не ошибка, показываем кнопку "Произвести расчёт"
+            if (e?.response?.status === 404) {
+                hasCalculation.value = false
+                error.value = null
+            } else {
+                error.value = parseApiError(e, 'Failed to fetch data')
+                hasCalculation.value = false
+            }
         } finally {
             isLoading.value = false
         }
+    }
+
+    async function createCalculation() {
+        if (!selectedTeacherId.value) return
+        // Trigger data fetch — backend will create the record on first GET if it doesn't exist.
+        // If a dedicated POST endpoint is added later, replace this with a direct API call.
+        await fetchTrainerData(selectedTeacherId.value, selectedMonth.value)
     }
 
     async function updateStatus(newStatus: 'draft' | 'confirmed' | 'paid') {
@@ -321,7 +329,9 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         rezygnacjeBonusAmount,
         totalPayout,
         loadTeachers,
+        hasCalculation,
         fetchTrainerData,
+        createCalculation,
         updateStatus,
         disputeSalary,
         doExport

@@ -45,12 +45,12 @@ const formatCurrency = (val: number) => {
 
 onMounted(async () => {
   await store.loadTeachers()
-  await store.fetchTrainerData(store.selectedTeacherId, store.selectedMonth)
+  // No auto-load: teacher must be chosen explicitly
 })
 
 const onTeacherChange = (e: Event) => {
   const id = Number((e.target as HTMLSelectElement).value)
-  store.fetchTrainerData(id, store.selectedMonth)
+  if (id) store.fetchTrainerData(id, store.selectedMonth)
 }
 
 const onMonthChange = (e: Event) => {
@@ -123,47 +123,83 @@ async function submitDispute() {
               :value="store.selectedTeacherId ?? ''"
               @change="onTeacherChange"
             >
-              <option v-if="!store.teachers.length" disabled value="">
-                --
-              </option>
-              <option v-for="t in store.teachers" :key="t.id" :value="t.id">
-                {{ t.name }}
+              <option value="" disabled>{{ t('salaryCalc.labels.selectTrainer') }}</option>
+              <option v-for="tr in store.teachers" :key="tr.id" :value="tr.id">
+                {{ tr.name }}
               </option>
             </select>
           </div>
-          <div class="filter-group">
-            <label class="filter-label">{{ t('salaryCalc.labels.status') }}</label>
-            <div class="status-pills">
-              <span 
-                class="st-pill st-draft" 
-                :class="{ active: store.status === 'draft' }"
-                @click="store.updateStatus('draft')"
-              >
-                ⬜ {{ t('teacherSalary.status.draft') }}
-              </span>
-              <span 
-                class="st-pill st-confirmed" 
-                :class="{ active: store.status === 'confirmed' }"
-                @click="store.updateStatus('confirmed')"
-              >
-                ✓ {{ t('teacherSalary.status.confirmed') }}
-              </span>
-              <span 
-                class="st-pill st-paid" 
-                :class="{ active: store.status === 'paid' }"
-                @click="store.updateStatus('paid')"
-              >
-                💳 {{ t('teacherSalary.status.paid') }}
-              </span>
+          <template v-if="store.hasCalculation">
+            <div class="filter-group">
+              <label class="filter-label">{{ t('salaryCalc.labels.status') }}</label>
+              <div class="status-pills">
+                <span
+                  class="st-pill st-draft"
+                  :class="{ active: store.status === 'draft' }"
+                  @click="store.updateStatus('draft')"
+                >
+                  ⬜ {{ t('teacherSalary.status.draft') }}
+                </span>
+                <span
+                  class="st-pill st-confirmed"
+                  :class="{ active: store.status === 'confirmed' }"
+                  @click="store.updateStatus('confirmed')"
+                >
+                  ✓ {{ t('teacherSalary.status.confirmed') }}
+                </span>
+                <span
+                  class="st-pill st-paid"
+                  :class="{ active: store.status === 'paid' }"
+                  @click="store.updateStatus('paid')"
+                >
+                  💳 {{ t('teacherSalary.status.paid') }}
+                </span>
+              </div>
             </div>
-          </div>
-          <button class="btn btn-primary" style="margin-top: auto;" @click="store.fetchTrainerData(store.selectedTeacherId, store.selectedMonth)">
+          </template>
+          <button
+            v-if="store.selectedTeacherId"
+            class="btn btn-primary"
+            style="margin-top: auto;"
+            :disabled="store.isLoading"
+            @click="store.fetchTrainerData(store.selectedTeacherId, store.selectedMonth)"
+          >
             🔄 {{ t('common.retry') }}
           </button>
         </div>
 
+        <!-- ── STATE 1: No teacher selected ── -->
+        <div v-if="!store.selectedTeacherId && !store.isLoading" class="empty-state">
+          <div class="empty-icon">👨‍🏫</div>
+          <div class="empty-title">{{ t('salaryCalc.labels.selectTrainer') }}</div>
+          <div class="empty-sub">{{ t('salaryCalc.labels.selectTrainerHint') }}</div>
+        </div>
+
+        <!-- ── STATE 2: Teacher selected, no calculation found ── -->
+        <div
+          v-else-if="store.selectedTeacherId && !store.isLoading && !store.hasCalculation && !store.error"
+          class="empty-state"
+        >
+          <div class="empty-icon">📋</div>
+          <div class="empty-title">{{ t('salaryCalc.labels.noCalculation') }}</div>
+          <div class="empty-sub">{{ t('salaryCalc.labels.noCalculationHint') }}</div>
+          <UiButton variant="primary" style="margin-top: 20px;" @click="store.createCalculation()">
+            ⚡ {{ t('salaryCalc.labels.createCalculation') }}
+          </UiButton>
+        </div>
+
+        <!-- ── STATE 3: Error ── -->
+        <div v-else-if="store.error && !store.isLoading" class="empty-state">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-title">{{ store.error }}</div>
+          <UiButton variant="ghost" style="margin-top: 16px;" @click="store.fetchTrainerData(store.selectedTeacherId, store.selectedMonth)">
+            🔄 {{ t('common.retry') }}
+          </UiButton>
+        </div>
+
+        <!-- ── STATE 4: Has calculation ── -->
         <!-- Summary grid -->
-        <div class="summary-grid" v-if="!store.isLoading">
+        <div class="summary-grid" v-else-if="store.hasCalculation && !store.isLoading">
           <!-- 1. Subscriptions -->
           <div class="sum-card c-blue">
             <div class="sum-label">{{ t('salaryCalc.components.subscriptions') }}</div>
@@ -477,9 +513,8 @@ async function submitDispute() {
           </div>
         </div>
 
-
         <!-- Loading State -->
-        <div class="loading-state" v-else>
+        <div class="loading-state" v-if="store.isLoading">
            <div class="spinner"></div>
            <p>{{ t('common.loadingData') }}</p>
         </div>
@@ -783,6 +818,12 @@ async function submitDispute() {
 .dispute-modal-label{font-size:12px;color:var(--app-text-dim);margin-bottom:8px}
 .dispute-modal-textarea{width:100%;min-height:120px;border:1px solid var(--app-border);border-radius:10px;padding:10px 12px;background:var(--app-surface);color:var(--app-text-main);font-family:inherit;resize:vertical}
 .dispute-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+
+/* ── Empty / placeholder states ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:280px;gap:8px;text-align:center;padding:40px 20px}
+.empty-icon{font-size:48px;line-height:1}
+.empty-title{font-size:18px;font-weight:700;color:var(--app-text-main);margin-top:8px}
+.empty-sub{font-size:13px;color:var(--app-text-dim);max-width:420px;line-height:1.5}
 
 /* ── Status pills ── */
 .st-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(107,114,128,.25);font-family:'Outfit',sans-serif;transition:all .2s;background:rgba(107,114,128,.12);color:var(--dim)}

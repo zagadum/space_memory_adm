@@ -1414,7 +1414,12 @@
       "trainer": "Trener:",
       "status": "Status:",
       "graduation": "% promocji",
-      "newTrainer": "Nowy trener"
+      "newTrainer": "Nowy trener",
+      "selectTrainer": "Wybierz trenera",
+      "selectTrainerHint": "Wybierz trenera z listy, aby załadować rozliczenie wynagrodzenia",
+      "noCalculation": "Nie znaleziono rozliczenia dla tego miesiąca",
+      "noCalculationHint": "Rozliczenie za wybrany miesiąc nie zostało jeszcze utworzone. Kliknij przycisk poniżej, aby je wygenerować.",
+      "createCalculation": "Generuj rozliczenie"
     },
     "export": {
       "category": "Kategoria",

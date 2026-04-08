@@ -1414,7 +1414,12 @@
       "trainer": "Trainer:",
       "status": "Status:",
       "graduation": "Graduation %",
-      "newTrainer": "New Trainer"
+      "newTrainer": "New Trainer",
+      "selectTrainer": "Select a trainer",
+      "selectTrainerHint": "Choose a trainer from the list to load the salary calculation",
+      "noCalculation": "No calculation found for this month",
+      "noCalculationHint": "The calculation for the selected month has not been created yet. Click the button below to generate it.",
+      "createCalculation": "Generate Calculation"
     },
     "export": {
       "category": "Category",
