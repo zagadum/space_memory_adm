@@ -158,6 +158,12 @@ export const invoicesApi = {
     link.remove();
   },
 
+
+  async getAuditLogs(id: number): Promise<any[]> {
+    const { data } = await http.get(`/v1/invoices/${id}/logs`);
+    return data;
+  },
+
   /**
    * Helper to get PDF download URL
    */

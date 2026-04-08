@@ -10,6 +10,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const selectedIds = ref<number[]>([]);
+  const auditLogs = ref<any[]>([]);
   
   const pagination = reactive({
     currentPage: 1,
@@ -138,10 +139,13 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
   async function bulkDownloadPDFs() {
     if (selectedIds.value.length === 0) return;
+    isLoading.value = true;
     try {
       await invoicesApi.bulkDownloadPDFs(selectedIds.value);
-    } catch (e: any) {
-      error.value = e.message;
+    } catch (err) {
+      error.value = 'Failed to download PDFs';
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -156,6 +160,31 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function convertProforma(id: number) {
+    isLoading.value = true;
+    try {
+      const updated = await invoicesApi.convert(id);
+      const index = invoices.value.findIndex(i => i.id === id);
+      if (index !== -1) {
+        invoices.value[index] = updated;
+      }
+      return updated;
+    } catch (err) {
+      error.value = 'Failed to convert proforma';
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function fetchAuditLogs(id: number) {
+    try {
+      auditLogs.value = await invoicesApi.getAuditLogs(id);
+    } catch (err) {
+      console.error('Failed to fetch logs', err);
+    }
+  }
+
   return {
     invoices,
     isLoading,
@@ -163,6 +192,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     pagination,
     filters,
     selectedIds,
+    auditLogs,
     fetchInvoices,
     setPage,
     resetFilters,
@@ -175,6 +205,8 @@ export const useInvoicesStore = defineStore('invoices', () => {
     clearSelection,
     bulkSendToKsef,
     bulkDownloadPDFs,
-    exportFilteredExcel
+    exportFilteredExcel,
+    convertProforma,
+    fetchAuditLogs
   };
 });

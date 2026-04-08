@@ -76,8 +76,8 @@
 
         <!-- Data -->
         <tbody v-else>
-          <tr v-for="invoice in invoicesStore.invoices" :key="invoice.id" class="table-row" :class="{ selected: invoicesStore.selectedIds.includes(invoice.id) }">
-            <td class="selection-col">
+          <tr v-for="invoice in invoicesStore.invoices" :key="invoice.id" class="table-row clickable-row" :class="{ selected: invoicesStore.selectedIds.includes(invoice.id) }" @click="handleRowClick(invoice)">
+            <td class="selection-col" @click.stop>
               <input 
                 type="checkbox" 
                 :checked="invoicesStore.selectedIds.includes(invoice.id)"
@@ -115,7 +115,7 @@
                 {{ t(`faktury.statuses.${invoice.ksef_status}`) }}
               </UiBadge>
             </td>
-            <td>
+            <td @click.stop>
               <div class="actions-wrap">
                 <button class="actions-btn" @click.stop="toggleActions(invoice.id)">⋮</button>
                 <div class="actions-dropdown" :class="{ open: activeActionId === invoice.id }">
@@ -179,6 +179,16 @@
         </div>
       </div>
     </Transition>
+
+    <!-- Side Panel -->
+    <InvoiceSidePanel
+      :invoice="selectedInvoice"
+      :audit-logs="invoicesStore.auditLogs"
+      @close="selectedInvoice = null"
+      @convert="handleConvert"
+      @send-to-ksef="sendToKsef"
+      @refresh="invoicesStore.fetchInvoices"
+    />
   </div>
 </template>
 
@@ -193,6 +203,7 @@ import { useInvoicePermissions } from '../../composables/useInvoicePermissions';
 import UiButton from '../../components/ui/UiButton.vue';
 import UiBadge from '../../components/ui/UiBadge.vue';
 import { invoicesApi } from '../../api/invoices.api';
+import InvoiceSidePanel from './components/InvoiceSidePanel.vue';
 
 const { t } = useI18n();
 const invoicesStore = useInvoicesStore();
@@ -200,8 +211,8 @@ const projectsStore = useProjectsStore();
 const searchStore = useGlobalSearchStore();
 const modal = useModalStore();
 const { can, canEdit } = useInvoicePermissions();
-
 const activeActionId = ref<number | null>(null);
+const selectedInvoice = ref<any | null>(null);
 
 function toggleActions(id: number) {
   activeActionId.value = activeActionId.value === id ? null : id;
@@ -219,6 +230,22 @@ async function handleBulkKsef() {
   if (confirm(t('modals.korekta.ksefBulkConfirm') || 'Send selected invoices to KSeF?')) {
     await invoicesStore.bulkSendToKsef();
   }
+}
+
+async function handleConvert(id: number) {
+  try {
+    await invoicesStore.convertProforma(id);
+    if (selectedInvoice.value?.id === id) {
+      selectedInvoice.value = invoicesStore.invoices.find(i => i.id === id);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function handleRowClick(invoice: any) {
+  selectedInvoice.value = invoice;
+  invoicesStore.fetchAuditLogs(invoice.id);
 }
 
 function handleExport() {
@@ -411,9 +438,10 @@ td {
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
+  opacity: 0.6;
 }
 
-.actions-btn:hover { border-color: var(--blue); color: var(--blue); }
+.actions-btn:hover { border-color: var(--blue); color: var(--blue); opacity: 1; }
 
 .actions-dropdown {
   position: absolute;
@@ -506,16 +534,25 @@ td {
 }
 
 .bulk-count {
-  background: var(--color-primary);
+  background: var(--app-primary);
   color: white;
   padding: 2px 8px;
-  border-radius: 99px;
-  font-size: 13px;
+  border-radius: 6px;
+  font-weight: 700;
 }
 
 .bulk-actions {
   display: flex;
   gap: 12px;
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.clickable-row:hover {
+  background: rgba(79, 110, 247, 0.05) !important;
 }
 
 .slide-up-enter-active,
