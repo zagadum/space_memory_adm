@@ -35,6 +35,9 @@
           <option value="cancelled">{{ t('faktury.statuses.cancelled') }}</option>
         </select>
 
+        <UiButton variant="ghost" size="sm" @click="handleExport">
+          📥 {{ t('faktury.exportXlsx') || 'Export XLSX' }}
+        </UiButton>
         <UiButton variant="primary" size="sm" @click="handleCreateInvoice">
           + {{ t('faktury.createInvoice') }}
         </UiButton>
@@ -184,6 +187,11 @@ function getStatusVariant(status: string) {
 
 function handleCreateInvoice() {
   modal.open('invoice-create');
+}
+
+function handleExport() {
+  const url = invoicesApi.getExportUrl(invoicesStore.filters);
+  window.open(url, '_blank');
 }
 
 function downloadPdf(invoice: any) {

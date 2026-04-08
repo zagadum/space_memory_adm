@@ -2377,6 +2377,7 @@
   },
   "faktury": {
     "documentList": "Lista faktur",
+    "exportXlsx": "Eksport XLSX",
     "createInvoice": "Wystaw fakturę",
     "number": "Numer",
     "buyer": "Nabywca",

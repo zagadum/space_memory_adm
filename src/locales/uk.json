@@ -2373,6 +2373,7 @@
   },
   "faktury": {
     "documentList": "Список рахунків",
+    "exportXlsx": "Експорт XLSX",
     "createInvoice": "Створити рахунок",
     "number": "Номер",
     "buyer": "Покупець",

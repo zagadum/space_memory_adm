@@ -2376,6 +2376,7 @@
   },
   "faktury": {
     "documentList": "Invoices List",
+    "exportXlsx": "Export XLSX",
     "createInvoice": "Create Invoice",
     "number": "Number",
     "buyer": "Buyer",

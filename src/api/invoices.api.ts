@@ -1,5 +1,5 @@
-import http from './http';
-import { ENDPOINTS } from './endpoints';
+import { http } from './http';
+import { endpoints } from './endpoints';
 
 export interface Invoice {
   id: number;
@@ -62,44 +62,61 @@ export const invoicesApi = {
    * Fetch paginated invoices with filters
    */
   getList(filters: InvoiceFilters = {}): Promise<InvoicesResponse> {
-    return http.get(ENDPOINTS.INVOICES.BASE, { params: filters });
+    const params = { ...filters };
+    if (params.search) {
+      delete params.search;
+      (params as any).q = filters.search;
+    }
+    return http.get(endpoints.INVOICES.BASE, { params });
   },
 
   /**
    * Fetch single invoice detail
    */
   getById(id: number | string): Promise<Invoice> {
-    return http.get(ENDPOINTS.INVOICES.BY_ID(id));
+    return http.get(endpoints.INVOICES.BY_ID(id));
   },
 
   /**
    * Manually create an invoice
    */
   create(data: Partial<Invoice> & { project_code: string }): Promise<Invoice> {
-    return http.post(ENDPOINTS.INVOICES.BASE, data);
+    return http.post(endpoints.INVOICES.BASE, data);
   },
 
   /**
    * Update invoice or its status
    */
   update(id: number | string, data: Partial<Invoice>): Promise<Invoice> {
-    return http.patch(ENDPOINTS.INVOICES.BY_ID(id), data);
+    return http.patch(endpoints.INVOICES.BY_ID(id), data);
   },
 
   /**
    * Delete/Cancel an invoice
    */
   delete(id: number | string): Promise<void> {
-    return http.delete(ENDPOINTS.INVOICES.BY_ID(id));
+    return http.delete(endpoints.INVOICES.BY_ID(id));
   },
 
   /**
    * Helper to get PDF download URL
    */
   getPdfUrl(id: number | string): string {
-    // Usually routes in Laravel are /api/v1/payments/documents/{id}/pdf 
-    // but for our new module we might have a dedicated one.
-    // For now we use the existing one if possible or define a new one.
     return `/api/v1/payments/documents/${id}/pdf`;
+  },
+
+  /**
+   * Helper to get XLSX export URL with filters
+   */
+  getExportUrl(filters: InvoiceFilters = {}): string {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        const apiKey = key === 'search' ? 'q' : key;
+        params.append(apiKey, value.toString());
+      }
+    });
+    // In sm-recrut, it's /v1/invoices/export
+    return `/v1/${endpoints.INVOICES.BASE}/export?${params.toString()}`;
   }
 };

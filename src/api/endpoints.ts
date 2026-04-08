@@ -188,10 +188,35 @@ export const TEACHERS = {
   NOTES: (id: number | string) => `teachers/${id}/notes`,
 } as const;
 
+export const INVOICES = {
+  BASE: 'invoices',
+  BY_ID: (id: number | string) => `invoices/${id}`,
+  CORRECT: (id: number | string) => `invoices/${id}/correct`,
+  NUMBER: (id: number | string) => `invoices/${id}/number`,
+  EMAIL: (id: number | string) => `invoices/${id}/email`,
+} as const;
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Backwards compatible export (для существующих импортов)
 // ═══════════════════════════════════════════════════════════════════════════
+export const endpoints = {
+  AUTH,
+  DASHBOARD,
+  RECRUITMENT,
+  EXPELLED,
+  ARCHIVED,
+  PAYMENTS,
+  DICTIONARIES,
+  STUDENT,
+  NEW_GROUPS,
+  SALARY,
+  SETTINGS,
+  TEACHERS,
+  INVOICES,
+} as const;
+
 export const API_ENDPOINTS = {
   DICTIONARIES,
   PAYMENTS,
+  INVOICES,
 } as const;

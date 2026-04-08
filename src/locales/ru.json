@@ -2382,6 +2382,7 @@
   },
   "faktury": {
     "documentList": "Список счетов",
+    "exportXlsx": "Экспорт XLSX",
     "createInvoice": "Создать счет",
     "number": "Номер",
     "buyer": "Покупатель",
