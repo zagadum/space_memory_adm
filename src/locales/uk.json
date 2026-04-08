@@ -1918,6 +1918,35 @@
       "studentsCount": "Всього учнів",
       "comment": "Коментар"
     },
+    "panel": {
+      "teacherRole": "Викладач",
+      "tabProfile": "Профіль",
+      "tabGroups": "Групи",
+      "tabHistory": "Історія",
+      "tabNotes": "Нотатки",
+      "sections": {
+        "groups": "Групи викладача",
+        "history": "Історія змін",
+        "notes": "Нотатки по вчителю"
+      },
+      "groups": {
+        "empty": "Немає активних груп",
+        "name": "Назва",
+        "schedule": "Розклад",
+        "students": "Учні"
+      },
+      "history": {
+        "empty": "Історія порожня",
+        "action": "Дія",
+        "user": "Користувач",
+        "date": "Дата"
+      },
+      "notes": {
+        "empty": "Нотаток поки немає",
+        "placeholder": "Напишіть нотатку...",
+        "addBtn": "Додати нотатку"
+      }
+    },
     "noTeachers": "Немає вчителів за обраними фільтрами"
   },
   "importDb": {

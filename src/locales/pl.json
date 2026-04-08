@@ -1922,6 +1922,35 @@
       "studentsCount": "Liczba uczniów",
       "comment": "Komentarz"
     },
+    "panel": {
+      "teacherRole": "Nauczyciel",
+      "tabProfile": "Profil",
+      "tabGroups": "Grupy",
+      "tabHistory": "Historia",
+      "tabNotes": "Notatki",
+      "sections": {
+        "groups": "Grupy nauczyciela",
+        "history": "Historia zmian",
+        "notes": "Notatki o nauczycielu"
+      },
+      "groups": {
+        "empty": "Brak aktywnych grup",
+        "name": "Nazwa",
+        "schedule": "Harmonogram",
+        "students": "Uczniowie"
+      },
+      "history": {
+        "empty": "Historia jest pusta",
+        "action": "Działanie",
+        "user": "Użytkownik",
+        "date": "Data"
+      },
+      "notes": {
+        "empty": "Brak notatek",
+        "placeholder": "Napisz notatkę...",
+        "addBtn": "Dodaj notatkę"
+      }
+    },
     "noTeachers": "Brak nauczycieli dla wybranych filtrów"
   },
   "importDb": {

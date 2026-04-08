@@ -819,6 +819,52 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { success: true });
   }
 
+  // --- TEACHERS EXTRA DATA: HISTORY, GROUPS, NOTES ---
+  if (method === 'get' && /teachers\/\d+\/history$/.test(url)) {
+    return ok(config, [
+      { id: 1, action: 'Профиль обновлен', userName: 'Admin', createdAt: '2024-03-01 12:00:00' },
+      { id: 2, action: 'Добавлен в группу "SM-A"', userName: 'Manager', createdAt: '2024-02-15 10:30:00' },
+      { id: 3, action: 'Пароль изменен', userName: 'System', createdAt: '2024-01-10 09:15:00' },
+    ]);
+  }
+
+  if (method === 'get' && /teachers\/\d+\/groups$/.test(url)) {
+    return ok(config, [
+      { id: 101, name: 'SM-A / Пн 16:00', schedule: 'Пн 16:00', studentsCount: 8, school: 'Space Memory' },
+      { id: 104, name: 'SM-D / Вт 18:00', schedule: 'Вт 18:00', studentsCount: 10, school: 'Space Memory' },
+      { id: 108, name: 'SM-C / Чт 15:00', schedule: 'Чт 15:00', studentsCount: 4, school: 'Space Memory' },
+    ]);
+  }
+
+  if (method === 'get' && /teachers\/\d+\/notes$/.test(url)) {
+    const t_id = url.split('/')[2];
+    const teacherNotesAll: any = (globalThis as any).__mock_teacher_notes ?? ((globalThis as any).__mock_teacher_notes = {});
+    if (!teacherNotesAll[t_id]) {
+      teacherNotesAll[t_id] = [
+        { id: 1, userId: 1, userName: 'Super Admin', text: 'Очень ответственный преподаватель, всегда вовремя сдает отчеты.', createdAt: '2024-02-20 14:00:00' },
+        { id: 2, userId: 2, userName: 'Demo Admin', text: 'Планирует отпуск в июне.', createdAt: '2024-03-05 11:30:00' },
+      ];
+    }
+    return ok(config, teacherNotesAll[t_id]);
+  }
+
+  if (method === 'post' && /teachers\/\d+\/notes$/.test(url)) {
+    const t_id = url.split('/')[2];
+    const body = readBody(config);
+    const teacherNotesAll: any = (globalThis as any).__mock_teacher_notes ?? ((globalThis as any).__mock_teacher_notes = {});
+    if (!teacherNotesAll[t_id]) teacherNotesAll[t_id] = [];
+    
+    const newNote = {
+      id: Date.now(),
+      userId: 2,
+      userName: 'Demo Admin',
+      text: body.text,
+      createdAt: new Date().toISOString().replace('T', ' ').slice(0, 19)
+    };
+    teacherNotesAll[t_id].push(newNote);
+    return ok(config, newNote);
+  }
+
   // --- STUDENTS LIST ---
   if (method === "get" && (url === "students/groups-filter" || url === "student/groups-filter")) {
     return ok(config, {

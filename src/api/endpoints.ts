@@ -183,6 +183,9 @@ export const TEACHERS = {
   LIST: 'teachers',
   BY_ID: (id: number | string) => `teachers/${id}`,
   PASSWORD: (id: number | string) => `teachers/${id}/change-password`,
+  HISTORY: (id: number | string) => `teachers/${id}/history`,
+  GROUPS: (id: number | string) => `teachers/${id}/groups`,
+  NOTES: (id: number | string) => `teachers/${id}/notes`,
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════

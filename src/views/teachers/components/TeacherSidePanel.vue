@@ -18,15 +18,41 @@
             <div class="sp-close" @click="$emit('close')">✕</div>
           </div>
           <div class="sp-tabs">
-            <div class="sp-tab active">
-              👤 {{ t('newStudents.panel.tabProfile') || 'Профиль' }}
+            <div
+              class="sp-tab"
+              :class="{ active: activeTab === 'profile' }"
+              @click="activeTab = 'profile'"
+            >
+              👤 {{ t('teachersList.panel.tabProfile') || 'Профиль' }}
+            </div>
+            <div
+              class="sp-tab"
+              :class="{ active: activeTab === 'groups' }"
+              @click="activeTab = 'groups'"
+            >
+              👥 {{ t('teachersList.panel.tabGroups') || 'Группы' }}
+            </div>
+            <div
+              class="sp-tab"
+              :class="{ active: activeTab === 'history' }"
+              @click="activeTab = 'history'"
+            >
+              📜 {{ t('teachersList.panel.tabHistory') || 'История' }}
+            </div>
+            <div
+              class="sp-tab"
+              :class="{ active: activeTab === 'notes' }"
+              @click="activeTab = 'notes'"
+            >
+              📝 {{ t('teachersList.panel.tabNotes') || 'Заметки' }}
             </div>
           </div>
         </div>
 
         <!-- BODY -->
         <div class="sp-body">
-          <div class="sp-tab-content">
+          <!-- PROFILE TAB -->
+          <div v-if="activeTab === 'profile'" class="sp-tab-content">
             <div class="sp-section-title">{{ t('newStudents.panel.sectionAccount') || 'Данные аккаунта' }}</div>
             <div class="sp-grid cols-1">
               <div class="sp-field"><div class="sp-label">Email</div><input class="sp-input" v-model="form.email" type="email" /></div>
@@ -100,6 +126,73 @@
 
             <button class="sp-save-btn" @click="onSave">✦ {{ t('newStudents.panel.saveChanges') || 'Сохранить изменения' }}</button>
           </div>
+
+          <!-- GROUPS TAB -->
+          <div v-if="activeTab === 'groups'" class="sp-tab-content">
+            <div class="sp-section-title">{{ t('teachersList.panel.sections.groups') || 'Группы преподавателя' }}</div>
+            <div v-if="listStore.teacherGroups.length === 0" class="sp-empty-state">
+              {{ t('teachersList.panel.groups.empty') || 'Активных групп нет' }}
+            </div>
+            <div v-else class="sp-data-list">
+              <div v-for="group in listStore.teacherGroups" :key="group.id" class="sp-data-item">
+                <div class="sp-item-info">
+                  <div class="sp-item-title">{{ group.name }}</div>
+                  <div class="sp-item-sub">{{ group.schedule }}</div>
+                </div>
+                <div class="sp-item-badge">
+                  {{ group.studentsCount }} {{ t('teachersList.panel.groups.students') || 'учеников' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- HISTORY TAB -->
+          <div v-if="activeTab === 'history'" class="sp-tab-content">
+            <div class="sp-section-title">{{ t('teachersList.panel.sections.history') || 'История изменений' }}</div>
+            <div v-if="listStore.teacherHistory.length === 0" class="sp-empty-state">
+              {{ t('teachersList.panel.history.empty') || 'История пуста' }}
+            </div>
+            <div v-else class="sp-data-list">
+              <div v-for="event in listStore.teacherHistory" :key="event.id" class="sp-data-item history-item">
+                <div class="sp-item-info">
+                  <div class="sp-item-title">{{ event.action }}</div>
+                  <div class="sp-item-sub">{{ event.userName }} • {{ event.createdAt }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NOTES TAB -->
+          <div v-if="activeTab === 'notes'" class="sp-tab-content">
+            <div class="sp-section-title">{{ t('teachersList.panel.sections.notes') || 'Заметки по учителю' }}</div>
+            
+            <div class="sp-add-note">
+              <textarea 
+                class="sp-input sp-textarea" 
+                v-model="newNoteText" 
+                :placeholder="t('teachersList.panel.notes.placeholder') || 'Напишите заметку...'"
+              />
+              <button 
+                class="sp-save-btn" 
+                :disabled="!newNoteText.trim() || isAddingNote"
+                @click="onAddNote"
+              >
+                {{ isAddingNote ? '⏳' : '✦' }} {{ t('teachersList.panel.notes.addBtn') || 'Добавить заметку' }}
+              </button>
+            </div>
+
+            <div v-if="listStore.teacherNotes.length === 0" class="sp-empty-state" style="margin-top: 20px;">
+              {{ t('teachersList.panel.notes.empty') || 'Заметок пока нет' }}
+            </div>
+            <div v-else class="sp-data-list" style="margin-top: 20px;">
+              <div v-for="note in listStore.teacherNotes" :key="note.id" class="sp-data-item note-item">
+                <div class="sp-item-info">
+                  <div class="sp-item-text">{{ note.text }}</div>
+                  <div class="sp-item-sub">{{ note.userName }} • {{ note.createdAt }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </template>
     </div>
@@ -110,6 +203,12 @@
 import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TeacherDetails } from '../../../api/teachersApi'
+import { useTeachersListStore } from '../../../stores/teachersList.store'
+
+const listStore = useTeachersListStore()
+const activeTab = ref('profile')
+const newNoteText = ref('')
+const isAddingNote = ref(false)
 
 const props = defineProps<{
   teacherId: number | null
@@ -173,11 +272,31 @@ watch(() => props.details, (d) => {
   form.value = mapDetailsToForm(d)
 }, { immediate: true })
 
-watch(() => props.teacherId, () => {
+watch(() => props.teacherId, (id) => {
   showChangePassword.value = false
   newPassword.value = ''
   confirmPassword.value = ''
+  activeTab.value = 'profile'
+  newNoteText.value = ''
 })
+
+watch(activeTab, (tab) => {
+  if (!props.teacherId) return
+  if (tab === 'groups') listStore.fetchTeacherGroups(props.teacherId)
+  if (tab === 'history') listStore.fetchTeacherHistory(props.teacherId)
+  if (tab === 'notes') listStore.fetchTeacherNotes(props.teacherId)
+})
+
+async function onAddNote() {
+  if (!props.teacherId || !newNoteText.value.trim()) return
+  isAddingNote.value = true
+  try {
+    await listStore.addNote(props.teacherId, newNoteText.value)
+    newNoteText.value = ''
+  } finally {
+    isAddingNote.value = false
+  }
+}
 
 async function onChangePassword() {
   if (!newPassword.value || passwordMismatch.value) return
@@ -319,4 +438,34 @@ function onSave() {
 }
 .sp-save-pwd-btn:hover:not(:disabled) { box-shadow: 0 0 16px rgba(79,110,247,0.4); transform: translateY(-1px); }
 .sp-save-pwd-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+/* Data Lists */
+.sp-empty-state {
+  padding: 40px 20px; text-align: center; color: var(--app-text-dim);
+  font-size: 13px; border: 1px dashed var(--app-border); border-radius: 12px;
+}
+
+.sp-data-list { display: flex; flex-direction: column; gap: 8px; }
+.sp-data-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; background: var(--app-card); border: 1px solid var(--app-border);
+  border-radius: 10px; transition: all 0.15s;
+}
+.sp-data-item:hover { border-color: var(--app-border-hi); transform: translateX(2px); }
+
+.sp-item-info { display: flex; flex-direction: column; gap: 3px; }
+.sp-item-title { font-size: 14px; font-weight: 600; color: var(--app-text-main); }
+.sp-item-sub { font-size: 11px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
+
+.sp-item-badge {
+  font-size: 11px; font-weight: 600; background: var(--status-info-bg);
+  color: var(--blue); padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(79,110,247,0.2);
+}
+
+.history-item .sp-item-title { font-size: 13px; font-weight: 500; }
+
+.note-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+.sp-item-text { font-size: 13.5px; color: var(--app-text-main); line-height: 1.45; white-space: pre-wrap; }
+
+.sp-add-note { display: flex; flex-direction: column; gap: 10px; }
 </style>

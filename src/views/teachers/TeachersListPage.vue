@@ -30,7 +30,6 @@
             <th @click="sortBy('lastName')" style="cursor:pointer; user-select:none">
               {{ t('teachersList.table.name') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'lastName' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'lastName' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th style="width: 140px;">{{ t('teachersList.table.phone') }}</th>
             <th style="width: 200px;">{{ t('teachersList.table.email') }}</th>
             <th @click="sortBy('groupLessonsCount')" style="cursor:pointer; user-select:none; width: 100px; text-align: center;">
               {{ t('teachersList.table.groupLessons') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'groupLessonsCount' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'groupLessonsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
@@ -41,8 +40,12 @@
             <th @click="sortBy('city')" style="cursor:pointer; user-select:none; width: 120px;">
               {{ t('teachersList.table.city') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'city' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'city' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th style="width: 90px; text-align: center;">{{ t('teachersList.table.groupsCount') }}</th>
-            <th style="width: 100px; text-align: center;">{{ t('teachersList.table.studentsCount') }}</th>
+            <th @click="sortBy('groupsCount')" style="cursor:pointer; user-select:none; width: 90px; text-align: center;">
+              {{ t('teachersList.table.groupsCount') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'groupsCount' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'groupsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            </th>
+            <th @click="sortBy('studentsCount')" style="cursor:pointer; user-select:none; width: 100px; text-align: center;">
+              {{ t('teachersList.table.studentsCount') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'studentsCount' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'studentsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            </th>
             <th style="width: 250px;">{{ t('teachersList.table.comment') }}</th>
           </tr>
         </thead>
@@ -51,10 +54,8 @@
             <td>
               <div class="name-cell">
                 <span class="teacher-name">{{ teacher.lastName }} {{ teacher.firstName }}</span>
+                <span class="teacher-phone">{{ teacher.phone }}</span>
               </div>
-            </td>
-            <td>
-              <span class="date-mono">{{ teacher.phone }}</span>
             </td>
             <td>
               <a :href="`mailto:${teacher.email}`" class="email-link" @click.stop>{{ teacher.email }}</a>
@@ -87,7 +88,20 @@
               </button>
             </td>
             <td>
-              <div class="comment-text">{{ teacher.comment || '—' }}</div>
+              <div class="comment-cell" @click.stop="startEditComment(teacher.id, teacher.comment || '')">
+                <div v-if="editingCommentId !== teacher.id" class="comment-text">
+                  {{ teacher.comment || '—' }}
+                </div>
+                <input
+                  v-else
+                  ref="commentInput"
+                  v-model="tempComment"
+                  class="inline-comment-edit"
+                  @blur="saveComment(teacher.id)"
+                  @keyup.enter="saveComment(teacher.id)"
+                  @keyup.esc="cancelEditComment"
+                />
+              </div>
             </td>
           </tr>
           <tr v-if="teachers.length === 0">
@@ -145,6 +159,42 @@ const notify = useNotificationStore()
 const modal = useModalStore()
 
 const activeTeacherId = ref<number | null>(null)
+
+// Inline comment editing
+const editingCommentId = ref<number | null>(null)
+const tempComment = ref('')
+const commentInput = ref<HTMLInputElement | null>(null)
+
+function startEditComment(id: number, val: string) {
+  editingCommentId.value = id
+  tempComment.value = val
+  setTimeout(() => {
+    commentInput.value?.focus()
+  }, 50)
+}
+
+function cancelEditComment() {
+  editingCommentId.value = null
+  tempComment.value = ''
+}
+
+async function saveComment(id: number) {
+  if (editingCommentId.value === null) return
+  const oldVal = listStore.teachers.find(t => t.id === id)?.comment ?? ''
+  if (tempComment.value === oldVal) {
+    editingCommentId.value = null
+    return
+  }
+  
+  try {
+    await listStore.updateTeacherComment(id, tempComment.value)
+    notify.addToast(t('info.saved') || 'Изменения сохранены', 'success')
+  } catch (e) {
+    notify.addToast(t('common.error') || 'Ошибка', 'error')
+  } finally {
+    editingCommentId.value = null
+  }
+}
 
 function openCreateModal() {
   modal.open('create-teacher')
@@ -267,8 +317,9 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 .table-row:hover { background: var(--status-info-bg); cursor: pointer; }
 
 /* Внутренности ячеек */
-.name-cell { display: flex; flex-direction: column; }
+.name-cell { display: flex; flex-direction: column; gap: 2px; }
 .teacher-name { font-weight: 600; color: var(--app-text-main); font-size: 13.5px; }
+.teacher-phone { font-size: 11px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; opacity: 0.8; }
 
 .date-mono { font-family: 'Space Mono', monospace; color: var(--app-text-main); font-size: 12.5px; }
 
@@ -294,6 +345,13 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 
 .city-text { font-size: 12.5px; font-weight: 500; }
 
+.comment-cell {
+  cursor: text;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
 .comment-text {
   max-width: 250px;
   white-space: nowrap;
@@ -301,6 +359,25 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
   text-overflow: ellipsis;
   font-size: 12px;
   color: var(--app-text-dim);
+  border-bottom: 1px dashed transparent;
+  width: 100%;
+}
+
+.comment-cell:hover .comment-text {
+  border-bottom-color: var(--app-border-hi);
+  color: var(--app-text-main);
+}
+
+.inline-comment-edit {
+  width: 100%;
+  background: var(--app-surface-hi);
+  border: 1px solid var(--blue);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--app-text-main);
+  outline: none;
+  font-family: inherit;
 }
 
 /* Email link */

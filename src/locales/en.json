@@ -1921,6 +1921,35 @@
       "studentsCount": "Total students",
       "comment": "Comment"
     },
+    "panel": {
+      "teacherRole": "Teacher",
+      "tabProfile": "Profile",
+      "tabGroups": "Groups",
+      "tabHistory": "History",
+      "tabNotes": "Notes",
+      "sections": {
+        "groups": "Teacher Groups",
+        "history": "Change History",
+        "notes": "Teacher Notes"
+      },
+      "groups": {
+        "empty": "No active groups",
+        "name": "Name",
+        "schedule": "Schedule",
+        "students": "Students"
+      },
+      "history": {
+        "empty": "History is empty",
+        "action": "Action",
+        "user": "User",
+        "date": "Date"
+      },
+      "notes": {
+        "empty": "No notes yet",
+        "placeholder": "Write a note...",
+        "addBtn": "Add note"
+      }
+    },
     "noTeachers": "No teachers match the current filters"
   },
   "importDb": {

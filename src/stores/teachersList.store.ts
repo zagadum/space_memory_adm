@@ -28,6 +28,11 @@ export const useTeachersListStore = defineStore('teachersList', () => {
     orderDirection: 'asc' as 'asc' | 'desc',
   })
 
+  // Profile data
+  const teacherHistory = ref<any[]>([])
+  const teacherGroups = ref<any[]>([])
+  const teacherNotes = ref<any[]>([])
+
   const totalTeachers = computed(() => pagination.value.total || teachers.value.length)
 
   async function fetchTeachers(page?: number) {
@@ -69,7 +74,7 @@ export const useTeachersListStore = defineStore('teachersList', () => {
       sorting.value.orderDirection = sorting.value.orderDirection === 'asc' ? 'desc' : 'asc'
     } else {
       sorting.value.orderBy = orderBy
-      sorting.value.orderDirection = 'asc'
+      sorting.value.orderDirection = orderBy === 'groupsCount' || orderBy === 'studentsCount' ? 'desc' : 'asc'
     }
     applyFilters()
   }
@@ -84,10 +89,58 @@ export const useTeachersListStore = defineStore('teachersList', () => {
     error.value = ''
     try {
       selectedTeacherDetails.value = await getTeacher(id)
+      // Fetch related data in parallel if needed, or lazy-load later
     } catch (e: any) {
       error.value = 'Failed to fetch teacher details'
     } finally {
       detailsLoading.value = false
+    }
+  }
+
+  async function fetchTeacherHistory(id: number) {
+    try {
+      const { getTeacherHistory } = await import('../api/teachersApi')
+      teacherHistory.value = await getTeacherHistory(id)
+    } catch (e) {
+      console.error('Failed to fetch teacher history', e)
+    }
+  }
+
+  async function fetchTeacherGroups(id: number) {
+    try {
+      const { getTeacherGroups } = await import('../api/teachersApi')
+      teacherGroups.value = await getTeacherGroups(id)
+    } catch (e) {
+      console.error('Failed to fetch teacher groups', e)
+    }
+  }
+
+  async function fetchTeacherNotes(id: number) {
+    try {
+      const { getTeacherNotes } = await import('../api/teachersApi')
+      teacherNotes.value = await getTeacherNotes(id)
+    } catch (e) {
+      console.error('Failed to fetch teacher notes', e)
+    }
+  }
+
+  async function addNote(id: number, text: string) {
+    try {
+      const { addTeacherNote } = await import('../api/teachersApi')
+      const newNote = await addTeacherNote(id, text)
+      teacherNotes.value.unshift(newNote)
+    } catch (e) {
+      console.error('Failed to add note', e)
+      throw e
+    }
+  }
+
+  async function updateTeacherComment(id: number, comment: string) {
+    try {
+      await updateTeacherDetails(id, { comment })
+    } catch (e) {
+      console.error('Failed to update comment', e)
+      throw e
     }
   }
 
@@ -141,7 +194,9 @@ export const useTeachersListStore = defineStore('teachersList', () => {
 
   return {
     teachers, selectedTeacherDetails, loading, detailsLoading, error, pagination, filters, sorting,
+    teacherHistory, teacherGroups, teacherNotes,
     totalTeachers, fetchTeachers, applyFilters, setSort, setPage,
     fetchTeacherDetails, updateTeacherDetails, changePassword, addTeacher,
+    fetchTeacherHistory, fetchTeacherGroups, fetchTeacherNotes, addNote, updateTeacherComment
   }
 })

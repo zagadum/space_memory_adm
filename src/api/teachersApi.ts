@@ -86,3 +86,47 @@ export async function updateTeacher(id: number, payload: Partial<TeacherDetails>
 export async function changeTeacherPassword(id: number, password: string): Promise<void> {
   await http.post(TEACHERS.PASSWORD(id), { password })
 }
+
+export interface TeacherHistoryItem {
+  id: number
+  action: string
+  changes?: Record<string, any>
+  userName: string
+  createdAt: string
+}
+
+export interface TeacherGroupItem {
+  id: number
+  name: string
+  schedule: string
+  studentsCount: number
+  school: string
+}
+
+export interface TeacherNote {
+  id: number
+  userId: number
+  userName: string
+  text: string
+  createdAt: string
+}
+
+export async function getTeacherHistory(id: number): Promise<TeacherHistoryItem[]> {
+  const res = await http.get(TEACHERS.HISTORY(id))
+  return res.data as TeacherHistoryItem[]
+}
+
+export async function getTeacherGroups(id: number): Promise<TeacherGroupItem[]> {
+  const res = await http.get(TEACHERS.GROUPS(id))
+  return res.data as TeacherGroupItem[]
+}
+
+export async function getTeacherNotes(id: number): Promise<TeacherNote[]> {
+  const res = await http.get(TEACHERS.NOTES(id))
+  return res.data as TeacherNote[]
+}
+
+export async function addTeacherNote(id: number, text: string): Promise<TeacherNote> {
+  const res = await http.post(TEACHERS.NOTES(id), { text })
+  return res.data as TeacherNote
+}
