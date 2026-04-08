@@ -2374,5 +2374,30 @@
       "studentEmailHint": "Będzie używany jako login do systemu",
       "contractHint": "Wybierz typ umowy z listy"
     }
+  },
+  "faktury": {
+    "documentList": "Lista faktur",
+    "createInvoice": "Wystaw fakturę",
+    "number": "Numer",
+    "buyer": "Nabywca",
+    "amount": "Kwota",
+    "date": "Data wystawienia",
+    "status": "Status",
+    "type": "Typ",
+    "project": "Projekt",
+    "searchPlaceholder": "Szukaj po numerze lub nabywcy...",
+    "filterByProject": "Filtruj wg projektu",
+    "filterByType": "Filtruj wg typu",
+    "filterByStatus": "Filtruj wg statusu",
+    "actions": "Akcje",
+    "downloadPdf": "Pobierz PDF",
+    "viewDetails": "Szczegóły",
+    "statuses": {
+      "draft": "Szkic",
+      "wystawiona": "Wystawiona",
+      "sent": "Wysłana",
+      "paid": "Opłacona",
+      "cancelled": "Anulowana"
+    }
   }
 }

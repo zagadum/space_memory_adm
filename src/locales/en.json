@@ -2373,6 +2373,31 @@
       "studentEmailHint": "Will be used as login to the system",
       "contractHint": "Select contract type from the list"
     }
+  },
+  "faktury": {
+    "documentList": "Invoices List",
+    "createInvoice": "Create Invoice",
+    "number": "Number",
+    "buyer": "Buyer",
+    "amount": "Amount",
+    "date": "Issue Date",
+    "status": "Status",
+    "type": "Type",
+    "project": "Project",
+    "searchPlaceholder": "Search by number or buyer...",
+    "filterByProject": "Filter by project",
+    "filterByType": "Filter by type",
+    "filterByStatus": "Filter by status",
+    "actions": "Actions",
+    "downloadPdf": "Download PDF",
+    "viewDetails": "View Details",
+    "statuses": {
+      "draft": "Draft",
+      "wystawiona": "Issued",
+      "sent": "Sent",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    }
   }
 }
 

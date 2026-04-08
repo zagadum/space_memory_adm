@@ -1,0 +1,3371 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GLS · Faktury</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f2f8;--card:#ffffff;--card2:#fafbff;
+  --b:rgba(79,110,247,.13);--bh:rgba(79,110,247,.28);
+  --blue:#4f6ef7;--purple:#7c3aed;--cyan:#0891b2;
+  --amber:#d97706;--green:#059669;--red:#dc2626;
+  --orange:#ea580c;--pink:#db2777;
+  --white:#1a1f3a;--dim:#64748b;--faint:rgba(79,110,247,.04);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;}
+
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:0 16px 80px;}
+
+/* NAV */
+.nav{display:none;}
+.nav::-webkit-scrollbar{height:0;}
+.nt{padding:9px 16px;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;margin-bottom:-1px;}
+.nt:hover{color:var(--white);}
+.nt.act{color:var(--blue);border-bottom-color:var(--blue);font-weight:800;}
+
+/* SEG TABS */
+.seg{display:flex;gap:4px;background:#f1f3fa;border:1px solid var(--b);border-radius:11px;padding:4px;width:fit-content;}
+.sg{padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap;}
+.sg.act{background:#fff;color:var(--blue);border:1px solid rgba(79,110,247,.28);box-shadow:0 1px 4px rgba(79,110,247,.1);}
+.sg.act.amber{background:#fff;color:var(--amber);border-color:rgba(217,119,6,.3);}
+
+/* BTNS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all .18s;white-space:nowrap;}
+.btn-primary{background:linear-gradient(135deg,#4f6ef7,#8b5cf6);color:#fff;box-shadow:0 4px 16px rgba(79,110,247,.3);}
+.btn-primary:hover{box-shadow:0 6px 22px rgba(79,110,247,.5);transform:translateY(-1px);}
+.btn-amber{background:linear-gradient(135deg,#f59e0b,#f97316);color:#fff;box-shadow:0 4px 16px rgba(245,158,11,.25);}
+.btn-amber:hover{box-shadow:0 6px 22px rgba(245,158,11,.4);transform:translateY(-1px);}
+.btn-sec{background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.25);}
+.btn-sec:hover{background:rgba(79,110,247,.18);}
+.btn-ghost{background:#f1f3fa;color:var(--dim);border:1px solid var(--b);}
+.btn-ghost:hover{background:#e8ebf8;color:var(--white);}
+.btn-sm{padding:5px 10px;font-size:11px;border-radius:7px;}
+.btn-red{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.25);}
+.btn-red:hover{background:rgba(239,68,68,.18);}
+.btn-green{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.25);}
+
+/* PAGE HDR */
+.phdr{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:28px 0 16px;}
+.ptitle{font-size:20px;font-weight:900;letter-spacing:-.4px;}
+.ptitle span{background:linear-gradient(90deg,#4f6ef7,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.psub{font-size:11px;color:var(--dim);margin-top:3px;line-height:1.6;}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px;}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr);}}
+.sc{padding:12px 14px;background:var(--card);border:1px solid var(--b);border-radius:12px;}
+.sc-lbl{font-size:9px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);margin-bottom:5px;}
+.sc-val{font-family:'Space Mono',monospace;font-size:17px;font-weight:700;}
+.sc-sub{font-size:10px;color:var(--dim);margin-top:2px;}
+.blue{color:var(--blue);}.green{color:var(--green);}.amber{color:var(--amber);}.red{color:var(--red);}.purple{color:var(--purple);}
+
+
+/* ── ROLE SYSTEM ─────────────────────────────────────────────── */
+.role-bar{display:flex;align-items:center;gap:8px;padding:6px 12px;
+  background:#fffbeb;border-bottom:1px solid #fde68a;font-size:11px;color:#92400e;
+  position:sticky;top:0;z-index:200;}
+body.dark .role-bar{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.2);color:var(--amber);}
+.role-bar strong{font-weight:800;}
+.role-sel{padding:3px 8px;border-radius:6px;font-size:11px;font-family:'Outfit',sans-serif;
+  border:1px solid rgba(217,119,6,.3);background:#fff;color:#92400e;cursor:pointer;outline:none;}
+body.dark .role-sel{background:rgba(245,158,11,.1);color:var(--amber);}
+.role-note{font-size:10px;opacity:.7;margin-left:4px;}
+
+/* ── NO ACCESS SCREEN ────────────────────────────────────────── */
+#no-access{display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60vh;gap:12px;text-align:center;}
+#no-access .na-ico{font-size:48px;}
+#no-access .na-title{font-size:20px;font-weight:800;color:var(--white);}
+#no-access .na-sub{font-size:13px;color:var(--dim);max-width:340px;line-height:1.6;}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap;}
+.sb{flex:1;min-width:190px;position:relative;}
+.sb input{width:100%;padding:8px 12px 8px 32px;background:#fff;border:1px solid var(--b);border-radius:9px;font-size:12px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .15s;}
+.sb input:focus{border-color:rgba(79,110,247,.4);}
+.sb input::placeholder{color:var(--dim);}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--dim);}
+.fsel{padding:7px 24px 7px 10px;background:#fff;border:1px solid var(--b);border-radius:9px;font-size:12px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;cursor:pointer;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%2364748b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;}
+.fsel option{background:#fff;color:#1a1f3a;}
+.dr{display:flex;align-items:center;gap:5px;}
+.dr input{width:130px;padding:7px 9px;background:#fff;border:1px solid var(--b);border-radius:9px;font-size:11px;color:var(--white);font-family:'Space Mono',monospace;outline:none;}
+.dr-sep{font-size:11px;color:var(--dim);}
+
+/* INVOICE TABLE */
+.inv-card{background:var(--card);border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(79,110,247,.06);}
+.inv-table{width:100%;border-collapse:collapse;}
+.inv-table thead{background:rgba(79,110,247,.03);}
+.inv-table th{padding:9px 11px;font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:left;border-bottom:1px solid var(--b);white-space:nowrap;}
+.inv-table th:first-child{padding-left:16px;}
+.inv-table td{padding:9px 11px;border-bottom:1px solid rgba(100,120,255,.05);font-size:12px;vertical-align:middle;}
+.inv-table td:first-child{padding-left:16px;}
+.inv-table tbody tr{transition:background .12s;cursor:pointer;}
+.inv-table tbody tr:hover td{background:rgba(79,110,247,.04);}
+.inv-table tbody tr:last-child td{border-bottom:none;}
+.inv-num{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--blue);}
+.inv-num.kor{color:var(--amber);}
+.inv-num.b2b{color:var(--amber);}
+.inv-num.cancelled{color:var(--dim);text-decoration:line-through;}
+.ref-to{font-size:9.5px;color:var(--dim);margin-top:1px;}
+.cli-name{font-size:12px;font-weight:600;}
+.cli-id{font-size:10px;color:var(--dim);margin-top:1px;}
+.amt{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;}
+.amt.neg{color:var(--red);}
+.amt.dim{color:var(--dim);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;}
+.b-zw{background:rgba(16,185,129,.08);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+.b-kor{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.b-pro{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);}
+.b-b2b{background:rgba(245,158,11,.12);color:var(--amber);border:1px solid rgba(245,158,11,.25);font-weight:800;}
+.b-vat23{background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.2);}
+.b-auto{background:rgba(6,182,212,.08);color:var(--cyan);border:1px solid rgba(6,182,212,.2);}
+
+/* STATUS */
+.st{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;white-space:nowrap;}
+.st-ok{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.22);}
+.st-issued{background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.2);}
+.st-wait{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);animation:pw 2s ease-in-out infinite;}
+.st-draft{background:rgba(255,255,255,.05);color:var(--dim);border:1px dashed var(--b);}
+.st-cancel{background:rgba(100,100,100,.1);color:var(--dim);border:1px solid rgba(100,100,100,.2);}
+@keyframes pw{0%,100%{box-shadow:0 0 3px rgba(245,158,11,.2)}50%{box-shadow:0 0 8px rgba(245,158,11,.45)}}
+
+/* ── THREE-DOT DROPDOWN ──────────────────────────────────────── */
+.dd-wrap{position:relative;display:inline-block;}
+.dd-btn{width:28px;height:28px;border-radius:7px;background:#f1f3fa;border:1px solid var(--b);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  font-size:18px;line-height:1;color:var(--dim);transition:all .15s;user-select:none;}
+.dd-btn:hover{background:rgba(79,110,247,.1);border-color:rgba(79,110,247,.3);color:var(--blue);}
+.dd-menu{position:absolute;right:0;top:34px;background:#fff;border:1px solid var(--b);
+  border-radius:10px;box-shadow:0 8px 24px rgba(79,110,247,.12);
+  min-width:195px;z-index:50;opacity:0;pointer-events:none;
+  transform:translateY(-6px);transition:opacity .15s,transform .15s;}
+.dd-menu.open{opacity:1;pointer-events:all;transform:translateY(0);}
+.dditem{padding:8px 14px;font-size:12px;font-weight:500;color:var(--white);
+  cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .1s;white-space:nowrap;}
+.dditem:first-child{border-radius:10px 10px 0 0;}
+.dditem:last-child{border-radius:0 0 10px 10px;}
+.dditem:hover{background:rgba(79,110,247,.06);}
+.dditem+.dditem{border-top:1px solid rgba(79,110,247,.06);}
+.dditem-am{color:var(--amber);}.dditem-am:hover{background:rgba(217,119,6,.05);}
+.dditem-red{color:var(--red);}.dditem-red:hover{background:rgba(220,38,38,.05);}
+body.dark .dd-btn{background:rgba(255,255,255,.04);}
+body.dark .dd-menu{background:rgba(16,16,46,.99);border-color:rgba(100,120,255,.2);}
+body.dark .dditem:hover{background:rgba(79,110,247,.1);}
+/* ROW BTNS legacy */
+.rbtns{display:none;}
+.ib{display:none;}
+
+/* PAGINATION */
+.pag{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-top:1px solid var(--b);}
+.pag-info{font-size:11px;color:var(--dim);}
+.pag-btns{display:flex;gap:4px;}
+.pb{width:28px;height:28px;border-radius:6px;background:var(--faint);border:1px solid var(--b);font-size:11px;font-weight:600;color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;transition:all .15s;}
+.pb.act{background:rgba(79,110,247,.15);border-color:rgba(79,110,247,.35);color:var(--blue);}
+.pb:hover:not(.act){background:rgba(255,255,255,.05);color:var(--white);}
+
+/* B2B CLIENTS */
+.b2b-strip{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.b2b-cc{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fffbeb;border:1.5px solid rgba(217,119,6,.2);border-radius:12px;cursor:pointer;transition:all .18s;flex:1;min-width:220px;max-width:340px;}
+.b2b-cc:hover,.b2b-cc.act{border-color:var(--amber);background:rgba(245,158,11,.1);box-shadow:0 0 14px rgba(245,158,11,.12);}
+.b2b-icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,rgba(245,158,11,.3),rgba(249,115,22,.3));border:1px solid rgba(245,158,11,.4);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.b2b-name{font-size:13px;font-weight:800;}
+.b2b-nip{font-size:10px;color:var(--dim);font-family:'Space Mono',monospace;margin-top:2px;}
+.b2b-cs{font-size:10px;color:var(--dim);margin-top:3px;}
+.b2b-cs span{color:var(--amber);font-weight:700;}
+.b2b-add{display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 16px;background:var(--faint);border:1.5px dashed rgba(245,158,11,.25);border-radius:12px;cursor:pointer;font-size:12px;font-weight:600;color:var(--dim);transition:all .18s;flex:0 0 auto;}
+.b2b-add:hover{color:var(--amber);border-color:rgba(245,158,11,.5);}
+
+/* INFO BOXES */
+.ibox{padding:10px 14px;border-radius:9px;font-size:11.5px;display:flex;gap:9px;margin-bottom:12px;align-items:flex-start;line-height:1.6;}
+.ibox-blue{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;}
+.ibox-amber{background:#fffbeb;border:1px solid #fde68a;color:#92400e;}
+.ibox-green{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d;}
+.ibox-red{background:#fef2f2;border:1px solid #fecaca;color:#7f1d1d;}
+.ibox-icon{font-size:14px;flex-shrink:0;margin-top:1px;}
+
+/* IMOJE AUTO TAG */
+.auto-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 6px;background:rgba(6,182,212,.07);border:1px solid rgba(6,182,212,.18);border-radius:5px;font-size:9.5px;font-weight:700;color:var(--cyan);}
+
+/* PROJECT TAG */
+.proj-tag{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;}
+.pt-space{background:rgba(79,110,247,.1);color:var(--blue);border:1px solid rgba(79,110,247,.2);}
+.pt-indigo{background:rgba(139,92,246,.1);color:var(--purple);border:1px solid rgba(139,92,246,.2);}
+.pt-olimp{background:rgba(245,158,11,.1);color:var(--amber);border:1px solid rgba(245,158,11,.2);}
+.pt-kurs{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2);}
+
+/* DIV */
+.div{height:1px;background:var(--b);margin:14px 0;}
+.sec{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 0 8px;border-bottom:1px solid var(--b);margin-bottom:13px;display:flex;align-items:center;gap:7px;}
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+
+/* ══════════ OVERLAY & MODAL ══════════ */
+.overlay{position:fixed;inset:0;background:rgba(26,31,58,.4);backdrop-filter:blur(6px);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .22s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:#fff;border:1px solid var(--bh);border-radius:18px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto;box-shadow:0 8px 40px rgba(79,110,247,.12);transform:translateY(14px);transition:transform .22s;}
+.overlay.open .modal{transform:translateY(0);}
+.modal-lg{max-width:860px;}
+.modal-sm{max-width:480px;}
+.modal-xl{max-width:960px;}
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-thumb{background:rgba(79,110,247,.2);border-radius:2px;}
+.mhdr{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--b);}
+.mhl{display:flex;align-items:center;gap:10px;}
+.mhico{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.mi-bl{background:rgba(79,110,247,.15);border:1px solid rgba(79,110,247,.25);}
+.mi-am{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.22);}
+.mi-rd{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.22);}
+.mi-gr{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.22);}
+.mi-cy{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.22);}
+.mtitle{font-size:15px;font-weight:800;}
+.msub{font-size:11px;color:var(--dim);margin-top:2px;}
+.mclose{width:32px;height:32px;border-radius:8px;background:var(--faint);border:1px solid var(--b);font-size:13px;color:var(--dim);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.mclose:hover{background:rgba(239,68,68,.1);color:var(--red);}
+.mbody{padding:18px 22px;}
+.mfooter{padding:13px 22px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fafbff;}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.fg label{font-size:9.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--dim);}
+.fg input,.fg select,.fg textarea{padding:9px 12px;background:#f8f9ff;border:1px solid rgba(79,110,247,.18);border-radius:9px;font-size:13px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;transition:border-color .15s,background .15s;width:100%;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:rgba(79,110,247,.45);background:#fff;}
+.fg input[readonly]{opacity:.65;cursor:default;}
+.fg select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%2364748b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.fg select option{background:#fff;color:#1a1f3a;}
+.fg textarea{resize:vertical;min-height:58px;font-size:12px;line-height:1.6;}
+.hint{font-size:10px;color:var(--dim);margin-top:3px;line-height:1.5;}
+.gr2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.gr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.span2{grid-column:1/-1;}
+.span3{grid-column:1/-1;}
+
+/* POSITIONS TABLE */
+.ptbl{width:100%;border-collapse:collapse;margin-bottom:6px;}
+.ptbl thead tr{background:rgba(255,255,255,.02);}
+.ptbl th{padding:6px 8px;font-size:8.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:left;border-bottom:1px solid var(--b);}
+.ptbl td{padding:5px 5px;border-bottom:1px solid rgba(100,120,255,.05);vertical-align:middle;}
+.ptbl td input,.ptbl td select{padding:5px 8px;font-size:12px;background:#f8f9ff;border:1px solid var(--b);border-radius:7px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;width:100%;transition:border-color .15s;}
+.ptbl td input:focus,.ptbl td select:focus{border-color:rgba(79,110,247,.4);}
+.mono{font-family:'Space Mono',monospace;font-size:11px;}
+.del-pos{width:24px;height:24px;border-radius:5px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);color:var(--red);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.del-pos:hover{background:rgba(239,68,68,.18);}
+
+/* SUM BOX */
+.sumbox{background:rgba(79,110,247,.05);border:1px solid rgba(79,110,247,.16);border-radius:11px;padding:13px 15px;}
+.sr{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.slbl{font-size:12px;color:var(--dim);}
+.sval{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;}
+.sr.tot{border-top:1px solid var(--b);margin-top:7px;padding-top:9px;}
+.sr.tot .slbl{font-size:14px;font-weight:700;color:var(--white);}
+.sr.tot .sval{font-size:18px;color:var(--blue);}
+
+/* TOGGLE */
+.trow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(100,120,255,.06);}
+.trow:last-child{border-bottom:none;}
+.tl{font-size:12.5px;font-weight:600;}
+.th{font-size:10.5px;color:var(--dim);margin-top:2px;}
+.tog{position:relative;width:38px;height:22px;flex-shrink:0;}
+.tog input{opacity:0;width:0;height:0;}
+.tsl{position:absolute;inset:0;background:rgba(255,255,255,.1);border:1px solid var(--b);border-radius:11px;cursor:pointer;transition:all .2s;}
+.tsl::before{content:'';position:absolute;height:14px;width:14px;left:3px;bottom:3px;background:var(--dim);border-radius:50%;transition:all .2s;}
+.tog input:checked+.tsl{background:rgba(79,110,247,.25);border-color:rgba(79,110,247,.5);}
+.tog input:checked+.tsl::before{transform:translateX(16px);background:var(--blue);}
+.tog input:checked+.tsl.g{background:rgba(16,185,129,.25);border-color:rgba(16,185,129,.5);}
+.tog input:checked+.tsl.g::before{background:var(--green);}
+
+/* NUM PREVIEW BOX */
+.num-preview{background:rgba(79,110,247,.05);border:1px solid rgba(79,110,247,.18);border-radius:11px;padding:13px 16px;margin-bottom:14px;}
+.np-lbl{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--dim);margin-bottom:6px;}
+.np-tokens{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.tok{display:inline-flex;align-items:center;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;font-family:'Space Mono',monospace;border:1.5px solid;}
+.tok-fa{background:rgba(79,110,247,.12);border-color:rgba(79,110,247,.35);color:var(--blue);}
+.tok-fk{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--amber);}
+.tok-code{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--green);}
+.tok-sep{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1);color:var(--dim);padding:5px 6px;}
+.tok-yr{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3);color:var(--purple);}
+.tok-mm{background:rgba(6,182,212,.1);border-color:rgba(6,182,212,.3);color:var(--cyan);}
+.tok-nn{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--green);}
+.np-num{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--blue);}
+.np-num.kor{color:var(--amber);}
+
+/* INVOICE PDF PREVIEW */
+.pdf-wrap{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;}
+.pdf-inner{background:#fff;padding:28px 32px;font-size:12px;color:#111;line-height:1.5;}
+.pdf-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #e5e7eb;}
+.pdf-logo{font-size:20px;font-weight:900;color:#4f6ef7;letter-spacing:-1px;}
+.pdf-logo span{color:#8b5cf6;}
+.pdf-doctype{font-size:18px;font-weight:900;color:#111;margin-top:4px;}
+.pdf-num{font-size:13px;color:#4f6ef7;font-family:'Space Mono',monospace;}
+.pdf-dates{font-size:11px;color:#666;text-align:right;line-height:1.7;}
+.pdf-parties{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:18px;}
+.pdf-side-lbl{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#9ca3af;margin-bottom:5px;}
+.pdf-side-name{font-size:13px;font-weight:700;margin-bottom:3px;}
+.pdf-side-data{font-size:11px;color:#444;line-height:1.7;}
+.pdf-items table{width:100%;border-collapse:collapse;margin-bottom:16px;}
+.pdf-items th{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#9ca3af;padding:5px 7px;border-bottom:2px solid #e5e7eb;text-align:left;}
+.pdf-items td{padding:7px 7px;border-bottom:1px solid #f3f4f6;font-size:11.5px;}
+.pdf-items .r{text-align:right;}
+.pdf-sum{margin-left:auto;width:240px;margin-bottom:16px;}
+.pdf-sr{display:flex;justify-content:space-between;padding:3px 0;font-size:12px;}
+.pdf-sr.tot{border-top:2px solid #111;margin-top:6px;padding-top:8px;font-size:15px;font-weight:900;}
+.pdf-footer{padding-top:14px;border-top:1px solid #e5e7eb;display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;}
+.pdf-note{margin-top:10px;padding:8px 12px;background:#fef9c3;border:1px solid #fde047;border-radius:6px;font-size:10px;color:#854d0e;}
+.pdf-b2b-note{background:#eff6ff;border-color:#bfdbfe;color:#1e40af;}
+
+/* KOREKTA REASONS */
+.kor-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.kor-opt{padding:10px 13px;background:#f8f9ff;border:1.5px solid var(--b);border-radius:10px;cursor:pointer;transition:all .15s;}
+.kor-opt:hover{border-color:rgba(245,158,11,.4);}
+.kor-opt.sel{border-color:var(--amber);background:#fffbeb;}
+.kor-opt-ico{font-size:18px;margin-bottom:4px;}
+.kor-opt-name{font-size:12px;font-weight:700;}
+.kor-opt-desc{font-size:10.5px;color:var(--dim);margin-top:2px;line-height:1.4;}
+
+/* WORKFLOW STEPS */
+.wflow{display:flex;flex-direction:column;gap:1px;margin-bottom:14px;}
+.wstep{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border-radius:9px;border:1px solid var(--b);background:#f8f9ff;}
+.wstep.act{border-color:rgba(79,110,247,.35);background:#eff6ff;}
+.wstep.done{border-color:rgba(5,150,105,.3);background:#f0fdf4;}
+.wstep-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px;}
+.wstep.act .wstep-num{background:rgba(79,110,247,.2);border:1.5px solid rgba(79,110,247,.5);color:var(--blue);}
+.wstep.done .wstep-num{background:rgba(16,185,129,.2);border:1.5px solid rgba(16,185,129,.5);color:var(--green);}
+.wstep:not(.act):not(.done) .wstep-num{background:rgba(255,255,255,.05);border:1.5px solid var(--b);color:var(--dim);}
+.wstep-content .wtitle{font-size:12.5px;font-weight:700;}
+.wstep-content .wdesc{font-size:11px;color:var(--dim);margin-top:2px;line-height:1.5;}
+
+
+/* ZAPŁACONO INDICATOR */
+.paid-stamp{display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:5px;font-size:9.5px;font-weight:700;
+  background:#f0fdf4;border:1px solid #bbf7d0;color:#059669;
+  font-family:'Space Mono',monospace;margin-top:3px;}
+body.dark .paid-stamp{background:rgba(5,150,105,.1);border-color:rgba(5,150,105,.25);color:var(--green);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;padding:11px 17px;background:#fff;border:1px solid rgba(5,150,105,.3);border-radius:11px;font-size:12.5px;font-weight:600;color:var(--green);box-shadow:0 4px 20px rgba(79,110,247,.12);z-index:999;transform:translateY(24px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:7px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.am{border-color:rgba(217,119,6,.3);color:var(--amber);}
+.toast.info{border-color:rgba(79,110,247,.4);color:var(--blue);}
+.toast.err{border-color:rgba(220,38,38,.3);color:var(--red);}
+
+@media(max-width:640px){.gr2{grid-template-columns:1fr;}.gr3{grid-template-columns:1fr;}.kor-opts{grid-template-columns:1fr;}.pdf-parties{grid-template-columns:1fr;}}
+
+@media print{
+  body{background:#fff !important;}
+  body::before{display:none !important;}
+  .nav,.wrap>.phdr,.wrap>div:not(.overlay),.toast,.overlay:not(.open){display:none !important;}
+  .overlay.open{position:static !important;background:none !important;backdrop-filter:none !important;padding:0 !important;display:block !important;}
+  .overlay.open .modal{box-shadow:none !important;border:none !important;background:#fff !important;max-height:none !important;}
+  .mhdr,.mfooter,.mclose{display:none !important;}
+  .pdf-wrap{border:none !important;box-shadow:none !important;}
+  .pdf-inner{color:#111 !important;}
+}
+
+/* ══ FIRMA BADGE ══════════════════════════════════════════════ */
+.firma-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;padding:1px 5px;border-radius:4px;margin-left:3px;vertical-align:middle;}
+.fb-gls{background:rgba(79,110,247,.07);color:#8892b0;border:1px solid rgba(79,110,247,.14);}
+.fb-hrableuski{background:rgba(245,158,11,.07);color:var(--amber);border:1px solid rgba(245,158,11,.18);}
+.fb-lubenets{background:rgba(16,185,129,.07);color:var(--green);border:1px solid rgba(16,185,129,.16);}
+
+/* ══ EXPORT PANEL ════════════════════════════════════════════════ */
+.export-panel{background:#f8f9ff;border:1.5px solid rgba(79,110,247,.16);border-radius:14px;padding:14px 16px;margin-bottom:14px;}
+.export-title{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.exp-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.exp-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:9px;font-size:11.5px;font-weight:700;cursor:pointer;border:1px solid transparent;font-family:'Outfit',sans-serif;transition:all .18s;white-space:nowrap;line-height:1.3;}
+.exp-xlsx{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.3);color:var(--green);}
+.exp-xlsx:hover{background:rgba(16,185,129,.22);box-shadow:0 4px 14px rgba(16,185,129,.2);}
+.exp-pdf{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.28);color:var(--red);}
+.exp-pdf:hover{background:rgba(239,68,68,.18);box-shadow:0 4px 14px rgba(239,68,68,.18);}
+.exp-comarch{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--amber);}
+.exp-comarch:hover{background:rgba(245,158,11,.2);box-shadow:0 4px 14px rgba(245,158,11,.16);}
+.exp-jpk{background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.3);color:var(--purple);}
+.exp-jpk:hover{background:rgba(139,92,246,.2);box-shadow:0 4px 14px rgba(139,92,246,.16);}
+.exp-sep{width:1px;height:24px;background:rgba(100,120,255,.15);flex-shrink:0;margin:0 2px;}
+.exp-count{font-size:11px;color:var(--dim);margin-left:4px;}
+.exp-count b{color:var(--blue);font-family:'Space Mono',monospace;}
+
+/* ══ SELECTION TOOLBAR ══════════════════════════════════════════ */
+.sel-bar{display:none;align-items:center;gap:10px;background:#eff6ff;border:1.5px solid rgba(79,110,247,.3);border-radius:11px;padding:9px 14px;margin-top:10px;flex-wrap:wrap;}
+.sel-bar.show{display:flex;}
+.sel-bar-n{font-size:12px;font-weight:800;color:var(--blue);}
+.sel-bar-sum{font-size:11px;color:var(--dim);}
+.sel-bar-acts{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto;}
+
+/* ══ SORTABLE TH ════════════════════════════════════════════════ */
+th.srt{cursor:pointer;user-select:none;white-space:nowrap;transition:color .15s;}
+th.srt:hover{color:var(--white);}
+th.srt.asc:after{content:' ↑';color:var(--blue);}
+th.srt.desc:after{content:' ↓';color:var(--blue);}
+
+/* ══ CHECKBOX ════════════════════════════════════════════════════ */
+.cb-th{width:34px;padding:0 8px !important;}
+.cb-td{width:34px;padding:0 8px !important;}
+.row-cb,.hd-cb{width:15px;height:15px;accent-color:var(--blue);cursor:pointer;display:block;}
+tr.row-sel{background:rgba(79,110,247,.06) !important;}
+tr.row-sel td{border-bottom-color:rgba(79,110,247,.1) !important;}
+
+
+/* ── DARK MODE ── */
+body.dark{
+  --bg:#04040f;--card:rgba(12,12,36,.98);--card2:rgba(16,16,46,.97);
+  --b:rgba(100,120,255,.12);--bh:rgba(120,140,255,.28);
+  --white:#e8eeff;--dim:#8892b0;--faint:rgba(255,255,255,.035);
+  --amber:#f59e0b;--green:#10b981;--red:#ef4444;
+}
+body.dark::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    radial-gradient(1px 1px at 8% 14%,rgba(255,255,255,.5) 0%,transparent 100%),
+    radial-gradient(1px 1px at 24% 38%,rgba(255,255,255,.3) 0%,transparent 100%),
+    radial-gradient(1px 1px at 47% 8%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(1px 1px at 66% 55%,rgba(255,255,255,.25) 0%,transparent 100%),
+    radial-gradient(1px 1px at 81% 21%,rgba(255,255,255,.4) 0%,transparent 100%),
+    radial-gradient(2px 2px at 37% 82%,rgba(150,170,255,.35) 0%,transparent 100%),
+    radial-gradient(200px 200px at 18% 22%,rgba(79,110,247,.05) 0%,transparent 70%),
+    radial-gradient(240px 240px at 78% 58%,rgba(139,92,246,.04) 0%,transparent 70%);}
+body.dark .modal{background:var(--card2);}
+body.dark .mhdr,body.dark .mfooter,body.dark .mftr{background:rgba(255,255,255,.015);}
+body.dark .fg input,body.dark .fg select,body.dark .fg textarea{background:rgba(255,255,255,.04);border-color:var(--b);}
+body.dark .fg input:focus,body.dark .fg select:focus,body.dark .fg textarea:focus{background:rgba(79,110,247,.05);}
+body.dark .fg select option{background:#0d0d2e;}
+body.dark .sb input,body.dark .fsel,body.dark .dr input{background:var(--card);}
+body.dark .fsel option{background:#0d0d2e;}
+body.dark .seg{background:rgba(255,255,255,.03);}
+body.dark .sg.act{background:rgba(79,110,247,.18);box-shadow:none;border-color:rgba(79,110,247,.35);}
+body.dark .sg.act.amber{background:rgba(245,158,11,.15);}
+body.dark .btn-ghost{background:var(--faint);}
+body.dark .btn-ghost:hover{background:rgba(255,255,255,.07);}
+body.dark .ib{background:var(--faint);}
+body.dark .ib:hover{background:rgba(79,110,247,.15);}
+body.dark .sel-bar{background:rgba(79,110,247,.08);}
+body.dark .export-panel{background:rgba(79,110,247,.04);}
+body.dark .wstep{background:rgba(255,255,255,.015);}
+body.dark .wstep.act{background:rgba(79,110,247,.07);}
+body.dark .wstep.done{background:rgba(16,185,129,.05);}
+body.dark .kor-opt{background:rgba(255,255,255,.025);}
+body.dark .kor-opt.sel{background:rgba(245,158,11,.07);}
+body.dark .ibox-blue{background:rgba(79,110,247,.07);border-color:rgba(79,110,247,.2);color:rgba(180,200,255,.85);}
+body.dark .ibox-amber{background:rgba(245,158,11,.07);border-color:rgba(245,158,11,.2);color:rgba(255,220,130,.85);}
+body.dark .ibox-green{background:rgba(16,185,129,.07);border-color:rgba(16,185,129,.2);color:rgba(100,230,180,.85);}
+body.dark .ibox-red{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.2);color:rgba(255,150,150,.85);}
+body.dark .toast{background:var(--card2);}
+body.dark .overlay{background:rgba(4,4,15,.9);}
+body.dark .inv-table thead{background:rgba(255,255,255,.025);}
+body.dark .ptbl td input,body.dark .ptbl td select{background:rgba(255,255,255,.04);}
+body.dark .b2b-cc{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.2);}
+body.dark .mclose{background:rgba(255,255,255,.04);}
+body.dark .inv-card{box-shadow:none;}
+body.dark .sc{box-shadow:none;}
+
+/* THEME TOGGLE */
+.theme-btn{display:flex;align-items:center;gap:6px;padding:7px 13px;border-radius:9px;border:1px solid var(--b);background:var(--card);color:var(--dim);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;white-space:nowrap;}
+.theme-btn:hover{border-color:rgba(79,110,247,.4);color:var(--blue);}
+
+</style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<div class="role-bar" id="role-bar">
+  ⚙ Tryb podglądu:
+  <strong id="role-label">SuperAdmin</strong>
+  <select class="role-sel" onchange="setRole(this.value)">
+    <option value="superadmin">SuperAdmin</option>
+    <option value="bookkeeper">Księgowa</option>
+    <option value="admin">Administrator</option>
+    <option value="manager">Manager / Sprzedaż</option>
+    <option value="trainer">Trener</option>
+  </select>
+  <span class="role-note">(symulacja ról — w produkcji rola pochodzi z sesji)</span>
+</div>
+
+<div id="no-access">
+  <div class="na-ico">🔒</div>
+  <div class="na-title">Brak dostępu</div>
+  <div class="na-sub">Moduł Faktur nie jest dostępny dla roli <strong id="no-access-role">Trener</strong>.<br>Skontaktuj się z administratorem jeśli potrzebujesz dostępu.</div>
+</div>
+
+<div class="wrap" id="main-wrap">
+
+<!-- ── NAV ─────────────────────────────────────── -->
+<div class="nav">
+  <div class="nt">💳 Płatności</div>
+  <div class="nt act">🧾 Faktury</div>
+  <div class="nt">🧩 Projekty</div>
+  <div class="nt">📊 Raporty</div>
+  <div class="nt">⏸ Pauzy</div>
+  <div class="nt">🔄 Zwroty</div>
+  <div class="nt">⚙ Ustawienia</div>
+</div>
+
+<!-- ── PAGE HEADER ──────────────────────────────── -->
+<div class="phdr">
+  <div>
+    <div class="ptitle">Faktury <span>GLS</span></div>
+    <div class="psub">
+      B2C: automatyczne po Imoje · seria FA/[KOD]/RRRR/MM/NNN per projekt
+      &nbsp;·&nbsp; B2B: ręczne · seria FV/B2B/RRRR/MM/NNN (wspólna)
+      &nbsp;·&nbsp; Zwolnienie edukacyjne art. 43 ust. 1 pkt 26
+    </div>
+  </div>
+  <div style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+    <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙 Ciemny</button>
+  </div>
+</div>
+
+<!-- ── SEG TABS ──────────────────────────────────── -->
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+  <div class="seg">
+    <div class="sg act" id="seg-b2c" onclick="switchSeg('b2c')">👥 Faktury B2C &nbsp;<span style="font-size:10px;opacity:.65;">(2 184)</span></div>
+    <div class="sg" id="seg-b2b" onclick="switchSeg('b2b')">🏢 Faktury B2B &nbsp;<span style="background:rgba(245,158,11,.2);color:var(--amber);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:800;">2 firmy</span></div>
+  </div>
+  <div id="act-b2c" style="display:flex;gap:7px;flex-wrap:wrap;align-items:center;">
+    <button class="btn btn-ghost btn-sm" onclick="openModal('modal-proforma')">📄 Pro forma</button>
+    <button class="btn btn-primary" onclick="openModal('modal-new-b2c')">＋ Wystaw fakturę B2C</button>
+  </div>
+  <div id="act-b2b" style="display:none;gap:7px;flex-wrap:wrap;">
+    <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);border-radius:5px;font-size:10px;font-weight:700;color:var(--purple);">🛡 Admin / Super-Admin</span>
+    <button class="btn btn-ghost btn-sm">↓ Eksport PDF</button>
+    <button class="btn btn-amber" onclick="openModal('modal-new-b2b')">＋ Faktura VAT B2B</button>
+  </div>
+</div>
+
+<!-- ══════════════════ VIEW B2C ══════════════════ -->
+<div id="view-b2c">
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="sc">
+      <div class="sc-lbl">Wystawione 2025</div>
+      <div class="sc-val blue">2 184</div>
+      <div class="sc-sub">faktury B2C (auto + ręczne)</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Wartość brutto</div>
+      <div class="sc-val green">897 240 zł</div>
+      <div class="sc-sub">bieżący rok · ZW</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Korekty (FK/)</div>
+      <div class="sc-val amber">23</div>
+      <div class="sc-sub">bieżący rok</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Zwroty</div>
+      <div class="sc-val red">–8 640 zł</div>
+      <div class="sc-sub">12 faktur korygujących</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Pro Forma</div>
+      <div class="sc-val purple">11</div>
+      <div class="sc-sub">aktywne faktury proforma</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="sb"><span class="si">🔍</span><input type="text" placeholder="Szukaj po numerze, kliencie, kwocie..." oninput="applyFilters('b2c')"></div>
+    <select class="fsel" id="b2c-proj-filter" onchange="applyFilters('b2c')">
+      <option value="">Wszystkie projekty</option>
+      <option value="SPACE">🚀 Space Memory</option>
+      <option value="INDIGO">🧠 INDIGO Speedy Mind</option>
+      <option value="OLIMP">🏆 Olimpiada GLS</option>
+      <option value="SKLEP">🛍 E-sklep Space Memory</option>
+      <option value="LUB">📦 Materiały / Kursy</option>
+    </select>
+    <select class="fsel" id="b2c-type-filter" onchange="applyFilters('b2c')">
+      <option value="">Wszystkie typy</option>
+      <option value="b2c-fa">Faktura (ZW)</option>
+      <option value="b2c-fk">Korekta (FK/)</option>
+      <option value="b2c-pro">Pro Forma</option>
+      <option value="b2c-cancel">Anulowana</option>
+    </select>
+    <select class="fsel" id="b2c-status-filter" onchange="applyFilters('b2c')">
+      <option value="">Wszystkie statusy</option>
+      <option value="st-ok">✔ Wysłana</option>
+      <option value="st-issued">📄 Wystawiona</option>
+      <option value="st-cancel">✕ Anulowana</option>
+    </select>
+    <div class="dr">
+      <input type="date" id="b2c-date-from" value="2025-01-01" onchange="applyFilters('b2c')">
+      <span class="dr-sep">—</span>
+      <input type="date" id="b2c-date-to" value="2025-12-31" onchange="applyFilters('b2c')">
+    </div>
+  </div>
+
+  <!-- ══ PANEL EKSPORTU B2C ═══════════════════════════════════════════ -->
+  <div class="export-panel" id="exp-panel-b2c">
+    <div class="export-title">
+      <span>📤</span> Eksport i pobieranie
+      <span class="exp-count">— zakres: <b id="exp-sel-b2c">0</b> zaznaczonych / <b id="exp-all-b2c">6</b> widocznych</span>
+    </div>
+    <div class="exp-row">
+      <button class="exp-btn exp-xlsx"   onclick="openExport('xlsx','b2c')">
+        📊 Rejestr XLSX <span style="font-size:9.5px;opacity:.65;">Excel · buhgalter</span>
+      </button>
+      <button class="exp-btn exp-pdf"    onclick="openExport('pdf','b2c')">
+        📁 Pakiet PDF <span style="font-size:9.5px;opacity:.65;">ZIP · archiwum</span>
+      </button>
+      <div class="exp-sep"></div>
+      <button class="exp-btn exp-comarch" onclick="openExport('comarch','b2c')">
+        🏭 Comarch XML <span style="font-size:9.5px;opacity:.65;">Optima import</span>
+      </button>
+      <button class="exp-btn exp-jpk"    onclick="openExport('jpk','b2c')">
+        🏛 JPK_FA <span style="font-size:9.5px;opacity:.65;">XML · Urząd Skarbowy</span>
+      </button>
+      <div class="exp-sep"></div>
+      <select class="fsel" id="exp-period-b2c" style="font-size:11px;">
+        <option value="filter">Bieżący filtr</option>
+        <option value="month">Miesiąc: 05/2025</option>
+        <option value="q2">Q2 2025 (kwi–cze)</option>
+        <option value="year">Cały rok 2025</option>
+      </select>
+    </div>
+    <!-- Pasek zaznaczenia -->
+    <div class="sel-bar" id="sel-bar-b2c">
+      <span class="sel-bar-n">✔ Zaznaczono: <span id="seln-b2c">0</span> faktur</span>
+      <span class="sel-bar-sum">Suma: <strong id="selsum-b2c" style="color:var(--green);font-family:'Space Mono',monospace;">0,00 zł</strong></span>
+      <div class="sel-bar-acts">
+        <button class="exp-btn exp-xlsx"   style="padding:5px 10px;font-size:11px;" onclick="openExport('xlsx','b2c')">📊 XLSX</button>
+        <button class="exp-btn exp-pdf"    style="padding:5px 10px;font-size:11px;" onclick="openExport('pdf','b2c')">📁 PDF</button>
+        <button class="exp-btn exp-comarch" style="padding:5px 10px;font-size:11px;" onclick="openExport('comarch','b2c')">🏭 Comarch</button>
+        <button class="exp-btn exp-jpk"    style="padding:5px 10px;font-size:11px;" onclick="openExport('jpk','b2c')">🏛 JPK</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="clearSel('b2c')">✕ Odznacz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="inv-card">
+    <table class="inv-table" id="tbl-b2c">
+      <thead>
+        <tr>
+          <th class="cb-th"><input type="checkbox" class="hd-cb" id="hd-cb-b2c" onchange="toggleAll(this,'b2c')" title="Zaznacz wszystkie"></th>
+          <th class="srt" onclick="sortTbl('b2c','num',this)">Nr faktury</th>
+          <th>Typ</th>
+          <th class="srt" onclick="sortTbl('b2c','date',this)">Data</th>
+          <th class="srt" onclick="sortTbl('b2c','client',this)">Klient / Uczeń</th>
+          <th class="srt" onclick="sortTbl('b2c','proj',this)">Projekt</th>
+          <th>Źródło</th>
+          <th class="srt" onclick="sortTbl('b2c','amount',this)">Kwota</th>
+          <th>Status</th>
+          <th style="width:40px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- Auto FA/SPACE -->
+        <tr class="inv-row b2c-row" data-type="b2c-fa" data-status="st-ok" data-proj="SPACE" data-date="2025-05-15" data-ulica="ul. Mokotowska 12/4" data-miasto="Warszawa" data-kod="00-561" data-nip="" data-termin="2025-05-29" data-dataplatnosci="2025-05-15" onclick="openModal('modal-preview-b2c')">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2c')"></td>
+          <td><div class="inv-num">FA/SPACE/2025/05/042</div></td>
+          <td><span class="badge b-zw">ZW</span></td>
+          <td class="mono">15.05.2025</td>
+          <td><div class="cli-name">Anna Kowalska</div><div style="font-size:9.5px;color:var(--dim);margin-top:1px;font-style:italic;">Dot. ucznia: Marta Kowalska</div><div class="cli-id">#UCZ-00421 · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fb9a95959ad590bb9e969a9297d58b97">[email&#160;protected]</a></div></td>
+          <td><span class="proj-tag pt-space">SPACE</span><span class="firma-badge fb-gls">GLS</span></td>
+          <td><span class="auto-tag">⚡ Imoje auto</span></td>
+          <td><div class="amt green">480,00 zł</div></td>
+          <td><span class="st st-ok">✔ Wysłana</span><div class="paid-stamp">✅ Zapłacono 15.05.2025</div></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2c')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div class="dditem dditem-am" onclick="openModal('modal-kor-b2c')">FK Faktura korygująca</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib" onclick="openModal('modal-email-b2c')" title="Wyślij e-mail">✉</div>
+              <div class="ib a" onclick="openModal('modal-kor-b2c')" title="Faktura Korygująca">FK</div>
+              <div class="ib" title="Pobierz PDF" onclick="event.stopPropagation();showToast('🖨 Otwórz podgląd i użyj Drukuj / PDF','am')">⬇</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Auto FA/INDIGO -->
+        <tr class="inv-row b2c-row" data-type="b2c-fa" data-status="st-issued" data-proj="INDIGO" data-date="2025-05-14" data-ulica="ul. Wiśniowa 3" data-miasto="Kraków" data-kod="30-150" data-nip="" data-termin="2025-05-28" data-dataplatnosci="" onclick="openModal('modal-preview-b2c')">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2c')"></td>
+          <td><div class="inv-num">FA/INDIGO/2025/05/018</div></td>
+          <td><span class="badge b-zw">ZW</span></td>
+          <td class="mono">14.05.2025</td>
+          <td><div class="cli-name">Piotr Wiśniewski</div><div style="font-size:9.5px;color:var(--dim);margin-top:1px;font-style:italic;">Dot. ucznia: Piotr Nowak</div><div class="cli-id">#UCZ-00388 · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0878267f617b66616d7f7b6361487f78267864">[email&#160;protected]</a></div></td>
+          <td><span class="proj-tag pt-indigo">INDIGO</span><span class="firma-badge fb-gls">GLS</span></td>
+          <td><span class="auto-tag">⚡ Imoje auto</span></td>
+          <td><div class="amt green">480,00 zł</div></td>
+          <td><span class="st st-issued">📄 Wystawiona</span></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2c')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div class="dditem dditem-am" onclick="openModal('modal-kor-b2c')">FK Faktura korygująca</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib" onclick="openModal('modal-email-b2c')" title="Wyślij teraz">✉</div>
+              <div class="ib a" onclick="openModal('modal-kor-b2c')">FK</div>
+              <div class="ib">⬇</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Korekta FK/SPACE -->
+        <tr class="inv-row b2c-row" data-type="b2c-fk" data-status="st-ok" data-proj="SPACE" data-date="2025-05-13" data-ulica="ul. Różana 7/2" data-miasto="Warszawa" data-kod="02-569" data-nip="" data-termin="2025-05-27" data-dataplatnosci="2025-05-20" onclick="openModal('modal-preview-kor')">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2c')"></td>
+          <td>
+            <div class="inv-num kor">FK/SPACE/2025/05/003</div>
+            <div class="ref-to">do FA/SPACE/2025/04/030</div>
+          </td>
+          <td><span class="badge b-kor">KOREKTA</span></td>
+          <td class="mono">13.05.2025</td>
+          <td><div class="cli-name">Marta Nowak</div><div class="cli-id">#UCZ-00305</div></td>
+          <td><span class="proj-tag pt-space">SPACE</span><span class="firma-badge fb-gls">GLS</span></td>
+          <td style="font-size:11px;color:var(--dim);">ręczna</td>
+          <td><div class="amt neg">–240,00 zł</div></td>
+          <td><span class="st st-ok">✔ Wysłana</span><div class="paid-stamp">✅ Zapłacono 20.05.2025</div></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-kor')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib">⬇</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Pro Forma -->
+        <tr class="inv-row b2c-row" data-type="b2c-pro" data-status="st-issued" data-proj="SPACE" data-date="2025-05-12" data-ulica="ul. Narbutta 15" data-miasto="Warszawa" data-kod="02-541" data-nip="" data-termin="2025-05-26" data-dataplatnosci="" onclick="openModal('modal-preview-b2c')">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2c')"></td>
+          <td><div class="inv-num" style="color:var(--purple);">PRO/SPACE/2025/05/011</div></td>
+          <td><span class="badge b-pro">PRO FORMA</span></td>
+          <td class="mono">12.05.2025</td>
+          <td><div class="cli-name">Jakub Lewandowski</div><div class="cli-id">#UCZ-00522</div></td>
+          <td><span class="proj-tag pt-space">SPACE</span><span class="firma-badge fb-gls">GLS</span></td>
+          <td style="font-size:11px;color:var(--dim);">ręczna</td>
+          <td><div class="amt">480,00 zł</div></td>
+          <td><span class="st st-issued">📄 Wystawiona</span></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2c')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div class="dditem" onclick="showToast('⚙ Konwersja PF→FA — backend','info')">🔄 Zamień na fakturę FA</div>
+        <div class="dditem dditem-am" onclick="openModal('modal-kor-b2c')">FK Faktura korygująca</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib" onclick="openModal('modal-email-b2c')">✉</div>
+              <div class="ib" title="Zamień na FA/SPACE" style="font-size:9px;font-weight:800;">FA</div>
+              <div class="ib">⬇</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Olimpiada — jednorazowy -->
+        <tr class="inv-row b2c-row" data-type="b2c-fa" data-status="st-ok" data-proj="OLIMP" data-date="2025-04-03" data-ulica="ul. Puławska 100/5" data-miasto="Warszawa" data-kod="02-595" data-nip="" data-termin="2025-04-17" data-dataplatnosci="2025-04-10" onclick="openModal('modal-preview-b2c')">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2c')"></td>
+          <td><div class="inv-num" style="color:var(--amber);">FA/OLIMP/2025/04/067</div></td>
+          <td><span class="badge b-zw">ZW</span></td>
+          <td class="mono">03.04.2025</td>
+          <td><div class="cli-name">Zofia Dąbrowska</div><div class="cli-id">#UCZ-00710</div></td>
+          <td><span class="proj-tag pt-olimp">OLIMP</span><span class="firma-badge fb-gls">GLS</span></td>
+          <td><span class="auto-tag">⚡ Imoje auto</span></td>
+          <td><div class="amt green">150,00 zł</div></td>
+          <td><span class="st st-ok">✔ Wysłana</span><div class="paid-stamp">✅ Zapłacono 10.04.2025</div></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2c')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div class="dditem dditem-am" onclick="openModal('modal-kor-b2c')">FK Faktura korygująca</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib">✉</div>
+              <div class="ib a" onclick="openModal('modal-kor-b2c')">FK</div>
+              <div class="ib">⬇</div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Anulowana -->
+        <tr class="inv-row b2c-row" data-type="b2c-cancel" data-status="st-cancel" data-proj="SPACE" data-date="2025-04-04" style="opacity:.6;">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2c')"></td>
+          <td><div class="inv-num cancelled">FA/SPACE/2025/04/030</div></td>
+          <td><span class="badge b-zw">ZW</span></td>
+          <td class="mono" style="color:var(--dim);">04.04.2025</td>
+          <td><div class="cli-name" style="color:var(--dim);">Marta Nowak</div><div class="cli-id">#UCZ-00305</div></td>
+          <td><span class="proj-tag pt-space">SPACE</span><span class="firma-badge fb-gls">GLS</span></td>
+          <td style="font-size:11px;color:var(--dim);">auto</td>
+          <td><div class="amt dim">480,00 zł</div></td>
+          <td><span class="st st-cancel">✕ Anulowana</span></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2c')">👁 Podgląd PDF</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--b);flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;color:var(--dim);">Wierszy na stronie:</span>
+        <select class="fsel" style="padding:4px 22px 4px 8px;font-size:11px;" onchange="setPerPage('b2c',this.value)">
+          <option value="30" selected>30</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="300">300</option>
+          <option value="500">500</option>
+        </select>
+      </div>
+      <div class="pag-info" id="pag-info-b2c" style="font-size:11px;color:var(--dim);"></div>
+      <div class="pag-btns" id="pag-btns-b2c"></div>
+    </div>
+    </div>
+  </div>
+
+</div><!-- /view-b2c -->
+
+<!-- ══════════════════ VIEW B2B ══════════════════ -->
+<div id="view-b2b" style="display:none;">
+
+  <div class="ibox ibox-amber">
+    <div class="ibox-icon">🏢</div>
+    <div>Faktury B2B — wystawiane <strong>ręcznie</strong> tylko przez Admin / Super-Admin. Jedna wspólna seria numeracji dla wszystkich projektów:
+      <span style="font-family:'Space Mono',monospace;font-size:11px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);padding:2px 7px;border-radius:5px;margin-left:4px;">FV/B2B/RRRR/MM/NNN</span>
+      · Korekty B2B:
+      <span style="font-family:'Space Mono',monospace;font-size:11px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.2);padding:2px 7px;border-radius:5px;margin-left:4px;">FVK/B2B/RRRR/MM/NNN</span>
+      · Dokument: <strong>Faktura VAT</strong>
+    </div>
+  </div>
+
+  <!-- B2B CLIENT CARDS -->
+  <div class="b2b-strip">
+    <div class="b2b-cc act" id="b2b-c1" onclick="selectB2B(1)">
+      <div class="b2b-icon">🏭</div>
+      <div>
+        <div class="b2b-name">TechCorp Polska Sp. z o.o.</div>
+        <div class="b2b-nip">NIP: 527-123-45-67</div>
+        <div class="b2b-cs">Faktury 2025: <span>4</span> · Wartość: <span>7 680 zł</span></div>
+      </div>
+    </div>
+    <div class="b2b-cc" id="b2b-c2" onclick="selectB2B(2)">
+      <div class="b2b-icon">🏛</div>
+      <div>
+        <div class="b2b-name">Centrum Edukacji Pro S.A.</div>
+        <div class="b2b-nip">NIP: 789-123-45-67</div>
+        <div class="b2b-cs">Faktury 2025: <span>2</span> · Wartość: <span>3 840 zł</span></div>
+      </div>
+    </div>
+    <div class="b2b-add" onclick="openModal('modal-add-b2b-client')">＋ Dodaj klienta B2B</div>
+  </div>
+
+  <!-- B2B STATS -->
+  <div class="stats" style="grid-template-columns:repeat(4,1fr);">
+    <div class="sc">
+      <div class="sc-lbl">Faktury B2B 2025</div>
+      <div class="sc-val amber">6</div>
+      <div class="sc-sub">łącznie obie firmy</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Wartość brutto</div>
+      <div class="sc-val green">11 520 zł</div>
+      <div class="sc-sub">ZW — 0 zł VAT</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Korekty B2B</div>
+      <div class="sc-val" style="color:var(--dim);">0</div>
+      <div class="sc-sub">brak FVK w 2025</div>
+    </div>
+    <div class="sc">
+      <div class="sc-lbl">Następny numer</div>
+      <div class="sc-val blue" style="font-size:13px;">FV/B2B/2025/05/007</div>
+      <div class="sc-sub">seria B2B</div>
+    </div>
+  </div>
+
+  <!-- B2B FILTER -->
+  <div class="filter-bar">
+    <div class="sb"><span class="si">🔍</span><input type="text" placeholder="Szukaj faktury B2B..." oninput="applyFilters('b2b')"></div>
+    <select class="fsel"><option>Obie firmy</option><option>TechCorp Polska</option><option>Centrum Edukacji Pro</option></select>
+    <select class="fsel" id="b2b-type-filter" onchange="applyFilters('b2b')"><option value="">Wszystkie typy</option><option value="b2b-fv">Faktura VAT ZW</option><option value="b2b-fv23">Faktura VAT 23%</option><option value="b2b-fvk">Korekta FVK</option></select>
+    <div class="dr"><input type="date" id="b2b-date-from" value="2025-01-01" onchange="applyFilters('b2b')"><span class="dr-sep">—</span><input type="date" id="b2b-date-to" value="2025-12-31" onchange="applyFilters('b2b')"></div>
+  </div>
+
+  <!-- ══ PANEL EKSPORTU B2B ═══════════════════════════════════════════ -->
+  <div class="export-panel" id="exp-panel-b2b" style="border-color:rgba(245,158,11,.2);background:rgba(245,158,11,.03);">
+    <div class="export-title" style="color:var(--amber);">
+      <span>📤</span> Eksport faktur B2B
+      <span class="exp-count">— <b id="exp-sel-b2b">0</b> zaznaczonych / <b id="exp-all-b2b">2</b> widocznych</span>
+    </div>
+    <div class="exp-row">
+      <button class="exp-btn exp-xlsx"    onclick="openExport('xlsx','b2b')">📊 Rejestr XLSX</button>
+      <button class="exp-btn exp-pdf"     onclick="openExport('pdf','b2b')">📁 Pakiet PDF</button>
+      <div class="exp-sep"></div>
+      <button class="exp-btn exp-comarch" onclick="openExport('comarch','b2b')">🏭 Comarch XML <span style="font-size:9.5px;opacity:.65;">Optima import</span></button>
+      <button class="exp-btn exp-jpk"     onclick="openExport('jpk','b2b')">🏛 JPK_FA <span style="font-size:9.5px;opacity:.65;">XML · US</span></button>
+      <div class="exp-sep"></div>
+      <select class="fsel" style="font-size:11px;">
+        <option>Bieżący filtr</option><option>Miesiąc: 05/2025</option><option>Cały rok 2025</option>
+      </select>
+    </div>
+    <div class="sel-bar" id="sel-bar-b2b">
+      <span class="sel-bar-n">✔ Zaznaczono: <span id="seln-b2b">0</span></span>
+      <span class="sel-bar-sum">Suma: <strong id="selsum-b2b" style="color:var(--green);font-family:'Space Mono',monospace;">0,00 zł</strong></span>
+      <div class="sel-bar-acts">
+        <button class="exp-btn exp-xlsx"    style="padding:5px 10px;font-size:11px;" onclick="openExport('xlsx','b2b')">📊 XLSX</button>
+        <button class="exp-btn exp-pdf"     style="padding:5px 10px;font-size:11px;" onclick="openExport('pdf','b2b')">📁 PDF</button>
+        <button class="exp-btn exp-comarch" style="padding:5px 10px;font-size:11px;" onclick="openExport('comarch','b2b')">🏭 Comarch</button>
+        <button class="exp-btn exp-jpk"     style="padding:5px 10px;font-size:11px;" onclick="openExport('jpk','b2b')">🏛 JPK</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:11px;" onclick="clearSel('b2b')">✕ Odznacz</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- B2B TABLE -->
+  <div class="inv-card">
+    <table class="inv-table" id="tbl-b2b">
+      <thead>
+        <tr>
+          <th class="cb-th"><input type="checkbox" class="hd-cb" id="hd-cb-b2b" onchange="toggleAll(this,'b2b')"></th>
+          <th class="srt" onclick="sortTbl('b2b','num',this)">Nr faktury B2B</th>
+          <th>Typ</th>
+          <th class="srt" onclick="sortTbl('b2b','date',this)">Data</th>
+          <th class="srt" onclick="sortTbl('b2b','client',this)">Firma</th>
+          <th>NIP</th>
+          <th>Usługa</th>
+          <th class="srt" onclick="sortTbl('b2b','amount',this)">Kwota brutto</th>
+          <th>Status</th>
+          <th style="width:40px;"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="inv-row b2b-row" data-type="b2b-fv" data-status="st-ok" data-date="2025-05-10" data-ulica="ul. Prosta 51" data-miasto="Warszawa" data-kod="00-838" data-nip="521-345-67-89" data-termin="2025-05-24" data-dataplatnosci="2025-05-18" onclick="openModal('modal-preview-b2b')">
+          <td><span class="badge b-zw">ZW</span></td>
+          <td class="mono">10.05.2025</td>
+          <td><div class="cli-name">TechCorp Polska Sp. z o.o.</div></td>
+          <td class="mono" style="font-size:10px;color:var(--dim);">5271234567</td>
+          <td style="font-size:11px;color:var(--dim);">Space Memory × 4 uczniów — maj</td>
+          <td><div class="amt green">1 920,00 zł</div></td>
+          <td><span class="st st-ok">✔ Wysłana</span><div class="paid-stamp">✅ Zapłacono 18.05.2025</div></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2b')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div class="dditem dditem-am" onclick="openModal('modal-kor-b2b')">FVK Faktura korygująca</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib" onclick="openModal('modal-email-b2c')">✉</div>
+              <div class="ib a" onclick="openModal('modal-kor-b2b')">FVK</div>
+              <div class="ib">⬇</div>
+            </div>
+          </td>
+        </tr>
+        <tr class="inv-row b2b-row" onclick="openModal('modal-preview-b2b')">
+          <td class="cb-td" onclick="event.stopPropagation()"><input type="checkbox" class="row-cb" onchange="onCb(this,'b2b')"></td>
+          <td><div class="inv-num b2b">FV/B2B/2025/05/005</div></td>
+          <td><span class="badge b-zw">ZW</span></td>
+          <td class="mono">10.05.2025</td>
+          <td><div class="cli-name">Centrum Edukacji Pro S.A.</div></td>
+          <td class="mono" style="font-size:10px;color:var(--dim);">7891234567</td>
+          <td style="font-size:11px;color:var(--dim);">INDIGO × 2 uczniów — maj</td>
+          <td><div class="amt green">960,00 zł</div></td>
+          <td><span class="st st-issued">📄 Wystawiona</span></td>
+          <td>
+            <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2b')">👁 Podgląd PDF</div>
+        <div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>
+        <div class="dditem dditem-am" onclick="openModal('modal-kor-b2b')">FVK Faktura korygująca</div>
+        <div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+            </div>
+              <div class="ib r" onclick="deleteRow(this)" title="Usuń fakturę" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+            </div>
+              <div class="ib" onclick="openModal('modal-email-b2c')">✉</div>
+              <div class="ib a" onclick="openModal('modal-kor-b2b')">FVK</div>
+              <div class="ib">⬇</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-top:1px solid var(--b);flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:11px;color:var(--dim);">Wierszy na stronie:</span>
+        <select class="fsel" style="padding:4px 22px 4px 8px;font-size:11px;" onchange="setPerPage('b2b',this.value)">
+          <option value="30" selected>30</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+          <option value="300">300</option>
+          <option value="500">500</option>
+        </select>
+      </div>
+      <div class="pag-info" id="pag-info-b2b" style="font-size:11px;color:var(--dim);"></div>
+      <div class="pag-btns" id="pag-btns-b2b"></div>
+    </div>
+    </div>
+  </div>
+</div><!-- /view-b2b -->
+
+</div><!-- /wrap -->
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!--                        MODALS                         -->
+<!-- ══════════════════════════════════════════════════════ -->
+
+<!-- ① NOWA FAKTURA B2C ─────────────────────────────────── -->
+<div class="overlay" id="modal-new-b2c">
+<div class="modal modal-lg">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-bl">📄</div>
+      <div><div class="mtitle">Wystaw Fakturę · B2C</div><div class="msub">Osoba fizyczna · ZW art. 43 ust. 1 pkt 26 · seria FA/[KOD]/RRRR/MM/NNN</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-new-b2c')">✕</div>
+  </div>
+  <div class="mbody">
+
+    <!-- NR PREVIEW -->
+    <div class="num-preview">
+      <div class="np-lbl">Numer faktury — generowany po wyborze projektu</div>
+      <div class="np-tokens">
+        <div class="tok tok-fa">FA</div><div class="tok tok-sep">/</div>
+        <div class="tok tok-code" id="npc-code">???</div><div class="tok tok-sep">/</div>
+        <div class="tok tok-yr">2025</div><div class="tok tok-sep">/</div>
+        <div class="tok tok-mm">05</div><div class="tok tok-sep">/</div>
+        <div class="tok tok-nn">NNN</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:9px;color:var(--dim);margin-bottom:2px;">Następna faktura:</div><div class="np-num" id="npc-full">FA/???/2025/05/043</div></div>
+        <div style="text-align:right;"><div style="font-size:9px;color:var(--dim);margin-bottom:2px;">Korekta (FK/):</div><div class="np-num kor" id="npc-kor">FK/???/2025/05/004</div></div>
+      </div>
+    </div>
+
+    <div class="ibox ibox-blue">
+      <div class="ibox-icon">ℹ</div>
+      <div>Faktury B2C są <strong>generowane automatycznie</strong> po potwierdzeniu płatności przez Imoje. Wystawianie ręczne dotyczy korekt, naprawienia błędów lub faktur poza Imoje. Bez NIP nabywcy (klient indywidualny).</div>
+    </div>
+
+    <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Projekt i seria</div>
+    <div class="gr2">
+      <div class="fg">
+        <label>Projekt *</label>
+        <select id="new-proj" onchange="updateNumPreview(this.value)">
+          <option value="">— Wybierz projekt —</option>
+          <option value="SPACE" data-firma="gls">🚀 Space Memory → FA/SPACE/... · GLS Sp. z o.o.</option>
+          <option value="INDIGO" data-firma="gls">🧠 INDIGO Speedy Mind → FA/INDIGO/... · GLS Sp. z o.o.</option>
+          <option value="OLIMP" data-firma="gls">🏆 Olimpiada GLS → FA/OLIMP/... · GLS Sp. z o.o.</option>
+          <option value="SKLEP" data-firma="hrableuski">🛍 E-sklep Space Memory → FA/SKLEP/... · Hrableuski JDG</option>
+          <option value="LUB" data-firma="lubenets">📦 Materiały / Kursy → FA/LUB/... · Lubenets JDG</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Typ dokumentu</label>
+        <select>
+          <option>Faktura (ZW)</option>
+          <option>Faktura Pro Forma</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Data wystawienia *</label>
+        <input type="date" value="2025-05-15">
+      </div>
+      <div class="fg">
+        <label>Data sprzedaży *</label>
+        <input type="date" value="2025-05-01">
+        <div class="hint">Miesiąc świadczenia usługi (1-szy dzień miesiąca)</div>
+      </div>
+      <div class="fg">
+        <label>Termin płatności</label>
+        <input type="date" value="2025-05-25">
+      </div>
+      <div class="fg">
+        <label>Forma płatności</label>
+        <select><option>Imoje (online)</option><option>Przelew bankowy</option><option>BLIK</option><option>Gotówka</option></select>
+      </div>
+    </div>
+
+    <!-- AUTO FIRMA SPRZEDAWCY -->
+    <div id="b2c-firma-display" style="display:none;margin-bottom:4px;">
+      <div class="sec" style="margin-top:0;"><div class="sdot" style="background:var(--purple);"></div>Sprzedawca — z konfiguracji projektu</div>
+      <div style="display:flex;align-items:flex-start;gap:12px;background:rgba(139,92,246,.06);border:1.5px solid rgba(139,92,246,.2);border-radius:11px;padding:12px 16px;margin-bottom:8px;">
+        <div style="font-size:20px;">🏢</div>
+        <div style="flex:1;">
+          <div id="b2c-firma-name" style="font-size:13px;font-weight:800;color:var(--white);margin-bottom:3px;"></div>
+          <div id="b2c-firma-meta" style="font-size:11px;color:var(--dim);line-height:1.65;"></div>
+        </div>
+        <div style="font-size:9.5px;color:var(--dim);font-style:italic;padding-top:2px;">z ustawień projektu</div>
+      </div>
+      <div class="hint" style="margin-bottom:14px;">Zmiana firmy: <strong>🧩 Projekty → Krok 3</strong> lub <strong>⚙ Ustawienia → Dane firmy</strong></div>
+    </div>
+
+    <div class="sec"><div class="sdot" style="background:var(--green);"></div>Nabywca (B2C — osoba fizyczna)</div>
+    <div class="gr2">
+      <div class="fg">
+        <label>Powiąż z uczniem / rodzicem</label>
+        <select>
+          <option>— Wybierz z bazy CRM —</option>
+          <option>Anna Kowalska (#UCZ-00421)</option>
+          <option>Piotr Wiśniewski (#UCZ-00388)</option>
+          <option>Jakub Lewandowski (#UCZ-00522)</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>E-mail do wysyłki *</label>
+        <input type="email" placeholder="klient@email.pl">
+      </div>
+      <div class="fg span2">
+        <label>Imię i nazwisko nabywcy *</label>
+        <input type="text" placeholder="Podciągane z karty ucznia">
+      </div>
+      <div class="fg span2">
+        <label>Adres (opcjonalnie — na życzenie klienta)</label>
+        <input type="text" placeholder="ul. Przykładowa 12/3, 00-001 Warszawa">
+      </div>
+    </div>
+
+    <div class="sec"><div class="sdot" style="background:var(--amber);"></div>Pozycje faktury</div>
+    <table class="ptbl">
+      <thead><tr>
+        <th style="width:40%">Opis usługi</th>
+        <th style="width:11%">PKWiU</th>
+        <th style="width:7%">Ilość</th>
+        <th style="width:8%">J.m.</th>
+        <th style="width:13%">Cena netto</th>
+        <th style="width:7%">VAT</th>
+        <th style="width:11%">Brutto</th>
+        <th style="width:3%"></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><input type="text" list="opisy-uslug" value="Abonament miesięczny Space Memory — maj 2025"></td>
+          <td><input type="text" value="85.59.19.0" style="font-family:'Space Mono',monospace;font-size:11px;"></td>
+          <td><input type="number" value="1" style="width:50px;"></td>
+          <td><select style="font-size:11px;"><option>mies.</option><option>szt.</option><option>godz.</option></select></td>
+          <td><input type="number" value="480.00" step="0.01" style="font-family:'Space Mono',monospace;"></td>
+          <td><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green);font-weight:700;padding:4px 6px;background:rgba(16,185,129,.08);border-radius:5px;">ZW</span></td>
+          <td class="mono green" style="font-weight:700;">480,00 zł</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-bottom:14px;"><span style="font-size:11px;color:var(--blue);cursor:pointer;">＋ Dodaj pozycję</span></div>
+
+    <div class="div"></div>
+    <div class="gr2">
+      <div>
+        <div class="sec"><div class="sdot" style="background:var(--purple);"></div>Opcje</div>
+        <div class="trow">
+          <div><div class="tl">Wyślij e-mail do klienta</div><div class="th">PDF jako załącznik</div></div>
+          <label class="tog"><input type="checkbox" checked><div class="tsl g"></div></label>
+        </div>
+        <div class="trow">
+          <div><div class="tl">Zapisz jako szablon cykliczny</div><div class="th">Dla abonamentów miesięcznych</div></div>
+          <label class="tog"><input type="checkbox"><div class="tsl"></div></label>
+        </div>
+        <div class="fg" style="margin-top:10px;">
+          <label>Uwagi (drukowane na fakturze)</label>
+          <textarea>Podstawa zwolnienia: art. 43 ust. 1 pkt 26 lit. b ustawy o VAT z 11.03.2004 r.</textarea>
+        </div>
+      </div>
+      <div>
+        <div class="sec"><div class="sdot" style="background:var(--green);"></div>Podsumowanie</div>
+        <div class="sumbox">
+          <div class="sr"><div class="slbl">Wartość netto</div><div class="sval">480,00 zł</div></div>
+          <div class="sr"><div class="slbl">VAT</div><div class="sval" style="color:var(--dim);">0,00 zł (ZW)</div></div>
+          <div class="sr tot" style="background:rgba(5,150,105,.07);border-radius:7px;padding:4px 8px;">
+            <div class="slbl" style="color:#059669;">✅ ZAPŁACONO</div>
+            <div class="sval" style="color:#059669;">480,00 zł</div>
+          </div>
+          <div style="font-size:9.5px;color:#059669;text-align:right;margin-top:3px;font-family:'Space Mono',monospace;">Data płatności: 15.05.2025 · Imoje</div>
+          <div style="margin-top:9px;padding:7px 10px;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.15);border-radius:7px;">
+            <div style="font-size:9.5px;font-weight:800;color:var(--green);margin-bottom:2px;">SŁOWNIE:</div>
+            <div style="font-size:11px;color:rgba(180,255,210,.8);">czterysta osiemdziesiąt złotych 00/100</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+      <div class="fg">
+      <label>Dotyczy ucznia <span style="font-weight:400;color:var(--dim);">(pojawi się na fakturze pod tytułem usługi)</span></label>
+      <input type="text" id="new-uczen-b2c" list="uczniowie-list" placeholder="np. Marta Kowalska (imię i nazwisko dziecka)">
+      <datalist id="uczniowie-list">
+        <option value="Anna Wiśniewska">
+        <option value="Piotr Kowalski">
+        <option value="Maja Nowak">
+        <option value="Tomasz Zając">
+      </datalist>
+    </div>
+    <div class="fg">
+      <label>Uwagi <span style="font-weight:400;color:var(--dim);">(opcjonalne — pojawią się na fakturze pod opisem usługi)</span></label>
+      <textarea id="new-uwagi-b2c" rows="2" placeholder="np. Płatność za maj 2025. Dziękujemy za zaufanie."></textarea>
+    </div>
+  </div><!-- end mbody -->
+  <div class="mfooter">
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-new-b2c')">Anuluj</button>
+      <button class="btn btn-ghost btn-sm">💾 Szkic</button>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-sec btn-sm" onclick="openModal('modal-preview-b2c');closeModal('modal-new-b2c')">👁 PDF podgląd</button>
+      <button class="btn btn-primary" onclick="closeModal('modal-new-b2c');showToast('✔ Faktura FA/SPACE/2025/05/043 wystawiona i wysłana na e-mail')">✔ Wystaw fakturę</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ② NOWA FAKTURA B2B ─────────────────────────────────── -->
+<div class="overlay" id="modal-new-b2b">
+<div class="modal modal-lg">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-am">🏢</div>
+      <div><div class="mtitle">Faktura VAT · B2B</div><div class="msub">Klient firmowy · seria FV/B2B/RRRR/MM/NNN · tylko Admin / Super-Admin</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-new-b2b')">✕</div>
+  </div>
+  <div class="mbody">
+
+    <!-- NR PREVIEW B2B -->
+    <div class="num-preview" style="background:rgba(245,158,11,.05);border-color:rgba(245,158,11,.18);">
+      <div class="np-lbl">Numer faktury B2B — stała seria wspólna dla wszystkich projektów</div>
+      <div class="np-tokens">
+        <div class="tok" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--amber);">FV</div>
+        <div class="tok tok-sep">/</div>
+        <div class="tok" style="background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.3);color:var(--amber);">B2B</div>
+        <div class="tok tok-sep">/</div>
+        <div class="tok tok-yr">2025</div><div class="tok tok-sep">/</div>
+        <div class="tok tok-mm">05</div><div class="tok tok-sep">/</div>
+        <div class="tok tok-nn">007</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div><div style="font-size:9px;color:var(--dim);margin-bottom:2px;">Następna Faktura VAT B2B:</div><div class="np-num" style="color:var(--amber);">FV/B2B/2025/05/007</div></div>
+        <div style="text-align:right;"><div style="font-size:9px;color:var(--dim);margin-bottom:2px;">Korekta (FVK/):</div><div class="np-num kor">FVK/B2B/2025/05/001</div></div>
+      </div>
+    </div>
+
+    <div class="ibox ibox-amber">
+      <div class="ibox-icon">🏢</div>
+      <div>Dokument wystawiany jako <strong>Faktura VAT</strong> (nie "Faktura") — wymóg prawny dla klientów firmowych. Seria <code style="font-family:'Space Mono',monospace;font-size:11px;padding:1px 5px;background:rgba(245,158,11,.1);border-radius:3px;">FV/B2B/...</code> jest <strong>wspólna dla wszystkich projektów</strong> — niezależnie od programu (SPACE, INDIGO, OLIMP).</div>
+    </div>
+
+    <!-- FIRMA SPRZEDAWCY B2B -->
+    <div class="sec"><div class="sdot" style="background:var(--purple);"></div>Firma wystawiająca (Sprzedawca)</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:6px;">
+      <div class="b2b-sp-opt b2b-sp-sel" onclick="selSprzedawca(this,'gls')"
+           style="display:flex;align-items:flex-start;gap:10px;background:rgba(79,110,247,.07);border:1.5px solid rgba(79,110,247,.4);border-radius:10px;padding:11px 14px;cursor:pointer;transition:all .15s;">
+        <div class="sp-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--blue);margin-top:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+          <div style="width:6px;height:6px;border-radius:50%;background:#fff;"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:12.5px;font-weight:800;">Global Leaders Skills Sp. z o.o.
+            <span style="font-size:9.5px;color:var(--amber);margin-left:5px;">⭐ DOMYŚLNA</span></div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">NIP: 525-297-09-24 · KRS: 0001055763 · REGON: 526267569</div>
+          <div style="font-size:11px;color:var(--dim);">Kabacki Dukt 1/U1 i U2, 02-798 Warszawa · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="01636874736e41686f6568666e6c646f75606d2f716d">[email&#160;protected]</a></div>
+        </div>
+        <div class="sp-check" style="color:var(--green);font-size:14px;font-weight:800;">✓</div>
+      </div>
+      <div class="b2b-sp-opt" onclick="selSprzedawca(this,'hrableuski')"
+           style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.025);border:1.5px solid var(--b);border-radius:10px;padding:11px 14px;cursor:pointer;transition:all .15s;">
+        <div class="sp-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--b);margin-top:2px;flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="font-size:12.5px;font-weight:800;">E-sklep Space Memory — Artsiom Hrableuski (JDG)</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">NIP: 527-285-49-02 · REGON: 525651337 · al. Jerozolimskie 123A lok. 19p, 02-017 Warszawa</div>
+        </div>
+        <div class="sp-check" style="color:var(--green);font-size:14px;font-weight:800;opacity:0;">✓</div>
+      </div>
+      <div class="b2b-sp-opt" onclick="selSprzedawca(this,'lubenets')"
+           style="display:flex;align-items:flex-start;gap:10px;background:rgba(255,255,255,.025);border:1.5px solid var(--b);border-radius:10px;padding:11px 14px;cursor:pointer;transition:all .15s;">
+        <div class="sp-radio" style="width:18px;height:18px;border-radius:50%;border:2px solid var(--b);margin-top:2px;flex-shrink:0;"></div>
+        <div style="flex:1;">
+          <div style="font-size:12.5px;font-weight:800;">Oleksii Lubenets (JDG)</div>
+          <div style="font-size:11px;color:var(--dim);margin-top:2px;">NIP: 527-300-33-88 · REGON: 522099129</div>
+        </div>
+        <div class="sp-check" style="color:var(--green);font-size:14px;font-weight:800;opacity:0;">✓</div>
+      </div>
+    </div>
+    <div class="hint" style="margin-bottom:14px;">Zarządzasz firmami w <strong>⚙ Ustawienia → Dane firmy</strong></div>
+
+    <div class="sec"><div class="sdot" style="background:var(--amber);"></div>Firma nabywca</div>
+    <div class="gr2">
+      <div class="fg">
+        <label>Wybierz z bazy B2B</label>
+        <select>
+          <option>— Wybierz klienta —</option>
+          <option>TechCorp Polska Sp. z o.o.</option>
+          <option>Centrum Edukacji Pro S.A.</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>NIP nabywcy *</label>
+        <input type="text" placeholder="527-123-45-67" style="font-family:'Space Mono',monospace;">
+      </div>
+      <div class="fg span2">
+        <label>Pełna nazwa firmy *</label>
+        <input type="text" placeholder="TechCorp Polska Sp. z o.o.">
+      </div>
+      <div class="fg span2">
+        <label>Adres firmy *</label>
+        <input type="text" placeholder="ul. Biznesowa 15, 00-001 Warszawa">
+      </div>
+      <div class="fg">
+        <label>E-mail do wysyłki *</label>
+        <input type="email" placeholder="faktury@firma.pl">
+      </div>
+      <div class="fg">
+        <label>Projekt / Program</label>
+        <select>
+          <option>Space Memory</option>
+          <option>INDIGO Speedy Mind</option>
+          <option>Obydwa programy</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec"><div class="sdot" style="background:var(--green);"></div>Uczniowie objęci fakturą</div>
+    <div class="ibox ibox-blue" style="margin-bottom:10px;">
+      <div class="ibox-icon">👦</div>
+      <div>Wskaż konkretnych uczniów — każdemu zostanie automatycznie zaliczony abonament za wybrany miesiąc. Opis na fakturze generowany automatycznie.</div>
+    </div>
+    <div id="b2b-students-list" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(79,110,247,.05);border:1px solid rgba(79,110,247,.15);border-radius:8px;">
+        <span style="font-size:12px;">👦</span>
+        <select style="flex:1;padding:5px 8px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:7px;font-size:12px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;">
+          <option>— Wybierz ucznia —</option>
+          <option>Anna Kowalska (#UCZ-00421) · Space Memory · gr. ŚR-17</option>
+          <option>Piotr Wiśniewski (#UCZ-00388) · INDIGO · gr. WT-16</option>
+          <option>Tomasz Zając (#UCZ-00510) · Space Memory · gr. ŚR-17</option>
+          <option>Zofia Dąbrowska (#UCZ-00710) · Space Memory · gr. PT-18</option>
+        </select>
+        <select style="width:120px;padding:5px 8px;background:rgba(255,255,255,.04);border:1px solid var(--b);border-radius:7px;font-size:11px;color:var(--white);font-family:'Outfit',sans-serif;outline:none;">
+          <option>maj 2025</option><option>czerwiec 2025</option><option>lipiec 2025</option>
+        </select>
+        <div onclick="this.closest('div[style]').remove()" style="width:24px;height:24px;border-radius:5px;background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);color:var(--red);font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px;">
+      <span onclick="addB2BStudent()" style="font-size:11px;color:var(--amber);cursor:pointer;display:inline-flex;align-items:center;gap:4px;">＋ Dodaj ucznia</span>
+    </div>
+
+    <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Daty i płatność</div>
+    <div class="gr3">
+      <div class="fg"><label>Data wystawienia *</label><input type="date" value="2025-05-10"></div>
+      <div class="fg"><label>Data sprzedaży *</label><input type="date" value="2025-05-01"></div>
+      <div class="fg"><label>Termin płatności</label><input type="date" value="2025-05-24"></div>
+    </div>
+
+    <div class="sec"><div class="sdot" style="background:var(--purple);"></div>Pozycje</div>
+    <table class="ptbl">
+      <thead><tr>
+        <th style="width:38%">Opis usługi</th>
+        <th style="width:10%">PKWiU</th>
+        <th style="width:6%">Ilość</th>
+        <th style="width:8%">J.m.</th>
+        <th style="width:12%">Cena netto</th>
+        <th style="width:8%">VAT</th>
+        <th style="width:12%">Kwota VAT</th>
+        <th style="width:3%"></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><input type="text" list="opisy-uslug" value="Space Memory × 4 uczniów — maj 2025"></td>
+          <td><input type="text" value="85.59.19.0" style="font-family:'Space Mono',monospace;font-size:11px;"></td>
+          <td><input type="number" value="4" style="width:50px;"></td>
+          <td><input type="text" value="mies." style="width:55px;"></td>
+          <td><input type="number" value="480.00" step="0.01" style="font-family:'Space Mono',monospace;"></td>
+          <td>
+            <select style="font-size:11px;width:65px;">
+              <option>ZW</option><option>23%</option><option>8%</option><option>5%</option>
+            </select>
+          </td>
+          <td class="mono" style="color:var(--dim);">0,00 zł</td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="margin-bottom:14px;"><span style="font-size:11px;color:var(--amber);cursor:pointer;">＋ Dodaj pozycję</span></div>
+
+    <div class="sumbox" style="background:rgba(245,158,11,.04);border-color:rgba(245,158,11,.15);">
+      <div class="sr"><div class="slbl">Wartość netto</div><div class="sval">1 920,00 zł</div></div>
+      <div class="sr"><div class="slbl">Podatek VAT</div><div class="sval" style="color:var(--dim);">0,00 zł (ZW)</div></div>
+      <div class="sr tot" style="background:rgba(5,150,105,.08);border-radius:6px;padding:5px 8px;"><div class="slbl" style="color:#059669;font-weight:800;">✅ ZAPŁACONO</div><div class="sval" style="color:#059669;font-weight:800;">1 920,00 zł</div></div>
+    </div>
+
+  </div>
+      <div class="fg">
+      <label>Uwagi <span style="font-weight:400;color:var(--dim);">(opcjonalne — pojawią się na fakturze pod opisem usługi)</span></label>
+      <textarea id="new-uwagi-b2b" rows="2" placeholder="np. Faktura za zajęcia maj 2025 — 4 uczniów."></textarea>
+    </div>
+  </div><!-- end mbody -->
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-new-b2b')">Anuluj</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-sec btn-sm">👁 PDF podgląd</button>
+      <button class="btn btn-amber" onclick="closeModal('modal-new-b2b');showToast('✔ Faktura VAT FV/B2B/2025/05/007 wystawiona','am')">✔ Wystaw Fakturę VAT</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ③ PODGLĄD FAKTURY B2C (PDF) ───────────────────────── -->
+<div class="overlay" id="modal-preview-b2c">
+<div class="modal modal-xl">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-bl">👁</div>
+      <div><div class="mtitle">Podgląd faktury</div><div class="msub">FA/SPACE/2025/05/042 · Anna Kowalska · 480,00 zł</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-preview-b2c')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="pdf-wrap">
+      <div class="pdf-inner">
+        <div class="pdf-top">
+          <div>
+            <div class="pdf-logo">GLS<span>·edu</span></div>
+            <div style="font-size:11px;color:#666;margin-top:2px;">Global Leaders Skills Sp. z o.o.<br>Kabacki Dukt 1/U1 i U2, 02-798 Warszawa<br>NIP: 525-297-09-24</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="pdf-doctype">FAKTURA</div>
+            <div class="pdf-num">Nr: FA/SPACE/2025/05/042</div>
+            <div class="pdf-dates">Data wystawienia: 15.05.2025<br>Data sprzedaży: 01.05.2025<br>Termin płatności: 25.05.2025</div>
+          </div>
+        </div>
+        <div class="pdf-parties">
+          <div>
+            <div class="pdf-side-lbl">Sprzedawca</div>
+            <div class="pdf-side-name">Global Leaders Skills Sp. z o.o.</div>
+            <div class="pdf-side-data">Kabacki Dukt 1/U1 i U2<br>02-798 Warszawa<br>NIP: 525-297-09-24 · KRS: 0001055763<br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="1d7f74686f725d747379747a72707873697c71336d71">[email&#160;protected]</a></div>
+          </div>
+          <div>
+            <div class="pdf-side-lbl">Nabywca</div>
+            <div class="pdf-side-name">Anna Kowalska</div>
+            <div class="pdf-side-data">ul. Słoneczna 12/4<br>02-123 Warszawa<br><br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bddcd3d3dc93d6d2cadcd1ced6dcfdd8d0dcd4d193cdd1">[email&#160;protected]</a></div>
+          </div>
+        </div>
+        <div class="pdf-items">
+          <table>
+            <thead><tr>
+              <th>Lp.</th><th>Opis</th><th>PKWiU</th><th>Ilość</th><th>J.m.</th><th class="r">Cena netto</th><th class="r">Stawka VAT</th><th class="r">Kwota VAT</th><th class="r">Brutto</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>
+                  Abonament miesięczny Space Memory — maj 2025
+                  <div style="font-size:9.5px;color:#888;margin-top:2px;font-style:italic;">Dotyczy ucznia: Marta Kowalska</div>
+                </td>
+                <td>85.59.19.0</td><td>1</td><td>mies.</td>
+                <td class="r">480,00 zł</td><td class="r">ZW</td><td class="r">0,00 zł</td><td class="r" style="font-weight:700;">480,00 zł</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pdf-sum">
+          <div class="pdf-sr"><span>Wartość netto:</span><span>480,00 zł</span></div>
+          <div class="pdf-sr"><span>Kwota VAT:</span><span>0,00 zł</span></div>
+          <div class="pdf-sr tot" style="background:rgba(5,150,105,.08);border-radius:6px;padding:5px 8px;"><span style="color:#059669;font-weight:800;">✅ ZAPŁACONO</span><span style="color:#059669;font-weight:800;">480,00 zł</span></div>
+          <div style="font-size:9.5px;color:#059669;text-align:right;margin-top:4px;font-family:'Space Mono',monospace;">Data płatności: 15.05.2025 · Imoje</div>
+        </div>
+        <div style="font-size:11px;color:#666;margin-bottom:10px;"><strong>Słownie:</strong> czterysta osiemdziesiąt złotych 00/100</div>
+        <div style="font-size:11px;color:#666;margin-bottom:8px;"><strong>Forma płatności:</strong> Imoje (online) · ID transakcji: TXN-2025-04821</div>
+        <div class="pdf-note">Podstawa zwolnienia z VAT: art. 43 ust. 1 pkt 26 lit. b ustawy z dnia 11.03.2004 r. o podatku od towarów i usług.</div>
+        <div class="pdf-footer"><div>Wystawił: System CRM (automatycznie) · 15.05.2025 10:32</div><div>⚡ Wygenerowano automatycznie po płatności Imoje</div></div>
+      </div>
+    </div>
+
+    <!-- HISTORIA E-MAIL -->
+    <div style="margin-top:16px;">
+      <div class="sec"><div class="sdot" style="background:var(--cyan);"></div>Historia wysyłki e-mail</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:9px 13px;background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.18);border-radius:9px;">
+          <span style="font-size:13px;">✉</span>
+          <div style="flex:1;">
+            <div style="font-size:12px;font-weight:700;color:var(--green);">Wysłana automatycznie</div>
+            <div style="font-size:10.5px;color:var(--dim);margin-top:1px;">15.05.2025 · 10:32 · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="cdaca3a3ace3a6a2baaca1bea6ac8da8a0aca4a1e3bda1">[email&#160;protected]</a> · System CRM (Imoje webhook)</div>
+          </div>
+          <span class="st st-ok" style="font-size:10px;">✔ Dostarczona</span>
+        </div>
+        <div style="padding:8px 13px;background:rgba(255,255,255,.025);border:1px dashed rgba(100,120,255,.15);border-radius:9px;font-size:11px;color:var(--dim);">
+          Nie wysłano kolejnych wiadomości. E-mail wysyłany tylko na życzenie klienta.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-preview-b2c')">Zamknij</button>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 Drukuj / PDF</button>
+      <button class="btn btn-sec btn-sm" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--amber);border-color:rgba(245,158,11,.25);" onclick="openModal('modal-kor-b2c')">FK Faktura Korygująca</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ④ PODGLĄD FAKTURY B2B ───────────────────────────────── -->
+<div class="overlay" id="modal-preview-b2b">
+<div class="modal modal-xl">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-am">👁</div>
+      <div><div class="mtitle">Podgląd Faktury VAT · B2B</div><div class="msub">FV/B2B/2025/05/006 · TechCorp Polska · 1 920,00 zł</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-preview-b2b')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="pdf-wrap">
+      <div class="pdf-inner">
+        <div class="pdf-top">
+          <div>
+            <div class="pdf-logo">GLS<span>·edu</span></div>
+            <div style="font-size:11px;color:#666;margin-top:2px;">Global Leaders Skills Sp. z o.o.<br>Kabacki Dukt 1/U1 i U2, 02-798 Warszawa<br>NIP: 525-297-09-24</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="pdf-doctype">FAKTURA VAT</div>
+            <div class="pdf-num">Nr: FV/B2B/2025/05/006</div>
+            <div class="pdf-dates">Data wystawienia: 10.05.2025<br>Data sprzedaży: 01.05.2025<br>Termin płatności: 24.05.2025</div>
+          </div>
+        </div>
+        <div class="pdf-parties">
+          <div>
+            <div class="pdf-side-lbl">Sprzedawca</div>
+            <div class="pdf-side-name">Global Leaders Skills Sp. z o.o.</div>
+            <div class="pdf-side-data">Kabacki Dukt 1/U1 i U2<br>02-798 Warszawa<br>NIP: 525-297-09-24 · KRS: 0001055763</div>
+          </div>
+          <div>
+            <div class="pdf-side-lbl">Nabywca</div>
+            <div class="pdf-side-name">TechCorp Polska Sp. z o.o.</div>
+            <div class="pdf-side-data">ul. Biznesowa 15<br>00-001 Warszawa<br>NIP: 527-123-45-67<br><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed8b8c8699989f94ad99888e858e829f9dc39d81">[email&#160;protected]</a></div>
+          </div>
+        </div>
+        <div class="pdf-items">
+          <table>
+            <thead><tr>
+              <th>Lp.</th><th>Opis</th><th>PKWiU</th><th>Ilość</th><th>J.m.</th><th class="r">Cena netto</th><th class="r">VAT</th><th class="r">Brutto</th>
+            </tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Space Memory × 4 uczniów — maj 2025</td><td>85.59.19.0</td><td>4</td><td>mies.</td><td class="r">480,00 zł</td><td class="r">ZW</td><td class="r" style="font-weight:700;">1 920,00 zł</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pdf-sum">
+          <div class="pdf-sr"><span>Netto:</span><span>1 920,00 zł</span></div>
+          <div class="pdf-sr"><span>VAT:</span><span>0,00 zł</span></div>
+          <div class="pdf-sr tot" style="background:rgba(5,150,105,.07);border-radius:7px;padding:4px 8px;"><span style="color:#059669;">✅ ZAPŁACONO</span><span style="color:#059669;">1 920,00 zł</span></div>
+          <div style="font-size:9.5px;color:#059669;text-align:right;margin-top:3px;font-family:'Space Mono',monospace;">Data płatności: 18.05.2025 · Przelew bankowy</div>
+        </div>
+        <div class="pdf-note pdf-b2b-note">Podstawa zwolnienia z VAT: art. 43 ust. 1 pkt 26 lit. b ustawy z dnia 11.03.2004 r. · Faktura VAT B2B · Podpis wystawiającego: _______________</div>
+        <div class="pdf-footer"><div>Wystawił: Admin · 10.05.2025 14:15</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-preview-b2b')">Zamknij</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm" onclick="window.print()">🖨 Drukuj / PDF</button>
+      <button class="btn btn-ghost btn-sm" onclick="openModal('modal-email-b2c')">✉ E-mail</button>
+      <button class="btn btn-ghost btn-sm" style="color:var(--amber);border-color:rgba(245,158,11,.25);" onclick="openModal('modal-kor-b2b')">FVK Korekta B2B</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ⑤ FAKTURA KORYGUJĄCA B2C ────────────────────────────── -->
+<div class="overlay" id="modal-kor-b2c">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-am">📋</div>
+      <div><div class="mtitle">Faktura Korygująca · B2C</div><div class="msub">do FA/SPACE/2025/05/042 · seria FK/SPACE/RRRR/MM/NNN</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-kor-b2c')">✕</div>
+  </div>
+  <div class="mbody">
+
+    <div class="ibox ibox-amber">
+      <div class="ibox-icon">⚠</div>
+      <div>Faktura korygująca wystawiana gdy faktura <strong>już wysłana do klienta</strong>. Oryginał pozostaje nienaruszony w rejestrze. Nowy numer: <span style="font-family:'Space Mono',monospace;font-size:11px;">FK/SPACE/2025/05/004</span></div>
+    </div>
+
+    <!-- WORKFLOW SCENARIOS -->
+    <div class="sec"><div class="sdot" style="background:var(--amber);"></div>Wybierz scenariusz korekty</div>
+    <div class="kor-opts" id="kor-opts">
+      <div class="kor-opt sel" onclick="selectKor(this,'correction')">
+        <div class="kor-opt-ico">✏️</div>
+        <div class="kor-opt-name">Korekta danych / kwoty</div>
+        <div class="kor-opt-desc">Błąd w nazwie, adresie lub cenie. FK zmienia dane oryginału.</div>
+      </div>
+      <div class="kor-opt" onclick="selectKor(this,'zero')">
+        <div class="kor-opt-ico">↩️</div>
+        <div class="kor-opt-name">Zwrot — korekta do 0 zł</div>
+        <div class="kor-opt-desc">Rezygnacja klienta. FK do 0 zł + zwrot przez Imoje.</div>
+      </div>
+      <div class="kor-opt" onclick="selectKor(this,'cancel')">
+        <div class="kor-opt-ico">✕</div>
+        <div class="kor-opt-name">Anulowanie (NIE wysłana)</div>
+        <div class="kor-opt-desc">Faktura wystawiona ale jeszcze nie wysłana klientowi. Status → ANULOWANA.</div>
+      </div>
+      <div class="kor-opt" onclick="selectKor(this,'duplicate')">
+        <div class="kor-opt-ico">⚡</div>
+        <div class="kor-opt-name">Duplikat (błąd systemu)</div>
+        <div class="kor-opt-desc">Imoje wywołał 2 faktury na 1 płatność. Jedna anulowana z przyczyną.</div>
+      </div>
+    </div>
+
+    <!-- SCENARIO DETAIL -->
+    <div id="kor-detail-correction">
+      <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Oryginalna faktura</div>
+      <div style="padding:10px 13px;background:rgba(255,255,255,.025);border:1px solid var(--b);border-radius:9px;margin-bottom:12px;">
+        <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);font-weight:700;">FA/SPACE/2025/05/042</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px;">Anna Kowalska · 480,00 zł · 15.05.2025 · ✔ Wysłana</div>
+      </div>
+      <div class="sec"><div class="sdot" style="background:var(--amber);"></div>Nowe wartości</div>
+      <div class="gr2">
+        <div class="fg">
+          <label>Nowa kwota (zł)</label>
+          <input type="number" value="240.00" step="0.01" style="font-family:'Space Mono',monospace;">
+          <div class="hint">Korekta: –240,00 zł</div>
+        </div>
+        <div class="fg">
+          <label>Powód korekty *</label>
+          <select>
+            <option>Błąd w cenie / kwocie</option>
+            <option>Błąd w danych nabywcy</option>
+            <option>Zmiana grupy — korekta proporcjonalna</option>
+            <option>Zmiana stawki VAT</option>
+            <option>Inny powód</option>
+          </select>
+        </div>
+        <div class="fg span2">
+          <label>Komentarz dla księgowości</label>
+          <textarea placeholder="Wyjaśnienie dla biura rachunkowego..."></textarea>
+        </div>
+      </div>
+      <div style="padding:10px 13px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:9px;">
+        <div style="font-size:10px;font-weight:800;color:var(--amber);margin-bottom:4px;">NUMER FAKTURY KORYGUJĄCEJ:</div>
+        <div style="font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--amber);">FK/SPACE/2025/05/004</div>
+      </div>
+    </div>
+
+    <div id="kor-detail-zero" style="display:none;">
+      <div class="ibox ibox-red"><div class="ibox-icon">↩️</div><div>Korekta do 0 zł — całkowity zwrot. Po wystawieniu FK konieczne jest uruchomienie zwrotu przez Imoje (osobna akcja). Numer: <strong>FK/SPACE/2025/05/004</strong></div></div>
+      <div class="fg"><label>Powód zwrotu *</label>
+        <select><option>Rezygnacja z zajęć</option><option>Rezygnacja rodzica</option><option>Błąd naliczenia</option><option>Inny</option></select>
+      </div>
+      <div class="fg"><label>Komentarz</label><textarea placeholder="Szczegóły zwrotu..."></textarea></div>
+    </div>
+
+    <div id="kor-detail-cancel" style="display:none;">
+      <div class="ibox ibox-blue"><div class="ibox-icon">ℹ</div><div>Faktura <strong>nie była wysłana do klienta</strong> — można ją anulować. Numer pozostaje w rejestrze ze statusem ANULOWANA. Nie wystawiamy FK — tylko zmieniamy status.</div></div>
+      <div class="fg"><label>Powód anulowania *</label>
+        <select><option>Błąd podczas wystawiania</option><option>Duplikat</option><option>Anulowanie na życzenie klienta</option><option>Inny</option></select>
+      </div>
+      <div class="fg"><label>Komentarz</label><textarea placeholder="Opis przyczyny anulowania..."></textarea></div>
+    </div>
+
+    <div id="kor-detail-duplicate" style="display:none;">
+      <div class="ibox ibox-red"><div class="ibox-icon">⚡</div><div>Imoje webhook wywołał 2 faktury dla tej samej transakcji. Wybierz <strong>oficjalną</strong> — druga otrzyma status ANULOWANA z przyczyną "duplikat — błąd systemu".</div></div>
+      <div class="fg"><label>Uznaj za oficjalną</label>
+        <select>
+          <option>FA/SPACE/2025/05/042 — 15.05 · 10:32</option>
+          <option>FA/SPACE/2025/05/043 — 15.05 · 10:33 (duplikat)</option>
+        </select>
+      </div>
+    </div>
+
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-kor-b2c')">Anuluj</button>
+    <button class="btn btn-amber" onclick="closeModal('modal-kor-b2c');showToast('✔ Faktura korygująca FK/SPACE/2025/05/004 wystawiona','am')">✔ Wystaw FK/SPACE/2025/05/004</button>
+  </div>
+</div>
+</div>
+
+<!-- ⑥ FAKTURA KORYGUJĄCA B2B ────────────────────────────── -->
+<div class="overlay" id="modal-kor-b2b">
+<div class="modal modal-sm">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-am">📋</div>
+      <div><div class="mtitle">Korekta Faktury VAT · B2B</div><div class="msub">do FV/B2B/2025/05/006 · seria FVK/B2B/RRRR/MM/NNN</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-kor-b2b')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber">
+      <div class="ibox-icon">🏢</div>
+      <div>Korekta Faktury VAT B2B. Seria korekty: <span style="font-family:'Space Mono',monospace;font-size:11px;">FVK/B2B/RRRR/MM/NNN</span> — wspólna dla wszystkich klientów B2B.</div>
+    </div>
+    <div style="padding:10px 13px;background:rgba(255,255,255,.025);border:1px solid var(--b);border-radius:9px;margin-bottom:12px;">
+      <div style="font-family:'Space Mono',monospace;font-size:12px;color:var(--amber);font-weight:700;">FV/B2B/2025/05/006</div>
+      <div style="font-size:11px;color:var(--dim);margin-top:2px;">TechCorp Polska · 1 920,00 zł · 10.05.2025</div>
+    </div>
+    <div class="fg"><label>Typ korekty</label>
+      <select><option>Korekta kwoty</option><option>Korekta do 0 zł (zwrot)</option><option>Korekta danych nabywcy</option></select>
+    </div>
+    <div class="fg"><label>Nowa kwota (zł)</label>
+      <input type="number" value="960.00" step="0.01" style="font-family:'Space Mono',monospace;">
+    </div>
+    <div class="fg"><label>Powód korekty *</label>
+      <select><option>Zmiana liczby uczniów</option><option>Błąd w NIP</option><option>Błąd w kwocie</option><option>Inny</option></select>
+    </div>
+    <div style="padding:10px 13px;background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:9px;margin-top:12px;">
+      <div style="font-size:10px;font-weight:800;color:var(--amber);margin-bottom:4px;">NUMER FVK:</div>
+      <div style="font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:var(--amber);">FVK/B2B/2025/05/001</div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-kor-b2b')">Anuluj</button>
+    <button class="btn btn-amber" onclick="closeModal('modal-kor-b2b');showToast('✔ FVK/B2B/2025/05/001 wystawiona','am')">✔ Wystaw FVK/B2B/2025/05/001</button>
+  </div>
+</div>
+</div>
+
+<!-- ⑦ EMAIL ─────────────────────────────────────────────── -->
+<div class="overlay" id="modal-email-b2c">
+<div class="modal modal-sm">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-cy">✉</div>
+      <div><div class="mtitle">Wyślij fakturę e-mailem</div><div class="msub">FA/SPACE/2025/05/042 · PDF jako załącznik</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-email-b2c')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="fg">
+      <label>Do (e-mail klienta)</label>
+      <input type="email" value="anna.kowalska@email.pl">
+    </div>
+    <div class="fg">
+      <label>Temat</label>
+      <input type="text" value="Faktura FA/SPACE/2025/05/042 — Global Leaders Skills">
+    </div>
+    <div class="fg">
+      <label>Wiadomość</label>
+      <textarea style="min-height:80px;">Szanowna Pani Kowalska,
+
+W załączniku przesyłamy fakturę za abonament Space Memory — maj 2025.
+
+Z poważaniem,
+Zespół GLS</textarea>
+    </div>
+    <div class="ibox ibox-blue" style="margin-top:4px;">
+      <div class="ibox-icon">📎</div>
+      <div>Załącznik: <strong>FA_SPACE_2025_05_042.pdf</strong> · Podgląd potwierdzony</div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-email-b2c')">Anuluj</button>
+    <button class="btn btn-primary" onclick="closeModal('modal-email-b2c');showToast('✉ Faktura wysłana na anna.kowalska@email.pl')">✉ Wyślij</button>
+  </div>
+</div>
+</div>
+
+<!-- ⑧ PODGLĄD KOREKTY ────────────────────────────────────── -->
+<div class="overlay" id="modal-preview-kor">
+<div class="modal modal-xl">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-am">📋</div>
+      <div><div class="mtitle">Podgląd Faktury Korygującej</div><div class="msub">FK/SPACE/2025/05/003 · do FA/SPACE/2025/04/030</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-preview-kor')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="pdf-wrap">
+      <div class="pdf-inner">
+        <div class="pdf-top">
+          <div>
+            <div class="pdf-logo">GLS<span>·edu</span></div>
+            <div style="font-size:11px;color:#666;margin-top:2px;">Global Leaders Skills Sp. z o.o. · NIP: 525-297-09-24 · KRS: 0001055763</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="pdf-doctype" style="color:#d97706;">FAKTURA KORYGUJĄCA</div>
+            <div class="pdf-num">Nr: FK/SPACE/2025/05/003</div>
+            <div class="pdf-dates">Koryguje: FA/SPACE/2025/04/030<br>Data wystawienia: 13.05.2025<br>Powód: Zmiana grupy — korekta proporcjonalna</div>
+          </div>
+        </div>
+        <div class="pdf-parties">
+          <div>
+            <div class="pdf-side-lbl">Sprzedawca</div>
+            <div class="pdf-side-name">Global Leaders Skills Sp. z o.o.</div>
+            <div class="pdf-side-data">Kabacki Dukt 1/U1 i U2, 02-798 Warszawa<br>NIP: 525-297-09-24 · KRS: 0001055763</div>
+          </div>
+          <div>
+            <div class="pdf-side-lbl">Nabywca</div>
+            <div class="pdf-side-name">Marta Nowak</div>
+            <div class="pdf-side-data"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e28f83909683cc8c8d958389a2858f838b8ecc818d8f">[email&#160;protected]</a></div>
+          </div>
+        </div>
+        <div class="pdf-items">
+          <table>
+            <thead><tr><th></th><th>Opis</th><th class="r">Przed korektą</th><th class="r">Po korekcie</th><th class="r">Różnica</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>Abonament miesięczny Space Memory — kwiecień 2025</td><td class="r">480,00 zł</td><td class="r">240,00 zł</td><td class="r" style="color:#dc2626;font-weight:700;">–240,00 zł</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pdf-sum">
+          <div class="pdf-sr tot" style="color:#d97706;"><span>KOREKTA (do zwrotu):</span><span>–240,00 zł</span></div>
+        </div>
+        <div class="pdf-note" style="background:#fff7ed;border-color:#fed7aa;color:#9a3412;">Faktura korygująca do FA/SPACE/2025/04/030. Zwrot 240,00 zł zostanie zrealizowany na rachunek bankowy nabywcy w ciągu 5 dni roboczych.</div>
+      </div>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-preview-kor')">Zamknij</button>
+    <div style="display:flex;gap:6px;">
+      <button class="btn btn-ghost btn-sm">⬇ PDF</button>
+      <button class="btn btn-sec btn-sm">✉ Wyślij</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ⑨ USTAWIENIA SERII ──────────────────────────────────── -->
+<div class="overlay" id="modal-settings">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-bl">⚙</div>
+      <div><div class="mtitle">Ustawienia serii numeracji</div><div class="msub">Stan liczników na bieżący miesiąc (maj 2025)</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-settings')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-blue"><div class="ibox-icon">ℹ</div><div>Liczniki są <strong>atomowe</strong> — generowane przez SELECT FOR UPDATE w transakcji DB. Nie można edytować ręcznie aktywnych serii. Korekta możliwa tylko przez Super-Admin.</div></div>
+    <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Aktywne serie B2C (maj 2025)</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead>
+        <tr style="background:rgba(255,255,255,.025);">
+          <td style="padding:7px 10px;font-size:9.5px;font-weight:800;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--b);">Seria</td>
+          <td style="padding:7px 10px;font-size:9.5px;font-weight:800;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--b);">Ostatni numer</td>
+          <td style="padding:7px 10px;font-size:9.5px;font-weight:800;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--b);">Następny</td>
+          <td style="padding:7px 10px;font-size:9.5px;font-weight:800;color:var(--dim);text-transform:uppercase;border-bottom:1px solid var(--b);">Projekt</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(100,120,255,.06);">
+          <td style="padding:8px 10px;"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--blue);font-weight:700;">FA/SPACE</span></td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;">042</td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);">043</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--dim);">Space Memory</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(100,120,255,.06);">
+          <td style="padding:8px 10px;"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--purple);font-weight:700;">FA/INDIGO</span></td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;">018</td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);">019</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--dim);">INDIGO Speedy Mind</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(100,120,255,.06);">
+          <td style="padding:8px 10px;"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--amber);font-weight:700;">FA/OLIMP</span></td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;">067</td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);">068</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--dim);">Olimpiada GLS 2025</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(100,120,255,.06);">
+          <td style="padding:8px 10px;"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--green);font-weight:700;">FA/KURS</span></td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;">024</td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);">025</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--dim);">Kurs Intensywny — Wakacje</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="sec" style="margin-top:14px;"><div class="sdot" style="background:var(--amber);"></div>Seria B2B (wspólna)</div>
+    <table style="width:100%;border-collapse:collapse;">
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(100,120,255,.06);">
+          <td style="padding:8px 10px;"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--amber);font-weight:700;">FV/B2B</span></td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;">006</td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);">007</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--dim);">Wspólna — TechCorp + Centrum Edukacji</td>
+        </tr>
+        <tr>
+          <td style="padding:8px 10px;"><span style="font-family:'Space Mono',monospace;font-size:11px;color:var(--amber);font-weight:700;">FVK/B2B</span></td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;">000</td>
+          <td style="padding:8px 10px;font-family:'Space Mono',monospace;font-size:11px;color:var(--green);">001</td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--dim);">Korekty B2B</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-settings')">Zamknij</button>
+  </div>
+</div>
+</div>
+
+<!-- ⑩ DODAJ KLIENTA B2B ──────────────────────────────── -->
+<div class="overlay" id="modal-add-b2b-client">
+<div class="modal modal-sm">
+  <div class="mhdr">
+    <div class="mhl"><div class="mhico mi-am">🏢</div>
+      <div><div class="mtitle">Dodaj klienta B2B</div><div class="msub">Nowa firma — klient firmowy GLS</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-add-b2b-client')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber">
+      <div class="ibox-icon">🏢</div>
+      <div>Klient B2B to firma płacąca zbiorczo za uczniów. Po dodaniu będzie dostępny przy wystawianiu Faktury VAT B2B i pojawi się w panelu klientów B2B.</div>
+    </div>
+    <div class="fg"><label>NIP firmy *</label>
+      <input type="text" placeholder="527-123-45-67" style="font-family:'Space Mono',monospace;">
+      <div class="hint">Dane firmy można pobrać z bazy GUS po NIP (funkcja backendu)</div>
+    </div>
+    <div class="fg"><label>Pełna nazwa firmy *</label>
+      <input type="text" placeholder="TechCorp Polska Sp. z o.o.">
+    </div>
+    <div class="fg"><label>Adres siedziby *</label>
+      <input type="text" placeholder="ul. Biznesowa 15, 00-001 Warszawa">
+    </div>
+    <div class="gr2">
+      <div class="fg"><label>E-mail do faktur *</label>
+        <input type="email" placeholder="faktury@firma.pl">
+      </div>
+      <div class="fg"><label>Telefon kontaktowy</label>
+        <input type="tel" placeholder="+48 500 000 000">
+      </div>
+    </div>
+    <div class="fg"><label>Osoba kontaktowa</label>
+      <input type="text" placeholder="Jan Kowalski — Dział Kadr">
+    </div>
+    <div class="fg"><label>Uwagi</label>
+      <textarea placeholder="np. faktura do 10-ego każdego miesiąca, termin płatności 14 dni"></textarea>
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-add-b2b-client')">Anuluj</button>
+    <button class="btn btn-amber" onclick="closeModal('modal-add-b2b-client');showToast('✔ Klient B2B dodany do bazy','am')">✔ Dodaj klienta B2B</button>
+  </div>
+</div>
+</div>
+
+<!-- OPISY USŁUG datalist -->
+<datalist id="opisy-uslug">
+  <option value="Abonament miesięczny Space Memory — maj 2025">
+  <option value="Abonament miesięczny INDIGO Speedy Mind — maj 2025">
+  <option value="Space Memory × 2 uczniów — maj 2025">
+  <option value="Space Memory × 3 uczniów — maj 2025">
+  <option value="Space Memory × 4 uczniów — maj 2025">
+  <option value="INDIGO Speedy Mind × 2 uczniów — maj 2025">
+  <option value="Olimpiada GLS 2025 — opłata startowa">
+  <option value="Kurs intensywny Space Memory — Wakacje 2025">
+  <option value="Kurs intensywny INDIGO — Ferie zimowe 2025">
+  <option value="Zajęcia próbne Space Memory">
+  <option value="Zajęcia próbne INDIGO Speedy Mind">
+  <option value="Materiały dydaktyczne Space Memory — zestaw startowy">
+  <option value="Podręcznik Space Memory — poziom 1">
+  <option value="Kurs online Space Memory — dostęp roczny">
+</datalist>
+
+
+<!-- ══ MODAL: ZMIEŃ NUMER FAKTURY ════════════════════════════════════ -->
+<div class="overlay" id="modal-edit-num">
+<div class="modal" style="max-width:480px;">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-am">🔢</div>
+      <div><div class="mtitle">Zmień numer faktury</div><div class="msub" id="editnum-current-sub">tylko SuperAdmin · tylko przed wysyłką</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-edit-num')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber">
+      <span class="ibox-icon">⚠</span>
+      <div>
+        <strong>Kiedy można zmienić numer?</strong><br>
+        Tylko jeśli faktura ma status <em>Wystawiona</em> i nie została jeszcze wysłana klientowi ani wyeksportowana do Comarch / JPK.<br><br>
+        <strong>Duplkat transakcji Imoje?</strong> Nie zmieniaj numeru — wyстaw FK do 0 zł i odnotuj przyczynę.
+      </div>
+    </div>
+    <div class="fg" style="margin-top:12px;">
+      <label>Aktualny numer faktury</label>
+      <input type="text" id="editnum-old" readonly style="opacity:.6;font-family:'Space Mono',monospace;font-size:12px;">
+    </div>
+    <div class="fg">
+      <label>Nowy numer faktury</label>
+      <div style="position:relative;">
+        <input type="text" id="editnum-new" placeholder="FA/SPACE/2025/05/044" style="font-family:'Space Mono',monospace;font-size:12px;" oninput="validateNewNum()">
+        <div id="editnum-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;"></div>
+      </div>
+      <div id="editnum-hint" style="font-size:10.5px;color:var(--dim);margin-top:4px;">Format: FA/[PROJEKT]/RRRR/MM/NNN lub FV/B2B/RRRR/MM/NNN</div>
+    </div>
+    <div class="fg">
+      <label>Powód zmiany (wymagane)</label>
+      <select id="editnum-reason-select" onchange="editnumReasonChange(this)">
+        <option value="">— Wybierz powód —</option>
+        <option value="Błąd w nazwie serii przy wystawianiu">Błąd w nazwie serii przy wystawianiu</option>
+        <option value="Błędny numer porządkowy">Błędny numer porządkowy</option>
+        <option value="Korekta daty (zły miesiąc)">Korekta daty (zły miesiąc)</option>
+        <option value="other">Inny powód...</option>
+      </select>
+    </div>
+    <div class="fg" id="editnum-other-wrap" style="display:none;">
+      <label>Opisz powód</label>
+      <input type="text" id="editnum-reason-other" placeholder="Opisz szczegółowo...">
+    </div>
+    <div class="ibox ibox-blue" style="margin-top:4px;">
+      <span class="ibox-icon">📋</span>
+      Stary numer <strong id="editnum-old-badge">—</strong> zostanie zachowany w systemie jako <em>numer_poprzedni</em> — wyszukiwarka znajdzie fakturę po obu numerach.
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeModal('modal-edit-num')">Anuluj</button>
+    <button class="btn btn-primary" style="background:var(--amber);border-color:var(--amber);" onclick="confirmEditNum()">💾 Zmień numer</button>
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+
+
+<!-- ══ MODAL: ZMIEŃ NUMER FAKTURY ════════════════════════════════════ -->
+<div class="overlay" id="modal-edit-num">
+<div class="modal" style="max-width:480px;">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-am">🔢</div>
+      <div><div class="mtitle">Zmień numer faktury</div><div class="msub" id="editnum-current-sub">tylko SuperAdmin · tylko przed wysyłką</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-edit-num')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber">
+      <span class="ibox-icon">⚠</span>
+      <div>
+        <strong>Kiedy można zmienić numer?</strong><br>
+        Tylko jeśli faktura ma status <em>Wystawiona</em> i nie została jeszcze wysłana klientowi ani wyeksportowana do Comarch / JPK.<br><br>
+        <strong>Duplkat transakcji Imoje?</strong> Nie zmieniaj numeru — wyстaw FK do 0 zł i odnotuj przyczynę.
+      </div>
+    </div>
+    <div class="fg" style="margin-top:12px;">
+      <label>Aktualny numer faktury</label>
+      <input type="text" id="editnum-old" readonly style="opacity:.6;font-family:'Space Mono',monospace;font-size:12px;">
+    </div>
+    <div class="fg">
+      <label>Nowy numer faktury</label>
+      <div style="position:relative;">
+        <input type="text" id="editnum-new" placeholder="FA/SPACE/2025/05/044" style="font-family:'Space Mono',monospace;font-size:12px;" oninput="validateNewNum()">
+        <div id="editnum-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;"></div>
+      </div>
+      <div id="editnum-hint" style="font-size:10.5px;color:var(--dim);margin-top:4px;">Format: FA/[PROJEKT]/RRRR/MM/NNN lub FV/B2B/RRRR/MM/NNN</div>
+    </div>
+    <div class="fg">
+      <label>Powód zmiany (wymagane)</label>
+      <select id="editnum-reason-select" onchange="editnumReasonChange(this)">
+        <option value="">— Wybierz powód —</option>
+        <option value="Błąd w nazwie serii przy wystawianiu">Błąd w nazwie serii przy wystawianiu</option>
+        <option value="Błędny numer porządkowy">Błędny numer porządkowy</option>
+        <option value="Korekta daty (zły miesiąc)">Korekta daty (zły miesiąc)</option>
+        <option value="other">Inny powód...</option>
+      </select>
+    </div>
+    <div class="fg" id="editnum-other-wrap" style="display:none;">
+      <label>Opisz powód</label>
+      <input type="text" id="editnum-reason-other" placeholder="Opisz szczegółowo...">
+    </div>
+    <div class="ibox ibox-blue" style="margin-top:4px;">
+      <span class="ibox-icon">📋</span>
+      Stary numer <strong id="editnum-old-badge">—</strong> zostanie zachowany w systemie jako <em>numer_poprzedni</em> — wyszukiwarka znajdzie fakturę po obu numerach.
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeModal('modal-edit-num')">Anuluj</button>
+    <button class="btn btn-primary" style="background:var(--amber);border-color:var(--amber);" onclick="confirmEditNum()">💾 Zmień numer</button>
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+
+
+<!-- ══ EXPORT MODAL ══════════════════════════════════════════════════════ -->
+<div class="overlay" id="modal-export">
+<div class="modal modal-lg">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-bl">📤</div>
+      <div><div class="mtitle" id="exp-title">Eksport faktur</div><div class="msub" id="exp-sub">Wybierz format i zakres</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-export')">✕</div>
+  </div>
+  <div class="mbody">
+
+    <!-- FORMAT TILES -->
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:rgba(16,185,129,.05);border:1px solid rgba(16,185,129,.2);border-radius:11px;padding:13px 15px;">
+        <div style="font-size:11px;font-weight:800;color:var(--green);margin-bottom:6px;">📊 Rejestr XLSX — Excel</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.7;">Dla buhgaltera · wewnętrzna kontrola.<br>
+        Kolumny: Nr faktury · Data · Klient/NIP · Projekt · Opis · Netto · VAT · Brutto · Status · Firma (Sprzedawca)<br>
+        <span style="color:var(--green);font-weight:600;">→ .xlsx · Excel 2016+</span></div>
+      </div>
+      <div style="background:rgba(239,68,68,.05);border:1px solid rgba(239,68,68,.2);border-radius:11px;padding:13px 15px;">
+        <div style="font-size:11px;font-weight:800;color:var(--red);margin-bottom:6px;">📁 Pakiet PDF — ZIP</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.7;">Archiwum PDF wybranych faktur.<br>
+        Jeden .zip z plikiem PDF dla każdej faktury.<br>
+        Nazwa pliku: <span style="font-family:'Space Mono',monospace;font-size:10px;">FA_SPACE_2025_05_042.pdf</span><br>
+        <span style="color:var(--red);font-weight:600;">→ .zip · PDF/A-3</span></div>
+      </div>
+      <div style="background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.2);border-radius:11px;padding:13px 15px;">
+        <div style="font-size:11px;font-weight:800;color:var(--amber);margin-bottom:6px;">🏭 Comarch ERP Optima — XML</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.7;">Import do Comarch Optima <strong>bez integracji API</strong>.<br>
+        Ścieżka w Optimie: <span style="font-family:'Space Mono',monospace;font-size:10px;">Handel → Faktury → Import XML</span><br>
+        Format: Comarch ERP XML Schema v2.0 (FS — faktury sprzedaży).<br>
+        Pola: NumerPelny · DataWystawienia · Kontrahent · Pozycje · VAT · Brutto · FormaPlatnosci<br>
+        <span style="color:var(--amber);font-weight:600;">→ .xml · Comarch ERP Schema 2.0</span></div>
+      </div>
+      <div style="background:rgba(139,92,246,.05);border:1px solid rgba(139,92,246,.2);border-radius:11px;padding:13px 15px;">
+        <div style="font-size:11px;font-weight:800;color:var(--purple);margin-bottom:6px;">🏛 JPK_FA(3) — Ministerstwo Finansów</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.7;">Jednolity Plik Kontrolny dla faktur sprzedaży.<br>
+        <strong>Tylko na żądanie US podczas kontroli</strong> — nie wysyłamy co miesiąc!<br>
+        Struktura JPK_FA(3) wg schematu MF (jpk.gov.pl).<br>
+        Węzły: Naglowek · Podmiot1 · Faktury[] · FakturaWiersze[]<br>
+        <span style="color:var(--purple);font-weight:600;">→ .xml · JPK_FA(3) · UTF-8</span></div>
+      </div>
+    </div>
+
+    <!-- SCOPE INFO -->
+    <div class="sec"><div class="sdot" style="background:var(--blue);"></div>Zakres eksportu</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+      <div style="background:var(--faint);border:1px solid var(--b);border-radius:9px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Faktur w filtrze</div>
+        <div id="exp-n-total" style="font-size:22px;font-weight:800;color:var(--white);font-family:'Space Mono',monospace;">6</div>
+      </div>
+      <div style="background:var(--faint);border:1px solid var(--b);border-radius:9px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Zaznaczono ręcznie</div>
+        <div id="exp-n-sel" style="font-size:22px;font-weight:800;color:var(--blue);font-family:'Space Mono',monospace;">0</div>
+      </div>
+      <div style="background:rgba(16,185,129,.04);border:1px solid rgba(16,185,129,.18);border-radius:9px;padding:10px 12px;">
+        <div style="font-size:9px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Zostanie wyeksportowanych</div>
+        <div id="exp-n-final" style="font-size:22px;font-weight:800;color:var(--green);font-family:'Space Mono',monospace;">6</div>
+        <div style="font-size:9.5px;color:var(--dim);margin-top:2px;">(zaznaczone lub wszystkie)</div>
+      </div>
+    </div>
+
+    <!-- FORMAT SELECTOR -->
+    <div class="sec"><div class="sdot" style="background:var(--purple);"></div>Format pliku</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+      <button class="exp-btn exp-xlsx" id="fmt-xlsx" onclick="setFmt('xlsx')" style="border-width:2px;">📊 XLSX — Excel</button>
+      <button class="exp-btn exp-pdf"  id="fmt-pdf"  onclick="setFmt('pdf')"  style="opacity:.55;">📁 ZIP — PDF</button>
+      <button class="exp-btn exp-comarch" id="fmt-comarch" onclick="setFmt('comarch')" style="opacity:.55;">🏭 XML — Comarch</button>
+      <button class="exp-btn exp-jpk"  id="fmt-jpk"  onclick="setFmt('jpk')"  style="opacity:.55;">🏛 XML — JPK_FA(3)</button>
+    </div>
+
+    <!-- FILENAME -->
+    <div style="background:rgba(0,0,0,.25);border:1px solid var(--b);border-radius:9px;padding:10px 14px;display:flex;align-items:center;gap:10px;">
+      <span style="font-size:12px;color:var(--dim);">📄 Plik:</span>
+      <span id="exp-filename" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--blue);">GLS_Faktury_B2C_2025_05.xlsx</span>
+    </div>
+  </div>
+  <div class="mftr">
+    <button class="btn btn-ghost btn-sm" onclick="closeModal('modal-export')">Anuluj</button>
+    <button class="btn btn-primary" onclick="doDownload()">⬇ Pobierz plik</button>
+  </div>
+</div>
+</div>
+
+<!-- ──────────────────── JS ──────────────────── -->
+
+
+<!-- ══ MODAL: PRO FORMA ════════════════════════════════════════════════ -->
+<div class="overlay" id="modal-proforma">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-bl">📄</div>
+      <div><div class="mtitle">Nowa Pro Forma</div><div class="msub">Dokument wstępny — nie jest fakturą VAT</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-proforma')">✕</div>
+  </div>
+  <div class="mbody">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fg"><label>Klient / Rodzic</label><input type="text" placeholder="Imię i nazwisko lub szukaj..."></div>
+      <div class="fg"><label>Uczeń</label><input type="text" placeholder="Imię ucznia"></div>
+      <div class="fg"><label>Data wystawienia</label><input type="date" value="2025-05-20"></div>
+      <div class="fg"><label>Ważna do</label><input type="date" value="2025-06-03"></div>
+    </div>
+    <div class="fg"><label>Opis usługi</label><input type="text" list="opisy-uslug" placeholder="Abonament miesięczny Space Memory — maj 2025"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+      <div class="fg"><label>Kwota (zł)</label><input type="number" placeholder="120.00" step="0.01"></div>
+      <div class="fg"><label>Projekt</label>
+        <select><option>SPACE</option><option>INDIGO</option><option>OLIMP</option></select>
+      </div>
+      <div class="fg"><label>Waluta</label>
+        <select><option>PLN</option><option>EUR</option><option>USD</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Uwagi (opcjonalne)</label><textarea rows="2" placeholder="Dodatkowe informacje..."></textarea></div>
+    <div class="ibox ibox-blue"><span class="ibox-icon">ℹ</span>Pro Forma nie jest fakturą VAT. Po opłaceniu przez klienta zostanie automatycznie przekształcona w fakturę FA.</div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeModal('modal-proforma')">Anuluj</button>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-proforma');showToast('📩 Pro Forma wysłana na e-mail klienta','info')">✉ Wyślij klientowi</button>
+      <button class="btn btn-primary" onclick="addProForma()">＋ Utwórz Pro Forma</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: EDIT FAKTURA ════════════════════════════════════════════ -->
+<div class="overlay" id="modal-edit">
+<div class="modal">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-am">✏</div>
+      <div><div class="mtitle" id="edit-title">Edytuj fakturę</div><div class="msub" id="edit-sub">Zmiana danych faktury</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-edit')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber" id="edit-warning" style="display:none;"><span class="ibox-icon">⚠</span><span id="edit-warning-text"></span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fg"><label>Nr faktury</label><input type="text" id="edit-num" readonly style="opacity:.6;font-family:'Space Mono',monospace;font-size:11px;"></div>
+      <div class="fg"><label>Data wystawienia</label><input type="date" id="edit-date"></div>
+      <div class="fg"><label>Klient / Rodzic</label><input type="text" id="edit-client"></div>
+      <div class="fg"><label>Uczeń</label><input type="text" id="edit-student"></div>
+    </div>
+    <div class="fg"><label>Opis usługi</label><input type="text" id="edit-desc" list="opisy-uslug"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div class="fg"><label>Kwota (zł)</label><input type="number" id="edit-amount" step="0.01"></div>
+      <div class="fg"><label>Projekt</label>
+        <select id="edit-proj"><option>SPACE</option><option>INDIGO</option><option>OLIMP</option></select>
+      </div>
+    </div>
+    <div class="fg"><label>Powód edycji (wymagane)</label><input type="text" id="edit-reason" placeholder="np. Błąd w opisie usługi, korekta danych klienta..."></div>
+    <div class="fg"><label>Uwagi na fakturze <span style="font-weight:400;color:var(--dim);">(opcjonalne)</span></label><textarea id="edit-uwagi" rows="2" placeholder="np. Płatność za maj 2025. Dziękujemy za zaufanie."></textarea></div>
+    <div class="ibox ibox-blue"><span class="ibox-icon">📋</span>Każda edycja jest zapisywana w historii: autor, czas, zakres zmian.</div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeModal('modal-edit')">Anuluj</button>
+    <button class="btn btn-primary" style="background:var(--amber);border-color:var(--amber);" onclick="saveEdit()">💾 Zapisz zmiany</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: CONFIRM DELETE ══════════════════════════════════════════ -->
+<div class="overlay" id="modal-delete">
+<div class="modal" style="max-width:440px;">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-rd">🗑</div>
+      <div><div class="mtitle">Usuń fakturę</div><div class="msub" id="del-num-sub">Potwierdź usunięcie</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-delete')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-red"><span class="ibox-icon">⚠</span>Faktura zostanie usunięta z systemu CRM. <strong>Transakcja Imoje pozostaje bez zmian</strong> — rozliczenie po stronie banku nie ulega zmianie.</div>
+    <div class="fg" style="margin-top:8px;"><label>Powód usunięcia (wymagane)</label><input type="text" id="del-reason" placeholder="np. Duplikat, błąd systemowy..."></div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeModal('modal-delete')">Anuluj</button>
+    <button class="btn btn-primary" style="background:var(--red);border-color:var(--red);" onclick="confirmDelete()">🗑 Usuń fakturę</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ MODAL: ZMIEŃ NUMER FAKTURY ════════════════════════════════════ -->
+<div class="overlay" id="modal-edit-num">
+<div class="modal" style="max-width:480px;">
+  <div class="mhdr">
+    <div class="mhl">
+      <div class="mhico mi-am">🔢</div>
+      <div><div class="mtitle">Zmień numer faktury</div><div class="msub" id="editnum-current-sub">tylko SuperAdmin · tylko przed wysyłką</div></div>
+    </div>
+    <div class="mclose" onclick="closeModal('modal-edit-num')">✕</div>
+  </div>
+  <div class="mbody">
+    <div class="ibox ibox-amber">
+      <span class="ibox-icon">⚠</span>
+      <div>
+        <strong>Kiedy można zmienić numer?</strong><br>
+        Tylko jeśli faktura ma status <em>Wystawiona</em> i nie została jeszcze wysłana klientowi ani wyeksportowana do Comarch / JPK.<br><br>
+        <strong>Duplkat transakcji Imoje?</strong> Nie zmieniaj numeru — wyстaw FK do 0 zł i odnotuj przyczynę.
+      </div>
+    </div>
+    <div class="fg" style="margin-top:12px;">
+      <label>Aktualny numer faktury</label>
+      <input type="text" id="editnum-old" readonly style="opacity:.6;font-family:'Space Mono',monospace;font-size:12px;">
+    </div>
+    <div class="fg">
+      <label>Nowy numer faktury</label>
+      <div style="position:relative;">
+        <input type="text" id="editnum-new" placeholder="FA/SPACE/2025/05/044" style="font-family:'Space Mono',monospace;font-size:12px;" oninput="validateNewNum()">
+        <div id="editnum-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;"></div>
+      </div>
+      <div id="editnum-hint" style="font-size:10.5px;color:var(--dim);margin-top:4px;">Format: FA/[PROJEKT]/RRRR/MM/NNN lub FV/B2B/RRRR/MM/NNN</div>
+    </div>
+    <div class="fg">
+      <label>Powód zmiany (wymagane)</label>
+      <select id="editnum-reason-select" onchange="editnumReasonChange(this)">
+        <option value="">— Wybierz powód —</option>
+        <option value="Błąd w nazwie serii przy wystawianiu">Błąd w nazwie serii przy wystawianiu</option>
+        <option value="Błędny numer porządkowy">Błędny numer porządkowy</option>
+        <option value="Korekta daty (zły miesiąc)">Korekta daty (zły miesiąc)</option>
+        <option value="other">Inny powód...</option>
+      </select>
+    </div>
+    <div class="fg" id="editnum-other-wrap" style="display:none;">
+      <label>Opisz powód</label>
+      <input type="text" id="editnum-reason-other" placeholder="Opisz szczegółowo...">
+    </div>
+    <div class="ibox ibox-blue" style="margin-top:4px;">
+      <span class="ibox-icon">📋</span>
+      Stary numer <strong id="editnum-old-badge">—</strong> zostanie zachowany w systemie jako <em>numer_poprzedni</em> — wyszukiwarka znajdzie fakturę po obu numerach.
+    </div>
+  </div>
+  <div class="mfooter">
+    <button class="btn btn-ghost" onclick="closeModal('modal-edit-num')">Anuluj</button>
+    <button class="btn btn-primary" style="background:var(--amber);border-color:var(--amber);" onclick="confirmEditNum()">💾 Zmień numer</button>
+  </div>
+</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ──────────────────── JS ──────────────────── --
+
+<!-- ──────────────────── JS ──────────────────── -->
+
+<script>
+/* ════════════════════════════════════════════════════════════════════
+   GLS FAKTURY — Complete JS v7
+   Functions: theme, modal, tabs, filters, sort, checkbox, pagination,
+              export CSV, add invoice, edit invoice, delete invoice
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── THREE-DOT DROPDOWN ─────────────────────────────────────── */
+function toggleDD(btn){
+  const menu = btn.nextElementSibling;
+  const isOpen = menu.classList.contains('open');
+  // Close all other open menus first
+  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'));
+  if(!isOpen) menu.classList.add('open');
+}
+// Close dropdown on outside click
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.dd-menu.open').forEach(m => m.classList.remove('open'));
+});
+
+/* ════════════════════════════════════════════════════════════════
+   ROLE SYSTEM
+   Roles: superadmin | bookkeeper | admin | manager | trainer
+   ════════════════════════════════════════════════════════════════ */
+
+const ROLES = {
+  superadmin: { label: 'SuperAdmin',         color: '#7c3aed' },
+  bookkeeper: { label: 'Księgowa',            color: '#d97706' },
+  admin:      { label: 'Administrator',       color: '#4f6ef7' },
+  manager:    { label: 'Manager / Sprzedaż',  color: '#0891b2' },
+  trainer:    { label: 'Trener',              color: '#64748b' },
+};
+
+// Permissions
+const CAN = {
+  viewModule:     ['superadmin','bookkeeper','admin','manager'],
+  createInvoice:  ['superadmin','admin','manager'],
+  createFK:       ['superadmin','bookkeeper','admin','manager'],
+  editInvoice:    ['superadmin','bookkeeper','admin','manager'],
+  editNumber:     ['superadmin','bookkeeper'],
+  deleteInvoice:  ['superadmin','bookkeeper'],
+  exportCSV:      ['superadmin','bookkeeper','admin','manager'],
+  sendEmail:      ['superadmin','admin','manager'],
+};
+
+let _role = 'superadmin';
+
+function can(action){ return CAN[action]?.includes(_role) ?? false; }
+
+function setRole(role){
+  _role = role;
+  const info = ROLES[role] || ROLES.superadmin;
+  const lbl = document.getElementById('role-label');
+  if(lbl){ lbl.textContent = info.label; lbl.style.color = info.color; }
+
+  const wrap = document.getElementById('main-wrap');
+  const noAcc = document.getElementById('no-access');
+  const noAccRole = document.getElementById('no-access-role');
+
+  if(!can('viewModule')){
+    if(wrap)  wrap.style.display = 'none';
+    if(noAcc){ noAcc.style.display = 'flex'; }
+    if(noAccRole) noAccRole.textContent = info.label;
+    return;
+  }
+
+  if(wrap)  wrap.style.display = '';
+  if(noAcc) noAcc.style.display = 'none';
+
+  // Show/hide "Wystaw fakturę" buttons
+  const btnB2C = document.getElementById('act-b2c');
+  const btnB2B = document.getElementById('act-b2b');
+  const newB2CBtn = btnB2C?.querySelector('.btn-primary');
+  const newB2BBtn = btnB2B?.querySelector('.btn-primary');
+  if(newB2CBtn) newB2CBtn.style.display = can('createInvoice') ? '' : 'none';
+  if(newB2BBtn) newB2BBtn.style.display = can('createInvoice') ? '' : 'none';
+
+  // Show/hide Pro Forma button
+  const pfBtn = document.querySelector('[onclick*="modal-proforma"]');
+  if(pfBtn) pfBtn.style.display = can('createInvoice') ? '' : 'none';
+
+  // Export CSV button
+  const expBtn = document.querySelector('[onclick*="openExport"]');
+  if(expBtn) expBtn.style.display = can('exportCSV') ? '' : 'none';
+
+  // Rebuild all dropdowns
+  rebuildDropdowns();
+}
+
+function rebuildDropdowns(){
+  document.querySelectorAll('.dd-menu').forEach(menu => {
+    const tr = menu.closest('tr');
+    if(!tr) return;
+
+    const dtype  = tr.dataset.type   || '';
+    const dstatus= tr.dataset.status || '';
+    const isB2B  = !!tr.closest('#tbl-b2b');
+    const isFK   = dtype.includes('fk') || dtype.includes('fvk');
+    const isCancel = dstatus === 'st-cancel';
+    const isPro  = dtype === 'b2c-pro';
+    const korModal = isB2B ? 'modal-kor-b2b' : 'modal-kor-b2c';
+    const prvModal = isFK  ? 'modal-preview-kor' : (isB2B ? 'modal-preview-b2b' : 'modal-preview-b2c');
+    const korLabel = isB2B ? 'FVK' : 'FK';
+
+    const items = [];
+
+    // Always: preview
+    items.push(`<div class="dditem" onclick="openModal('${prvModal}')">👁 Podgląd PDF</div>`);
+
+    // Email — if allowed
+    if(!isCancel && can('sendEmail'))
+      items.push(`<div class="dditem" onclick="openModal('modal-email-b2c')">✉ Wyślij e-mail</div>`);
+
+    // Pro Forma → FA
+    if(isPro && can('createInvoice'))
+      items.push(`<div class="dditem" onclick="showToast('⚙ Konwersja PF→FA — backend','info')">🔄 Zamień na fakturę FA</div>`);
+
+    // FK / FVK
+    if(!isFK && !isCancel && can('createFK'))
+      items.push(`<div class="dditem dditem-am" onclick="openModal('${korModal}')">${korLabel} Faktura korygująca</div>`);
+
+    // Divider
+    if(can('editInvoice') || can('editNumber') || can('deleteInvoice'))
+      items.push(`<div style="height:1px;background:rgba(79,110,247,.08);margin:3px 0;"></div>`);
+
+    // Edit
+    if(can('editInvoice'))
+      items.push(`<div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>`);
+
+    // Edit number — bookkeeper / superadmin only
+    if(can('editNumber'))
+      items.push(`<div class="dditem" onclick="editNumRow(this)">🔢 Zmień numer faktury</div>`);
+
+    // Delete — bookkeeper / superadmin only
+    if(can('deleteInvoice'))
+      items.push(`<div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>`);
+
+    menu.innerHTML = items.join('\n');
+  });
+}
+
+/* ── THEME ──────────────────────────────────────────────────────── */
+function toggleTheme(){
+  const dark = document.body.classList.toggle('dark');
+  const btn = document.getElementById('theme-btn');
+  if(btn) btn.innerHTML = dark ? '☀ Jasny' : '🌙 Ciemny';
+  try{ localStorage.setItem('gls-theme', dark ? 'dark' : 'light'); }catch(e){}
+}
+(function initTheme(){
+  try{
+    const saved = localStorage.getItem('gls-theme');
+    if(saved === 'dark'){
+      document.body.classList.add('dark');
+      const btn = document.getElementById('theme-btn');
+      if(btn) btn.innerHTML = '☀ Jasny';
+    }
+  }catch(e){}
+})();
+
+/* ── MODAL ──────────────────────────────────────────────────────── */
+function openModal(id){
+  const el = document.getElementById(id);
+  if(!el){ showToast('⚙ Sekcja w budowie','am'); return; }
+  el.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id){
+  const el = document.getElementById(id);
+  if(el) el.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => {
+  if(e.key==='Escape')
+    document.querySelectorAll('.overlay.open').forEach(o=>{
+      o.classList.remove('open'); document.body.style.overflow='';
+    });
+});
+document.addEventListener('click', e => {
+  if(e.target.classList.contains('overlay') && e.target.classList.contains('open'))
+    closeModal(e.target.id);
+});
+
+/* ── SEG TABS ───────────────────────────────────────────────────── */
+function switchSeg(type){
+  document.querySelectorAll('.sg').forEach(s=>s.classList.remove('act'));
+  event.currentTarget.classList.add('act');
+  document.getElementById('view-b2c').style.display = type==='b2c' ? 'block':'none';
+  document.getElementById('view-b2b').style.display = type==='b2b' ? 'block':'none';
+  const ab2c = document.getElementById('act-b2c');
+  const ab2b = document.getElementById('act-b2b');
+  if(ab2c) ab2c.style.display = type==='b2c' ? 'flex':'none';
+  if(ab2b) ab2b.style.display = type==='b2b' ? 'flex':'none';
+}
+
+/* ── B2B CLIENT ─────────────────────────────────────────────────── */
+function selectB2B(n){
+  document.querySelectorAll('.b2b-cc').forEach(c=>c.classList.remove('act'));
+  const el = document.getElementById('b2b-c'+n);
+  if(el) el.classList.add('act');
+}
+
+/* ── FIRMA ──────────────────────────────────────────────────────── */
+const FIRMA = {
+  gls: {name:'Global Leaders Skills Sp. z o.o.',nip:'525-297-09-24',addr:'ul. Kabacki Dukt 1/U1 i U2, 02-798 Warszawa'},
+  skl: {name:'E-sklep Space Memory — Artsiom Hrableuski',nip:'527-285-49-02',addr:'Warszawa'},
+  lub: {name:'Oleksii Lubenets JDG',nip:'527-300-33-88',addr:'Warszawa'}
+};
+function selSprzedawca(key){
+  document.querySelectorAll('.sp-opt').forEach(o=>o.classList.remove('act'));
+  const btn = document.getElementById('sp-'+key);
+  if(btn) btn.classList.add('act');
+  const f = FIRMA[key]; if(!f) return;
+  ['b2c','b2b'].forEach(t=>{
+    const n=document.getElementById('firma-name-'+t);
+    const p=document.getElementById('firma-nip-'+t);
+    const a=document.getElementById('firma-addr-'+t);
+    if(n) n.textContent=f.name;
+    if(p) p.textContent='NIP: '+f.nip;
+    if(a) a.textContent=f.addr;
+  });
+}
+
+/* ── PAGINATION STATE ───────────────────────────────────────────── */
+const _pag = { b2c:{page:1,perPage:30}, b2b:{page:1,perPage:30} };
+
+function setPerPage(type, val){
+  _pag[type].perPage = parseInt(val);
+  _pag[type].page = 1;
+  renderPag(type);
+}
+
+function renderPag(type){
+  const tbl = document.getElementById('tbl-'+type);
+  if(!tbl) return;
+  const rows = Array.from(tbl.querySelectorAll('tbody tr'));
+  const visible = rows.filter(r => r.style.display !== 'none');
+  const {perPage} = _pag[type];
+  let {page} = _pag[type];
+  const totalPages = Math.max(1, Math.ceil(visible.length / perPage));
+  if(page > totalPages) page = _pag[type].page = totalPages;
+
+  visible.forEach((r, i) => {
+    r.style.display = (i >= (page-1)*perPage && i < page*perPage) ? '' : 'none';
+  });
+  // hidden rows (filtered out) stay hidden regardless
+
+  const info = document.getElementById('pag-info-'+type);
+  if(info){
+    const from = visible.length ? (page-1)*perPage+1 : 0;
+    const to   = Math.min(page*perPage, visible.length);
+    info.textContent = `Wyświetlono ${from}–${to} z ${visible.length} faktur`;
+  }
+
+  const btns = document.getElementById('pag-btns-'+type);
+  if(btns){
+    btns.innerHTML = '';
+    const mkBtn = (label, p, disabled, active) => {
+      const d = document.createElement('div');
+      d.className = 'pb' + (active?' act':'') + (disabled?' disabled':'');
+      d.textContent = label;
+      if(!disabled && !active) d.onclick = () => { _pag[type].page=p; renderPag(type); };
+      return d;
+    };
+    btns.appendChild(mkBtn('‹', page-1, page===1));
+    const range = [];
+    for(let p=1;p<=totalPages;p++){
+      if(p===1||p===totalPages||Math.abs(p-page)<=1) range.push(p);
+      else if(range[range.length-1]!=='…') range.push('…');
+    }
+    range.forEach(p => {
+      if(p==='…'){ const d=document.createElement('div'); d.className='pb'; d.textContent='…'; btns.appendChild(d); }
+      else btns.appendChild(mkBtn(p, p, false, p===page));
+    });
+    btns.appendChild(mkBtn('›', page+1, page===totalPages));
+  }
+}
+
+/* ── FILTERS ────────────────────────────────────────────────────── */
+function applyFilters(type){
+  const get = id => document.getElementById(id);
+  const val = id => { const el=get(id); return el ? el.value : ''; };
+
+  const q     = val('search-'+type).toLowerCase();
+  const proj  = val('flt-proj-'+type);
+  const ftype = val('flt-type-'+type);
+  const stat  = val('flt-stat-'+type);
+  const from  = val('flt-from-'+type);
+  const to    = val('flt-to-'+type);
+
+  const tbl = document.getElementById('tbl-'+type);
+  if(!tbl) return;
+
+  tbl.querySelectorAll('tbody tr').forEach(row => {
+    const text  = row.textContent.toLowerCase();
+    const rProj = row.dataset.proj  || '';
+    const rType = row.dataset.type  || '';
+    const rStat = row.dataset.status || row.dataset.stat || '';
+    const rDate = row.dataset.date  || '';
+
+    let show = true;
+    if(q     && !text.includes(q))  show=false;
+    if(proj  && rProj !== proj)     show=false;
+    if(ftype && rType !== ftype)    show=false;
+    if(stat  && rStat !== stat)     show=false;
+    if(from  && rDate && rDate<from) show=false;
+    if(to    && rDate && rDate>to)   show=false;
+
+    row._filteredOut = !show;
+    row.style.display = show ? '' : 'none';
+  });
+
+  _pag[type].page = 1;
+  renderPag(type);
+  updateSelBar(type);
+}
+
+/* ── SORT ───────────────────────────────────────────────────────── */
+function sortTbl(type, col, thEl){
+  const tbl = document.getElementById('tbl-'+type);
+  if(!tbl) return;
+  const asc = thEl.classList.toggle('asc');
+  thEl.classList.toggle('desc', !asc);
+  tbl.querySelectorAll('th.srt').forEach(h=>{ if(h!==thEl){h.classList.remove('asc','desc');} });
+
+  const colMap = {num:1,date:2,client:3,proj:4,amount:6};
+  const idx = colMap[col] ?? 1;
+  const tbody = tbl.querySelector('tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a,b)=>{
+    const av = (a.cells[idx]||{textContent:''}).textContent.trim();
+    const bv = (b.cells[idx]||{textContent:''}).textContent.trim();
+    const an = parseFloat(av.replace(/[^\d.,-]/g,'').replace(',','.'));
+    const bn = parseFloat(bv.replace(/[^\d.,-]/g,'').replace(',','.'));
+    if(!isNaN(an)&&!isNaN(bn)) return asc?an-bn:bn-an;
+    return asc?av.localeCompare(bv,'pl'):bv.localeCompare(av,'pl');
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+  renderPag(type);
+}
+
+/* ── CHECKBOXES ─────────────────────────────────────────────────── */
+function toggleAll(src, type){
+  const tbl = document.getElementById('tbl-'+type);
+  if(!tbl) return;
+  tbl.querySelectorAll('tbody tr').forEach(row=>{
+    if(row.style.display==='none') return;  // only visible rows
+    const cb = row.querySelector('input[type=checkbox]');
+    if(cb) cb.checked = src.checked;
+  });
+  updateSelBar(type);
+}
+function updateSelBar(type){
+  const tbl = document.getElementById('tbl-'+type);
+  const bar = document.getElementById('sel-bar-'+type);
+  if(!tbl||!bar) return;
+  const checked = tbl.querySelectorAll('tbody input[type=checkbox]:checked');
+  bar.classList.toggle('show', checked.length>0);
+  const nEl = bar.querySelector('.sel-bar-n');
+  if(nEl) nEl.textContent = '✔ Zaznaczono: '+checked.length+' faktur';
+
+  // Update sum
+  let sum = 0;
+  checked.forEach(cb=>{
+    const row = cb.closest('tr');
+    if(!row) return;
+    const amtCell = row.querySelector('.amt');
+    if(amtCell){
+      const n = parseFloat(amtCell.textContent.replace(/[^\d.,-]/g,'').replace(',','.'));
+      if(!isNaN(n)) sum += n;
+    }
+  });
+  const sumEl = document.getElementById('selsum-'+type);
+  if(sumEl) sumEl.textContent = sum.toFixed(2).replace('.',',') + ' zł';
+
+  // Update master checkbox state
+  const hd = document.getElementById('hd-cb-'+type);
+  if(hd){
+    const allVisible = tbl.querySelectorAll('tbody tr:not([style*="display: none"]) input[type=checkbox]');
+    hd.indeterminate = checked.length>0 && checked.length<allVisible.length;
+    hd.checked = allVisible.length>0 && checked.length===allVisible.length;
+  }
+}
+function clearSel(type){
+  const tbl = document.getElementById('tbl-'+type);
+  if(tbl) tbl.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked=false);
+  updateSelBar(type);
+}
+
+/* ── EXPORT ─────────────────────────────────────────────────────── */
+let _expType='b2c', _expFmt='csv';
+function openExport(fmt, type){
+  _expType = type||'b2c'; _expFmt = fmt||'csv';
+  const title=document.getElementById('exp-title');
+  const sub=document.getElementById('exp-sub');
+  if(title) title.textContent = 'Eksport faktur '+(type==='b2b'?'B2B':'B2C');
+  if(sub) sub.textContent = 'Format: '+fmt.toUpperCase();
+  openModal('modal-export');
+}
+function setFmt(el, fmt){
+  document.querySelectorAll('.fmt-tile').forEach(t=>t.classList.remove('act'));
+  el.classList.add('act'); _expFmt = fmt;
+}
+/* Kolumny eksportu (stałe — wymagane przez księgowość):
+   Numer | Brutto | Netto | VAT | Data wystawienia | Data sprzedaży |
+   Kontrahent | Ulica | Miejscowość | Kod pocztowy | NIP |
+   Termin płatności | Data płatności                                  */
+const EXPORT_HEADERS = [
+  'Numer dokumentu',
+  'Data wystawienia dokumentu',
+  'Data sprzedaży',
+  'Data – termin płatności',
+  'Nazwa kontrahenta',
+  'Adres kontrahenta',
+  'Numer domu kontrahenta',
+  'Numer mieszkania kontrahenta',
+  'Kod pocztowy kontrahenta',
+  'Miasto kontrahenta',
+  'NIP kontrahenta',
+  'Netto',
+  'Stawka vat',
+  'Vat',
+  'Brutto',
+  'Kraj kontrahenta',
+  'Forma płatności',
+  'Symbol waluty'
+];
+
+function extractRowData(tr){
+  // ── DOM ──────────────────────────────────────────────────────────
+  const num    = tr.querySelector('.inv-num')?.textContent?.trim() || '';
+  const client = tr.querySelector('.cli-name')?.textContent?.trim() || '';
+  const amtTxt = tr.querySelector('.amt')?.textContent?.trim() || '0';
+  const brutto = parseFloat(amtTxt.replace(/[^\d.,-]/g,'').replace(',','.')) || 0;
+
+  // GLS: zawsze ZW (art. 43 ust. 1 pkt 26)
+  const netto  = brutto;
+  const vatAmt = 0;
+
+  // ── Daty ─────────────────────────────────────────────────────────
+  const dateWyst      = tr.dataset.date           || '';
+  const dateSprzedazy = tr.dataset.datesprzedazy  || dateWyst;
+  const termin        = tr.dataset.termin         || calcTermin(dateWyst, 14);
+
+  // ── Adres — rozdziel ulicę na nazwę / numer domu / numer mieszkania
+  const fullStreet = tr.dataset.ulica || '';
+  const sm = fullStreet.match(/^(.*?)\s+(\d+[a-zA-Z]?)(?:\/(\d+))?$/) || [];
+  const ulicaNazwa = sm[1] || fullStreet;
+  const numDomu    = sm[2] || '';
+  const numMiesz   = sm[3] || '';
+
+  const kod    = tr.dataset.kod    || '';
+  const miasto = tr.dataset.miasto || '';
+  const nip    = tr.dataset.nip    || '';
+
+  const autoTag = tr.querySelector('.auto-tag')?.textContent?.trim() || '';
+  const forma   = tr.dataset.forma || (autoTag.includes('Imoje') ? 'Przelew' : 'Przelew');
+
+  // ── 18 kolumn (wg wzoru Comarch) ─────────────────────────────────
+  return [
+    num,                    //  1 Numer dokumentu
+    fmtDate(dateWyst),      //  2 Data wystawienia dokumentu
+    fmtDate(dateSprzedazy), //  3 Data sprzedaży
+    fmtDate(termin),        //  4 Data – termin płatności
+    client,                 //  5 Nazwa kontrahenta
+    ulicaNazwa,             //  6 Adres kontrahenta
+    numDomu,                //  7 Numer domu kontrahenta
+    numMiesz,               //  8 Numer mieszkania kontrahenta
+    kod,                    //  9 Kod pocztowy kontrahenta
+    miasto,                 // 10 Miasto kontrahenta
+    nip,                    // 11 NIP kontrahenta
+    netto,                  // 12 Netto  (liczba)
+    'ZW',                   // 13 Stawka vat
+    vatAmt,                 // 14 Vat    (liczba)
+    brutto,                 // 15 Brutto (liczba)
+    'Polska',               // 16 Kraj kontrahenta
+    forma,                  // 17 Forma płatności
+    'PLN',                  // 18 Symbol waluty
+  ];
+}
+
+function fmt2(n){ return n.toFixed(2).replace('.',','); }
+function fmtDate(d){
+  if(!d) return '';
+  // YYYY-MM-DD → DD.MM.YYYY
+  const p = d.split('-');
+  return p.length===3 ? p[2]+'.'+p[1]+'.'+p[0] : d;
+}
+function calcTermin(dateStr, days){
+  if(!dateStr) return '';
+  const d = new Date(dateStr);
+  if(isNaN(d)) return '';
+  d.setDate(d.getDate()+days);
+  return d.toISOString().slice(0,10);
+}
+function csvCell(v){ return '"'+String(v).replace(/"/g,'""')+'"'; }
+
+function doDownload(){
+  const tbl = document.getElementById('tbl-'+_expType);
+  if(!tbl){ showToast('Brak danych do eksportu','err'); return; }
+
+  // ── Collect rows ─────────────────────────────────────────────────
+  const dataRows = [];
+  tbl.querySelectorAll('tbody tr').forEach(tr=>{
+    if(tr._filteredOut || tr.style.display==='none') return;
+    dataRows.push(extractRowData(tr));
+  });
+
+  if(!dataRows.length){ showToast('Brak widocznych faktur do eksportu','err'); return; }
+
+  // ── Build worksheet ──────────────────────────────────────────────
+  const wsData = [EXPORT_HEADERS, ...dataRows];
+  const ws     = XLSX.utils.aoa_to_sheet(wsData);
+
+  // ── Column widths ────────────────────────────────────────────────
+  ws['!cols'] = [
+    {wch:22}, // Numer dokumentu
+    {wch:14}, // Data wystawienia
+    {wch:14}, // Data sprzedaży
+    {wch:14}, // Termin płatności
+    {wch:28}, // Nazwa kontrahenta
+    {wch:22}, // Adres
+    {wch:10}, // Numer domu
+    {wch:10}, // Numer mieszkania
+    {wch:12}, // Kod pocztowy
+    {wch:16}, // Miasto
+    {wch:14}, // NIP
+    {wch:10}, // Netto
+    {wch:10}, // Stawka vat
+    {wch:8},  // Vat
+    {wch:10}, // Brutto
+    {wch:10}, // Kraj
+    {wch:14}, // Forma płatności
+    {wch:8},  // Waluta
+  ];
+
+  // ── Header row — bold + fill ─────────────────────────────────────
+  const headerFill = { patternType:'solid', fgColor:{ rgb:'1E3A5F' } };
+  const headerFont = { bold:true, color:{ rgb:'FFFFFF' }, name:'Arial', sz:10 };
+  const hdrAlign   = { horizontal:'center', wrapText:true };
+
+  EXPORT_HEADERS.forEach((_,ci)=>{
+    const cell = XLSX.utils.encode_cell({r:0,c:ci});
+    if(ws[cell]){
+      ws[cell].s = { fill:headerFill, font:headerFont, alignment:hdrAlign,
+                     border:{ bottom:{style:'thin',color:{rgb:'4F6EF7'}} } };
+    }
+  });
+
+  // ── Number format for Netto/Vat/Brutto columns (12,14,15 — 0-indexed 11,13,14) ──
+  const numFmt = '#,##0.00';
+  dataRows.forEach((_,ri)=>{
+    [11,13,14].forEach(ci=>{
+      const cell = XLSX.utils.encode_cell({r:ri+1,c:ci});
+      if(ws[cell]) ws[cell].s = { numFmt, alignment:{horizontal:'right'} };
+    });
+  });
+
+  // ── Freeze header row ────────────────────────────────────────────
+  ws['!freeze'] = { xSplit:0, ySplit:1, topLeftCell:'A2', activePane:'bottomLeft' };
+
+  // ── Workbook ─────────────────────────────────────────────────────
+  const wb       = XLSX.utils.book_new();
+  const sheetName = 'Faktury '+(_expType==='b2b'?'B2B':'B2C');
+  XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+  const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+  const fname = 'GLS_Faktury_'+_expType.toUpperCase()+'_'+date+'.xlsx';
+
+  XLSX.writeFile(wb, fname);
+  showToast('✅ Excel pobrany — '+dataRows.length+' faktur', 'ok');
+  closeModal('modal-export');
+}
+
+/* ── ADD INVOICE (form submit) ──────────────────────────────────── */
+let _nextNum = { b2c:44, b2b:8, kor:5, proforma:3 };
+
+function submitNewB2C(){
+  const modal = document.getElementById('modal-new-b2c');
+  if(!modal) return;
+
+  // Read form fields
+  const proj = modal.querySelector('#new-proj-b2c, select')?.value || 'SPACE';
+  const clientEl = modal.querySelector('input[placeholder*="nazwisko"], input[placeholder*="Imię"]');
+  const amountEl = modal.querySelector('input[type=number], input[placeholder*="120"]');
+  const descEl   = modal.querySelector('input[list="opisy-uslug"]');
+  const dateEl   = modal.querySelector('input[type=date]');
+
+  const client  = clientEl?.value  || 'Nowy klient';
+  const amount  = amountEl?.value  || '120.00';
+  const desc    = descEl?.value    || 'Abonament miesięczny Space Memory';
+  const date    = dateEl?.value    || new Date().toISOString().slice(0,10);
+  const num     = 'FA/SPACE/2025/05/' + String(_nextNum.b2c++).padStart(3,'0');
+
+  addRowToTable('b2c', {num, date, client, desc, proj, amount, type:'b2c-fa', status:'st-issued'});
+  closeModal('modal-new-b2c');
+  showToast('✔ Faktura '+num+' wystawiona');
+}
+
+function submitNewB2B(){
+  const modal = document.getElementById('modal-new-b2b');
+  if(!modal) return;
+
+  const companyEl = modal.querySelector('.b2b-cc.act .b2b-cname');
+  const company   = companyEl ? companyEl.textContent : 'Firma B2B';
+  const amountEl  = modal.querySelector('input[type=number]');
+  const amount    = amountEl?.value || '480.00';
+  const date      = new Date().toISOString().slice(0,10);
+  const num       = 'FV/B2B/2025/05/' + String(_nextNum.b2b++).padStart(3,'0');
+
+  addRowToTable('b2b', {num, date, client:company, desc:'Space Memory × uczniów', proj:'B2B', amount, type:'b2b-fv', status:'st-issued'});
+  closeModal('modal-new-b2b');
+  showToast('✔ Faktura '+num+' wystawiona','am');
+}
+
+function addProForma(){
+  const modal = document.getElementById('modal-proforma');
+  if(!modal) return;
+  const inputs = modal.querySelectorAll('input');
+  const client = inputs[0]?.value || 'Klient';
+  const date   = inputs[2]?.value || new Date().toISOString().slice(0,10);
+  const amount = modal.querySelector('input[type=number]')?.value || '120.00';
+  const num    = 'PF/SPACE/2025/05/' + String(_nextNum.proforma++).padStart(3,'0');
+
+  addRowToTable('b2c', {num, date, client, desc:'Pro Forma', proj:'SPACE', amount, type:'b2c-pro', status:'st-issued'});
+  closeModal('modal-proforma');
+  showToast('✔ Pro Forma '+num+' utworzona');
+}
+
+function addRowToTable(type, {num, date, client, desc, proj, amount, status}){
+  const tbl = document.getElementById('tbl-'+type);
+  if(!tbl) return;
+  const tbody = tbl.querySelector('tbody');
+
+  const amtFmt = parseFloat(amount).toFixed(2).replace('.',',') + ' zł';
+  const dateDisp = date.split('-').reverse().join('.');
+
+  const isB2c = type==='b2c';
+  const previewModal = isB2c ? 'modal-preview-b2c' : 'modal-preview-b2b';
+
+  const tr = document.createElement('tr');
+  tr.className = 'inv-row '+(isB2c?'b2c':'b2b')+'-row new-row';
+  tr.dataset.type   = isB2c ? 'b2c-fa' : 'b2b-fv';
+  tr.dataset.status = status;
+  tr.dataset.proj   = proj;
+  tr.dataset.date   = date;
+  tr.setAttribute('onclick', `openModal('${previewModal}')`);
+
+  tr.innerHTML = `
+    <td onclick="event.stopPropagation()"><input type="checkbox" onchange="updateSelBar('${type}')"></td>
+    <td>
+      <div class="inv-num">${num}</div>
+      <div class="ref-to">${desc.slice(0,40)}</div>
+    </td>
+    <td><span class="badge b-fa">FA</span></td>
+    <td><span style="font-family:'Space Mono',monospace;font-size:11px;">${dateDisp}</span></td>
+    <td>
+      <div class="cli-name">${client}</div>
+      <div class="cli-id">nowy</div>
+    </td>
+    <td><span class="proj-badge proj-${proj.toLowerCase()}">${proj}</span></td>
+    <td><span style="font-size:10px;color:var(--dim);">ręczna</span></td>
+    <td><span class="amt">${amtFmt}</span></td>
+    <td><span class="badge b-issued">📄 Wystawiona</span></td>
+    <td>
+      <div class="dd-wrap" onclick="event.stopPropagation()">
+              <div class="dd-btn" onclick="toggleDD(this)" title="Akcje">⋯</div>
+              <div class="dd-menu">
+        <div class="dditem" onclick="openModal('modal-preview-b2c')">👁 Podgląd</div>
+        <div class="dditem" onclick="editRow(this)">✏ Edytuj fakturę</div>
+        <div class="dditem dditem-red" onclick="deleteRow(this)">🗑 Usuń fakturę</div>
+              </div>
+            </div>
+        <div class="ib" onclick="editRow(this)" title="Edytuj" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">edytuj</div>
+        <div class="ib r" onclick="deleteRow(this)" title="Usuń" style="font-size:9px;font-weight:700;width:auto;padding:0 7px;">usuń</div>
+      </div>
+    </td>`;
+
+  // Highlight new row
+  tr.style.background = 'rgba(79,110,247,.05)';
+  tbody.insertBefore(tr, tbody.firstChild);
+  setTimeout(()=>{ tr.style.transition='background 1.5s'; tr.style.background=''; }, 200);
+
+  _pag[type].page = 1;
+  renderPag(type);
+  rebuildDropdowns();
+}
+
+/* ── EDIT INVOICE ───────────────────────────────────────────────── */
+let _editRow = null;
+
+function editRow(btn){
+  const row = btn.closest('tr');
+  _editRow = row;
+  const cells = row.querySelectorAll('td');
+  const num    = cells[1]?.querySelector('.inv-num')?.textContent?.trim() || '';
+  const client = cells[4]?.querySelector('.cli-name')?.textContent?.trim() || '';
+  const status = row.dataset.status || '';
+  const date   = row.dataset.date   || '';
+  const amtEl  = cells[7]?.querySelector('.amt');
+  const amount = amtEl ? parseFloat(amtEl.textContent.replace(/[^\d.,-]/g,'').replace(',','.')) : 0;
+  const desc   = cells[1]?.querySelector('.ref-to')?.textContent?.trim() || '';
+
+  // Fill edit modal
+  const set = (id,v) => { const el=document.getElementById(id); if(el) el.value=v; };
+  set('edit-num', num);
+  set('edit-date', date);
+  set('edit-client', client);
+  set('edit-student', '');
+  set('edit-desc', desc);
+  set('edit-amount', amount);
+  set('edit-reason','');
+
+  const sub = document.getElementById('edit-sub');
+  if(sub) sub.textContent = num;
+
+  const warn = document.getElementById('edit-warning');
+  const warnText = document.getElementById('edit-warning-text');
+
+  // Determine restrictions
+  const sent = status==='st-ok'; // paid/sent
+  const amtInput = document.getElementById('edit-amount');
+
+  if(sent && warn && warnText){
+    warn.style.display='flex';
+    warnText.textContent='Faktura opłacona — zmiana kwoty jest zablokowana. Modyfikuj tylko opis lub datę.';
+    if(amtInput) amtInput.readOnly=true;
+  } else {
+    if(warn) warn.style.display='none';
+    if(amtInput) amtInput.readOnly=false;
+  }
+
+  openModal('modal-edit');
+}
+
+function saveEdit(){
+  const reason = document.getElementById('edit-reason')?.value?.trim();
+  if(!reason){ showToast('⚠ Podaj powód edycji','err'); return; }
+  if(!_editRow){ closeModal('modal-edit'); return; }
+
+  const newDate    = document.getElementById('edit-date')?.value    || '';
+  const newClient  = document.getElementById('edit-client')?.value  || '';
+  const newDesc    = document.getElementById('edit-desc')?.value    || '';
+  const newAmount  = document.getElementById('edit-amount')?.value  || '';
+  const num        = document.getElementById('edit-num')?.value     || '';
+
+  // Update row cells
+  const cells = _editRow.querySelectorAll('td');
+  const clientEl = cells[4]?.querySelector('.cli-name');
+  if(clientEl) clientEl.textContent = newClient;
+  const descEl = cells[1]?.querySelector('.ref-to');
+  if(descEl) descEl.textContent = newDesc;
+  if(newDate) _editRow.dataset.date = newDate;
+
+  if(newAmount){
+    const amtEl = cells[7]?.querySelector('.amt');
+    if(amtEl) amtEl.textContent = parseFloat(newAmount).toFixed(2).replace('.',',') + ' zł';
+  }
+
+  // Flash edit
+  _editRow.style.background='rgba(245,158,11,.08)';
+  _editRow.style.transition='background 1.5s';
+  setTimeout(()=>{ _editRow.style.background=''; },1500);
+
+  closeModal('modal-edit');
+  showToast('✏ Faktura '+num+' zaktualizowana','am');
+  _editRow = null;
+}
+
+/* ── DELETE INVOICE ─────────────────────────────────────────────── */
+let _deleteRow = null;
+
+function deleteRow(btn){
+  const row = btn.closest('tr');
+  _deleteRow = row;
+  const num = row.querySelector('.inv-num')?.textContent?.trim() || 'fakturę';
+  const sub = document.getElementById('del-num-sub');
+  if(sub) sub.textContent = num;
+  const reason = document.getElementById('del-reason');
+  if(reason) reason.value = '';
+  openModal('modal-delete');
+}
+
+function confirmDelete(){
+  const reason = document.getElementById('del-reason')?.value?.trim();
+  if(!reason){ showToast('⚠ Podaj powód usunięcia','err'); return; }
+  if(!_deleteRow){ closeModal('modal-delete'); return; }
+
+  const num  = _deleteRow.querySelector('.inv-num')?.textContent?.trim() || '';
+  const type = _deleteRow.closest('#tbl-b2b') ? 'b2b' : 'b2c';
+
+  // Animate out
+  _deleteRow.style.transition='opacity .3s, transform .3s';
+  _deleteRow.style.opacity='0';
+  _deleteRow.style.transform='translateX(20px)';
+  setTimeout(()=>{
+    _deleteRow.remove();
+    renderPag(type);
+    closeModal('modal-delete');
+    showToast('🗑 Faktura '+num+' usunięta (transakcja Imoje zachowana)','am');
+    _deleteRow = null;
+  }, 320);
+}
+
+/* ── EDIT NUMBER ────────────────────────────────────────────────── */
+let _editNumRow = null;
+// Simulated used numbers (in real system — checked via API)
+const _usedNumbers = new Set([
+  'FA/SPACE/2025/05/041','FA/SPACE/2025/05/042','FA/SPACE/2025/05/043',
+  'FK/SPACE/2025/05/003','PF/SPACE/2025/05/001','FV/B2B/2025/05/006','FV/B2B/2025/05/007'
+]);
+
+function editNumRow(btn){
+  const row = btn.closest('tr');
+  const status = row.dataset.status || '';
+
+  // Block if paid / sent
+  if(status === 'st-ok'){
+    showToast('⚠ Faktura opłacona — numer można zmienić tylko przez FK','err');
+    return;
+  }
+
+  _editNumRow = row;
+  const currentNum = row.querySelector('.inv-num')?.textContent?.trim() || '';
+
+  const oldInp = document.getElementById('editnum-old');
+  const newInp = document.getElementById('editnum-new');
+  const badge  = document.getElementById('editnum-old-badge');
+  const sub    = document.getElementById('editnum-current-sub');
+  const sel    = document.getElementById('editnum-reason-select');
+  const other  = document.getElementById('editnum-other-wrap');
+  const hint   = document.getElementById('editnum-status');
+
+  if(oldInp) oldInp.value = currentNum;
+  if(newInp){ newInp.value = ''; }
+  if(badge)  badge.textContent = currentNum;
+  if(sub)    sub.textContent   = currentNum + ' · tylko SuperAdmin';
+  if(sel)    sel.value = '';
+  if(other)  other.style.display = 'none';
+  if(hint)   hint.textContent = '';
+
+  openModal('modal-edit-num');
+}
+
+function validateNewNum(){
+  const inp  = document.getElementById('editnum-new');
+  const stat = document.getElementById('editnum-status');
+  if(!inp || !stat) return;
+  const val = inp.value.trim();
+
+  // Format check
+  const ok = /^(FA|FK|PF|FV|FVK)\/(SPACE|INDIGO|OLIMP|B2B)\/\d{4}\/\d{2}\/\d{3}$/.test(val);
+  const dup = _usedNumbers.has(val);
+  const same = val === (document.getElementById('editnum-old')?.value || '');
+
+  if(!val){ stat.textContent=''; inp.style.borderColor=''; return; }
+  if(same){  stat.innerHTML='<span style="color:var(--dim)">— bez zmian</span>'; inp.style.borderColor=''; return; }
+  if(!ok){   stat.innerHTML='<span style="color:var(--red)">✗ zły format</span>'; inp.style.borderColor='rgba(220,38,38,.4)'; return; }
+  if(dup){   stat.innerHTML='<span style="color:var(--red)">✗ numer zajęty</span>'; inp.style.borderColor='rgba(220,38,38,.4)'; return; }
+  stat.innerHTML='<span style="color:var(--green)">✓ dostępny</span>';
+  inp.style.borderColor='rgba(5,150,105,.4)';
+}
+
+function editnumReasonChange(sel){
+  const wrap = document.getElementById('editnum-other-wrap');
+  if(wrap) wrap.style.display = sel.value === 'other' ? '' : 'none';
+}
+
+function confirmEditNum(){
+  const newNum  = document.getElementById('editnum-new')?.value?.trim();
+  const oldNum  = document.getElementById('editnum-old')?.value?.trim();
+  const selEl   = document.getElementById('editnum-reason-select');
+  const reason  = selEl?.value === 'other'
+    ? document.getElementById('editnum-reason-other')?.value?.trim()
+    : selEl?.value;
+
+  if(!newNum){ showToast('⚠ Wpisz nowy numer','err'); return; }
+  if(newNum === oldNum){ showToast('Numer jest taki sam — brak zmian','am'); return; }
+  if(!reason){ showToast('⚠ Wybierz powód zmiany','err'); return; }
+
+  const ok  = /^(FA|FK|PF|FV|FVK)\/(SPACE|INDIGO|OLIMP|B2B)\/\d{4}\/\d{2}\/\d{3}$/.test(newNum);
+  if(!ok){ showToast('⚠ Nieprawidłowy format numeru','err'); return; }
+  if(_usedNumbers.has(newNum)){ showToast('⚠ Ten numer jest już zajęty','err'); return; }
+
+  if(!_editNumRow){ closeModal('modal-edit-num'); return; }
+
+  // Update DOM
+  const numEl = _editNumRow.querySelector('.inv-num');
+  if(numEl){
+    numEl.textContent = newNum;
+    numEl.dataset.previous = oldNum; // keep old num for search
+  }
+  // Add old num as hidden search helper
+  _editNumRow.dataset.prevnum = oldNum;
+
+  // Update used numbers set
+  _usedNumbers.delete(oldNum);
+  _usedNumbers.add(newNum);
+
+  // Flash row
+  _editNumRow.style.background='rgba(217,119,6,.07)';
+  _editNumRow.style.transition='background 1.5s';
+  setTimeout(()=>{ if(_editNumRow) _editNumRow.style.background=''; }, 1500);
+
+  closeModal('modal-edit-num');
+  showToast(`🔢 Numer zmieniony: ${oldNum} → ${newNum}`,'am');
+  _editNumRow = null;
+}
+function selectKor(el, scenario){
+  document.querySelectorAll('.kor-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  ['correction','zero','cancel','duplicate'].forEach(s=>{
+    const d=document.getElementById('kor-detail-'+s);
+    if(d) d.style.display = s===scenario ? '' : 'none';
+  });
+}
+
+/* ── TOAST ──────────────────────────────────────────────────────── */
+let _toastT;
+function showToast(msg, cls){
+  const t=document.getElementById('toast');
+  if(!t) return;
+  t.textContent=msg;
+  t.className='toast'+(cls?' '+cls:'');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+/* ── B2B STUDENT ROWS ───────────────────────────────────────────── */
+let _stuN=2;
+function addB2BStudent(){
+  const c=document.getElementById('b2b-students-list');
+  if(!c) return;
+  const n=_stuN++;
+  const row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+  row.innerHTML=`
+    <select style="flex:2;padding:7px 10px;background:#f8f9ff;border:1px solid rgba(79,110,247,.18);border-radius:8px;font-size:12px;color:var(--white);font-family:Outfit,sans-serif;outline:none;">
+      <option>Anna Kowalska</option><option>Piotr Nowak</option><option>Maja Wiśniewska</option>
+    </select>
+    <select style="flex:1;padding:7px 10px;background:#f8f9ff;border:1px solid rgba(79,110,247,.18);border-radius:8px;font-size:12px;color:var(--white);font-family:Outfit,sans-serif;outline:none;">
+      <option>maj 2025</option><option>czerwiec 2025</option><option>lipiec 2025</option>
+    </select>
+    <div onclick="this.closest('div').remove()" style="width:28px;height:28px;border-radius:7px;background:#fef2f2;border:1px solid rgba(220,38,38,.2);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;flex-shrink:0;">✕</div>`;
+  c.appendChild(row);
+}
+
+/* ── INIT ───────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // Init role (default superadmin)
+  setRole('superadmin');
+
+  // Init pagination for both tables
+  renderPag('b2c');
+  renderPag('b2b');
+
+  // Wire up "Wystaw fakturę" buttons (override static onclick)
+  const btnB2C = document.querySelector('#modal-new-b2c .mfooter .btn-primary');
+  if(btnB2C) btnB2C.setAttribute('onclick','submitNewB2C()');
+  const btnB2B = document.querySelector('#modal-new-b2b .mfooter .btn-primary');
+  if(btnB2B) btnB2B.setAttribute('onclick','submitNewB2B()');
+
+  // Wire checkbox change events via delegation
+  ['b2c','b2b'].forEach(type=>{
+    const tbl=document.getElementById('tbl-'+type);
+    if(tbl) tbl.addEventListener('change', e=>{
+      if(e.target.type==='checkbox') updateSelBar(type);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -2379,6 +2379,31 @@
       "studentEmailHint": "Будет использоваться как логин в систему",
       "contractHint": "Выберите тип договора из списка"
     }
+  },
+  "faktury": {
+    "documentList": "Список счетов",
+    "createInvoice": "Создать счет",
+    "number": "Номер",
+    "buyer": "Покупатель",
+    "amount": "Сумма",
+    "date": "Дата выписки",
+    "status": "Статус",
+    "type": "Тип",
+    "project": "Проект",
+    "searchPlaceholder": "Поиск по номеру или покупателю...",
+    "filterByProject": "Фильтр по проекту",
+    "filterByType": "Фильтр по типу",
+    "filterByStatus": "Фильтр по статусу",
+    "actions": "Действия",
+    "downloadPdf": "Скачать PDF",
+    "viewDetails": "Подробнее",
+    "statuses": {
+      "draft": "Черновик",
+      "wystawiona": "Выставлена",
+      "sent": "Отправлена",
+      "paid": "Оплачена",
+      "cancelled": "Аннулирована"
+    }
   }
 }
 

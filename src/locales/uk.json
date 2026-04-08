@@ -2370,5 +2370,30 @@
       "studentEmailHint": "Буде використовуватися як логін в систему",
       "contractHint": "Оберіть тип договору зі списку"
     }
+  },
+  "faktury": {
+    "documentList": "Список рахунків",
+    "createInvoice": "Створити рахунок",
+    "number": "Номер",
+    "buyer": "Покупець",
+    "amount": "Сума",
+    "date": "Дата виписки",
+    "status": "Статус",
+    "type": "Тип",
+    "project": "Проект",
+    "searchPlaceholder": "Пошук за номером або покупцем...",
+    "filterByProject": "Фільтр за проектом",
+    "filterByType": "Фільтр за типом",
+    "filterByStatus": "Фільтр за статусом",
+    "actions": "Дії",
+    "downloadPdf": "Завантажити PDF",
+    "viewDetails": "Детальніше",
+    "statuses": {
+      "draft": "Чернетка",
+      "wystawiona": "Виставлено",
+      "sent": "Відправлено",
+      "paid": "Оплачено",
+      "cancelled": "Анульовано"
+    }
   }
 }
