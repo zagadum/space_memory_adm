@@ -54,11 +54,22 @@
           :label="t('faktury.buyer')" 
           required 
         />
-        <UiInput 
-          v-model="form.buyer_tax_id" 
-          :label="mode === 'b2b' ? 'NIP' : 'NIP (Optional)'" 
-          :required="mode === 'b2b'" 
-        />
+        <div class="nip-input-wrapper">
+          <UiInput 
+            v-model="form.buyer_tax_id" 
+            :label="mode === 'b2b' ? 'NIP' : 'NIP (Optional)'" 
+            :required="mode === 'b2b'" 
+            @input="onNipInput"
+          />
+          <button 
+            v-if="mode === 'b2b'"
+            class="nip-btn" 
+            @click="handleNipLookup" 
+            :disabled="lookupLoading || form.buyer_tax_id.length < 10"
+          >
+            {{ lookupLoading ? '...' : '🔍 Check' }}
+          </button>
+        </div>
       </div>
       <div class="mt-2">
         <UiInput 
@@ -154,6 +165,7 @@ const projectsStore = useProjectsStore();
 
 const mode = ref<'b2c' | 'b2b'>('b2c');
 const loading = ref(false);
+const lookupLoading = ref(false);
 const error = ref<string | null>(null);
 
 const studentSearch = ref('');
@@ -181,6 +193,33 @@ const isFormValid = computed(() => {
   if (mode.value === 'b2b') return common && form.buyer_tax_id;
   return false;
 });
+
+async function handleNipLookup() {
+  const nip = form.buyer_tax_id.replace(/\D/g, '');
+  if (nip.length !== 10) return;
+
+  lookupLoading.value = true;
+  error.value = null;
+  try {
+    const data = await invoicesStore.lookupNip(nip);
+    if (data) {
+      form.buyer_name = data.name;
+      form.buyer_address = data.address;
+    }
+  } catch (err: any) {
+    console.error(err);
+    error.value = t('modals.invoice.errors.nipNotFound') || 'Company not found in GUS';
+  } finally {
+    lookupLoading.value = false;
+  }
+}
+
+function onNipInput() {
+  const nip = form.buyer_tax_id.replace(/\D/g, '');
+  if (nip.length === 10 && mode.value === 'b2b') {
+    handleNipLookup();
+  }
+}
 
 async function onStudentSearch() {
   if (studentSearch.value.length < 3) {
@@ -307,6 +346,42 @@ async function submit() {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 12px;
+}
+
+.nip-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+}
+
+.nip-input-wrapper :deep(.ui-input) {
+  flex: 1;
+}
+
+.nip-btn {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 5;
+}
+
+.nip-btn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.nip-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .popup-2col {

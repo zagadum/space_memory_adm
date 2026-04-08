@@ -82,6 +82,10 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function lookupNip(nip: string) {
+    return await invoicesApi.lookupNip(nip);
+  }
+
   return {
     invoices,
     isLoading,

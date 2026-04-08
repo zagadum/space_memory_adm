@@ -120,6 +120,13 @@ export const invoicesApi = {
   },
 
   /**
+   * Look up company data by NIP (GUS)
+   */
+  lookupNip(nip: string): Promise<any> {
+    return http.get(`${endpoints.INVOICES.BASE}/lookup-nip/${nip}`);
+  },
+
+  /**
    * Helper to get PDF download URL
    */
   getPdfUrl(id: number | string): string {

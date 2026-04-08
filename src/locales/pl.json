@@ -569,7 +569,10 @@
       "buyerNip": "NIP (jeśli jest)",
       "buyerAddress": "Adres",
       "ksefWarning": "Edycja numeru lub daty może wpłynąć na status w KSeF. Jeśli faktura została już wysłana, może być wymagana korekta.",
-      "saveChanges": "Zapisz zmiany"
+      "saveChanges": "Zapisz zmiany",
+      "errors": {
+        "nipNotFound": "Nie znaleziono firmy w GUS. Sprawdź poprawność numeru NIP."
+      }
     },
     "korekta": {
       "title": "Korekta",

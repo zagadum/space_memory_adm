@@ -569,7 +569,10 @@
       "buyerNip": "VAT ID (NIP)",
       "buyerAddress": "Address",
       "ksefWarning": "Editing the number or date may affect the KSeF status. If the invoice has already been sent, a correction may be required.",
-      "saveChanges": "Save Changes"
+      "saveChanges": "Save Changes",
+      "errors": {
+        "nipNotFound": "Company not found in GUS. Please check the NIP number."
+      }
     },
     "korekta": {
       "title": "Correction (Korekta)",
