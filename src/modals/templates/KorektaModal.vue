@@ -124,37 +124,43 @@
 import { ref, computed } from "vue";
 import { useI18n } from "vue-i18n";
 import BaseModal from "../BaseModal.vue";
-import { usePaymentsStore } from "../../stores/payments.store";
+import { useInvoicesStore } from "../../stores/invoices.store";
 import { useModalStore } from "../../stores/modal.store";
-import { paymentsApi } from "../../api/paymentsApi";
+import { invoicesApi } from "../../api/invoices.api";
 
 const { t } = useI18n();
-const paymentsStore = usePaymentsStore();
+const invoicesStore = useInvoicesStore();
 const modal = useModalStore();
 const payload = modal.payload as any;
-const tx = payload?.tx || {};
+const invoice = payload?.invoice || {};
 
-// Data from tx
-const fvnum = tx.sub?.match(/FV\/[\d/]+/)?.[0] || tx.fvnum || "FV/2026/01/312";
-const origAmount = tx.amount || 0;
-const ksefStatus = tx.ksef || "ok";
+// Data from invoice
+const fvnum = invoice.number || "FV/2026/01/???";
+const origAmount = invoice.amount_gross || 0;
+const ksefStatus = invoice.ksef_status || "draft";
 
 // Form state
 const corrType = ref<"full" | "partial">("full");
-const newAmount = ref(origAmount);
+const newAmount = ref(0);
 const corrDate = ref(new Date().toISOString().split("T")[0]);
-const reasonId = ref("");
+const reasonId = ref("return");
 const comment = ref("");
 const saving = ref(false);
 const errorMessage = ref('');
 
 // Calculations
-const diffAmount = computed(() => newAmount.value - origAmount);
+const diffAmount = computed(() => {
+  if (corrType.value === 'full') return -origAmount;
+  return newAmount.value - origAmount;
+});
 
-// KSeF labels
+// KSeF labels (fallback)
 const KL: Record<string, string> = {
-  ok: "✓ Отправлен", manual: "✎ Ручной", pending: "⏳ Ожидает",
-  error: "✕ Ошибка", conflict: "! Конфликт",
+  draft: "Черновик",
+  wystawiona: "Выставлена",
+  sent: "Отправлена",
+  paid: "Оплачена",
+  cancelled: "Аннулирована"
 };
 
 const isValid = computed(() => {
@@ -169,13 +175,16 @@ async function save() {
   saving.value = true;
   errorMessage.value = '';
   try {
-    await paymentsApi.submitCorrection({
-      programId: payload?.programId as string,
-      amount: corrType.value === 'full' ? 0 : newAmount.value,
-      note: comment.value || undefined,
-      corrDate: corrDate.value || undefined,
+    const finalAmount = corrType.value === 'full' ? 0 : newAmount.value;
+    
+    await invoicesApi.correct(invoice.id, {
+      amount_gross: finalAmount,
+      reason: reasonId.value,
+      notes: comment.value || undefined,
+      issue_date: corrDate.value || undefined,
     });
-    await paymentsStore.reloadCurrent();
+    
+    await invoicesStore.fetchInvoices();
     modal.close();
   } catch (e: unknown) {
     errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';

@@ -3,6 +3,31 @@
     <div class="preview-header">
       <div class="popup-title">📄 {{ invoice?.number || 'Invoice Preview' }}</div>
       <div class="header-actions">
+        <UiButton 
+          variant="ghost" 
+          size="sm" 
+          @click="handleSendEmail"
+          :disabled="sendingEmail"
+        >
+          ✉️ {{ sendingEmail ? t('common.sending') : t('faktury.sendEmail') || 'Send Email' }}
+        </UiButton>
+        <UiButton 
+          v-if="invoice?.document_type === 'PF'"
+          variant="primary" 
+          size="sm" 
+          @click="handleConvert"
+          :disabled="converting"
+        >
+          ⚡ {{ converting ? t('common.loading') : t('faktury.convertToFa') || 'PF → FA' }}
+        </UiButton>
+        <UiButton 
+          v-if="invoice?.document_type === 'FA'"
+          variant="warning" 
+          size="sm" 
+          @click="handleCorrect"
+        >
+          📋 {{ t('faktury.correct') || 'Correct' }}
+        </UiButton>
         <UiButton variant="ghost" size="sm" @click="download">
           ⬇️ {{ t('faktury.downloadPdf') }}
         </UiButton>
@@ -33,15 +58,23 @@ import { useI18n } from 'vue-i18n';
 import BaseModal from '../BaseModal.vue';
 import UiButton from '../../components/ui/UiButton.vue';
 import { useModalStore } from '../../stores/modal.store';
+import { useInvoicesStore } from '../../stores/invoices.store';
 import { invoicesApi } from '../../api/invoices.api';
 
 const { t } = useI18n();
 const modal = useModalStore();
+const invoicesStore = useInvoicesStore();
 
 const invoice = computed(() => modal.payload as any);
-const pdfUrl = computed(() => invoice.value ? invoicesApi.getPdfUrl(invoice.value.id) : '');
+const pdfUrl = computed(() => {
+  if (!invoice.value) return '';
+  // Force reload PDF if needed by adding timestamp
+  return invoicesApi.getPdfUrl(invoice.value.id) + '?t=' + Date.now();
+});
 
 const loading = ref(true);
+const sendingEmail = ref(false);
+const converting = ref(false);
 
 function onLoad() {
   loading.value = false;
@@ -55,6 +88,42 @@ function download() {
   if (pdfUrl.value) {
     window.open(pdfUrl.value, '_blank');
   }
+}
+
+async function handleSendEmail() {
+  if (!invoice.value) return;
+  sendingEmail.value = true;
+  try {
+    await invoicesApi.sendEmail(invoice.value.id);
+    alert('Email request sent successfully');
+  } catch (e) {
+    console.error(e);
+    alert('Failed to send email');
+  } finally {
+    sendingEmail.value = false;
+  }
+}
+
+async function handleConvert() {
+  if (!invoice.value) return;
+  if (!confirm('Convert this Pro Forma to a regular Invoice (FA)?')) return;
+  
+  converting.value = true;
+  try {
+    const newDoc = await invoicesApi.convert(invoice.value.id);
+    await invoicesStore.fetchInvoices();
+    modal.open('invoice-preview', newDoc);
+  } catch (e) {
+    console.error(e);
+    alert('Conversion failed');
+  } finally {
+    converting.value = false;
+  }
+}
+
+function handleCorrect() {
+  if (!invoice.value) return;
+  modal.open('korekta', { invoice: invoice.value });
 }
 </script>
 

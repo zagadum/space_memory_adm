@@ -99,6 +99,27 @@ export const invoicesApi = {
   },
 
   /**
+   * Create a correction (FK) for an existing invoice
+   */
+  correct(id: number | string, data: { amount_gross: number; reason: string; notes?: string; issue_date?: string }): Promise<Invoice> {
+    return http.post(`${endpoints.INVOICES.BY_ID(id)}/correct`, data);
+  },
+
+  /**
+   * Convert Pro Forma (PF) to Invoice (FA)
+   */
+  convert(id: number | string): Promise<Invoice> {
+    return http.post(`${endpoints.INVOICES.BY_ID(id)}/convert`);
+  },
+
+  /**
+   * Send/Resend invoice email to student
+   */
+  sendEmail(id: number | string): Promise<void> {
+    return http.post(`${endpoints.INVOICES.BY_ID(id)}/email`);
+  },
+
+  /**
    * Helper to get PDF download URL
    */
   getPdfUrl(id: number | string): string {

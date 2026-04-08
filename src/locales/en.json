@@ -2391,7 +2391,10 @@
     "filterByStatus": "Filter by status",
     "actions": "Actions",
     "downloadPdf": "Download PDF",
-    "viewDetails": "View Details",
+    "sendEmail": "Send Email",
+    "convertToFa": "PF → FA",
+    "correct": "Correct",
+    "viewDetails": "Details",
     "statuses": {
       "draft": "Draft",
       "wystawiona": "Issued",

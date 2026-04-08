@@ -2392,6 +2392,9 @@
     "filterByStatus": "Filtruj wg statusu",
     "actions": "Akcje",
     "downloadPdf": "Pobierz PDF",
+    "sendEmail": "Wyślij e-mail",
+    "convertToFa": "PF → FA",
+    "correct": "Korekta",
     "viewDetails": "Szczegóły",
     "statuses": {
       "draft": "Szkic",

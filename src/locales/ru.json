@@ -2397,6 +2397,9 @@
     "filterByStatus": "Фильтр по статусу",
     "actions": "Действия",
     "downloadPdf": "Скачать PDF",
+    "sendEmail": "Отправить на Email",
+    "convertToFa": "PF → FA",
+    "correct": "Корректировка",
     "viewDetails": "Подробнее",
     "statuses": {
       "draft": "Черновик",

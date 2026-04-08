@@ -2388,6 +2388,9 @@
     "filterByStatus": "Фільтр за статусом",
     "actions": "Дії",
     "downloadPdf": "Завантажити PDF",
+    "sendEmail": "Надіслати на Email",
+    "convertToFa": "PF → FA",
+    "correct": "Коригування",
     "viewDetails": "Детальніше",
     "statuses": {
       "draft": "Чернетка",
