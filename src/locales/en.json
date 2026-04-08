@@ -1,4 +1,29 @@
 {
+  "attendance": {
+    "title": "Attendance",
+    "lessonNumber": "Lesson #{num}",
+    "total": "Total lessons",
+    "present": "Present",
+    "absent": "Absent",
+    "late": "Late",
+    "makeup": "Makeup",
+    "rate": "Attendance rate",
+    "date": "Date",
+    "topic": "Topic",
+    "trainer": "Trainer",
+    "status": "Status",
+    "note": "Note",
+    "change": "Click to change",
+    "history": "Change history",
+    "marked": "Marked: {action}",
+    "save": "💾 Save",
+    "topics": {
+      "speed5": "Speed ×5",
+      "exam3": "Exam Block 3",
+      "cards80": "80 cards",
+      "assoc": "Associations"
+    }
+  },
   "sidebar": {
     "dashboard": "School Dashboard",
     "importDb": "Registrations DB",
@@ -539,11 +564,12 @@
     },
     "invoice": {
       "title": "🧾 Edit Invoice",
+      "subtitle": "Manual document creation",
       "fv": "FV Number",
       "date": "Date",
       "amount": "Amount",
       "ksef": "KSeF",
-      "subtitle": "Editing invoice for the selected month.",
+      "editSubtitle": "Editing invoice for the selected month.",
       "fvnum": "FV Number",
       "fvPlaceholder": "FV/2026/03/001",
       "ksefPlaceholder": "Status / id KSeF",
@@ -565,7 +591,11 @@
       "buyerTitle": "Buyer Details",
       "buyerName": "Name / Company",
       "buyerNip": "VAT ID (NIP)",
-      "buyerAddress": "Address",
+      "buyerAddress": "Buyer Address",
+      "saleDate": "Sale Date",
+      "formaPlatnosci": "Payment Method",
+      "correctSubtitle": "Creating correction for invoice {number}",
+      "emailSubtitle": "Preparing email for invoice {number}",
       "ksefWarning": "Editing the number or date may affect the KSeF status. If the invoice has already been sent, a correction may be required.",
       "saveChanges": "Save Changes",
       "errors": {
@@ -778,27 +808,6 @@
     "photoConsent": "📷 Photo/Video Consent",
     "regComment": "Registration Comment",
     "save": "✓ Save Changes"
-  },
-  "attendance": {
-    "title": "Attendance",
-    "total": "Total Lessons",
-    "present": "Present",
-    "absent": "Absent",
-    "late": "Late",
-    "makeup": "Makeup",
-    "rate": "Attendance Rate",
-    "date": "Date",
-    "topic": "Topic",
-    "trainer": "Trainer",
-    "status": "Status",
-    "note": "Note",
-    "change": "Click to change",
-    "topics": {
-      "speed5": "Speed ×5",
-      "exam3": "Block 3 Exam",
-      "cards80": "80 cards",
-      "assoc": "Associations"
-    }
   },
   "progress": {
     "title": "Progress",
@@ -2191,14 +2200,6 @@
       "sun": "Sunday"
     }
   },
-  "attendance": {
-    "title": "Attendance · Lesson #{num}",
-    "present": "Present",
-    "absent": "Absent",
-    "history": "Change history",
-    "marked": "Marked: {action}",
-    "save": "💾 Save"
-  },
   "comingSoon": {
     "title": "Section Under Development",
     "subtitle": "We are actively working on this module. It will be available soon.",
@@ -2377,9 +2378,16 @@
     }
   },
   "faktury": {
+    "stats": {
+      "monthlyTurnover": "Turnover (Month)",
+      "paidSum": "Paid",
+      "unpaidCount": "Unpaid",
+      "needAttention": "Need Attention",
+      "errorsDetected": "Errors Detected"
+    },
     "documentList": "Invoices List",
     "exportXlsx": "Export XLSX",
-    "createInvoice": "Create Invoice",
+    "createInvoice": "Issue Invoice",
     "number": "Number",
     "buyer": "Buyer",
     "amount": "Amount",
@@ -2387,16 +2395,23 @@
     "status": "Status",
     "type": "Type",
     "project": "Project",
-    "searchPlaceholder": "Search by number or buyer...",
+    "searchPlaceholder": "Search student (min. 3 chars)...",
     "filterByProject": "Filter by project",
     "filterByType": "Filter by type",
     "filterByStatus": "Filter by status",
     "actions": "Actions",
     "downloadPdf": "Download PDF",
-    "sendEmail": "Send Email",
-    "convertToFa": "PF → FA",
-    "correct": "Correct",
+    "sendEmail": "Send to Email",
+    "convertToFa": "Convert to FA",
+    "correct": "Correction",
     "viewDetails": "Details",
+    "issueCorrection": "Issue FK",
+    "correctionHint": "This will create a new legal document (FK) linked to the original.",
+    "emailSubject": "Email Subject",
+    "emailBody": "Message Body",
+    "emailNote": "The PDF invoice will be attached automatically.",
+    "emailPlaceholder": "Enter your message...",
+    "placeholdersHint": "Available fields:",
     "statuses": {
       "draft": "Draft",
       "wystawiona": "Issued",
@@ -2408,17 +2423,9 @@
       "error": "KSeF Error"
     },
     "sendToKsef": "Send to KSeF",
-    "downloadZip": "Download ZIP (PDF)",
+    "downloadZip": "Download (ZIP)",
     "correctionReason": "Correction Reason",
-    "issueCorrection": "Issue Correction",
     "difference": "difference",
-    "relation": {
-      "corrects": "Corrects"
-    },
-    "emailSubject": "Email Subject",
-    "emailBody": "Message Body",
-    "placeholdersHint": "Available variables (click to insert):",
-    "emailNote": "The PDF invoice will be attached automatically.",
     "clearFilters": "Clear filters",
     "dateFrom": "Date from",
     "dateTo": "Date to",
@@ -2426,15 +2433,13 @@
     "maxAmount": "Max amount",
     "sendBulkEmails": "Send Bulk Emails",
     "bulkEmailConfirm": "Send emails to all selected students?",
-    "downloadZip": "Download (ZIP)",
     "exportSelected": "Export Selected (XLSX)",
-    "ksefBulkConfirm": "Send selected invoices to KSeF?",
     "relation": {
       "parent": "Original Invoice",
       "child": "Correction",
       "corrects": "Corrects"
     },
-    "actions": {
+    "auditActions": {
       "created": "Document Created",
       "edited": "Changes Applied",
       "sent_to_ksef": "Sent to KSeF",

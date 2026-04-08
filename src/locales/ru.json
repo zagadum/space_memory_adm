@@ -544,11 +544,12 @@
     },
     "invoice": {
       "title": "🧾 Редактировать счет",
+      "subtitle": "Создание нового документа вручную",
       "fv": "Номер FV",
       "date": "Дата",
       "amount": "Сумма",
       "ksef": "KSeF",
-      "subtitle": "Редактирование счета для выбранного месяца.",
+      "editSubtitle": "Редактирование счета для выбранного месяца.",
       "fvnum": "Номер FV",
       "fvPlaceholder": "FV/2026/03/001",
       "ksefPlaceholder": "Статус / id KSeF",
@@ -570,11 +571,15 @@
       "buyerTitle": "Данные плательщика (Buyer)",
       "buyerName": "Имя / Название",
       "buyerNip": "NIP (если есть)",
-      "buyerAddress": "Адрес",
+      "buyerAddress": "Адрес покупателя",
+      "saleDate": "Дата продажи",
+      "formaPlatnosci": "Форма оплаты",
+      "correctSubtitle": "Создание корректировки для счета {number}",
+      "emailSubtitle": "Подготовка письма для счета {number}",
       "ksefWarning": "Редактирование номера или даты может повлиять на статус в KSeF. Если счёт уже отправлен, может потребоваться корректировка.",
       "saveChanges": "Сохранить изменения",
       "errors": {
-        "nipNotFound": "Компания не найдена в GUS. Проверьте правильность NIP."
+        "nipNotFound": "Компания не найдена в базе GUS. Проверьте правильность NIP."
       }
     },
     "korekta": {
@@ -2392,7 +2397,7 @@
     },
     "documentList": "Список счетов",
     "exportXlsx": "Экспорт XLSX",
-    "createInvoice": "Создать счет",
+    "createInvoice": "Выставить счет",
     "number": "Номер",
     "buyer": "Покупатель",
     "amount": "Сумма",
@@ -2400,16 +2405,23 @@
     "status": "Статус",
     "type": "Тип",
     "project": "Проект",
-    "searchPlaceholder": "Поиск по номеру или покупателю...",
+    "searchPlaceholder": "Поиск ученика (мин. 3 символа)...",
     "filterByProject": "Фильтр по проекту",
     "filterByType": "Фильтр по типу",
     "filterByStatus": "Фильтр по статусу",
     "actions": "Действия",
     "downloadPdf": "Скачать PDF",
     "sendEmail": "Отправить на Email",
-    "convertToFa": "PF → FA",
+    "convertToFa": "Конвертировать в FA",
     "correct": "Корректировка",
     "viewDetails": "Подробнее",
+    "issueCorrection": "Выставить FK",
+    "correctionHint": "Это создаст новый юридический документ (FK), связанный с оригиналом.",
+    "emailSubject": "Тема письма",
+    "emailBody": "Текст сообщения",
+    "emailNote": "PDF-счет будет прикреплен автоматически.",
+    "emailPlaceholder": "Введите текст сообщения...",
+    "placeholdersHint": "Доступные поля:",
     "statuses": {
       "draft": "Черновик",
       "wystawiona": "Выставлена",
@@ -2421,17 +2433,9 @@
       "error": "Ошибка KSeF"
     },
     "sendToKsef": "Отправить в KSeF",
-    "downloadZip": "Скачать ZIP (PDF)",
+    "downloadZip": "Скачать архивом (ZIP)",
     "correctionReason": "Причина корректировки",
-    "issueCorrection": "Выставить корректировку",
     "difference": "разница",
-    "relation": {
-      "corrects": "Корректирует"
-    },
-    "emailSubject": "Тема письма",
-    "emailBody": "Текст сообщения",
-    "placeholdersHint": "Доступные переменные (нажмите, чтобы вставить):",
-    "emailNote": "PDF-счет будет прикреплен автоматически.",
     "clearFilters": "Сбросить фильтры",
     "dateFrom": "Дата от",
     "dateTo": "Дата до",
@@ -2439,14 +2443,13 @@
     "maxAmount": "Макс. сумма",
     "sendBulkEmails": "Рассылка счетов по email",
     "bulkEmailConfirm": "Отправить счета всем выбранным ученикам?",
-    "downloadZip": "Скачать архивом (ZIP)",
     "exportSelected": "Экспорт выбранного (XLSX)",
     "relation": {
       "parent": "Оригинальный счет",
       "child": "Корректировка",
       "corrects": "Корректирует"
     },
-    "actions": {
+    "auditActions": {
       "created": "Документ создан",
       "edited": "Изменения внесены",
       "sent_to_ksef": "Отправлено в KSeF",

@@ -23,7 +23,7 @@
 
     <!-- Student Search (B2C only) -->
     <div v-if="mode === 'b2c'" class="search-section">
-      <div class="popup-label">{{ t('studentList.table.name') }}</div>
+      <div class="popup-label">{{ t('info.fullName') }}</div>
       <div class="search-container">
         <input 
           class="popup-input" 
@@ -46,20 +46,16 @@
     </div>
 
     <!-- Buyer Details -->
-    <div class="client-card">
+    <div class="client-card" :class="{ 'card-b2b': mode === 'b2b' }">
       <div class="client-card-title">{{ t('faktury.buyer') }}</div>
       <div class="popup-2col">
-        <UiInput 
-          v-model="form.buyer_name" 
-          :label="t('faktury.buyer')" 
-          required 
-        />
         <div class="nip-input-wrapper">
           <UiInput 
             v-model="form.buyer_tax_id" 
             :label="mode === 'b2b' ? 'NIP' : 'NIP (Optional)'" 
             :required="mode === 'b2b'" 
             @input="onNipInput"
+            placeholder="0000000000"
           />
           <button 
             v-if="mode === 'b2b'"
@@ -67,15 +63,23 @@
             @click="handleNipLookup" 
             :disabled="lookupLoading || form.buyer_tax_id.length < 10"
           >
-            {{ lookupLoading ? '...' : '🔍 Check' }}
+            <span v-if="lookupLoading" class="loader-inner"></span>
+            <span v-else>🔍 Check</span>
           </button>
         </div>
+        <UiInput 
+          v-model="form.buyer_name" 
+          :label="t('modals.invoice.buyerName')" 
+          required 
+          :placeholder="mode === 'b2b' ? 'Pełna nazwa firmy...' : 'Imię i nazwisko...'"
+        />
       </div>
       <div class="mt-2">
         <UiInput 
           v-model="form.buyer_address" 
           :label="t('modals.invoice.buyerAddress')" 
           required 
+          placeholder="Ulica, Kod Pocztowy, Miasto"
         />
       </div>
     </div>
@@ -118,15 +122,16 @@
       <UiInput 
         type="number" 
         v-model="form.amount_gross" 
-        :label="t('faktury.amount') + ' (Gross)'" 
+        :label="t('faktury.amount')" 
         required 
       />
       <div>
         <div class="popup-label">{{ t('modals.invoice.formaPlatnosci') }}</div>
         <select class="popup-input" v-model="form.payment_method">
-          <option value="transfer">{{ t('common.transfer') }}</option>
-          <option value="card">{{ t('common.card') }}</option>
-          <option value="cash">{{ t('common.cash') }}</option>
+          <option value="transfer">Przelew</option>
+          <option value="card">Karta</option>
+          <option value="cash">Gotówka</option>
+          <option value="imoje">Imoje (Online)</option>
         </select>
       </div>
     </div>
@@ -190,7 +195,7 @@ const form = reactive({
 const isFormValid = computed(() => {
   const common = form.buyer_name && form.buyer_address && form.amount_gross > 0 && form.issue_date && form.sale_date;
   if (mode.value === 'b2c') return common && form.student_id;
-  if (mode.value === 'b2b') return common && form.buyer_tax_id;
+  if (mode.value === 'b2b') return common && form.buyer_tax_id.replace(/\D/g, '').length === 10;
   return false;
 });
 
@@ -208,7 +213,7 @@ async function handleNipLookup() {
     }
   } catch (err: any) {
     console.error(err);
-    error.value = t('modals.invoice.errors.nipNotFound') || 'Company not found in GUS';
+    error.value = t('modals.invoice.errors.nipNotFound') || 'Nie znaleziono firmy w GUS';
   } finally {
     lookupLoading.value = false;
   }
@@ -260,10 +265,13 @@ async function submit() {
   }
 
   try {
-    await invoicesStore.createInvoice({ ...form });
+    await invoicesStore.createInvoice({ 
+      ...form,
+      mode: mode.value 
+    });
     modal.close();
   } catch (err: any) {
-    error.value = err.message || 'Error creating invoice';
+    error.value = err.message || 'Błąd podczas wystawiania faktury';
   } finally {
     loading.value = false;
   }
@@ -277,66 +285,75 @@ async function submit() {
   display: flex;
   background: rgba(255, 255, 255, 0.04);
   padding: 4px;
-  border-radius: 10px;
-  margin-bottom: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .mode-btn {
   flex: 1;
-  padding: 8px;
+  padding: 10px;
   border: none;
   background: transparent;
   color: var(--dim, #8892b0);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.2s;
+  border-radius: 10px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mode-btn.active {
-  background: var(--blue, #4f6ef7);
+  background: linear-gradient(135deg, var(--blue, #4f6ef7), #3b5bdb);
   color: white;
-  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2);
+  box-shadow: 0 4px 15px rgba(79, 110, 247, 0.3);
 }
 
-.search-section { margin-bottom: 16px; }
+.search-section { margin-bottom: 20px; }
 .search-container { position: relative; }
 
 .search-results {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 5px);
   left: 0;
   right: 0;
-  background: #161633;
-  border: 1px solid var(--blue);
-  border-radius: 8px;
+  background: #1a1a3a;
+  border: 1px solid rgba(79, 110, 247, 0.3);
+  border-radius: 12px;
   z-index: 100;
-  max-height: 200px;
+  max-height: 240px;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+  backdrop-filter: blur(10px);
 }
 
 .search-item {
-  padding: 10px 14px;
+  padding: 12px 16px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s;
 }
 
-.search-item:hover { background: rgba(79, 110, 247, 0.1); }
+.search-item:hover { background: rgba(79, 110, 247, 0.15); }
 .search-item:last-child { border-bottom: none; }
 
-.s-name { font-weight: 600; color: white; font-size: 13px; }
-.s-email { font-size: 11px; color: var(--dim); }
+.s-name { font-weight: 600; color: white; font-size: 14px; }
+.s-email { font-size: 12px; color: var(--dim); }
 
 .client-card {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(100, 120, 255, 0.1);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 20px;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  transition: all 0.3s;
+}
+
+.card-b2b {
+  border-color: rgba(79, 110, 247, 0.2);
+  background: rgba(79, 110, 247, 0.02);
 }
 
 .client-card-title {
@@ -344,8 +361,8 @@ async function submit() {
   font-weight: 800;
   color: var(--blue);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 12px;
+  letter-spacing: 0.15em;
+  margin-bottom: 16px;
 }
 
 .nip-input-wrapper {
@@ -360,52 +377,70 @@ async function submit() {
 
 .nip-btn {
   position: absolute;
-  right: 5px;
-  bottom: 5px;
+  right: 6px;
+  bottom: 6px;
+  height: 32px;
+  min-width: 70px;
   background: var(--blue);
   color: white;
   border: none;
-  border-radius: 6px;
-  padding: 5px 10px;
+  border-radius: 8px;
+  padding: 0 12px;
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s;
   z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nip-btn:hover:not(:disabled) {
-  filter: brightness(1.1);
+  filter: brightness(1.2);
   transform: translateY(-1px);
 }
 
 .nip-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
   cursor: not-allowed;
+}
+
+.loader-inner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 .popup-2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .popup-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--dim, #8892b0);
-  margin-bottom: 6px;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  margin-bottom: 8px;
 }
 
 .popup-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(100, 120, 255, 0.15);
-  border-radius: 8px;
-  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(100, 120, 255, 0.2);
+  border-radius: 10px;
+  padding: 11px 14px;
   color: white;
   font-family: inherit;
   font-size: 13px;
@@ -413,9 +448,16 @@ async function submit() {
   transition: all 0.2s;
 }
 
-.popup-input:focus { border-color: var(--blue); }
+.popup-input:focus { border-color: var(--blue); background: rgba(255,255,255,0.08); }
 
 .mt-2 { margin-top: 8px; }
 .mt-4 { margin-top: 24px; }
-.text-danger { color: #ef4444; font-size: 12px; }
+.text-danger { 
+  color: #ff5555; 
+  font-size: 12px; 
+  padding: 8px 12px;
+  background: rgba(255, 0, 0, 0.05);
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
 </style>

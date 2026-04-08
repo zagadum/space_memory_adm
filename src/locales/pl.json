@@ -538,11 +538,12 @@
     },
     "invoice": {
       "title": "🧾 Edytuj fakturę",
+      "subtitle": "Ręczne tworzenie dokumentu",
       "fv": "Numer FV",
       "date": "Data",
       "amount": "Kwota",
       "ksef": "KSeF",
-      "subtitle": "Edycja faktury dla wybranego miesiąca.",
+      "editSubtitle": "Edycja faktury dla wybranego miesiąca.",
       "fvnum": "Numer FV",
       "fvPlaceholder": "FV/2026/03/001",
       "ksefPlaceholder": "Status / id KSeF",
@@ -564,11 +565,15 @@
       "buyerTitle": "Dane nabywcy (Buyer)",
       "buyerName": "Imię i nazwisko / Nazwa",
       "buyerNip": "NIP (jeśli jest)",
-      "buyerAddress": "Adres",
+      "buyerAddress": "Adres nabywcy",
+      "saleDate": "Data sprzedaży",
+      "formaPlatnosci": "Forma płatności",
+      "correctSubtitle": "Tworzenie korekty dla faktury {number}",
+      "emailSubtitle": "Przygotowanie wiadomości dla faktury {number}",
       "ksefWarning": "Edycja numeru lub daty może wpłynąć na status w KSeF. Jeśli faktura została już wysłana, może być wymagana korekta.",
       "saveChanges": "Zapisz zmiany",
       "errors": {
-        "nipNotFound": "Nie znaleziono firmy w GUS. Sprawdź poprawność numeru NIP."
+        "nipNotFound": "Nie znaleziono firmy w bazie GUS. Sprawdź poprawność numeru NIP."
       }
     },
     "korekta": {
@@ -780,6 +785,7 @@
   },
   "attendance": {
     "title": "Obecność",
+    "lessonNumber": "Zajęcia #{num}",
     "total": "Razem zajęć",
     "present": "Obecny",
     "absent": "Nieobecny",
@@ -792,6 +798,9 @@
     "status": "Status",
     "note": "Notatka",
     "change": "Kliknij, aby zmienić",
+    "history": "Historia zmian",
+    "marked": "Oznaczono: {action}",
+    "save": "💾 Zapisz",
     "topics": {
       "speed5": "Prędkość ×5",
       "exam3": "Zaliczenie blok 3",
@@ -2191,14 +2200,6 @@
       "sun": "Niedziela"
     }
   },
-  "attendance": {
-    "title": "Frekwencja · Lekcja #{num}",
-    "present": "Obecny",
-    "absent": "Nieobecny",
-    "history": "Historia zmian",
-    "marked": "Oznaczono: {action}",
-    "save": "💾 Zapisz"
-  },
   "comingSoon": {
     "title": "Sekcja w przygotowaniu",
     "subtitle": "Aktywnie pracujemy nad tym modułem. Wkrótce będzie dostępny.",
@@ -2382,7 +2383,7 @@
       "paidSum": "Opłacone",
       "unpaidCount": "Nieopłacone",
       "needAttention": "Wymagają uwagi",
-      "errorsDetected": "Wykryto błęды"
+      "errorsDetected": "Wykryto błędy"
     },
     "documentList": "Lista faktur",
     "exportXlsx": "Eksport XLSX",
@@ -2394,16 +2395,23 @@
     "status": "Status",
     "type": "Typ",
     "project": "Projekt",
-    "searchPlaceholder": "Szukaj po numerze lub nabywcy...",
+    "searchPlaceholder": "Szukaj ucznia (min. 3 znaki)...",
     "filterByProject": "Filtruj wg projektu",
     "filterByType": "Filtruj wg typu",
     "filterByStatus": "Filtruj wg statusu",
     "actions": "Akcje",
     "downloadPdf": "Pobierz PDF",
-    "sendEmail": "Wyślij e-mail",
-    "convertToFa": "PF → FA",
+    "sendEmail": "Wyślij na Email",
+    "convertToFa": "Konwertuj na FA",
     "correct": "Korekta",
     "viewDetails": "Szczegóły",
+    "issueCorrection": "Wystaw FK",
+    "correctionHint": "To utworzy nowy dokument prawny (FK) powiązany z oryginałem.",
+    "emailSubject": "Temat wiadomości",
+    "emailBody": "Treść wiadomości",
+    "emailNote": "Faktura PDF zostanie załączona automatycznie.",
+    "emailPlaceholder": "Wpisz treść wiadomości...",
+    "placeholdersHint": "Dostępne pola:",
     "statuses": {
       "draft": "Szkic",
       "wystawiona": "Wystawiona",
@@ -2414,43 +2422,37 @@
       "pending": "Przetwarzanie KSeF",
       "error": "Błąd KSeF"
     },
-    "selected": "Wybrano",
     "sendToKsef": "Wyślij do KSeF",
-    "downloadZip": "Pobierz ZIP (PDF)",
-    "correctionReason": "Przyczyna korekty",
-    "issueCorrection": "Wystaw korektę",
+    "downloadZip": "Pobierz archiwum (ZIP)",
+    "correctionReason": "Powód korekty",
     "difference": "różnica",
-    "relation": {
-      "corrects": "Koryguje"
-    },
-    "emailSubject": "Temat e-maila",
-    "emailBody": "Treść wiadomości",
-    "placeholdersHint": "Dostępne zmienne (kliknij, aby wstawić):",
-    "emailNote": "Faktura PDF zostanie dołączona automatycznie.",
     "clearFilters": "Wyczyść filtry",
     "dateFrom": "Data od",
     "dateTo": "Data do",
-    "minAmount": "Suma min.",
-    "maxAmount": "Suma maks.",
+    "minAmount": "Min. kwota",
+    "maxAmount": "Maks. kwota",
     "sendBulkEmails": "Masowa wysyłka faktur",
-    "bulkEmailConfirm": "Czy wysłać faktury do wszystkich wybranych uczniów?",
-    "downloadZip": "Pobierz jako ZIP",
-    "exportSelected": "Eksportuj wybrane (XLSX)",
-    "ksefBulkConfirm": "Potwierdź wysyłkę KSeF",
+    "bulkEmailConfirm": "Wyślij faktury do wszystkich wybranych uczniów?",
+    "exportSelected": "Eksport wybranych (XLSX)",
     "relation": {
       "parent": "Oryginalna faktura",
       "child": "Korekta",
       "corrects": "Koryguje"
     },
-    "actions": {
+    "auditActions": {
       "created": "Dokument utworzony",
-      "edited": "Zmiany naniesione",
+      "edited": "Wprowadzono zmiany",
       "sent_to_ksef": "Wysłano do KSeF",
-      "ksef_accepted": "Zaakceptowano KSeF",
-      "ksef_rejected": "Odrzucono KSeF",
-      "converted_to_fa": "Skonwertowano do FA",
-      "correction_created": "Utworzono korektę",
+      "ksef_accepted": "Zaakceptowano przez KSeF",
+      "ksef_rejected": "Odrzucono przez KSeF",
+      "converted_to_fa": "Konwertowano na FA",
+      "correction_created": "Wystawiono korektę",
       "email_sent": "Email wysłany"
-    }
+    },
+    "paymentDate": "Data płatności",
+    "markAsPaid": "Oznacz jako opłacone",
+    "markAsPaidConfirm": "Ustaw datę płatności dla wybranych faktur",
+    "accountingExport": "Rejestr sprzedaży (XLSX)",
+    "unpaid": "Nieopłacona"
   }
 }

@@ -273,14 +273,14 @@ function getStatusVariant(status: string) {
 
 function formatAction(action: string) {
   const map: Record<string, string> = {
-    'created': t('faktury.actions.created') || 'Документ создан',
-    'edited': t('faktury.actions.edited') || 'Изменения внесены',
-    'sent_to_ksef': t('faktury.actions.sent_to_ksef') || 'Отправлено в KSeF',
-    'ksef_accepted': t('faktury.actions.ksef_accepted') || 'Принято KSeF',
-    'ksef_rejected': t('faktury.actions.ksef_rejected') || 'Отклонено KSeF',
-    'converted_to_fa': t('faktury.actions.converted_to_fa') || 'Конвертировано в FA',
-    'correction_created': t('faktury.actions.correction_created') || 'Создана корректировка',
-    'email_sent': t('faktury.actions.email_sent') || 'Email отправлен'
+    'created': t('faktury.auditActions.created') || 'Документ создан',
+    'edited': t('faktury.auditActions.edited') || 'Изменения внесены',
+    'sent_to_ksef': t('faktury.auditActions.sent_to_ksef') || 'Отправлено в KSeF',
+    'ksef_accepted': t('faktury.auditActions.ksef_accepted') || 'Принято KSeF',
+    'ksef_rejected': t('faktury.auditActions.ksef_rejected') || 'Отклонено KSeF',
+    'converted_to_fa': t('faktury.auditActions.converted_to_fa') || 'Конвертировано в FA',
+    'correction_created': t('faktury.auditActions.correction_created') || 'Создана корректировка',
+    'email_sent': t('faktury.auditActions.email_sent') || 'Email отправлен'
   };
   return map[action] || action;
 }

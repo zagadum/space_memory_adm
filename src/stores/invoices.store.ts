@@ -161,6 +161,20 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function bulkMarkAsPaid(ids: number[], paymentDate: string) {
+    isLoading.value = true;
+    try {
+      await invoicesApi.bulkPay(ids, paymentDate);
+      await fetchInvoices();
+      clearSelection();
+    } catch (e: any) {
+      error.value = 'Failed to mark invoices as paid';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function bulkDownloadPDFs() {
     if (selectedIds.value.length === 0) return;
     isLoading.value = true;
@@ -267,6 +281,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     bulkSendToKsef,
     bulkSendEmails,
     bulkDownloadPDFs,
+    bulkMarkAsPaid,
     exportFilteredExcel,
     convertProforma,
     issueCorrection,

@@ -538,11 +538,12 @@
     },
     "invoice": {
       "title": "🧾 Редагувати рахунок",
+      "subtitle": "Створення нового документа вручну",
       "fv": "Номер FV",
       "date": "Дата",
       "amount": "Сума",
       "ksef": "KSeF",
-      "subtitle": "Редагування рахунку для обраного місяця.",
+      "editSubtitle": "Редагування рахунку для обраного місяця.",
       "fvnum": "Номер FV",
       "fvPlaceholder": "FV/2026/03/001",
       "ksefPlaceholder": "Статус / id KSeF",
@@ -564,11 +565,15 @@
       "buyerTitle": "Дані платника (Buyer)",
       "buyerName": "Ім'я / Назва",
       "buyerNip": "NIP (якщо є)",
-      "buyerAddress": "Адреса",
+      "buyerAddress": "Адреса покупця",
+      "saleDate": "Дата продажу",
+      "formaPlatnosci": "Форма оплати",
+      "correctSubtitle": "Створення коригування для рахунку {number}",
+      "emailSubtitle": "Підготовка листа для рахунку {number}",
       "ksefWarning": "Редагування номера або дати може вплинути на статус у KSeF. Якщо рахунок вже надіслано, може знадобитися коректура.",
       "saveChanges": "Зберегти зміни",
       "errors": {
-        "nipNotFound": "Компанію не знайдено в GUS. Перевірте правильність NIP."
+        "nipNotFound": "Компанію не знайдено в базі GUS. Перевірте правильність NIP."
       }
     },
     "korekta": {
@@ -779,6 +784,7 @@
   },
   "attendance": {
     "title": "Відвідуваність",
+    "lessonNumber": "Заняття #{num}",
     "total": "Всього занять",
     "present": "Присутній",
     "absent": "Відсутній",
@@ -791,6 +797,9 @@
     "status": "Статус",
     "note": "Нотатка",
     "change": "Клікніть щоб змінити",
+    "history": "Історія змін",
+    "marked": "Відмічено: {action}",
+    "save": "💾 Зберегти",
     "topics": {
       "speed5": "Швидкість ×5",
       "exam3": "Залік блок 3",
@@ -2187,14 +2196,7 @@
       "sun": "Неділя"
     }
   },
-  "attendance": {
-    "title": "Явка · Заняття #{num}",
-    "present": "Присутній",
-    "absent": "Відсутній",
-    "history": "Історія змін",
-    "marked": "Відмічено: {action}",
-    "save": "💾 Зберегти"
-  },
+
   "comingSoon": {
     "title": "Розділ у розробці",
     "subtitle": "Ми активно працюємо над цим модулем. Він скоро буде доступний.",
@@ -2382,70 +2384,72 @@
     },
     "documentList": "Список рахунків",
     "exportXlsx": "Експорт XLSX",
-    "createInvoice": "Створити рахунок",
+    "createInvoice": "Виставити рахунок",
     "number": "Номер",
     "buyer": "Покупець",
     "amount": "Сума",
     "date": "Дата виписки",
     "status": "Статус",
     "type": "Тип",
-    "project": "Проект",
-    "searchPlaceholder": "Пошук за номером або покупцем...",
-    "filterByProject": "Фільтр за проектом",
+    "project": "Проєкт",
+    "searchPlaceholder": "Пошук учня (мін. 3 символи)...",
+    "filterByProject": "Фільтр за проєктом",
     "filterByType": "Фільтр за типом",
     "filterByStatus": "Фільтр за статусом",
     "actions": "Дії",
     "downloadPdf": "Завантажити PDF",
     "sendEmail": "Надіслати на Email",
-    "convertToFa": "PF → FA",
-    "correct": "Коригування",
+    "convertToFa": "Конвертувати в FA",
+    "correct": "Корекція",
     "viewDetails": "Детальніше",
+    "issueCorrection": "Виставити FK",
+    "correctionHint": "Це створить новий юридичний документ (FK), пов'язаний з оригіналом.",
+    "emailSubject": "Тема листа",
+    "emailBody": "Текст повідомлення",
+    "emailNote": "PDF-рахунок буде прикріплено автоматично.",
+    "emailPlaceholder": "Введіть текст повідомлення...",
+    "placeholdersHint": "Доступні поля:",
     "statuses": {
       "draft": "Чернетка",
-      "wystawiona": "Виставлено",
-      "sent": "Надіслано",
-      "paid": "Оплачено",
-      "cancelled": "Анульовано",
+      "wystawiona": "Виставлена",
+      "sent": "Надіслана",
+      "paid": "Оплачена",
+      "cancelled": "Анульована",
       "sending": "Надсилання...",
       "pending": "В обробці KSeF",
       "error": "Помилка KSeF"
     },
-    "sendToKsef": "Відправити в KSeF",
-    "downloadZip": "Завантажити ZIP (PDF)",
+    "sendToKsef": "Надіслати до KSeF",
+    "downloadZip": "Завантажити архівом (ZIP)",
     "correctionReason": "Причина коригування",
-    "issueCorrection": "Виставити коригування",
     "difference": "різниця",
-    "relation": {
-      "corrects": "Коригує"
-    },
-    "emailSubject": "Тема листа",
-    "emailBody": "Текст повідомлення",
-    "placeholdersHint": "Доступні змінні (натисніть, щоб вставити):",
-    "emailNote": "PDF-рахунок буде додано автоматично.",
     "clearFilters": "Скинути фільтри",
     "dateFrom": "Дата від",
     "dateTo": "Дата до",
     "minAmount": "Мін. сума",
     "maxAmount": "Макс. сума",
     "sendBulkEmails": "Розсилка рахунків по email",
-    "bulkEmailConfirm": "Відправити рахунки всім вибраним учням?",
-    "downloadZip": "Завантажити архівом (ZIP)",
-    "exportSelected": "Експорт вибраного (XLSX)",
-    "selected": "Вибрано",
+    "bulkEmailConfirm": "Надіслати рахунки всім обраним учням?",
+    "exportSelected": "Експорт обраного (XLSX)",
     "relation": {
       "parent": "Оригінальний рахунок",
-      "child": "Коригування",
+      "child": "Корекція",
       "corrects": "Коригує"
     },
-    "actions": {
+    "auditActions": {
       "created": "Документ створено",
       "edited": "Зміни внесено",
-      "sent_to_ksef": "Відправлено до KSeF",
+      "sent_to_ksef": "Надіслано до KSeF",
       "ksef_accepted": "Прийнято KSeF",
       "ksef_rejected": "Відхилено KSeF",
-      "converted_to_fa": "Конвертовано у FA",
-      "correction_created": "Створено коригування",
-      "email_sent": "Email відправлено"
-    }
+      "converted_to_fa": "Конвертовано в FA",
+      "correction_created": "Створено корекцію",
+      "email_sent": "Email надіслано"
+    },
+    "paymentDate": "Дата оплати",
+    "markAsPaid": "Позначити оплаченим",
+    "markAsPaidConfirm": "Встановіть дату оплати для обраних рахунків",
+    "accountingExport": "Реєстр продажів (XLSX)",
+    "unpaid": "Не оплачено"
   }
 }
