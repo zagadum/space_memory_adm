@@ -2409,8 +2409,12 @@
       "wystawiona": "Выставлена",
       "sent": "Отправлена",
       "paid": "Оплачена",
-      "cancelled": "Аннулирована"
-    }
+      "cancelled": "Аннулирована",
+      "sending": "Отправка...",
+      "pending": "В обработке KSeF",
+      "error": "Ошибка KSeF"
+    },
+    "sendToKsef": "Отправить в KSeF"
   }
 }
 

@@ -21,7 +21,7 @@ export interface Invoice {
   buyer_address: string;
   payment_method?: string;
   notes?: string;
-  ksef_status: 'draft' | 'wystawiona' | 'wyslana' | 'oplacona' | 'anulowana';
+  ksef_status: 'draft' | 'sending' | 'pending' | 'sent' | 'error' | 'cancelled';
   ksef_reference?: string;
   pdf_path?: string;
   student?: {
@@ -124,6 +124,22 @@ export const invoicesApi = {
    */
   lookupNip(nip: string): Promise<any> {
     return http.get(`${endpoints.INVOICES.BASE}/lookup-nip/${nip}`);
+  },
+
+  /**
+   * Send invoice to KSeF
+   */
+  async sendToKsef(id: number): Promise<any> {
+    const response = await http.post(`${endpoints.INVOICES.BY_ID(id)}/ksef-send`);
+    return response.data;
+  },
+
+  /**
+   * Get KSeF status
+   */
+  async getKsefStatus(id: number): Promise<any> {
+    const response = await http.get(`${endpoints.INVOICES.BY_ID(id)}/ksef-status`);
+    return response.data;
   },
 
   /**

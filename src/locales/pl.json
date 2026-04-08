@@ -2404,7 +2404,11 @@
       "wystawiona": "Wystawiona",
       "sent": "Wysłana",
       "paid": "Opłacona",
-      "cancelled": "Anulowana"
-    }
+      "cancelled": "Anulowana",
+      "sending": "Wysyłanie...",
+      "pending": "Przetwarzanie KSeF",
+      "error": "Błąd KSeF"
+    },
+    "sendToKsef": "Wyślij do KSeF"
   }
 }

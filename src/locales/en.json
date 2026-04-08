@@ -2403,8 +2403,12 @@
       "wystawiona": "Issued",
       "sent": "Sent",
       "paid": "Paid",
-      "cancelled": "Cancelled"
-    }
+      "cancelled": "Cancelled",
+      "sending": "Sending...",
+      "pending": "KSeF Processing",
+      "error": "KSeF Error"
+    },
+    "sendToKsef": "Send to KSeF"
   }
 }
 

@@ -86,6 +86,30 @@ export const useInvoicesStore = defineStore('invoices', () => {
     return await invoicesApi.lookupNip(nip);
   }
 
+  async function sendToKsef(id: number) {
+    try {
+      await invoicesApi.sendToKsef(id);
+      await fetchInvoices(); // Refresh list to see status change
+    } catch (err: any) {
+      error.value = err.message || 'KSeF transmission failed';
+      throw err;
+    }
+  }
+
+  async function fetchKsefStatus(id: number) {
+    try {
+      const data = await invoicesApi.getKsefStatus(id);
+      // Update local invoice object in list if found
+      const idx = invoices.value.findIndex(i => i.id === id);
+      if (idx !== -1) {
+        invoices.value[idx] = { ...invoices.value[idx], ...data };
+      }
+      return data;
+    } catch (err: any) {
+      console.error('Failed to fetch KSeF status', err);
+    }
+  }
+
   return {
     invoices,
     isLoading,
@@ -96,5 +120,8 @@ export const useInvoicesStore = defineStore('invoices', () => {
     setPage,
     resetFilters,
     createInvoice,
+    lookupNip,
+    sendToKsef,
+    fetchKsefStatus,
   };
 });

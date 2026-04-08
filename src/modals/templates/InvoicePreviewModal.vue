@@ -20,13 +20,16 @@
         >
           ⚡ {{ converting ? t('common.loading') : t('faktury.convertToFa') || 'PF → FA' }}
         </UiButton>
-        <UiButton 
-          v-if="invoice?.document_type === 'FA'"
-          variant="warning" 
-          size="sm" 
-          @click="handleCorrect"
-        >
           📋 {{ t('faktury.correct') || 'Correct' }}
+        </UiButton>
+        <UiButton 
+          v-if="invoice?.document_type === 'FA' && ['draft', 'error'].includes(invoice?.ksef_status)"
+          variant="primary" 
+          size="sm" 
+          @click="handleSendKsef"
+          :disabled="sendingKsef"
+        >
+          🚀 {{ sendingKsef ? t('common.sending') : t('faktury.sendToKsef') || 'Send to KSeF' }}
         </UiButton>
         <UiButton variant="ghost" size="sm" @click="download">
           ⬇️ {{ t('faktury.downloadPdf') }}
@@ -75,6 +78,7 @@ const pdfUrl = computed(() => {
 const loading = ref(true);
 const sendingEmail = ref(false);
 const converting = ref(false);
+const sendingKsef = ref(false);
 
 function onLoad() {
   loading.value = false;
@@ -124,6 +128,20 @@ async function handleConvert() {
 function handleCorrect() {
   if (!invoice.value) return;
   modal.open('korekta', { invoice: invoice.value });
+}
+
+async function handleSendKsef() {
+  if (!invoice.value) return;
+  sendingKsef.value = true;
+  try {
+    await invoicesStore.sendToKsef(invoice.value.id);
+    // Modal will reactive update via computed invoice if store updates it, 
+    // but usually we might need to re-fetch the specific object details.
+  } catch (e) {
+    console.error(e);
+  } finally {
+    sendingKsef.value = false;
+  }
 }
 </script>
 

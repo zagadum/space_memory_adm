@@ -2398,9 +2398,13 @@
     "statuses": {
       "draft": "Чернетка",
       "wystawiona": "Виставлено",
-      "sent": "Відправлено",
+      "sent": "Надіслано",
       "paid": "Оплачено",
-      "cancelled": "Анульовано"
-    }
+      "cancelled": "Анульовано",
+      "sending": "Надсилання...",
+      "pending": "В обробці KSeF",
+      "error": "Помилка KSeF"
+    },
+    "sendToKsef": "Надіслати до KSeF"
   }
 }

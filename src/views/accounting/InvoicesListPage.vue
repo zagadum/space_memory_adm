@@ -111,6 +111,13 @@
                   <div class="action-item" @click="viewDetails(invoice)">
                     🔍 {{ t('faktury.viewDetails') }}
                   </div>
+                  <div 
+                    v-if="['draft', 'error'].includes(invoice.ksef_status)" 
+                    class="action-item ksef-action" 
+                    @click="sendToKsef(invoice)"
+                  >
+                    🚀 {{ t('faktury.sendToKsef') || 'Send to KSeF' }}
+                  </div>
                 </div>
               </div>
             </td>
@@ -181,8 +188,20 @@ function getStatusVariant(status: string) {
     case 'draft': return 'warning';
     case 'wystawiona':
     case 'sent': return 'info';
+    case 'sending':
+    case 'pending': return 'warning';
+    case 'error': return 'danger';
     default: return 'default';
   }
+}
+
+async function sendToKsef(invoice: any) {
+  try {
+    await invoicesStore.sendToKsef(invoice.id);
+  } catch (err) {
+    console.error(err);
+  }
+  activeActionId.value = null;
 }
 
 function handleCreateInvoice() {
