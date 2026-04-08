@@ -87,6 +87,7 @@
   "common": {
     "age": "нет лет | {n} год | {n} года | {n} лет",
     "cancel": "Отмена",
+    "selected": "выбрано",
     "save": "Сохранить",
     "ok": "OK",
     "confirm": "Подтвердить",
@@ -609,7 +610,8 @@
       "commentPlaceholder": "Причина коррекции — попадёт в текст Faktura Korekta...",
       "ksefWarning": "Корректура создаст новый документ FK/... в KSeF. Оригинальный счёт {fvnum} будет помечен как скорректированный.",
       "cancel": "Отмена",
-      "submit": "Создать корректуру"
+      "submit": "Создать корректуру",
+      "ksefBulkConfirm": "Отправить выбранные счета в KSeF?"
     },
     "refund": {
       "title": "↩️ Возврат",
@@ -2411,7 +2413,8 @@
       "pending": "В обработке KSeF",
       "error": "Ошибка KSeF"
     },
-    "sendToKsef": "Отправить в KSeF"
+    "sendToKsef": "Отправить в KSeF",
+    "downloadZip": "Скачать ZIP (PDF)"
   }
 }
 

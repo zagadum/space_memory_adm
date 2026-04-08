@@ -87,6 +87,7 @@
   "common": {
     "age": "no age | {n} year | {n} years",
     "cancel": "Cancel",
+    "selected": "selected",
     "save": "Save",
     "ok": "OK",
     "confirm": "Confirm",
@@ -604,7 +605,8 @@
       "commentPlaceholder": "Reason for correction — will appear on the Faktura Korekta...",
       "ksefWarning": "The correction will create a new FK/... document in KSeF. The original invoice {fvnum} will be marked as corrected.",
       "cancel": "Cancel",
-      "submit": "Create Correction"
+      "submit": "Create Correction",
+      "ksefBulkConfirm": "Send selected invoices to KSeF?"
     },
     "refund": {
       "title": "↩️ Refund",
@@ -2405,7 +2407,8 @@
       "pending": "KSeF Processing",
       "error": "KSeF Error"
     },
-    "sendToKsef": "Send to KSeF"
+    "sendToKsef": "Send to KSeF",
+    "downloadZip": "Download ZIP (PDF)",
+    "ksefBulkConfirm": "Send selected invoices to KSeF?"
   }
 }
-

@@ -137,9 +137,25 @@ export const invoicesApi = {
   /**
    * Get KSeF status
    */
-  async getKsefStatus(id: number): Promise<any> {
-    const response = await http.get(`${endpoints.INVOICES.BY_ID(id)}/ksef-status`);
-    return response.data;
+  async getKsefStatus(id: number): Promise<{ status: string; reference?: string; updated_at: string }> {
+    const { data } = await http.get(`${endpoints.INVOICES.BY_ID(id)}/ksef-status`);
+    return data;
+  },
+
+  async sendBulkToKsef(ids: number[]): Promise<{ message: string }> {
+    const { data } = await http.post('/v1/invoices/bulk-ksef', { ids });
+    return data;
+  },
+
+  async bulkDownloadPDFs(ids: number[]): Promise<void> {
+    const response = await http.post('/v1/invoices/bulk-download', { ids }, { responseType: 'blob' });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `invoices_bulk_${new Date().getTime()}.zip`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   },
 
   /**
@@ -160,7 +176,29 @@ export const invoicesApi = {
         params.append(apiKey, value.toString());
       }
     });
-    // In sm-recrut, it's /v1/invoices/export
-    return `/v1/${endpoints.INVOICES.BASE}/export?${params.toString()}`;
+    return `/v1/invoices/export?${params.toString()}`;
+  },
+
+  async exportExcel(filters: InvoiceFilters & { ids?: number[] }): Promise<void> {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        if (key === 'ids' && Array.isArray(value)) {
+          value.forEach(id => params.append('ids[]', id.toString()));
+        } else {
+          const apiKey = key === 'search' ? 'q' : key;
+          params.append(apiKey, value.toString());
+        }
+      }
+    });
+
+    const response = await http.get(`/v1/invoices/export?${params.toString()}`, { responseType: 'blob' });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `invoices_export_${new Date().getTime()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   }
 };

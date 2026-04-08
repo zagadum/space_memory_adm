@@ -49,6 +49,13 @@
       <table>
         <thead>
           <tr>
+            <th class="selection-col">
+              <input 
+                type="checkbox" 
+                :checked="invoicesStore.selectedIds.length === invoicesStore.invoices.length && invoicesStore.invoices.length > 0"
+                @change="toggleSelectAll"
+              />
+            </th>
             <th>{{ t('faktury.number') }}</th>
             <th>{{ t('faktury.buyer') }}</th>
             <th>{{ t('faktury.project') }}</th>
@@ -69,7 +76,14 @@
 
         <!-- Data -->
         <tbody v-else>
-          <tr v-for="invoice in invoicesStore.invoices" :key="invoice.id" class="table-row">
+          <tr v-for="invoice in invoicesStore.invoices" :key="invoice.id" class="table-row" :class="{ selected: invoicesStore.selectedIds.includes(invoice.id) }">
+            <td class="selection-col">
+              <input 
+                type="checkbox" 
+                :checked="invoicesStore.selectedIds.includes(invoice.id)"
+                @change="invoicesStore.toggleSelection(invoice.id)"
+              />
+            </td>
             <td>
               <div class="invoice-number">{{ invoice.number }}</div>
             </td>
@@ -144,6 +158,27 @@
         <button class="dropdown-filter-btn" :disabled="invoicesStore.pagination.currentPage >= invoicesStore.pagination.lastPage" @click="invoicesStore.setPage(invoicesStore.pagination.currentPage + 1)">→</button>
       </div>
     </div>
+
+    <!-- Bulk Actions Toolbar -->
+    <Transition name="slide-up">
+      <div v-if="invoicesStore.selectedIds.length > 0" class="bulk-toolbar">
+        <div class="bulk-info">
+          <span class="bulk-count">{{ invoicesStore.selectedIds.length }}</span>
+          {{ t('common.selected') }}
+        </div>
+        <div class="bulk-actions">
+          <UiButton variant="primary" size="sm" @click="handleBulkKsef">
+            🚀 {{ t('faktury.sendToKsef') }}
+          </UiButton>
+          <UiButton variant="cyan" size="sm" @click="invoicesStore.bulkDownloadPDFs">
+            📦 {{ t('faktury.downloadZip') || 'Download ZIP' }}
+          </UiButton>
+          <UiButton variant="ghost" size="sm" @click="invoicesStore.clearSelection">
+            ✕ {{ t('common.cancel') }}
+          </UiButton>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -172,9 +207,27 @@ function toggleActions(id: number) {
   activeActionId.value = activeActionId.value === id ? null : id;
 }
 
-function formatDate(date: string) {
-  if (!date) return '—';
-  return new Date(date).toLocaleDateString();
+function toggleSelectAll() {
+  if (invoicesStore.selectedIds.length === invoicesStore.invoices.length) {
+    invoicesStore.clearSelection();
+  } else {
+    invoicesStore.selectAllOnPage();
+  }
+}
+
+async function handleBulkKsef() {
+  if (confirm(t('modals.korekta.ksefBulkConfirm') || 'Send selected invoices to KSeF?')) {
+    await invoicesStore.bulkSendToKsef();
+  }
+}
+
+function handleExport() {
+  invoicesStore.exportFilteredExcel();
+}
+
+function formatDate(dateStr: string) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString();
 }
 
 function formatCurrency(amount: number, currency: string) {
@@ -208,10 +261,6 @@ function handleCreateInvoice() {
   modal.open('invoice-create');
 }
 
-function handleExport() {
-  const url = invoicesApi.getExportUrl(invoicesStore.filters);
-  window.open(url, '_blank');
-}
 
 function downloadPdf(invoice: any) {
   const url = invoicesApi.getPdfUrl(invoice.id);
@@ -421,5 +470,62 @@ td {
 @keyframes skeleton {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+.table-row.selected {
+  background-color: var(--color-bg-hover);
+}
+
+.selection-col {
+  width: 40px;
+  text-align: center;
+}
+
+.bulk-toolbar {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  backdrop-filter: blur(8px);
+}
+
+.bulk-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.bulk-count {
+  background: var(--color-primary);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 13px;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  opacity: 0;
+  transform: translate(-50%, 20px);
 }
 </style>

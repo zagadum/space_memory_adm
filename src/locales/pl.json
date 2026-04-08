@@ -604,7 +604,8 @@
       "commentPlaceholder": "Powód korekty — trafi do tekstu Faktura Korekta...",
       "ksefWarning": "Korekta utworzy nowy dokument FK/... w KSeF. Oryginalna faktura {fvnum} zostanie oznaczona jako skorygowana.",
       "cancel": "Anuluj",
-      "submit": "Utwórz korektę"
+      "submit": "Utwórz korektę",
+      "ksefBulkConfirm": "Wyślij wybrane faktury do KSeF?"
     },
     "refund": {
       "title": "↩️ Zwrot",
@@ -2406,6 +2407,9 @@
       "pending": "Przetwarzanie KSeF",
       "error": "Błąd KSeF"
     },
-    "sendToKsef": "Wyślij do KSeF"
+    "selected": "Wybrano",
+    "sendToKsef": "Wyślij do KSeF",
+    "downloadZip": "Pobierz ZIP (PDF)",
+    "ksefBulkConfirm": "Potwierdź wysyłkę KSeF"
   }
 }

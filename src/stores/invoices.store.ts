@@ -9,6 +9,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const invoices = ref<Invoice[]>([]);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const selectedIds = ref<number[]>([]);
   
   const pagination = reactive({
     currentPage: 1,
@@ -99,14 +100,59 @@ export const useInvoicesStore = defineStore('invoices', () => {
   async function fetchKsefStatus(id: number) {
     try {
       const data = await invoicesApi.getKsefStatus(id);
-      // Update local invoice object in list if found
       const idx = invoices.value.findIndex(i => i.id === id);
       if (idx !== -1) {
-        invoices.value[idx] = { ...invoices.value[idx], ...data };
+        invoices.value[idx].ksef_status = data.status as any;
+        invoices.value[idx].ksef_reference = data.reference;
       }
-      return data;
-    } catch (err: any) {
-      console.error('Failed to fetch KSeF status', err);
+    } catch (e: any) {
+      console.error('Failed to fetch KSeF status');
+    }
+  }
+
+  // --- SELECTION & BULK ---
+  function toggleSelection(id: number) {
+    const idx = selectedIds.value.indexOf(id);
+    if (idx === -1) selectedIds.value.push(id);
+    else selectedIds.value.splice(idx, 1);
+  }
+
+  function selectAllOnPage() {
+    selectedIds.value = invoices.value.map(i => i.id);
+  }
+
+  function clearSelection() {
+    selectedIds.value = [];
+  }
+
+  async function bulkSendToKsef() {
+    if (selectedIds.value.length === 0) return;
+    try {
+      await invoicesApi.sendBulkToKsef(selectedIds.value);
+      await fetchInvoices();
+      clearSelection();
+    } catch (e: any) {
+      error.value = e.message;
+    }
+  }
+
+  async function bulkDownloadPDFs() {
+    if (selectedIds.value.length === 0) return;
+    try {
+      await invoicesApi.bulkDownloadPDFs(selectedIds.value);
+    } catch (e: any) {
+      error.value = e.message;
+    }
+  }
+
+  async function exportFilteredExcel() {
+    try {
+      await invoicesApi.exportExcel({
+        ...filters,
+        ids: selectedIds.value.length > 0 ? selectedIds.value : undefined
+      });
+    } catch (e: any) {
+      error.value = e.message;
     }
   }
 
@@ -116,6 +162,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     error,
     pagination,
     filters,
+    selectedIds,
     fetchInvoices,
     setPage,
     resetFilters,
@@ -123,5 +170,11 @@ export const useInvoicesStore = defineStore('invoices', () => {
     lookupNip,
     sendToKsef,
     fetchKsefStatus,
+    toggleSelection,
+    selectAllOnPage,
+    clearSelection,
+    bulkSendToKsef,
+    bulkDownloadPDFs,
+    exportFilteredExcel
   };
 });
