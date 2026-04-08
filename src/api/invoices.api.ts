@@ -52,6 +52,8 @@ export interface InvoiceFilters {
   status?: string;
   date_from?: string;
   date_to?: string;
+  min_amount?: number;
+  max_amount?: number;
   search?: string;
   per_page?: number;
   page?: number;
@@ -154,6 +156,11 @@ export const invoicesApi = {
 
   async sendBulkToKsef(ids: number[]): Promise<{ message: string }> {
     const { data } = await http.post('/v1/invoices/bulk-ksef', { ids });
+    return data;
+  },
+
+  async bulkSendEmails(ids: number[]): Promise<{ message: string }> {
+    const { data } = await http.post('/v1/invoices/bulk-email', { ids });
     return data;
   },
 

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { invoicesApi, type Invoice, type InvoiceFilters } from '../api/invoices.api';
 import { useI18n } from 'vue-i18n';
 // Assuming a toast utility exists based on gls-main.md: ToastContainer
@@ -26,9 +26,15 @@ export const useInvoicesStore = defineStore('invoices', () => {
     status: undefined,
     date_from: undefined,
     date_to: undefined,
+    min_amount: undefined,
+    max_amount: undefined,
     search: '',
     per_page: 25,
     page: 1,
+  });
+
+  const hasActiveFilters = computed(() => {
+    return !!(filters.project_id || filters.type || filters.status || filters.date_from || filters.date_to || filters.min_amount || filters.max_amount || filters.search);
   });
 
   async function fetchInvoices() {
@@ -62,6 +68,8 @@ export const useInvoicesStore = defineStore('invoices', () => {
       status: undefined,
       date_from: undefined,
       date_to: undefined,
+      min_amount: undefined,
+      max_amount: undefined,
       search: '',
       per_page: 25,
       page: 1,
@@ -135,6 +143,21 @@ export const useInvoicesStore = defineStore('invoices', () => {
       clearSelection();
     } catch (e: any) {
       error.value = e.message;
+    }
+  }
+
+  async function bulkSendEmails() {
+    if (selectedIds.value.length === 0) return;
+    isLoading.value = true;
+    try {
+      await invoicesApi.bulkSendEmails(selectedIds.value);
+      clearSelection();
+      return true;
+    } catch (e: any) {
+      error.value = 'Failed to send bulk emails';
+      throw e;
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -230,6 +253,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     selectedIds,
     auditLogs,
     stats,
+    hasActiveFilters,
     fetchInvoices,
     setPage,
     resetFilters,
@@ -241,6 +265,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     selectAllOnPage,
     clearSelection,
     bulkSendToKsef,
+    bulkSendEmails,
     bulkDownloadPDFs,
     exportFilteredExcel,
     convertProforma,

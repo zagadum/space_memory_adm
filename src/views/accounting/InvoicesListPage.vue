@@ -8,6 +8,29 @@
           {{ t('faktury.documentList') }}
           <span class="section-count">{{ t('common.count', { n: invoicesStore.pagination.total }) }}</span>
         </div>
+
+        <!-- Unified Bulk Actions Menu -->
+        <div v-if="invoicesStore.selectedIds.length > 0" class="bulk-actions-wrap ml-4">
+          <UiButton variant="primary" size="sm" @click="toggleBulkMenu" class="bulk-active-btn">
+            ⚡ {{ t('common.bulkActions') || 'Bulk Actions' }} ({{ invoicesStore.selectedIds.length }})
+            <span class="chevron-icon">▼</span>
+          </UiButton>
+          
+          <div v-if="isBulkMenuOpen" class="bulk-dropdown-menu">
+            <div class="menu-item" @click="handleBulkEmails">
+              📧 {{ t('faktury.sendBulkEmails') || 'Send Emails' }}
+            </div>
+            <div class="menu-item" @click="handleBulkKsef">
+              🏛️ {{ t('faktury.sendToKsef') }}
+            </div>
+            <div class="menu-item dividing" @click="invoicesStore.bulkDownloadPDFs">
+              📄 {{ t('faktury.downloadZip') || 'Download PDFs (ZIP)' }}
+            </div>
+            <div class="menu-item" @click="invoicesStore.exportFilteredExcel">
+              📊 {{ t('faktury.exportSelected') || 'Export Selected (XLSX)' }}
+            </div>
+          </div>
+        </div>
       </div>
       <div class="toolbar-right">
         <!-- Project Filter -->
@@ -35,6 +58,41 @@
           <option value="paid">{{ t('faktury.statuses.paid') }}</option>
           <option value="cancelled">{{ t('faktury.statuses.cancelled') }}</option>
         </select>
+
+        <!-- Date Range Filter -->
+        <UiDateRangePicker 
+          v-model:startDate="invoicesStore.filters.date_from" 
+          v-model:endDate="invoicesStore.filters.date_to"
+          @change="invoicesStore.fetchInvoices"
+        />
+
+        <!-- Amount Filter Popover (Simplified for now as inputs) -->
+        <div class="amount-filter-group">
+          <input 
+            type="number" 
+            v-model.number="invoicesStore.filters.min_amount" 
+            placeholder="Min PLN"
+            class="filter-input-small"
+            @change="invoicesStore.fetchInvoices"
+          />
+          <input 
+            type="number" 
+            v-model.number="invoicesStore.filters.max_amount" 
+            placeholder="Max PLN"
+            class="filter-input-small"
+            @change="invoicesStore.fetchInvoices"
+          />
+        </div>
+
+        <UiButton 
+          v-if="invoicesStore.hasActiveFilters"
+          variant="ghost" 
+          size="sm" 
+          @click="invoicesStore.resetFilters"
+          class="reset-btn"
+        >
+          ✕ {{ t('faktury.clearFilters') || 'Clear' }}
+        </UiButton>
 
         <UiButton variant="ghost" size="sm" @click="handleExport">
           📥 {{ t('faktury.exportXlsx') || 'Export XLSX' }}
@@ -202,7 +260,9 @@ import { useProjectsStore } from '../../stores/projects.store';
 import { useGlobalSearchStore } from '../../stores/globalSearch.store';
 import { useModalStore } from '../../stores/modal.store';
 import { useInvoicePermissions } from '../../composables/useInvoicePermissions';
+import { useRouter, useRoute } from 'vue-router';
 import UiButton from '../../components/ui/UiButton.vue';
+import UiDateRangePicker from '../../components/ui/UiDateRangePicker.vue';
 import { invoicesApi } from '../../api/invoices.api';
 import InvoiceSidePanel from './components/InvoiceSidePanel.vue';
 import InvoicesStatsHeader from './components/InvoicesStatsHeader.vue';
@@ -212,8 +272,11 @@ const invoicesStore = useInvoicesStore();
 const projectsStore = useProjectsStore();
 const searchStore = useGlobalSearchStore();
 const modal = useModalStore();
+const router = useRouter();
+const route = useRoute();
 const { can, canEdit } = useInvoicePermissions();
 const activeActionId = ref<number | null>(null);
+const isBulkMenuOpen = ref(false);
 const selectedInvoice = ref<any | null>(null);
 
 function toggleActions(id: number) {
@@ -231,7 +294,19 @@ function toggleSelectAll() {
 async function handleBulkKsef() {
   if (confirm(t('modals.korekta.ksefBulkConfirm') || 'Send selected invoices to KSeF?')) {
     await invoicesStore.bulkSendToKsef();
+    isBulkMenuOpen.value = false;
   }
+}
+
+async function handleBulkEmails() {
+  if (confirm(t('faktury.bulkEmailConfirm') || 'Send emails to all selected students?')) {
+    await invoicesStore.bulkSendEmails();
+    isBulkMenuOpen.value = false;
+  }
+}
+
+function toggleBulkMenu() {
+  isBulkMenuOpen.value = !isBulkMenuOpen.value;
 }
 
 async function handleConvert(id: number) {
@@ -317,13 +392,41 @@ watch(() => searchStore.query, (val) => {
   }, 400);
 });
 
+// URL Sync & Persistence
+function syncFiltersToUrl() {
+  const query: any = {};
+  Object.entries(invoicesStore.filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && key !== 'page' && key !== 'per_page') {
+      query[key] = value;
+    }
+  });
+  router.replace({ query });
+}
+
+function loadFiltersFromUrl() {
+  const query = route.query;
+  if (query.project_id) invoicesStore.filters.project_id = Number(query.project_id);
+  if (query.type) invoicesStore.filters.type = String(query.type);
+  if (query.status) invoicesStore.filters.status = String(query.status);
+  if (query.date_from) invoicesStore.filters.date_from = String(query.date_from);
+  if (query.date_to) invoicesStore.filters.date_to = String(query.date_to);
+  if (query.min_amount) invoicesStore.filters.min_amount = Number(query.min_amount);
+  if (query.max_amount) invoicesStore.filters.max_amount = Number(query.max_amount);
+  if (query.search) {
+    invoicesStore.filters.search = String(query.search);
+    searchStore.query = String(query.search);
+  }
+}
+
 onMounted(async () => {
+  loadFiltersFromUrl();
   await projectsStore.fetchProjects();
   await invoicesStore.fetchInvoices();
   await invoicesStore.fetchStats();
 });
 
 watch(() => invoicesStore.filters, () => {
+  syncFiltersToUrl();
   invoicesStore.fetchStats();
 }, { deep: true });
 
@@ -331,6 +434,9 @@ const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
   if (!target.closest('.actions-wrap')) {
     activeActionId.value = null;
+  }
+  if (!target.closest('.bulk-actions-wrap')) {
+    isBulkMenuOpen.value = false;
   }
 };
 
@@ -375,7 +481,84 @@ onUnmounted(() => {
   border-radius: 8px;
 }
 
-.toolbar-right { display: flex; gap: 10px; align-items: center; }
+.toolbar-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+.amount-filter-group {
+  display: flex;
+  gap: 4px;
+}
+
+.filter-input-small {
+  width: 80px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card);
+  color: var(--app-text-main);
+  outline: none;
+}
+
+.filter-input-small:focus { border-color: var(--blue); }
+
+.reset-btn { color: var(--red) !important; }
+
+/* Bulk Actions Menu Styles */
+.bulk-actions-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.bulk-active-btn {
+  background: var(--blue) !important;
+  color: white !important;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3);
+}
+
+.chevron-icon {
+  font-size: 10px;
+  margin-left: 6px;
+  opacity: 0.8;
+}
+
+.bulk-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  z-index: 100;
+  min-width: 240px;
+  padding: 8px;
+  overflow: hidden;
+}
+
+.menu-item {
+  padding: 10px 14px;
+  font-size: 14px;
+  color: var(--app-text-main);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.menu-item:hover {
+  background: var(--app-surface);
+  color: var(--blue);
+}
+
+.menu-item.dividing {
+  border-top: 1px solid var(--app-border);
+  margin-top: 4px;
+  padding-top: 14px;
+}
 
 .dropdown-filter-btn {
   padding: 8px 12px;

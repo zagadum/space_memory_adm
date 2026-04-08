@@ -2431,7 +2431,31 @@
     "emailSubject": "Тема письма",
     "emailBody": "Текст сообщения",
     "placeholdersHint": "Доступные переменные (нажмите, чтобы вставить):",
-    "emailNote": "PDF-счет будет прикреплен автоматически."
+    "emailNote": "PDF-счет будет прикреплен автоматически.",
+    "clearFilters": "Сбросить фильтры",
+    "dateFrom": "Дата от",
+    "dateTo": "Дата до",
+    "minAmount": "Мин. сумма",
+    "maxAmount": "Макс. сумма",
+    "sendBulkEmails": "Рассылка счетов по email",
+    "bulkEmailConfirm": "Отправить счета всем выбранным ученикам?",
+    "downloadZip": "Скачать архивом (ZIP)",
+    "exportSelected": "Экспорт выбранного (XLSX)",
+    "relation": {
+      "parent": "Оригинальный счет",
+      "child": "Корректировка",
+      "corrects": "Корректирует"
+    },
+    "actions": {
+      "created": "Документ создан",
+      "edited": "Изменения внесены",
+      "sent_to_ksef": "Отправлено в KSeF",
+      "ksef_accepted": "Принято KSeF",
+      "ksef_rejected": "Отклонено KSeF",
+      "converted_to_fa": "Конвертировано в FA",
+      "correction_created": "Создана корректировка",
+      "email_sent": "Email отправлен"
+    }
   }
 }
 

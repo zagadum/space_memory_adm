@@ -2427,6 +2427,30 @@
     "emailBody": "Treść wiadomości",
     "placeholdersHint": "Dostępne zmienne (kliknij, aby wstawić):",
     "emailNote": "Faktura PDF zostanie dołączona automatycznie.",
-    "ksefBulkConfirm": "Potwierdź wysyłkę KSeF"
+    "clearFilters": "Wyczyść filtry",
+    "dateFrom": "Data od",
+    "dateTo": "Data do",
+    "minAmount": "Suma min.",
+    "maxAmount": "Suma maks.",
+    "sendBulkEmails": "Masowa wysyłka faktur",
+    "bulkEmailConfirm": "Czy wysłać faktury do wszystkich wybranych uczniów?",
+    "downloadZip": "Pobierz jako ZIP",
+    "exportSelected": "Eksportuj wybrane (XLSX)",
+    "ksefBulkConfirm": "Potwierdź wysyłkę KSeF",
+    "relation": {
+      "parent": "Oryginalna faktura",
+      "child": "Korekta",
+      "corrects": "Koryguje"
+    },
+    "actions": {
+      "created": "Dokument utworzony",
+      "edited": "Zmiany naniesione",
+      "sent_to_ksef": "Wysłano do KSeF",
+      "ksef_accepted": "Zaakceptowano KSeF",
+      "ksef_rejected": "Odrzucono KSeF",
+      "converted_to_fa": "Skonwertowano do FA",
+      "correction_created": "Utworzono korektę",
+      "email_sent": "Email wysłany"
+    }
   }
 }

@@ -2419,6 +2419,30 @@
     "emailBody": "Message Body",
     "placeholdersHint": "Available variables (click to insert):",
     "emailNote": "The PDF invoice will be attached automatically.",
-    "ksefBulkConfirm": "Send selected invoices to KSeF?"
+    "clearFilters": "Clear filters",
+    "dateFrom": "Date from",
+    "dateTo": "Date to",
+    "minAmount": "Min amount",
+    "maxAmount": "Max amount",
+    "sendBulkEmails": "Send Bulk Emails",
+    "bulkEmailConfirm": "Send emails to all selected students?",
+    "downloadZip": "Download (ZIP)",
+    "exportSelected": "Export Selected (XLSX)",
+    "ksefBulkConfirm": "Send selected invoices to KSeF?",
+    "relation": {
+      "parent": "Original Invoice",
+      "child": "Correction",
+      "corrects": "Corrects"
+    },
+    "actions": {
+      "created": "Document Created",
+      "edited": "Changes Applied",
+      "sent_to_ksef": "Sent to KSeF",
+      "ksef_accepted": "KSeF Accepted",
+      "ksef_rejected": "KSeF Rejected",
+      "converted_to_fa": "Converted to FA",
+      "correction_created": "Correction Issued",
+      "email_sent": "Email Sent"
+    }
   }
 }

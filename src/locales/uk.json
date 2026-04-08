@@ -2422,6 +2422,30 @@
     "emailBody": "Текст повідомлення",
     "placeholdersHint": "Доступні змінні (натисніть, щоб вставити):",
     "emailNote": "PDF-рахунок буде додано автоматично.",
-    "selected": "Вибрано"
+    "clearFilters": "Скинути фільтри",
+    "dateFrom": "Дата від",
+    "dateTo": "Дата до",
+    "minAmount": "Мін. сума",
+    "maxAmount": "Макс. сума",
+    "sendBulkEmails": "Розсилка рахунків по email",
+    "bulkEmailConfirm": "Відправити рахунки всім вибраним учням?",
+    "downloadZip": "Завантажити архівом (ZIP)",
+    "exportSelected": "Експорт вибраного (XLSX)",
+    "selected": "Вибрано",
+    "relation": {
+      "parent": "Оригінальний рахунок",
+      "child": "Коригування",
+      "corrects": "Коригує"
+    },
+    "actions": {
+      "created": "Документ створено",
+      "edited": "Зміни внесено",
+      "sent_to_ksef": "Відправлено до KSeF",
+      "ksef_accepted": "Прийнято KSeF",
+      "ksef_rejected": "Відхилено KSeF",
+      "converted_to_fa": "Конвертовано у FA",
+      "correction_created": "Створено коригування",
+      "email_sent": "Email відправлено"
+    }
   }
 }

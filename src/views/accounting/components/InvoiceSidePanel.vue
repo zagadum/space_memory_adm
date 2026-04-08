@@ -103,12 +103,30 @@
                   </div>
                 </div>
 
-                <div v-if="invoice.parent_id" class="info-item">
-                  <div class="info-label">{{ t('faktury.relation.corrects') || 'Corrects' }}</div>
-                  <div class="info-value">
-                    <a href="#" @click.prevent="$emit('select', invoice.parent_id)">
-                      #{{ invoice.parent?.number || invoice.parent_id }}
-                    </a>
+                <div v-if="invoice.corrections?.length || invoice.parent" class="history-list">
+                  <!-- Parent Link -->
+                  <div v-if="invoice.parent" class="history-item parent" @click="emit('select', invoice.parent.id)">
+                    <div class="item-header">
+                      <UiBadge variant="warning" size="sm">FK (Orig)</UiBadge>
+                      <span class="item-date">{{ formatDate(invoice.parent.issue_date) }}</span>
+                    </div>
+                    <div class="item-number">{{ invoice.parent.number }}</div>
+                    <div class="item-link">← {{ t('faktury.relation.parent') || 'Original Invoice' }}</div>
+                  </div>
+
+                  <!-- Corrections (Children) -->
+                  <div 
+                    v-for="corr in invoice.corrections" 
+                    :key="corr.id" 
+                    class="history-item child" 
+                    @click="emit('select', corr.id)"
+                  >
+                    <div class="item-header">
+                      <UiBadge variant="info" size="sm">FK</UiBadge>
+                      <span class="item-date">{{ formatDate(corr.issue_date) }}</span>
+                    </div>
+                    <div class="item-number">{{ corr.number }}</div>
+                    <div class="item-link">→ {{ t('faktury.relation.child') || 'Correction' }}</div>
                   </div>
                 </div>
 
@@ -221,14 +239,14 @@ function getStatusVariant(status: string) {
 
 function formatAction(action: string) {
   const map: Record<string, string> = {
-    'created': 'Документ создан',
-    'edited': 'Изменения внесены',
-    'sent_to_ksef': 'Отправлено в KSeF',
-    'ksef_accepted': 'Принято KSeF',
-    'ksef_rejected': 'Отклонено KSeF',
-    'converted_to_fa': 'Конвертировано в FA',
-    'correction_created': 'Создана корректировка',
-    'email_sent': 'Email отправлен'
+    'created': t('faktury.actions.created') || 'Документ создан',
+    'edited': t('faktury.actions.edited') || 'Изменения внесены',
+    'sent_to_ksef': t('faktury.actions.sent_to_ksef') || 'Отправлено в KSeF',
+    'ksef_accepted': t('faktury.actions.ksef_accepted') || 'Принято KSeF',
+    'ksef_rejected': t('faktury.actions.ksef_rejected') || 'Отклонено KSeF',
+    'converted_to_fa': t('faktury.actions.converted_to_fa') || 'Конвертировано в FA',
+    'correction_created': t('faktury.actions.correction_created') || 'Создана корректировка',
+    'email_sent': t('faktury.actions.email_sent') || 'Email отправлен'
   };
   return map[action] || action;
 }
@@ -328,6 +346,52 @@ function sendToKsef() {
 
 .ksef-actions { margin-top: 8px; }
 .full-width { width: 100%; }
+
+/* History List */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.history-item {
+  padding: 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.history-item:hover {
+  transform: translateX(4px);
+  border-color: var(--app-primary);
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.item-date {
+  font-size: 11px;
+  color: var(--app-text-dim);
+}
+
+.item-number {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--app-text-main);
+}
+
+.item-link {
+  font-size: 12px;
+  color: var(--app-primary);
+  margin-top: 4px;
+}
 
 /* Timeline */
 .timeline { display: flex; flex-direction: column; gap: 0; border-left: 1px solid var(--app-border); margin-left: 10px; padding-left: 20px; }
