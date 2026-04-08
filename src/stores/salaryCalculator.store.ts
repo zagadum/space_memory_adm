@@ -1,5 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { salaryApi } from '../api/salaryApi'
+import { parseApiError } from '../api/errorHelper'
+import { getTeachers } from '../api/teachersApi'
 
 export interface SalaryComponent {
     id: string
@@ -10,7 +13,7 @@ export interface SalaryComponent {
 }
 
 export interface Teacher {
-    id: string
+    id: number
     name: string
     role: string
 }
@@ -22,14 +25,11 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     const error = ref<string | null>(null)
     const status = ref<'draft' | 'confirmed' | 'paid'>('draft')
 
-    const teachers = ref<Teacher[]>([
-        { id: 'anna', name: 'Anna Kowalska', role: 'Trener Space Memory' },
-        { id: 'marek', name: 'Marek Wójcik', role: 'Trener Space Memory' },
-        { id: 'jan', name: 'Jan Kowalski', role: 'Trener Indigo' }
-    ])
+    const teachers = ref<Teacher[]>([])
 
-    const selectedTeacherId = ref('anna')
+    const selectedTeacherId = ref<number | null>(null)
     const selectedMonth = ref('2026-02')
+    const currentSalaryId = ref<string | number | null>(null)
 
     // Mock data for Anna Kowalska
     const salaryData = ref({
@@ -60,7 +60,7 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
     })
 
     const selectedTeacher = computed(() => {
-        return teachers.value.find(t => t.id === selectedTeacherId.value) || teachers.value[0]
+        return teachers.value.find(t => t.id === selectedTeacherId.value) || { id: 0, name: '—', role: '—' }
     })
 
     // Calculations
@@ -93,90 +93,118 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         return subtotalBeforeBonus.value + rezygnacjeBonusAmount.value - salaryData.value.penalties
     })
 
+    async function loadTeachers() {
+        try {
+            const response = await getTeachers({ per_page: 200, orderBy: 'lastName', orderDirection: 'asc' })
+            teachers.value = response.data.map((item) => ({
+                id: item.id,
+                name: `${item.firstName} ${item.lastName}`.trim(),
+                role: 'Trener',
+            }))
+
+            if (!selectedTeacherId.value && teachers.value.length > 0) {
+                selectedTeacherId.value = teachers.value[0].id
+            }
+        } catch (e: unknown) {
+            error.value = parseApiError(e, 'Failed to load teachers list')
+            teachers.value = []
+            selectedTeacherId.value = null
+        }
+    }
+
     // Actions
-    async function fetchTrainerData(id: string, month: string) {
+    async function fetchTrainerData(id: number | null, month: string) {
         isLoading.value = true
         error.value = null
+        currentSalaryId.value = null
         try {
-            // TODO: replace mock below with real API call when backend is ready:
-            // const data = await salaryApi.getTrainerData(id, month);
-            // salaryData.value = mapApiResponseToSalaryData(data);
-            await new Promise(resolve => setTimeout(resolve, 600))
-            selectedTeacherId.value = id
+            if (!teachers.value.length) {
+                await loadTeachers()
+            }
+
+            const teacherId = typeof id === 'number' && id > 0
+                ? id
+                : (selectedTeacherId.value ?? teachers.value[0]?.id ?? null)
+
+            if (!teacherId) {
+                throw new Error('Teacher is not selected')
+            }
+
+            selectedTeacherId.value = teacherId
             selectedMonth.value = month
 
-            // Update mock data based on teacher — full replacement to avoid data mixing
-            if (id === 'marek') {
-                salaryData.value = {
-                    subscriptions: 2100.50,
-                    substitutions: 80.00,
-                    methodical: 62.80,
-                    individual: 0,
-                    olympiad: 0,
-                    travel: 100,
-                    adminDuty: 500,
-                    rezygnacje: 2, // has rezygnacje → no retention bonus
-                    extraBonus: 0,
-                    penalties: 0,
-                    trialRows: [
-                        { attended: 5, won: 2 }, // 40% → does NOT qualify
-                        { attended: 4, won: 1 }, // 25% → does NOT qualify
-                    ],
-                    activeKids: 42,
-                    graduationPct: 11,
-                    rezygnacjeBonusPct: 1,
-                }
-            } else if (id === 'jan') {
-                salaryData.value = {
-                    subscriptions: 1850.00,
-                    substitutions: 0,
-                    methodical: 62.80,
-                    individual: 120.00,
-                    olympiad: 80.00,
-                    travel: 0,
-                    adminDuty: 420.00,
-                    rezygnacje: 0,
-                    extraBonus: 100.00,
-                    penalties: 0,
-                    trialRows: [
-                        { attended: 6, won: 4 }, // 66.7% → qualifies → 35 zł
-                    ],
-                    activeKids: 35,
-                    graduationPct: 11,
-                    rezygnacjeBonusPct: 1,
-                }
-            } else {
-                // Reset to Anna defaults
-                salaryData.value = {
-                    subscriptions: 2847.64,
-                    substitutions: 150.70,
-                    methodical: 125.60,
-                    individual: 280.00,
-                    olympiad: 160.00,
-                    travel: 0,
-                    adminDuty: 660.93,
-                    rezygnacje: 0,
-                    extraBonus: 215.00,
-                    penalties: 0,
-                    trialRows: [
-                        { attended: 6, won: 4 },
-                        { attended: 8, won: 3 },
-                        { attended: 5, won: 3 },
-                    ],
-                    activeKids: 58,
-                    graduationPct: 11,
-                    rezygnacjeBonusPct: 1,
-                }
+            const data = await salaryApi.getTeacherSalary(teacherId, month, 1)
+
+            salaryData.value = {
+                subscriptions: data.subscriptions.amount,
+                substitutions: data.substitutions.amount,
+                methodical: data.methodical.amount,
+                individual: data.individual.amount,
+                olympiad: data.olympiad.amount,
+                travel: 0,
+                adminDuty: data.admin3pct.amount,
+                rezygnacje: data.rezygnacje.length,
+                extraBonus: data.bonuses.amount,
+                penalties: 0,
+                trialRows: data.trialLessons.rows.map((row) => ({
+                    attended: row.attended,
+                    won: row.won,
+                })),
+                activeKids: data.subscriptions.childrenCount,
+                graduationPct: data.subscriptions.rate,
+                rezygnacjeBonusPct: 1,
             }
+
+            currentSalaryId.value = data.id
+            status.value = data.status === 'disputed' ? 'draft' : data.status
         } catch (e: any) {
-            error.value = e.message || 'Failed to fetch data'
+            error.value = parseApiError(e, 'Failed to fetch data')
         } finally {
             isLoading.value = false
         }
     }
 
-    function updateStatus(newStatus: 'draft' | 'confirmed' | 'paid') {
+    async function updateStatus(newStatus: 'draft' | 'confirmed' | 'paid') {
+        if (newStatus === 'confirmed' && currentSalaryId.value) {
+            isLoading.value = true
+            error.value = null
+            try {
+                await salaryApi.confirmSalary(currentSalaryId.value, 1)
+                status.value = 'confirmed'
+                return
+            } catch (e: any) {
+                error.value = parseApiError(e, 'Failed to confirm salary')
+            } finally {
+                isLoading.value = false
+            }
+        }
+
         status.value = newStatus
+    }
+
+    async function disputeSalary(reason: string) {
+        const teacherId = selectedTeacherId.value
+        const salaryId = currentSalaryId.value
+        const text = reason.trim()
+
+        if (!teacherId || !salaryId || !text) {
+            error.value = 'Dispute cannot be sent without teacher, salary and reason.'
+            return false
+        }
+
+        isLoading.value = true
+        error.value = null
+        try {
+            await salaryApi.disputeSalary(salaryId, teacherId, text, 1)
+            status.value = 'draft'
+            await fetchTrainerData(teacherId, selectedMonth.value)
+            return true
+        } catch (e: unknown) {
+            error.value = parseApiError(e, 'Failed to send dispute')
+            return false
+        } finally {
+            isLoading.value = false
+        }
     }
     function doExport(t: any, format: ExcelFormat = 'xlsx') {
         const rows: any[] = []
@@ -292,8 +320,10 @@ export const useSalaryCalculatorStore = defineStore('salaryCalculator', () => {
         subtotalBeforeBonus,
         rezygnacjeBonusAmount,
         totalPayout,
+        loadTeachers,
         fetchTrainerData,
         updateStatus,
+        disputeSalary,
         doExport
     }
 })

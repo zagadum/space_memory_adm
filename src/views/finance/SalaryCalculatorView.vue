@@ -20,6 +20,12 @@ const openSections = ref<Record<string, boolean>>({
 })
 
 const openGroups = ref<Record<string, boolean>>({})
+const disputeVisible = ref(false)
+const disputeReason = ref('')
+
+const canSendDispute = computed(() => {
+  return disputeReason.value.trim().length > 0 && !store.isLoading
+})
 
 function toggleSection(id: string) {
   openSections.value[id] = !openSections.value[id]
@@ -37,18 +43,35 @@ const formatCurrency = (val: number) => {
   return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(val)
 }
 
-onMounted(() => {
-  store.fetchTrainerData(store.selectedTeacherId, store.selectedMonth)
+onMounted(async () => {
+  await store.loadTeachers()
+  await store.fetchTrainerData(store.selectedTeacherId, store.selectedMonth)
 })
 
 const onTeacherChange = (e: Event) => {
-  const id = (e.target as HTMLSelectElement).value
+  const id = Number((e.target as HTMLSelectElement).value)
   store.fetchTrainerData(id, store.selectedMonth)
 }
 
 const onMonthChange = (e: Event) => {
   const month = (e.target as HTMLInputElement).value
   store.fetchTrainerData(store.selectedTeacherId, month)
+}
+
+function openDisputeModal() {
+  disputeVisible.value = true
+}
+
+function closeDisputeModal() {
+  disputeVisible.value = false
+  disputeReason.value = ''
+}
+
+async function submitDispute() {
+  const ok = await store.disputeSalary(disputeReason.value)
+  if (ok) {
+    closeDisputeModal()
+  }
 }
 </script>
 
@@ -97,9 +120,12 @@ const onMonthChange = (e: Event) => {
             <label class="filter-label">{{ t('salaryCalc.labels.trainer') }}</label>
             <select 
               class="filter-select" 
-              :value="store.selectedTeacherId"
+              :value="store.selectedTeacherId ?? ''"
               @change="onTeacherChange"
             >
+              <option v-if="!store.teachers.length" disabled value="">
+                --
+              </option>
               <option v-for="t in store.teachers" :key="t.id" :value="t.id">
                 {{ t.name }}
               </option>
@@ -441,7 +467,10 @@ const onMonthChange = (e: Event) => {
               </div>
             </div>
             <div class="final-actions">
-            <UiButton variant="primary" @click="store.doExport(t)">
+              <UiButton variant="amber" :disabled="store.isLoading || !store.selectedTeacherId" @click="openDisputeModal">
+                ⚠️ {{ t('teacherSalary.actions.dispute') }}
+              </UiButton>
+              <UiButton variant="primary" @click="store.doExport(t)">
                 📥 {{ t('salaryCalc.labels.exportExcel') }}
               </UiButton>
             </div>
@@ -575,6 +604,26 @@ const onMonthChange = (e: Event) => {
               <div class="section-divider"></div>
               <UiButton variant="primary">Create Trainer Profile</UiButton>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="disputeVisible" class="dispute-modal-overlay" @click="closeDisputeModal">
+        <div class="dispute-modal" @click.stop>
+          <div class="dispute-modal-title">{{ t('teacherSalary.actions.dispute') }}</div>
+          <div class="dispute-modal-label">{{ t('teacherSalary.actions.disputeLabel') }}</div>
+          <textarea
+            v-model="disputeReason"
+            class="dispute-modal-textarea"
+            :placeholder="t('teacherSalary.actions.disputePlaceholder')"
+          />
+          <div class="dispute-modal-actions">
+            <UiButton variant="ghost" :disabled="store.isLoading" @click="closeDisputeModal">
+              {{ t('teacherSalary.actions.cancel') }}
+            </UiButton>
+            <UiButton variant="amber" :disabled="!canSendDispute" @click="submitDispute">
+              {{ t('teacherSalary.actions.sendToAccounting') }}
+            </UiButton>
           </div>
         </div>
       </div>
@@ -723,9 +772,17 @@ const onMonthChange = (e: Event) => {
 
 /* ── Final block ── */
 .final-block{background:linear-gradient(135deg,rgba(79,110,247,.1),rgba(139,92,246,.1));border:1px solid rgba(79,110,247,.3);border-radius:16px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;box-shadow:var(--app-shadow);margin-top:24px}
+.final-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .final-amount{font-family:'Space Mono',monospace;font-size:38px;font-weight:700;text-shadow:0 0 30px rgba(79,110,247,.3);color:var(--app-text-main)}
 .final-bd-row{display:flex;justify-content:space-between;gap:40px;font-size:12px;color:var(--app-text-dim)}
 .final-bd-row.deduction{color:var(--red)}
+
+.dispute-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.dispute-modal{width:min(560px,100%);background:var(--app-card);border:1px solid var(--app-border);border-radius:14px;padding:18px;box-shadow:var(--app-shadow)}
+.dispute-modal-title{font-size:18px;font-weight:700;margin-bottom:10px}
+.dispute-modal-label{font-size:12px;color:var(--app-text-dim);margin-bottom:8px}
+.dispute-modal-textarea{width:100%;min-height:120px;border:1px solid var(--app-border);border-radius:10px;padding:10px 12px;background:var(--app-surface);color:var(--app-text-main);font-family:inherit;resize:vertical}
+.dispute-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
 
 /* ── Status pills ── */
 .st-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(107,114,128,.25);font-family:'Outfit',sans-serif;transition:all .2s;background:rgba(107,114,128,.12);color:var(--dim)}
