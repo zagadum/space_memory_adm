@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, reactive } from 'vue';
-import { invoicesApi, type Invoice, type InvoiceFilters } from '@/api/invoices.api';
+import { invoicesApi, type Invoice, type InvoiceFilters } from '../api/invoices.api';
 import { useI18n } from 'vue-i18n';
 // Assuming a toast utility exists based on gls-main.md: ToastContainer
 // I'll skip toast for now or use a generic alert since I don't see the exact toast store name yet.
@@ -67,6 +67,21 @@ export const useInvoicesStore = defineStore('invoices', () => {
     fetchInvoices();
   }
 
+  async function createInvoice(data: any) {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const response = await invoicesApi.create(data);
+      await fetchInvoices();
+      return response;
+    } catch (err: any) {
+      error.value = err.message || 'Failed to create invoice';
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     invoices,
     isLoading,
@@ -76,5 +91,6 @@ export const useInvoicesStore = defineStore('invoices', () => {
     fetchInvoices,
     setPage,
     resetFilters,
+    createInvoice,
   };
 });

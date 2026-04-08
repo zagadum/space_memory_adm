@@ -77,7 +77,7 @@
               </div>
             </td>
             <td>
-              <UiBadge variant="outline" size="sm">
+              <UiBadge variant="default" size="sm">
                 {{ invoice.project?.name || '—' }}
               </UiBadge>
             </td>
@@ -140,17 +140,21 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useInvoicesStore } from '@/stores/invoices.store';
-import { useProjectsStore } from '@/stores/projects.store';
-import { useGlobalSearchStore } from '@/stores/globalSearch.store';
-import UiButton from '@/components/ui/UiButton.vue';
-import UiBadge from '@/components/ui/UiBadge.vue';
-import { invoicesApi } from '@/api/invoices.api';
+import { useInvoicesStore } from '../../stores/invoices.store';
+import { useProjectsStore } from '../../stores/projects.store';
+import { useGlobalSearchStore } from '../../stores/globalSearch.store';
+import { useModalStore } from '../../stores/modal.store';
+import { useInvoicePermissions } from '../../composables/useInvoicePermissions';
+import UiButton from '../../components/ui/UiButton.vue';
+import UiBadge from '../../components/ui/UiBadge.vue';
+import { invoicesApi } from '../../api/invoices.api';
 
 const { t } = useI18n();
 const invoicesStore = useInvoicesStore();
 const projectsStore = useProjectsStore();
 const searchStore = useGlobalSearchStore();
+const modal = useModalStore();
+const { can, canEdit } = useInvoicePermissions();
 
 const activeActionId = ref<number | null>(null);
 
@@ -164,7 +168,7 @@ function formatDate(date: string) {
 }
 
 function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency }).format(amount);
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: currency || 'PLN' }).format(amount);
 }
 
 function getStatusVariant(status: string) {
@@ -174,13 +178,12 @@ function getStatusVariant(status: string) {
     case 'draft': return 'warning';
     case 'wystawiona':
     case 'sent': return 'info';
-    default: return 'outline';
+    default: return 'default';
   }
 }
 
 function handleCreateInvoice() {
-  // Logic to open create invoice modal
-  alert('Create invoice modal coming soon');
+  modal.open('invoice-create');
 }
 
 function downloadPdf(invoice: any) {
@@ -190,7 +193,7 @@ function downloadPdf(invoice: any) {
 }
 
 function viewDetails(invoice: any) {
-  alert(`Details for invoice ${invoice.number}`);
+  modal.open('invoice-preview', invoice);
   activeActionId.value = null;
 }
 
