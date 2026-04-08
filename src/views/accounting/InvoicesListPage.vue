@@ -23,11 +23,17 @@
             <div class="menu-item" @click="handleBulkKsef">
               🏛️ {{ t('faktury.sendToKsef') }}
             </div>
+            <div class="menu-item" @click="handleBulkPay">
+              💰 {{ t('faktury.markAsPaid') || 'Mark as Paid' }}
+            </div>
             <div class="menu-item dividing" @click="invoicesStore.bulkDownloadPDFs">
               📄 {{ t('faktury.downloadZip') || 'Download PDFs (ZIP)' }}
             </div>
+            <div class="menu-item" @click="handleAccountingExport">
+              📁 {{ t('faktury.accountingExport') || 'Accounting Export (XLSX)' }}
+            </div>
             <div class="menu-item" @click="invoicesStore.exportFilteredExcel">
-              📊 {{ t('faktury.exportSelected') || 'Export Selected (XLSX)' }}
+              📊 {{ t('faktury.exportSelected') || 'Standard Export' }}
             </div>
           </div>
         </div>
@@ -299,10 +305,33 @@ async function handleBulkKsef() {
 }
 
 async function handleBulkEmails() {
-  if (confirm(t('faktury.bulkEmailConfirm') || 'Send emails to all selected students?')) {
-    await invoicesStore.bulkSendEmails();
+  if (!confirm(t('faktury.bulkEmailConfirm') || 'Send emails to all selected students?')) return;
+  try {
+    await invoicesStore.bulkSendEmails(invoicesStore.selectedIds);
+    toast.success(t('common.success') || 'Success');
     isBulkMenuOpen.value = false;
+  } catch (err) {
+    toast.error(t('common.error') || 'Error');
   }
+}
+
+async function handleBulkPay() {
+  const date = new Date().toISOString().split('T')[0];
+  if (!confirm(t('faktury.markAsPaidConfirm') || 'Mark selected as paid today?')) return;
+  try {
+    await invoicesStore.bulkMarkAsPaid(invoicesStore.selectedIds, date);
+    toast.success(t('common.success'));
+    isBulkMenuOpen.value = false;
+    invoicesStore.selectedIds = [];
+  } catch (err) {
+    toast.error(t('common.error'));
+  }
+}
+
+function handleAccountingExport() {
+  const url = invoicesApi.getAccountingExportUrl(invoicesStore.filters);
+  window.open(url, '_blank');
+  isBulkMenuOpen.value = false;
 }
 
 function toggleBulkMenu() {

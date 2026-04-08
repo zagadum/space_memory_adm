@@ -194,6 +194,11 @@ export const INVOICES = {
   CORRECT: (id: number | string) => `invoices/${id}/correct`,
   NUMBER: (id: number | string) => `invoices/${id}/number`,
   EMAIL: (id: number | string) => `invoices/${id}/email`,
+  BULK_KSEF: 'invoices/bulk-ksef',
+  BULK_DOWNLOAD: 'invoices/bulk-download',
+  BULK_EMAIL: 'invoices/bulk-email',
+  BULK_PAY: 'invoices/bulk-pay',
+  EXPORT_ACCOUNTING: 'invoices/export-accounting',
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════

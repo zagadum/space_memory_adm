@@ -94,6 +94,38 @@
             </div>
 
             <div class="sp-section">
+              <div class="sp-section-title">{{ t('faktury.paymentDate') || 'Payment Status' }}</div>
+              <div class="info-card" :class="{ 'highlight-success': !!invoice.payment_date }">
+                <div class="info-row">
+                  <span class="info-label">{{ t('faktury.status') }}</span>
+                  <span class="info-value">
+                    <UiBadge v-if="invoice.payment_date" variant="success">
+                      {{ t('faktury.statuses.paid') }}
+                    </UiBadge>
+                    <UiBadge v-else variant="danger">
+                      {{ t('faktury.unpaid') || 'Unpaid' }}
+                    </UiBadge>
+                  </span>
+                </div>
+                <div class="info-row border-top pt-2" v-if="invoice.payment_date">
+                  <span class="info-label">{{ t('faktury.paymentDate') }}</span>
+                  <span class="info-value">{{ formatDate(invoice.payment_date) }}</span>
+                </div>
+                <div class="mt-2" v-if="!invoice.payment_date">
+                  <UiButton 
+                    variant="primary" 
+                    size="sm" 
+                    class="full-width" 
+                    :loading="isPaying"
+                    @click="handleMarkAsPaid"
+                  >
+                    💰 {{ t('faktury.markAsPaid') }}
+                  </UiButton>
+                </div>
+              </div>
+            </div>
+
+            <div class="sp-section">
               <div class="sp-section-title">KSeF</div>
               <div class="info-card" :class="invoice.ksef_status">
                 <div class="info-item">
@@ -184,6 +216,8 @@ const props = defineProps<{
   invoice: any | null;
   auditLogs: any[];
 }>();
+
+const isPaying = ref(false);
 
 const emit = defineEmits<{
   close: [];
@@ -276,6 +310,20 @@ function onCorrect() {
 
 function sendToKsef() {
   if (props.invoice) emit('sendToKsef', props.invoice.id);
+}
+
+async function handleMarkAsPaid() {
+  if (!props.invoice) return;
+  const date = new Date().toISOString().split('T')[0];
+  if (!confirm(t('faktury.markAsPaidConfirm') || 'Mark as paid today?')) return;
+  
+  isPaying.value = true;
+  try {
+    await invoicesApi.bulkPay([props.invoice.id], date);
+    emit('refresh');
+  } finally {
+    isPaying.value = false;
+  }
 }
 </script>
 

@@ -2455,7 +2455,12 @@
       "converted_to_fa": "Конвертировано в FA",
       "correction_created": "Создана корректировка",
       "email_sent": "Email отправлен"
-    }
+    },
+    "paymentDate": "Дата оплаты",
+    "markAsPaid": "Отметить оплаченным",
+    "markAsPaidConfirm": "Установите дату оплаты для выбранных счетов",
+    "accountingExport": "Реестр продаж (XLSX)",
+    "unpaid": "Не оплачен"
   }
 }
 

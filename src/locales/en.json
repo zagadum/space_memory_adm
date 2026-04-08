@@ -2443,6 +2443,11 @@
       "converted_to_fa": "Converted to FA",
       "correction_created": "Correction Issued",
       "email_sent": "Email Sent"
-    }
+    },
+    "paymentDate": "Payment Date",
+    "markAsPaid": "Mark as Paid",
+    "markAsPaidConfirm": "Set payment date for selected invoices",
+    "accountingExport": "Accounting Export (XLSX)",
+    "unpaid": "Unpaid"
   }
 }

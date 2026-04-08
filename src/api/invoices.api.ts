@@ -159,9 +159,27 @@ export const invoicesApi = {
     return data;
   },
 
-  async bulkSendEmails(ids: number[]): Promise<{ message: string }> {
-    const { data } = await http.post('/v1/invoices/bulk-email', { ids });
-    return data;
+  async bulkSendEmails(ids: number[]) {
+    const response = await http.post(endpoints.INVOICES.BULK_EMAIL, { ids });
+    return response.data;
+  },
+
+  async bulkPay(ids: number[], paymentDate: string) {
+    const response = await http.post(endpoints.INVOICES.BULK_PAY, {
+      ids,
+      payment_date: paymentDate
+    });
+    return response.data;
+  },
+
+  getAccountingExportUrl(filters: any) {
+    const params = new URLSearchParams();
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && value !== '') {
+        params.append(key, String(value));
+      }
+    });
+    return `${endpoints.INVOICES.EXPORT_ACCOUNTING}?${params.toString()}`;
   },
 
   async bulkDownloadPDFs(ids: number[]): Promise<void> {
