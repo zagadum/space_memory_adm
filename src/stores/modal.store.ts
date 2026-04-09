@@ -20,11 +20,23 @@ export type ModalId =
   | "consent-confirm"
   | "invite-lead"
   | "create-teacher"
-  | "invoice-create"
-  | "invoice-correct"
+  | "invoice-create-b2c"
+  | "invoice-create-b2b"
+  | "invoice-proforma"
+  | "invoice-preview-b2c"
+  | "invoice-preview-b2b"
+  | "invoice-preview-kor"
+  | "invoice-correct-b2c"
+  | "invoice-correct-b2b"
+  | "invoice-edit"
+  | "invoice-edit-number"
+  | "invoice-delete"
   | "invoice-email"
-  | "invoice-preview"
-  | "create-contractor";
+  | "invoice-export"
+  | "invoice-settings"
+  | "invoice-add-b2b"
+  | "create-contractor"
+  | "BulkGenerateInvoicesModal";
 
 export const useModalStore = defineStore("modal", {
   state: () => ({

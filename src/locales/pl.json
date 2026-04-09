@@ -2496,6 +2496,18 @@
       "correction_created": "Wystawiono korektę",
       "email_sent": "Email wysłany"
     },
+    "paidVsIssued": "Zapłacono vs Wystawiono",
+    "segments": {
+      "b2c": "Faktury B2C",
+      "b2b": "Faktury B2B"
+    },
+    "exportPanel": {
+      "title": "Eksport i pobieranie",
+      "xlsxHint": "Excel · księgowość",
+      "pdfHint": "ZIP · archiwum",
+      "comarchHint": "Import Optima",
+      "jpkHint": "XML · US"
+    },
     "paymentDate": "Data płatności",
     "markAsPaid": "Oznacz jako opłacone",
     "markAsPaidConfirm": "Ustaw datę płatności dla wybranych faktur",

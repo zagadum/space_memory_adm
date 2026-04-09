@@ -2437,11 +2437,14 @@
   },
   "faktury": {
     "stats": {
-      "monthlyTurnover": "Turnover (Month)",
-      "paidSum": "Paid",
-      "unpaidCount": "Unpaid",
-      "needAttention": "Need Attention",
-      "errorsDetected": "Errors Detected"
+      "issuedFA": "Issued FA",
+      "grossValue": "Gross Value",
+      "correctionsCount": "Corrections Count",
+      "refundsTotal": "Refunds Total",
+      "proformaCount": "Pro Forma Count",
+      "currentYear": "current year",
+      "refundedFA": "refunded via FK",
+      "pendingPF": "pending pro-formas"
     },
     "documentList": "Invoices List",
     "number": "Number",

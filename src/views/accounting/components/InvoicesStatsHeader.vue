@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useInvoicesStore } from '../../../stores/invoices.store'
 import UiCard from '../../../components/ui/UiCard.vue'
@@ -10,91 +9,77 @@ const store = useInvoicesStore()
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(amount || 0)
 }
-
-const paidPercent = computed(() => {
-  if (!store.grossMonthly) return 0
-  return Math.round((store.paidMonthly / store.grossMonthly) * 100)
-})
-
-const getRateVariant = (rate: number) => {
-  if (rate >= 90) return 'text-emerald-500'
-  if (rate >= 70) return 'text-amber-500'
-  return 'text-rose-500'
-}
 </script>
 
 <template>
   <div class="stats-grid">
-    <!-- Turnover -->
-    <UiCard class="stat-card glass platinum">
+    <!-- Issued FA -->
+    <UiCard class="stat-card glass">
       <div class="stat-icon-wrapper blue">
+        <span class="emoji-icon">📄</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{ t('faktury.stats.issuedFA') }}</span>
+        <div class="stat-value-row">
+          <span class="stat-value blue-text">{{ store.issuedCount }}</span>
+        </div>
+        <span class="stat-sub">{{ t('faktury.stats.currentYear') }}</span>
+      </div>
+    </UiCard>
+
+    <!-- Total Gross -->
+    <UiCard class="stat-card glass">
+      <div class="stat-icon-wrapper emerald">
         <span class="emoji-icon">💰</span>
       </div>
       <div class="stat-info">
-        <span class="stat-label">{{ t('faktury.stats.monthlyTurnover') }}</span>
+        <span class="stat-label">{{ t('faktury.stats.grossValue') }}</span>
         <div class="stat-value-row">
-          <span class="stat-value highlight">{{ formatCurrency(store.grossMonthly) }}</span>
+          <span class="stat-value emerald-text">{{ formatCurrency(store.grossTotal) }}</span>
         </div>
-        <span class="stat-sub">{{ store.stats?.month || '-' }}</span>
+        <span class="stat-sub">{{ t('faktury.stats.currentYear') }}</span>
       </div>
     </UiCard>
 
-    <!-- Paid -->
-    <UiCard class="stat-card glass">
-      <div class="stat-icon-wrapper emerald">
-        <span class="emoji-icon">✅</span>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">{{ t('faktury.stats.paidSum') }}</span>
-        <div class="stat-value-row">
-          <span class="stat-value">{{ formatCurrency(store.paidMonthly) }}</span>
-          <span class="stat-badge success">{{ paidPercent }}%</span>
-        </div>
-        <span class="stat-sub">{{ t('common.total') }}</span>
-      </div>
-    </UiCard>
-
-    <!-- Collection Rate -->
+    <!-- Corrections Count -->
     <UiCard class="stat-card glass">
       <div class="stat-icon-wrapper amber">
-        <span class="emoji-icon">📈</span>
+        <span class="emoji-icon">📝</span>
       </div>
       <div class="stat-info">
-        <span class="stat-label">{{ t('faktury.collectionRate') }}</span>
+        <span class="stat-label">{{ t('faktury.stats.correctionsCount') }}</span>
         <div class="stat-value-row">
-          <span class="stat-value" :class="getRateVariant(store.collectionRate)">{{ store.collectionRate }}%</span>
+          <span class="stat-value amber-text">{{ store.correctionsCount }}</span>
         </div>
-        <span class="stat-sub">{{ t('faktury.paidVsIssued') }}</span>
+        <span class="stat-sub">FK / FVK</span>
       </div>
     </UiCard>
 
-    <!-- Unpaid -->
+    <!-- Refunds Total -->
     <UiCard class="stat-card glass">
       <div class="stat-icon-wrapper rose">
+        <span class="emoji-icon">💸</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{ t('faktury.stats.refundsTotal') }}</span>
+        <div class="stat-value-row">
+          <span class="stat-value rose-text">{{ formatCurrency(store.refundsTotal) }}</span>
+        </div>
+        <span class="stat-sub">{{ t('faktury.stats.refundedFA') }}</span>
+      </div>
+    </UiCard>
+
+    <!-- Pro Forma -->
+    <UiCard class="stat-card glass">
+      <div class="stat-icon-wrapper purple">
         <span class="emoji-icon">⏳</span>
       </div>
       <div class="stat-info">
-        <span class="stat-label">{{ t('faktury.stats.unpaidCount') }}</span>
+        <span class="stat-label">{{ t('faktury.stats.proformaCount') }}</span>
         <div class="stat-value-row">
-          <span class="stat-value text-rose-500">{{ store.unpaidCount }}</span>
+          <span class="stat-value purple-text">{{ store.proformaCount }}</span>
         </div>
-        <span class="stat-sub">{{ t('faktury.stats.needAttention') }}</span>
-      </div>
-    </UiCard>
-
-    <!-- KSeF Health -->
-    <UiCard class="stat-card glass health-card" :class="{ 'has-errors': (store.stats?.ksef_error_count || 0) > 0 }">
-      <div class="stat-icon-wrapper" :class="(store.stats?.ksef_error_count || 0) === 0 ? 'emerald' : 'rose'">
-        <span class="emoji-icon">{{ (store.stats?.ksef_error_count || 0) === 0 ? '🛡️' : '⚠️' }}</span>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">KSeF Status</span>
-        <div class="stat-value-row">
-          <span class="stat-value">{{ store.stats?.ksef_error_count || 0 }}</span>
-        </div>
-        <span class="stat-sub">
-          {{ (store.stats?.ksef_error_count || 0) === 0 ? 'All systems nominal' : t('faktury.stats.errorsDetected') }}
-        </span>
+        <span class="stat-sub">{{ t('faktury.stats.pendingPF') }}</span>
       </div>
     </UiCard>
   </div>

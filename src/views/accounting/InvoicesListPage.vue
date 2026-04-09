@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter, useRoute } from 'vue-router'
 import { useInvoicesStore } from '../../stores/invoices.store'
 import { useProjectsStore } from '../../stores/projects.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import { useModalStore } from '../../stores/modal.store'
-import { invoicesApi } from '../../api/invoices.api'
+import { useInvoicePermissions } from '../../composables/useInvoicePermissions'
 import UiButton from '../../components/ui/UiButton.vue'
 import UiBadge from '../../components/ui/UiBadge.vue'
 import UiCard from '../../components/ui/UiCard.vue'
@@ -22,15 +22,21 @@ const searchStore = useGlobalSearchStore()
 const modal = useModalStore()
 const router = useRouter()
 const route = useRoute()
+const { can } = useInvoicePermissions()
 
+const activeTab = ref<'b2c' | 'b2b'>( (route.query.tab as any) || 'b2c' )
 const activeActionId = ref<number | null>(null)
 const selectedInvoice = ref<any | null>(null)
+
+// Permission check: Trainer/Teacher cannot access this module
+if (!can.viewModule.value) {
+  router.push('/')
+}
 
 // --- Lifecycle ---
 onMounted(async () => {
   loadFiltersFromUrl()
   await Promise.all([
-    projectsStore.fetchProjects(),
     invoicesStore.fetchInvoices(),
     invoicesStore.fetchStats()
   ])
@@ -62,6 +68,12 @@ const toggleSelectAll = () => {
   }
 }
 
+const switchTab = (tab: 'b2c' | 'b2b') => {
+  activeTab.value = tab
+  router.replace({ query: { ...route.query, tab } })
+  // In a real scenario, we might trigger a fetch with a specific type filter here
+}
+
 const getStatusVariant = (status: string) => {
   switch (status) {
     case 'paid': return 'success'
@@ -72,7 +84,7 @@ const getStatusVariant = (status: string) => {
     case 'sending':
     case 'pending': return 'warning'
     case 'error': return 'danger'
-    default: return 'neutral'
+    default: return 'default'
   }
 }
 
@@ -82,12 +94,12 @@ const formatCurrency = (amount: number, currency: string) => {
 
 const formatDate = (dateStr: string) => {
   if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString()
+  return new Date(dateStr).toLocaleDateString('pl-PL')
 }
 
 // --- Filter Sync ---
 const syncFiltersToUrl = () => {
-  const query: any = {}
+  const query: any = { tab: activeTab.value }
   Object.entries(invoicesStore.filters).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== '' && key !== 'page' && key !== 'per_page') {
       query[key] = value
@@ -126,236 +138,246 @@ const handleClickOutside = (event: MouseEvent) => {
     <!-- Stats Header -->
     <InvoicesStatsHeader />
 
-    <!-- Page Header & Main Toolbar -->
-    <div class="header-section">
+    <!-- Page Header -->
+    <div class="phdr">
       <div class="header-info">
-        <h1 class="title">{{ t('faktury.documentList') }}</h1>
-        <div class="subtitle-row">
-          <span class="count-badge">{{ invoicesStore.pagination.total }}</span>
-          <span class="subtitle">{{ t('common.total') }}</span>
-        </div>
+        <h1 class="ptitle">Faktury <span>GLS</span></h1>
+        <p class="psub">
+          B2C: automatyczne po Imoje · seria FA/[KOD]/RRRR/MM/NNN per projekt
+          &nbsp;·&nbsp; B2B: ręczne · seria FV/B2B/RRRR/MM/NNN (wspólna)
+        </p>
       </div>
 
       <div class="header-actions">
         <UiButton variant="neutral" @click="handleRefresh" :loading="invoicesStore.isLoading">
-          🔄
+          🔄 {{ t('common.refresh') }}
         </UiButton>
-        <UiButton variant="neutral" @click="invoicesStore.exportFilteredExcel">
-          📥 {{ t('faktury.exportXlsx') }}
-        </UiButton>
-        <UiButton variant="neutral" @click="modal.open('BulkGenerateInvoicesModal')">
-          ✨ {{ t('faktury.generateInvoices') }}
-        </UiButton>
-        <UiButton variant="primary" @click="modal.open('invoice-create')">
-          ➕ {{ t('faktury.createInvoice') }}
+        <UiButton v-if="can.manageSettings.value" variant="neutral" @click="modal.open('invoice-settings')">
+          ⚙️ {{ t('common.settings') }}
         </UiButton>
       </div>
     </div>
 
-    <!-- Filters Strip -->
-    <UiCard class="filters-card">
-      <div class="filters-layout">
-        <div class="search-box">
-          <UiInput 
-            v-model="invoicesStore.filters.search" 
-            :placeholder="t('faktury.searchPlaceholder')"
-            @input="invoicesStore.fetchInvoices"
-          >
-            <template #prefix>🔍</template>
-          </UiInput>
+    <!-- Segments Controls -->
+    <div class="seg-wrap">
+      <div class="seg">
+        <div 
+          class="sg" 
+          :class="{ act: activeTab === 'b2c' }" 
+          @click="switchTab('b2c')"
+        >
+          👥 {{ t('faktury.segments.b2c') }} <span class="count-pill">({{ invoicesStore.pagination.total }})</span>
         </div>
-
-        <div class="filter-controls">
-          <div class="control-group">
-            <select v-model="invoicesStore.filters.project_id" @change="invoicesStore.fetchInvoices" class="custom-select">
-              <option :value="undefined">{{ t('faktury.filterByProject') }}</option>
-              <option v-for="p in projectsStore.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <select v-model="invoicesStore.filters.status" @change="invoicesStore.fetchInvoices" class="custom-select">
-              <option :value="undefined">{{ t('faktury.filterByStatus') }}</option>
-              <option v-for="s in ['draft', 'wystawiona', 'sent', 'paid', 'cancelled', 'error']" :key="s" :value="s">
-                {{ t('faktury.statuses.' + s) }}
-              </option>
-            </select>
-          </div>
-
-          <div class="control-group">
-            <UiDateRangePicker 
-              v-model:startDate="invoicesStore.filters.date_from" 
-              v-model:endDate="invoicesStore.filters.date_to"
-              @change="invoicesStore.fetchInvoices"
-            />
-          </div>
-
-          <UiButton 
-            v-if="invoicesStore.hasActiveFilters" 
-            variant="ghost" 
-            size="sm" 
-            class="text-rose-500"
-            @click="invoicesStore.resetFilters"
-          >
-            {{ t('faktury.clearFilters') }}
-          </UiButton>
+        <div 
+          class="sg" 
+          :class="{ act: activeTab === 'b2b' }" 
+          @click="switchTab('b2b')"
+        >
+          🏢 {{ t('faktury.segments.b2b') }} <span class="badge-b2b">2 фирмы</span>
         </div>
       </div>
-    </UiCard>
+      
+      <div class="tab-actions">
+        <template v-if="activeTab === 'b2c'">
+          <UiButton variant="neutral" size="sm" @click="modal.open('invoice-proforma')">
+            📄 {{ t('faktury.proforma') }}
+          </UiButton>
+          <UiButton variant="primary" @click="modal.open('invoice-create-b2c')">
+            ➕ {{ t('faktury.createInvoice') }}
+          </UiButton>
+        </template>
+        <template v-else>
+          <UiButton variant="neutral" size="sm" @click="invoicesStore.exportFilteredExcel">
+            ⬇️ Eksport PDF
+          </UiButton>
+          <UiButton variant="primary" class="btn-amber" @click="modal.open('invoice-create-b2b')">
+            ➕ {{ t('faktury.createInvoice') }} B2B
+          </UiButton>
+        </template>
+      </div>
+    </div>
 
-    <!-- Table Section -->
-    <UiCard class="table-card">
-      <div class="table-wrapper" :class="{ 'is-loading': invoicesStore.isLoading }">
-        <table class="premium-table">
+    <!-- Filters Area -->
+    <div class="filter-bar">
+      <div class="sb">
+        <span class="si">🔍</span>
+        <input 
+          v-model="invoicesStore.filters.search" 
+          type="text" 
+          :placeholder="t('faktury.searchPlaceholder')"
+          @input="invoicesStore.fetchInvoices"
+        >
+      </div>
+      
+      <select v-model="invoicesStore.filters.project_id" @change="invoicesStore.fetchInvoices" class="fsel">
+        <option :value="undefined">{{ t('faktury.filterByProject') }}</option>
+        <option v-for="p in projectsStore.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+      </select>
+
+      <select v-model="invoicesStore.filters.status" @change="invoicesStore.fetchInvoices" class="fsel">
+        <option :value="undefined">{{ t('faktury.filterByStatus') }}</option>
+        <option v-for="s in ['draft', 'wystawiona', 'sent', 'paid', 'cancelled', 'error']" :key="s" :value="s">
+          {{ t('faktury.statuses.' + s) }}
+        </option>
+      </select>
+
+      <div class="dr">
+        <input type="date" v-model="invoicesStore.filters.date_from" @change="invoicesStore.fetchInvoices">
+        <span class="dr-sep">—</span>
+        <input type="date" v-model="invoicesStore.filters.date_to" @change="invoicesStore.fetchInvoices">
+      </div>
+    </div>
+
+    <!-- Premium Export Panel -->
+    <div class="export-panel">
+      <div class="export-title">
+        <span>📤</span> {{ t('faktury.exportPanel.title') }}
+        <span class="exp-count">— диапазон: <b>{{ invoicesStore.selectedIds.length }}</b> выбрано / <b>{{ invoicesStore.invoices.length }}</b> на странице</span>
+      </div>
+      <div class="exp-row">
+        <button class="exp-btn exp-xlsx" @click="invoicesStore.exportFilteredExcel">
+          📊 {{ t('faktury.exportXlsx') }} <span class="exp-hint">{{ t('faktury.exportPanel.xlsxHint') }}</span>
+        </button>
+        <button class="exp-btn exp-pdf" @click="invoicesStore.bulkDownloadPDFs">
+          📁 {{ t('faktury.exportPanel.pdfPackage') }} <span class="exp-hint">{{ t('faktury.exportPanel.pdfHint') }}</span>
+        </button>
+        <div class="exp-sep"></div>
+        <button class="exp-btn exp-comarch" @click="invoicesStore.exportFilteredExcel">
+          🏭 {{ t('faktury.exportPanel.comarchHint') }} <span class="exp-hint">Import Optima</span>
+        </button>
+        <button class="exp-btn exp-jpk" @click="invoicesStore.exportFilteredExcel">
+          🏛 {{ t('faktury.exportPanel.jpkHint') }} <span class="exp-hint">XML · US</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Invoices Table -->
+    <div class="inv-card">
+      <div class="table-container" :class="{ loading: invoicesStore.isLoading }">
+        <table class="inv-table">
           <thead>
             <tr>
-              <th class="selection-col">
+              <th class="cb-th">
                 <input 
                   type="checkbox" 
-                  class="custom-checkbox"
+                  class="hd-cb"
                   :checked="invoicesStore.selectedIds.length === invoicesStore.invoices.length && invoicesStore.invoices.length > 0"
                   @change="toggleSelectAll"
                 />
               </th>
               <th>{{ t('faktury.number') }}</th>
+              <th>{{ t('faktury.type') }}</th>
+              <th>{{ t('faktury.date') }}</th>
               <th>{{ t('faktury.buyer') }}</th>
+              <th>{{ t('faktury.project') }}</th>
               <th>{{ t('faktury.amount') }}</th>
               <th>{{ t('faktury.status') }}</th>
-              <th>{{ t('faktury.date') }}</th>
-              <th class="actions-col"></th>
+              <th style="width: 40px"></th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="invoicesStore.isLoading && !invoicesStore.invoices.length" v-for="i in 5" :key="i">
-              <td colspan="7"><div class="skeleton-row"></div></td>
+              <td colspan="9"><div class="skeleton-row"></div></td>
             </tr>
             <tr 
               v-else 
               v-for="invoice in invoicesStore.invoices" 
               :key="invoice.id" 
-              class="clickable-row"
-              :class="{ selected: invoicesStore.selectedIds.includes(invoice.id) }"
+              class="inv-row"
+              :class="{ 'row-sel': invoicesStore.selectedIds.includes(invoice.id) }"
               @click="handleRowClick(invoice)"
             >
-              <td class="selection-col" @click.stop>
+              <td class="cb-td" @click.stop>
                 <input 
                   type="checkbox" 
-                  class="custom-checkbox"
+                  class="row-cb"
                   :checked="invoicesStore.selectedIds.includes(invoice.id)"
                   @change="invoicesStore.toggleSelection(invoice.id)"
                 />
               </td>
               <td>
-                <div class="invoice-number">{{ invoice.number }}</div>
-                <div class="invoice-type-sub">
-                  <span class="type-tag">{{ invoice.document_type }}</span>
-                  <span class="project-tag">{{ invoice.project?.name }}</span>
-                </div>
+                <div class="inv-num" :class="invoice.document_type.toLowerCase()">{{ invoice.number }}</div>
               </td>
               <td>
-                <div class="buyer-cell">
-                  <span class="buyer-name">{{ invoice.buyer_name }}</span>
-                  <span v-if="invoice.buyer_tax_id" class="buyer-nip">NIP: {{ invoice.buyer_tax_id }}</span>
-                </div>
+                <span class="badge-type" :class="'b-' + invoice.document_type.toLowerCase()">
+                  {{ invoice.document_type }}
+                </span>
+              </td>
+              <td class="mono-text">{{ formatDate(invoice.issue_date) }}</td>
+              <td>
+                <div class="cli-name">{{ invoice.buyer_name }}</div>
+                <div class="cli-id" v-if="invoice.buyer_tax_id">NIP: {{ invoice.buyer_tax_id }}</div>
               </td>
               <td>
-                <div class="amount-cell">
-                  <span class="amount-gross">{{ formatCurrency(invoice.amount_gross, invoice.currency) }}</span>
-                  <span class="amount-net">{{ t('common.netto') }}: {{ formatCurrency(invoice.amount_net, invoice.currency) }}</span>
+                <span class="proj-tag" :class="'pt-' + invoice.project?.code.toLowerCase()">{{ invoice.project?.name }}</span>
+              </td>
+              <td>
+                <div class="amt" :class="{ neg: invoice.amount_gross < 0 }">
+                  {{ formatCurrency(invoice.amount_gross, invoice.currency) }}
                 </div>
               </td>
               <td>
                 <UiBadge :variant="getStatusVariant(invoice.ksef_status)">
                   {{ t('faktury.statuses.' + invoice.ksef_status) }}
                 </UiBadge>
+                <div v-if="(invoice.ksef_status as any) === 'paid'" class="paid-stamp">
+                  ✅ {{ t('faktury.paid') }}
+                </div>
               </td>
-              <td>
-                <span class="issue-date">{{ formatDate(invoice.issue_date) }}</span>
-              </td>
-              <td class="actions-col" @click.stop>
-                <div class="actions-wrap">
-                  <button class="action-trigger" @click.stop="activeActionId = activeActionId === invoice.id ? null : invoice.id">
-                    ⋮
-                  </button>
-                  <div v-if="activeActionId === invoice.id" class="action-dropdown shadow-lg">
-                    <button @click="handleRowClick(invoice)" class="dropdown-item">
-                      📄 {{ t('faktury.viewDetails') }}
-                    </button>
-                    <button 
-                      v-if="['draft', 'error'].includes(invoice.ksef_status)"
-                      @click="invoicesStore.sendToKsef(invoice.id)" 
-                      class="dropdown-item text-blue-500"
-                    >
-                      🚀 {{ t('faktury.sendToKsef') }}
-                    </button>
-                    <button @click="() => {}" class="dropdown-item">
-                      📥 {{ t('faktury.downloadPdf') }}
-                    </button>
+              <td class="actions-wrap" @click.stop>
+                <div class="dd-wrap">
+                  <button class="dd-btn" @click.stop="activeActionId = activeActionId === invoice.id ? null : invoice.id">⋯</button>
+                  <div v-if="activeActionId === invoice.id" class="dd-menu open">
+                    <div class="dditem" @click="handleRowClick(invoice)">👁 {{ t('faktury.viewDetails') }}</div>
+                    <div class="dditem" @click="modal.open('invoice-email', invoice)">✉ {{ t('faktury.sendEmail') }}</div>
+                    <div class="dditem dditem-am" v-if="can.createInvoice.value" @click="modal.open('invoice-correct-b2c', invoice)">FK {{ t('faktury.correct') }}</div>
+                    <div class="separator"></div>
+                    <div class="dditem" @click="modal.open('invoice-edit', invoice)">✏ {{ t('common.edit') }}</div>
+                    <div class="dditem dditem-red" v-if="can.deleteInvoice.value" @click="modal.open('invoice-delete', invoice)">🗑 {{ t('common.delete') }}</div>
                   </div>
                 </div>
               </td>
             </tr>
             <tr v-if="!invoicesStore.isLoading && !invoicesStore.invoices.length">
-              <td colspan="7" class="empty-state">
-                <div class="empty-icon">📁</div>
+              <td colspan="9" class="empty-state">
+                <div class="na-ico">📁</div>
+                <div class="na-title">Brak faktur</div>
                 <p>{{ t('common.noData') }}</p>
               </td>
             </tr>
           </tbody>
         </table>
-      </div>
 
-      <!-- Pagination Footer -->
-      <div class="pagination-footer" v-if="invoicesStore.pagination.total > 0">
-        <div class="page-info">
-          {{ (invoicesStore.pagination.currentPage - 1) * invoicesStore.pagination.perPage + 1 }}-{{ Math.min(invoicesStore.pagination.currentPage * invoicesStore.pagination.perPage, invoicesStore.pagination.total) }} 
-          <span class="dim">/ {{ invoicesStore.pagination.total }}</span>
-        </div>
-        <div class="page-controls">
-          <UiButton 
-            variant="ghost" 
-            size="sm" 
-            :disabled="invoicesStore.pagination.currentPage <= 1"
-            @click="invoicesStore.setPage(invoicesStore.pagination.currentPage - 1)"
-          >
-            ←
-          </UiButton>
-          <span class="current-page">{{ invoicesStore.pagination.currentPage }} / {{ invoicesStore.pagination.lastPage }}</span>
-          <UiButton 
-            variant="ghost" 
-            size="sm" 
-            :disabled="invoicesStore.pagination.currentPage >= invoicesStore.pagination.lastPage"
-            @click="invoicesStore.setPage(invoicesStore.pagination.currentPage + 1)"
-          >
-            →
-          </UiButton>
+        <!-- Pagination -->
+        <div class="pag">
+          <div class="pag-info">
+             {{ (invoicesStore.pagination.currentPage - 1) * invoicesStore.pagination.perPage + 1 }}-{{ Math.min(invoicesStore.pagination.currentPage * invoicesStore.pagination.perPage, invoicesStore.pagination.total) }} 
+             / {{ invoicesStore.pagination.total }}
+          </div>
+          <div class="pag-btns">
+            <button class="pb" :disabled="invoicesStore.pagination.currentPage <= 1" @click="invoicesStore.setPage(invoicesStore.pagination.currentPage - 1)">‹</button>
+            <button 
+              v-for="page in Math.min(invoicesStore.pagination.lastPage, 5)" 
+              :key="page" 
+              class="pb" 
+              :class="{ act: page === invoicesStore.pagination.currentPage }"
+              @click="invoicesStore.setPage(page)"
+            >{{ page }}</button>
+            <button class="pb" :disabled="invoicesStore.pagination.currentPage >= invoicesStore.pagination.lastPage" @click="invoicesStore.setPage(invoicesStore.pagination.currentPage + 1)">›</button>
+          </div>
         </div>
       </div>
-    </UiCard>
+    </div>
 
-    <!-- Bulk Toolbar -->
+    <!-- Selection Toolbar (Bottom) -->
     <Transition name="slide-up">
-      <div v-if="invoicesStore.selectedIds.length > 0" class="bulk-toolbar-fixed">
-        <div class="bulk-content">
-          <div class="bulk-info">
-            <span class="selection-indicator">{{ invoicesStore.selectedIds.length }}</span>
-            <span class="selection-label">{{ t('common.selected') }}</span>
-          </div>
-          <div class="divider" />
-          <div class="bulk-actions-row">
-            <UiButton variant="primary" size="sm" @click="invoicesStore.bulkSendToKsef">
-              🚀 {{ t('faktury.sendToKsef') }}
-            </UiButton>
-            <UiButton variant="neutral" size="sm" @click="invoicesStore.bulkSendEmails">
-              📧 Email
-            </UiButton>
-            <UiButton variant="neutral" size="sm" @click="invoicesStore.bulkDownloadPDFs">
-              📦 ZIP
-            </UiButton>
-            <UiButton variant="ghost" size="sm" @click="invoicesStore.clearSelection">
-              ✕ {{ t('common.cancel') }}
-            </UiButton>
-          </div>
+      <div v-if="invoicesStore.selectedIds.length > 0" class="sel-bar show">
+        <span class="sel-bar-n">✔ {{ t('common.selected') }}: <span>{{ invoicesStore.selectedIds.length }}</span></span>
+        <div class="sel-bar-acts">
+           <button class="exp-btn exp-xlsx" style="background: white" @click="invoicesStore.exportFilteredExcel">📊 XLSX</button>
+           <button class="exp-btn exp-pdf" style="background: white" @click="invoicesStore.bulkDownloadPDFs">📁 PDF</button>
+           <button class="btn btn-primary btn-sm" @click="modal.open('invoice-email')">✉ Email</button>
+           <button class="btn btn-ghost btn-sm" @click="invoicesStore.clearSelection">✕ {{ t('common.cancel') }}</button>
         </div>
       </div>
     </Transition>
@@ -366,128 +388,131 @@ const handleClickOutside = (event: MouseEvent) => {
       :audit-logs="invoicesStore.auditLogs"
       @close="selectedInvoice = null"
       @refresh="handleRefresh"
-      @convert="invoicesStore.convertProforma"
-      @send-to-ksef="invoicesStore.sendToKsef"
     />
   </div>
 </template>
 
 <style scoped>
 .invoices-page {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  max-width: 1600px;
+  padding: 0 24px 80px;
+  max-width: 1400px;
   margin: 0 auto;
+  font-family: 'Outfit', sans-serif;
 }
 
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* Page Header */
+.phdr { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 28px 0 16px; }
+.ptitle { font-size: 24px; font-weight: 900; letter-spacing: -0.4px; color: var(--app-text-main); }
+.ptitle span { background: linear-gradient(90deg, #4f6ef7, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.psub { font-size: 11px; color: var(--app-text-dim); margin-top: 3px; line-height: 1.6; max-width: 600px; }
 
-.title { font-size: 24px; font-weight: 800; color: var(--app-text-main); margin: 0; }
-.subtitle-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
-.count-badge { font-size: 11px; font-weight: 700; background: var(--app-card-hi); color: var(--app-primary); padding: 2px 8px; border-radius: 6px; }
-.subtitle { font-size: 13px; color: var(--app-text-dim); }
+.header-actions { display: flex; gap: 8px; }
 
-.header-actions { display: flex; gap: 10px; }
+/* Segments */
+.seg-wrap { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.seg { display: flex; gap: 4px; background: var(--app-card-hi); border: 1px solid var(--app-border); border-radius: 11px; padding: 4px; width: fit-content; }
+.sg { padding: 7px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--app-text-dim); cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.sg.act { background: var(--app-card); color: var(--app-primary); border: 1px solid rgba(79, 110, 247, 0.28); box-shadow: 0 1px 4px rgba(79, 110, 247, 0.1); }
+.count-pill { font-size: 10px; opacity: 0.65; }
+.badge-b2b { background: rgba(245, 158, 11, 0.2); color: #d97706; padding: 1px 6px; border-radius: 10px; font-size: 10px; font-weight: 800; }
 
-/* Filters */
-.filters-card { padding: 16px; border: 1px solid var(--app-border); background: var(--app-card); }
-.filters-layout { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
-.search-box { flex: 1; max-width: 320px; }
-.filter-controls { display: flex; align-items: center; gap: 12px; }
+.tab-actions { display: flex; gap: 8px; align-items: center; }
+.btn-amber { background: linear-gradient(135deg, #f59e0b, #f97316); color: #fff; border: none; }
 
-.custom-select {
-  background: var(--app-card-hi);
-  border: 1px solid var(--app-border);
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-size: 13px;
-  color: var(--app-text-main);
-  outline: none;
-  min-width: 160px;
-  transition: border-color 0.2s;
-}
-.custom-select:focus { border-color: var(--app-primary); }
+/* Filter Bar */
+.filter-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+.sb { flex: 1; min-width: 220px; position: relative; }
+.sb input { width: 100%; padding: 8px 12px 8px 34px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 9px; font-size: 13px; color: var(--app-text-main); font-family: 'Outfit', sans-serif; outline: none; }
+.si { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--app-text-dim); }
+.fsel { padding: 7px 24px 7px 10px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 9px; font-size: 13px; color: var(--app-text-main); font-family: 'Outfit', sans-serif; outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%2364748b' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; min-width: 140px; }
+.dr { display: flex; align-items: center; gap: 5px; }
+.dr input { width: 120px; padding: 7px 9px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 9px; font-size: 12px; font-family: 'Space Mono', monospace; }
+.dr-sep { font-size: 12px; color: var(--app-text-dim); }
+
+/* Export Panel */
+.export-panel { background: var(--app-card-hi); border: 1.5px solid var(--app-border); border-radius: 14px; padding: 14px 16px; margin-bottom: 14px; }
+.export-title { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--app-text-dim); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.export-title b { color: var(--app-primary); font-family: 'Space Mono', monospace; }
+.exp-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.exp-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid var(--app-border); font-family: 'Outfit', sans-serif; transition: all 0.18s; white-space: nowrap; background: var(--app-card); color: var(--app-text-main); }
+.exp-hint { font-size: 10px; opacity: 0.5; margin-left: 2px; font-weight: 400; }
+.exp-xlsx { border-color: #10b98133; color: #059669; }
+.exp-xlsx:hover { background: #10b98111; border-color: #10b981; }
+.exp-pdf { border-color: #ef444433; color: #dc2626; }
+.exp-pdf:hover { background: #ef444411; border-color: #ef4444; }
+.exp-sep { width: 1px; height: 24px; background: var(--app-border); margin: 0 4px; }
 
 /* Table Section */
-.table-card { border: 1px solid var(--app-border); padding: 0; overflow: hidden; background: var(--app-card); }
-.table-wrapper { position: relative; }
+.inv-card { background: var(--app-card); border: 1px solid var(--app-border); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+.table-container { position: relative; }
+.inv-table { width: 100%; border-collapse: collapse; }
+.inv-table thead { background: var(--app-card-hi); }
+.inv-table th { padding: 12px 16px; font-size: 10px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--app-text-dim); text-align: left; border-bottom: 1px solid var(--app-border); }
+.inv-table td { padding: 14px 16px; border-bottom: 1px solid var(--app-border); font-size: 13px; vertical-align: middle; transition: background 0.1s; }
+.inv-row { cursor: pointer; }
+.inv-row:hover td { background: var(--app-bg); }
+.row-sel td { background: rgba(79, 110, 247, 0.05) !important; }
 
-.premium-table { width: 100%; border-collapse: collapse; text-align: left; }
-.premium-table th { background: var(--app-card-hi); padding: 14px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--app-text-dim); letter-spacing: 0.05em; }
-.premium-table td { padding: 16px 20px; border-top: 1px solid var(--app-border); }
+.cb-th, .cb-td { width: 40px; text-align: center; }
+.hd-cb, .row-cb { width: 16px; height: 16px; accent-color: var(--app-primary); cursor: pointer; }
 
-.clickable-row { cursor: pointer; transition: background 0.15s; }
-.clickable-row:hover { background: rgba(79, 110, 247, 0.03); }
-.clickable-row.selected { background: rgba(79, 110, 247, 0.06); }
+.inv-num { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--app-primary); }
+.inv-num.fk { color: #d97706; }
+.inv-num.cancelled { color: var(--app-text-dim); text-decoration: line-through; }
 
-.selection-col { width: 44px; text-align: center; }
-.custom-checkbox { width: 16px; height: 16px; accent-color: var(--app-primary); cursor: pointer; }
+.cli-name { font-weight: 700; color: var(--app-text-main); }
+.cli-id { font-size: 11px; color: var(--app-text-dim); margin-top: 1px; }
 
-.invoice-number { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 14px; color: var(--app-text-main); }
-.invoice-type-sub { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
-.type-tag { font-size: 10px; font-weight: 800; color: var(--app-primary); background: rgba(79, 110, 247, 0.1); padding: 1px 4px; border-radius: 4px; }
-.project-tag { font-size: 11px; color: var(--app-text-dim); }
+.badge-type { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 5px; }
+.b-fa { background: #4f6ef71a; color: #4f6ef7; }
+.b-fk { background: #f59e0b1a; color: #d97706; }
+.b-pro { background: #8b5cf61a; color: #7c3aed; }
 
-.buyer-cell { display: flex; flex-direction: column; }
-.buyer-name { font-weight: 600; font-size: 14px; color: var(--app-text-main); }
-.buyer-nip { font-size: 11px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
+.proj-tag { font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--app-card-hi); color: var(--app-text-dim); border: 1px solid var(--app-border); }
+.pt-space { color: #4f6ef7; border-color: #4f6ef744; }
 
-.amount-cell { display: flex; flex-direction: column; }
-.amount-gross { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--app-text-main); }
-.amount-net { font-size: 11px; color: var(--app-text-dim); }
+.amt { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 14px; }
+.amt.neg { color: #dc2626; }
 
-.issue-date { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--app-text-dim); }
+.paid-stamp { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: #059669; margin-top: 4px; font-family: 'Space Mono', monospace; }
 
-.actions-col { width: 60px; text-align: center; }
-.action-trigger { padding: 6px; border-radius: 8px; color: var(--app-text-dim); transition: all 0.2s; font-size: 20px; line-height: 1; }
-.action-trigger:hover { background: var(--app-card-hi); color: var(--app-text-main); }
+/* Dropdown */
+.dd-wrap { position: relative; display: flex; justify-content: center; }
+.dd-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--app-border); background: var(--app-bg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--app-text-dim); transition: all 0.15s; }
+.dd-btn:hover { background: var(--app-card-hi); color: var(--app-primary); border-color: var(--app-primary); }
+.dd-menu { position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 12px; width: 220px; z-index: 100; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+.dditem { padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--app-text-main); cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: all 0.1s; }
+.dditem:hover { background: var(--app-card-hi); }
+.dditem-am { color: #d97706; }
+.dditem-red { color: #dc2626; }
+.separator { height: 1px; background: var(--app-border); margin: 6px 0; }
 
-.actions-wrap { position: relative; display: flex; justify-content: center; }
-.action-dropdown {
-  position: absolute; right: 0; top: 100%; margin-top: 8px;
-  background: var(--app-card); border: 1px solid var(--app-border);
-  border-radius: 12px; width: 180px; z-index: 100;
-  padding: 6px; display: flex; flex-direction: column;
-}
-.dropdown-item {
-  padding: 10px 12px; font-size: 13px; border-radius: 8px; color: var(--app-text-dim);
-  display: flex; align-items: center; gap: 10px; transition: all 0.15s;
-}
-.dropdown-item:hover { background: var(--app-card-hi); color: var(--app-text-main); }
+/* Pagination */
+.pag { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-top: 1px solid var(--app-border); }
+.pag-info { font-size: 12px; color: var(--app-text-dim); font-weight: 600; }
+.pag-btns { display: flex; gap: 6px; }
+.pb { min-width: 32px; height: 32px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--app-border); background: var(--app-bg); font-size: 12px; font-weight: 700; color: var(--app-text-dim); cursor: pointer; transition: all 0.15s; font-family: 'Space Mono', monospace; }
+.pb.act { background: var(--app-primary); color: white; border-color: var(--app-primary); }
+.pb:hover:not(.act):not(:disabled) { border-color: var(--app-primary); color: var(--app-primary); }
+.pb:disabled { opacity: 0.4; cursor: default; }
 
-.pagination-footer { padding: 16px 24px; border-top: 1px solid var(--app-border); display: flex; justify-content: space-between; align-items: center; }
-.page-info { font-size: 13px; color: var(--app-text-main); font-weight: 600; }
-.dim { color: var(--app-text-dim); font-weight: 400; }
-.page-controls { display: flex; align-items: center; gap: 16px; }
-.current-page { font-size: 13px; font-weight: 600; color: var(--app-primary); }
-
-.skeleton-row { height: 60px; background: linear-gradient(90deg, var(--app-card-hi) 25%, var(--app-border) 50%, var(--app-card-hi) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; }
-@keyframes skeleton-loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
-
-.empty-state { text-align: center; padding: 64px !important; color: var(--app-text-dim); }
-.empty-icon { font-size: 40px; margin-bottom: 12px; }
-
-/* Bulk Toolbar */
-.bulk-toolbar-fixed {
-  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
-  background: var(--app-bg); border: 1px solid var(--app-border);
-  border-radius: 20px; padding: 12px 24px; z-index: 500;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-}
-.bulk-content { display: flex; align-items: center; gap: 20px; }
-.bulk-info { display: flex; align-items: center; gap: 8px; }
-.selection-indicator { background: var(--app-primary); color: white; border-radius: 6px; padding: 2px 8px; font-weight: 700; font-size: 13px; }
-.selection-label { font-size: 14px; font-weight: 600; color: var(--app-text-dim); }
-.divider { width: 1px; height: 24px; background: var(--app-border); }
-.bulk-actions-row { display: flex; gap: 10px; }
+/* Selection Bar */
+.sel-bar { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #eff6ff; border: 1.5px solid #4f6ef755; border-radius: 12px; padding: 12px 24px; display: none; align-items: center; gap: 24px; z-index: 1000; box-shadow: 0 12px 40px rgba(79, 110, 247, 0.2); }
+.sel-bar.show { display: flex; }
+.sel-bar-n { font-size: 14px; font-weight: 800; color: #1e40af; }
+.sel-bar-acts { display: flex; gap: 8px; }
 
 /* Transitions */
 .slide-up-enter-active, .slide-up-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 .slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translate(-50%, 40px); }
+
+/* Skeleton */
+.skeleton-row { height: 64px; background: linear-gradient(90deg, var(--app-bg) 25%, var(--app-card-hi) 50%, var(--app-bg) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; margin: 4px; }
+@keyframes skeleton-loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.empty-state { padding: 80px !important; text-align: center; }
+.na-ico { font-size: 48px; margin-bottom: 12px; }
+.na-title { font-size: 20px; font-weight: 800; color: var(--app-text-main); margin-bottom: 8px; }
+
+.mono-text { font-family: 'Space Mono', monospace; font-size: 12px; }
 </style>

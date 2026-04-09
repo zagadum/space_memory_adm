@@ -18,17 +18,21 @@
   <ConsentConfirmModal v-else-if="openId==='consent-confirm'" />
   <InviteLeadModal v-else-if="openId==='invite-lead'" />
   <CreateTeacherModal v-else-if="openId==='create-teacher'" />
-  <InvoiceCreateModal v-else-if="openId==='invoice-create'" />
-  <InvoiceCorrectModal v-else-if="openId==='invoice-correct'" :invoice="modal.payload.invoice" />
-  <SendEmailModal v-else-if="openId==='invoice-email'" :invoice="modal.payload.invoice" />
-  <InvoicePreviewModal v-else-if="openId==='invoice-preview'" />
+  <InvoiceCreateModal v-else-if="openId==='invoice-create-b2c'" mode="b2c" />
+  <InvoiceCreateModal v-else-if="openId==='invoice-create-b2b'" mode="b2b" />
+  <InvoiceCreateModal v-else-if="openId==='invoice-proforma'" mode="b2c" is-proforma />
+  <InvoiceCorrectModal v-else-if="openId==='invoice-correct-b2c'" :invoice="modal.payload" mode="b2c" />
+  <InvoiceCorrectModal v-else-if="openId==='invoice-correct-b2b'" :invoice="modal.payload" mode="b2b" />
+  <InvoicePreviewModal v-else-if="openId==='invoice-preview-b2c'" :invoice="modal.payload" />
+  <InvoicePreviewModal v-else-if="openId==='invoice-preview-b2b'" :invoice="modal.payload" />
+  <SendEmailModal v-else-if="openId==='invoice-email'" :invoice="modal.payload" />
+  <BulkGenerateInvoicesModal v-else-if="openId==='BulkGenerateInvoicesModal'" />
   <CreateContractorModal
     v-else-if="openId==='create-contractor'"
-    :contractor="modal.payload.contractor"
-    :on-success="modal.payload.onSuccess"
+    :contractor="modal.payload?.contractor"
+    :on-success="modal.payload?.onSuccess"
     @close="modal.close"
   />
-  <BulkGenerateInvoicesModal v-else-if="openId==='BulkGenerateInvoicesModal'" />
 </template>
 
 <script setup lang="ts">

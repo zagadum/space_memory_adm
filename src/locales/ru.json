@@ -62,6 +62,7 @@
     "settingsTariffs": "Тарифы и скидки",
     "settingsUsers": "Доступы",
     "settingsSys": "Система",
+    "accounting": "Бухгалтерия",
     "faktury": "Счета (Faktury)",
     "ustawienia": "Настройки (Ustawienia)",
     "indigoTechniques": "Techniki INDIGO",
@@ -2445,11 +2446,14 @@
   },
   "faktury": {
     "stats": {
-      "monthlyTurnover": "Оборот (Месяц)",
-      "paidSum": "Оплачено",
-      "unpaidCount": "Неоплачено",
-      "needAttention": "Требуют внимания",
-      "errorsDetected": "Обнаружены ошибки"
+      "issuedFA": "Выставлено FA",
+      "grossValue": "Сумма Brutto",
+      "correctionsCount": "Корректировки FK",
+      "refundsTotal": "Сумма возвратов",
+      "proformaCount": "Счета Pro Forma",
+      "currentYear": "текущий год",
+      "refundedFA": "возвраты по FK",
+      "pendingPF": "активные проформы"
     },
     "documentList": "Список счетов",
     "number": "Номер",
@@ -2526,8 +2530,20 @@
     "fetchEligibleStudents": "Найти подходящих студентов",
     "noStudentsDue": "Нет студентов, которым нужно выставить счет в этом периоде",
     "studentsFound": "Найдено студентов",
-    "collectionRate": "Процент сборов",
-    "paidVsIssued": "Оплачено vs Выставлено"
+    "paidVsIssued": "Оплачено vs Выставлено",
+    "segments": {
+      "b2c": "Счета B2C",
+      "b2b": "Счета B2B"
+    },
+    "proforma": "Проформа",
+    "exportPanel": {
+      "title": "Экспорт и выгрузка",
+      "xlsxHint": "Excel · бухгалтерия",
+      "pdfPackage": "Пакет PDF",
+      "pdfHint": "ZIP · архив",
+      "comarchHint": "Import Optima",
+      "jpkHint": "XML · Налоговая"
+    }
   },
   "cohorts": {
     "title": "Когортный анализ оплат",

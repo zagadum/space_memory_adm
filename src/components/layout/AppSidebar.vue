@@ -43,7 +43,7 @@
       <!-- МОЙ КАБИНЕТ -->
       <div 
         v-if="isVisible('my-cabinet')"
-        class="nav-standalone nav-item--stub"
+        class="nav-standalone"
         :class="[{ active: activeItem === 'my-cabinet' }, accessClass('my-cabinet')]"
         @click="navigateTo('my-cabinet', '/my-cabinet')"
       >
@@ -54,7 +54,7 @@
       <!-- ДАШБОРД -->
       <div
         v-if="isVisible('dashboard')"
-        class="nav-standalone nav-item--stub"
+        class="nav-standalone"
         :class="[{ active: activeItem === 'dashboard' }, accessClass('dashboard')]"
         @click="setActive('dashboard')"
       >
@@ -164,10 +164,10 @@
         <div v-if="isVisible('trainer-dashboard')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-dashboard' }" @click="navigateTo('trainer-dashboard', '/trainer/dashboard')">
           <span class="nav-icon">📊</span> {{ t('sidebar.trainerDashboard') }}
         </div>
-        <div v-if="isVisible('trainer-students')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-students' }" @click="navigateTo('trainer-students', '/trainer/students')">
+        <div v-if="isVisible('trainer-students')" class="nav-item" :class="[{ active: activeItem === 'trainer-students' }, accessClass('trainer-students')]" @click="navigateTo('trainer-students', '/trainer/students')">
           <span class="nav-icon">👩‍🎓</span> {{ t('sidebar.trainerStudents') }}
         </div>
-        <div v-if="isVisible('trainer-groups')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'trainer-groups' }" @click="navigateTo('trainer-groups', '/trainer/groups')">
+        <div v-if="isVisible('trainer-groups')" class="nav-item" :class="[{ active: activeItem === 'trainer-groups' }, accessClass('trainer-groups')]" @click="navigateTo('trainer-groups', '/trainer/groups')">
           <span class="nav-icon">🎓</span> {{ t('sidebar.trainerGroups') }}
         </div>
         <div v-if="isVisible('lesson-tracker')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'lesson-tracker' }" @click="navigateTo('lesson-tracker', '/trainer/lesson-tracker')">
@@ -305,7 +305,7 @@
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('accounting')" class="nav-children" :class="{ open: openSections.accounting }">
-        <div v-if="isVisible('faktury')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'faktury' }" @click="navigateTo('faktury', '/accounting/faktury')">
+        <div v-if="isVisible('faktury')" class="nav-item" :class="[{ active: activeItem === 'faktury' }, accessClass('faktury')]" @click="navigateTo('faktury', '/accounting/faktury')">
           <span class="nav-icon">🧾</span> {{ t('sidebar.faktury') }}
         </div>
         <div v-if="isVisible('returns')" class="nav-item" :class="[{ active: activeItem === 'returns' }, accessClass('returns')]" @click="navigateTo('returns', '/finance/returns')">
@@ -318,7 +318,7 @@
         <div v-if="isVisible('salary-calculator')" class="nav-item" :class="[{ active: activeItem === 'salary-calculator' }, accessClass('salary-calculator')]" @click="navigateTo('salary-calculator', '/finance/salary-calculator')">
           <span class="nav-icon">🧮</span> {{ t('sidebar.salaryCalculator') }}
         </div>
-        <div v-if="isVisible('finance-ustawienia')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'settings' }" @click="navigateTo('settings', '/finance/settings-ustawienia', 'finance-ustawienia')">
+        <div v-if="isVisible('finance-ustawienia')" class="nav-item" :class="[{ active: activeItem === 'settings' }, accessClass('finance-ustawienia')]" @click="navigateTo('settings', '/finance/settings-ustawienia', 'finance-ustawienia')">
           <span class="nav-icon">🔧</span> {{ t('sidebar.ustawienia') }}
         </div>
       </div>

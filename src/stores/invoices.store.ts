@@ -15,10 +15,12 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const debtors = ref<any[]>([]);
   
   // Stats individual refs for easier shortcut access
-  const grossMonthly = ref(0);
-  const paidMonthly = ref(0);
-  const collectionRate = ref(0);
-  const unpaidCount = ref(0);
+  // Mockup-aligned stats
+  const issuedCount = ref(0);
+  const grossTotal = ref(0);
+  const correctionsCount = ref(0);
+  const refundsTotal = ref(0);
+  const proformaCount = ref(0);
   
   const pagination = reactive({
     currentPage: 1,
@@ -260,10 +262,11 @@ export const useInvoicesStore = defineStore('invoices', () => {
   async function fetchStats() {
     try {
       const data = await invoicesApi.getStats(filters);
-      grossMonthly.value = data.gross_total_monthly;
-      paidMonthly.value = data.paid_total_monthly;
-      collectionRate.value = data.collection_rate || 0;
-      unpaidCount.value = data.unpaid_count;
+      issuedCount.value = data.issued_count || 0;
+      grossTotal.value = data.gross_total || 0;
+      correctionsCount.value = data.corrections_count || 0;
+      refundsTotal.value = data.refunds_total || 0;
+      proformaCount.value = data.proforma_count || 0;
     } catch (e) {
       console.error('Failed to fetch stats', e);
     }
@@ -368,10 +371,11 @@ export const useInvoicesStore = defineStore('invoices', () => {
     fetchStats,
     bulkGenerate,
     batchStatusUpdate,
-    grossMonthly,
-    paidMonthly,
-    collectionRate,
-    unpaidCount,
+    issuedCount,
+    grossTotal,
+    correctionsCount,
+    refundsTotal,
+    proformaCount,
     debtors,
     fetchDebtors,
     sendReminders
