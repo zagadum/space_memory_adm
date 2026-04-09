@@ -12,6 +12,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const selectedIds = ref<number[]>([]);
   const auditLogs = ref<any[]>([]);
   const stats = ref<any>(null);
+  const debtors = ref<any[]>([]);
   
   // Stats individual refs for easier shortcut access
   const grossMonthly = ref(0);
@@ -308,6 +309,33 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function fetchDebtors(projectId?: number) {
+    isLoading.value = true;
+    try {
+      const res = await invoicesApi.getDebtors(projectId);
+      debtors.value = res.debtors;
+      return res;
+    } catch (e: any) {
+      error.value = e.response?.data?.message || 'Failed to fetch debtors';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function sendReminders(params: { student_ids?: number[], project_id?: number }) {
+    isLoading.value = true;
+    try {
+      const res = await invoicesApi.sendReminders(params);
+      return res;
+    } catch (e: any) {
+      error.value = e.response?.data?.message || 'Failed to send reminders';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   return {
     invoices,
     isLoading,
@@ -343,6 +371,9 @@ export const useInvoicesStore = defineStore('invoices', () => {
     grossMonthly,
     paidMonthly,
     collectionRate,
-    unpaidCount
+    unpaidCount,
+    debtors,
+    fetchDebtors,
+    sendReminders
   };
 });

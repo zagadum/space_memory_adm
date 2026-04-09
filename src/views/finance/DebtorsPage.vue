@@ -4,15 +4,19 @@
     <div class="stats-grid" v-if="debtorsStore.stats">
       <div class="stat-card">
         <div class="stat-label">{{ t('finance.totalDebtors') || 'Total Debtors' }}</div>
-        <div class="stat-value">{{ debtorsStore.stats.total_debtors_count }}</div>
+        <div class="stat-value">{{ debtorsStore.stats.total_debtors_count || 0 }}</div>
       </div>
       <div class="stat-card debt">
         <div class="stat-label">{{ t('finance.totalDebtSum') || 'Total Debt Sum' }}</div>
-        <div class="stat-value">{{ formatCurrency(debtorsStore.stats.total_debt_amount) }}</div>
+        <div class="stat-value">{{ formatCurrency(debtorsStore.stats.total_debt_amount || 0) }}</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">{{ t('finance.invoiceDebt') || 'Invoice Debt' }}</div>
-        <div class="stat-value">{{ formatCurrency(debtorsStore.stats.invoice_debt) }}</div>
+        <div class="stat-value">{{ formatCurrency(debtorsStore.stats.invoice_debt || 0) }}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">{{ t('finance.proformaDebt') || 'Proforma Debt' }}</div>
+        <div class="stat-value">{{ formatCurrency(debtorsStore.stats.proforma_debt || 0) }}</div>
       </div>
     </div>
 
@@ -21,7 +25,7 @@
       <div class="toolbar-left">
         <div class="section-title">
           {{ t('finance.debtorsList') || 'Debtors List' }}
-          <span class="section-count">{{ debtorsStore.pagination.total }}</span>
+          <span class="section-count">{{ debtorsStore.debtors.length }}</span>
         </div>
       </div>
       <div class="toolbar-right">
@@ -33,6 +37,16 @@
           </option>
         </select>
 
+        <UiButton 
+          v-if="debtorsStore.debtors.length > 0"
+          variant="primary" 
+          size="sm" 
+          @click="handleSendBulkReminders"
+          :loading="debtorsStore.isLoading"
+        >
+          📧 {{ t('common.remindAll') || 'Remind All' }}
+        </UiButton>
+
         <UiInput 
           v-model="debtorsStore.filters.search" 
           :placeholder="t('common.search')"
@@ -43,15 +57,15 @@
       </div>
     </div>
 
-    <!-- Table Container -->
+    <!-- ... table container ... -->
     <div class="table-container">
       <table>
         <thead>
           <tr>
             <th>{{ t('faktury.buyer') }}</th>
-            <th>{{ t('faktury.project') }}</th>
             <th>{{ t('common.balance') || 'Balance' }}</th>
             <th>{{ t('finance.invoiceDebt') || 'Invoice Debt' }}</th>
+            <th>{{ t('finance.proformaDebt') || 'Proforma Debt' }}</th>
             <th>{{ t('finance.totalDebt') || 'Total Debt' }}</th>
             <th>{{ t('finance.overdueCount') || 'Overdue' }}</th>
             <th>{{ t('finance.lastInvoice') || 'Last Invoice' }}</th>
@@ -76,16 +90,12 @@
               </div>
             </td>
             <td>
-              <UiBadge variant="default" size="sm">
-                {{ debtor.project?.name || '—' }}
-              </UiBadge>
-            </td>
-            <td>
               <span :class="{ 'text-danger': debtor.balance < 0 }">
                 {{ formatCurrency(debtor.balance) }}
               </span>
             </td>
             <td>{{ formatCurrency(debtor.invoice_debt) }}</td>
+            <td>{{ formatCurrency(debtor.proforma_debt || 0) }}</td>
             <td>
               <div class="total-debt-cell">
                 <span class="debt-amount">{{ formatCurrency(debtor.total_debt) }}</span>
@@ -120,12 +130,12 @@
     <!-- Pagination -->
     <div class="pagination-footer" v-if="debtorsStore.pagination.total > 0">
       <div class="pagination-info">
-        {{ (debtorsStore.pagination.currentPage - 1) * debtorsStore.pagination.perPage + 1 }}-{{ Math.min(debtorsStore.pagination.currentPage * debtorsStore.pagination.perPage, debtorsStore.pagination.total) }} / {{ debtorsStore.pagination.total }}
+        1-{{ debtorsStore.debtors.length }} / {{ debtorsStore.pagination.total }}
       </div>
       <div class="pagination-controls">
-        <button class="dropdown-filter-btn" :disabled="debtorsStore.pagination.currentPage <= 1" @click="debtorsStore.setPage(debtorsStore.pagination.currentPage - 1)">←</button>
-        <span class="section-count">{{ debtorsStore.pagination.currentPage }} / {{ debtorsStore.pagination.lastPage }}</span>
-        <button class="dropdown-filter-btn" :disabled="debtorsStore.pagination.currentPage >= debtorsStore.pagination.lastPage" @click="debtorsStore.setPage(debtorsStore.pagination.currentPage + 1)">→</button>
+        <button class="dropdown-filter-btn" disabled>←</button>
+        <span class="section-count">1 / 1</span>
+        <button class="dropdown-filter-btn" disabled>→</button>
       </div>
     </div>
   </div>
@@ -136,7 +146,7 @@ import { onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useDebtorsStore } from '../../stores/debtors.store';
 import { useProjectsStore } from '../../stores/projects.store';
-import { useModalStore } from '../../stores/modal.store';
+import { useNotificationStore } from '../../stores/notification.store';
 import UiButton from '../../components/ui/UiButton.vue';
 import UiBadge from '../../components/ui/UiBadge.vue';
 import UiInput from '../../components/ui/UiInput.vue';
@@ -144,12 +154,10 @@ import UiInput from '../../components/ui/UiInput.vue';
 const { t } = useI18n();
 const debtorsStore = useDebtorsStore();
 const projectsStore = useProjectsStore();
-const modal = useModalStore();
+const notifications = useNotificationStore();
 
 onMounted(async () => {
-  await projectsStore.fetchProjects();
   await debtorsStore.fetchDebtors();
-  await debtorsStore.fetchStats();
 });
 
 function formatDate(dateStr?: string) {
@@ -169,14 +177,31 @@ function handleSearch() {
   }, 400);
 }
 
-function handleSendReminder(debtor: any) {
-  modal.open('invoice-email', { 
-    invoice: { 
-      id: debtor.id, // Proxy for student logic or specific invoice logic
-      student: debtor 
-    } 
-  });
+async function handleSendReminder(debtor: any) {
+  try {
+    await debtorsStore.sendReminders({ 
+      student_ids: [debtor.id],
+      project_id: debtorsStore.filters.project_id
+    });
+    notifications.addToast(t('common.success'), 'success');
+  } catch (e) {
+    notifications.addToast(t('common.error'), 'error');
+  }
 }
+
+async function handleSendBulkReminders() {
+  if (!confirm(t('common.confirmAction'))) return;
+
+  try {
+    await debtorsStore.sendReminders({ 
+      project_id: debtorsStore.filters.project_id
+    });
+    notifications.addToast(t('common.success'), 'success');
+  } catch (e) {
+    notifications.addToast(t('common.error'), 'error');
+  }
+}
+</script>
 </script>
 
 <style scoped>

@@ -160,13 +160,21 @@
       "thursday": "Thursday",
       "friday": "Friday",
       "sunday": "Sunday"
-    }
+    },
+    "remind": "Remind",
+    "remindAll": "Remind All",
+    "balance": "Balance",
+    "success": "Success",
+    "error": "Error",
+    "confirmAction": "Are you sure?",
+    "noData": "No data found"
   },
   "finance": {
     "totalDebtors": "Total Debtors",
-    "totalDebtSum": "Total Debt Amount",
-    "invoiceDebt": "Invoice Debt",
+    "totalDebtSum": "Total Debt Sum",
+    "invoiceDebt": "Debt (FA)",
     "subscriptionDebt": "Subscription Debt",
+    "proformaDebt": "Debt (Proforma)",
     "debtorsList": "Debtors List",
     "totalDebt": "Total Debt",
     "overdueCount": "Overdue",
@@ -2411,7 +2419,8 @@
       "paidSum": "Paid",
       "unpaidCount": "Unpaid",
       "needAttention": "Need Attention",
-      "errorsDetected": "Errors Detected"
+      "errorsDetected": "Errors Detected",
+      "topCohort": "Best cohort"
     },
     "documentList": "Invoices List",
     "exportXlsx": "Export XLSX",
@@ -2424,8 +2433,25 @@
     "studentsFound": "Students Found",
     "generateSelected": "Generate {count} Invoices",
     "bulkSuccessMessage": "Successfully created {count} draft invoices.",
-    "collectionRate": "Collection Rate",
-    "paidVsIssued": "Paid vs Issued",
+    "proformaDebt": "Debt (Proforma)",
+    "debtorsList": "Debtors List",
+    "totalDebtors": "Total Debtors",
+    "totalDebtSum": "Total Debt Sum",
+    "invoiceDebt": "Debt (FA)",
+    "overdueCount": "Overdue",
+    "lastInvoice": "Last Invoice",
+    "totalDebt": "Total Debt"
+  },
+  "common": {
+    "remind": "Remind",
+    "remindAll": "Remind All",
+    "success": "Success",
+    "error": "Error",
+    "confirmAction": "Are you sure?",
+    "noData": "No data found",
+    "balance": "Balance"
+  },
+  "invoiceFields": {
     "number": "Number",
     "buyer": "Buyer",
     "amount": "Amount",

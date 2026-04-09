@@ -127,21 +127,20 @@
     "welcome": "Привіт, {name}! 👋",
     "retry": "Спробувати ще раз",
     "search": "Пошук",
-    "days": {
-      "monday": "Понеділок",
-      "tuesday": "Вівторок",
-      "wednesday": "Середа",
-      "thursday": "Четвер",
-      "friday": "П'ятниця",
-      "saturday": "Субота",
-      "sunday": "Неділя"
-    }
+    "remind": "Нагадати",
+    "remindAll": "Нагадати всім",
+    "balance": "Баланс",
+    "success": "Успішно",
+    "error": "Помилка",
+    "confirmAction": "Ви впевнені?",
+    "noData": "Даних не знайдено"
   },
   "finance": {
     "totalDebtors": "Усього боржників",
     "totalDebtSum": "Загальна сума боргу",
-    "invoiceDebt": "Борг за рахунками",
+    "invoiceDebt": "Борг (Фактури)",
     "subscriptionDebt": "Борг за абонементом",
+    "proformaDebt": "Борг (Проформа)",
     "debtorsList": "Список боржників",
     "totalDebt": "Разом борг",
     "overdueCount": "Прострочених",

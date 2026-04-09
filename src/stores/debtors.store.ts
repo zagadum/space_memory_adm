@@ -25,15 +25,12 @@ export const useDebtorsStore = defineStore('debtors', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await invoicesApi.getDebtors({
-        ...filters,
-        page: pagination.currentPage,
-        per_page: pagination.perPage,
-      });
-      debtors.value = response.data;
-      pagination.currentPage = response.meta.current_page;
-      pagination.lastPage = response.meta.last_page;
-      pagination.total = response.meta.total;
+      const response = await invoicesApi.getDebtors(filters.project_id);
+      debtors.value = response.debtors;
+      stats.value = response.summary;
+      // Note: Backend debtors currently returns array without pagination wrapper for simpler view, 
+      // but if we add pagination later we'll update this.
+      pagination.total = response.debtors.length;
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch debtors';
     } finally {
@@ -42,16 +39,26 @@ export const useDebtorsStore = defineStore('debtors', () => {
   }
 
   async function fetchStats() {
+    // Already unified in fetchDebtors for this specific implementation
+    if (!stats.value) await fetchDebtors();
+  }
+
+  async function sendReminders(params: { student_ids?: number[], project_id?: number }) {
+    isLoading.value = true;
     try {
-      stats.value = await invoicesApi.getDebtorsStats(filters);
-    } catch (e) {
-      console.error('Failed to fetch debtor stats', e);
+      return await invoicesApi.sendReminders(params);
+    } catch (err: any) {
+      error.value = err.message || 'Failed to send reminders';
+      throw err;
+    } finally {
+      isLoading.value = false;
     }
   }
 
   async function fetchOverpayments() {
     isLoading.value = true;
     try {
+      // Assuming existing finance/overpayments endpoint exists on backend
       const response = await invoicesApi.getOverpayments({
         ...filters,
         page: pagination.currentPage,
@@ -80,6 +87,7 @@ export const useDebtorsStore = defineStore('debtors', () => {
     fetchDebtors,
     fetchStats,
     fetchOverpayments,
+    sendReminders,
     setPage,
   };
 });

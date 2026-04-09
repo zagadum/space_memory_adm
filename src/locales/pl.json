@@ -126,20 +126,20 @@
     "searchHint": "Szukaj po imieniu, telefonie...",
     "welcome": "Cześć, {name}! 👋",
     "search": "Szukaj",
-    "days": {
-      "monday": "Poniedziałek",
-      "tuesday": "Wtorek",
-      "wednesday": "Środa",
-      "thursday": "Czwartek",
-      "friday": "Piątek",
-      "sunday": "Niedziela"
-    }
+    "remind": "Przypomnij",
+    "remindAll": "Przypomnij wszystkim",
+    "balance": "Saldo",
+    "success": "Sukces",
+    "error": "Błąd",
+    "confirmAction": "Czy jesteś pewien?",
+    "noData": "Nie znaleziono danych"
   },
   "finance": {
     "totalDebtors": "Wszystkich dłużników",
     "totalDebtSum": "Całkowita kwota długu",
     "invoiceDebt": "Dług z faktur",
     "subscriptionDebt": "Dług z abonamentu",
+    "proformaDebt": "Dług (Proforma)",
     "debtorsList": "Lista dłużników",
     "totalDebt": "Suma zadłużenia",
     "overdueCount": "Przeterminowane",

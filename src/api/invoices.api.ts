@@ -78,6 +78,7 @@ export interface Debtor {
   group?: { group: string };
   balance: number;
   invoice_debt: number;
+  proforma_debt: number;
   total_debt: number;
   overdue_invoices_count: number;
   last_invoice_date?: string;
@@ -266,7 +267,17 @@ export const invoicesApi = {
   },
 
   async batchStatusUpdate(params: { ids: number[], status: string, reason?: string }) {
-    const { data } = await http.post(`${endpoints.INVOICES.BASE}/bulk/status`, params);
+    const { data } = await http.post(`${endpoints.INVOICES.BATCH_STATUS}`, params);
+    return data;
+  },
+
+  async getDebtors(projectId?: number) {
+    const { data } = await http.get(`${endpoints.INVOICES.DEBTORS}`, { params: { project_id: projectId } });
+    return data;
+  },
+
+  async sendReminders(params: { student_ids?: number[], project_id?: number }) {
+    const { data } = await http.post(`${endpoints.INVOICES.REMIND}`, params);
     return data;
   },
 
@@ -346,10 +357,6 @@ export const invoicesApi = {
     if (filters.date_from) params.append('date_from', filters.date_from);
     if (filters.date_to) params.append('date_to', filters.date_to);
     return `/v1/invoices/export-jpk?${params.toString()}`;
-  },
-
-  async getDebtors(filters: any = {}): Promise<DebtorsResponse> {
-    return (await http.get('/v1/finance/debtors', { params: filters })).data;
   },
 
   async getDebtorsStats(filters: any = {}): Promise<any> {

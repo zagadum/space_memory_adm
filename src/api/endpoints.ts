@@ -198,6 +198,9 @@ export const INVOICES = {
   BULK_DOWNLOAD: 'invoices/bulk-download',
   BULK_EMAIL: 'invoices/bulk-email',
   BULK_PAY: 'invoices/bulk-pay',
+  BATCH_STATUS: 'invoices/bulk/status',
+  DEBTORS: 'invoices/debtors',
+  REMIND: 'invoices/remind',
   EXPORT_ACCOUNTING: 'invoices/export-accounting',
 } as const;
 
