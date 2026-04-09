@@ -39,7 +39,8 @@
     "studentFinance": "Счета учеников",
     "debtors": "Должники",
     "nadplaty": "Переплаты",
-    "accounting": "Бухгалтерия",
+    "contractors": "Контрагенты",
+    "cohorts": "Когортный анализ",
     "qualityMonitoring": "Отдел Качества",
     "quality": "Отдел Качества",
     "rezygnacje": "Отказы",
@@ -78,8 +79,7 @@
     "trainerMaterials": "Учебные материалы",
     "trainerExam": "Экзаменация",
     "trainerMail": "Почта / Уведомления",
-    "financeSettings": "Настройки финансов",
-    "cohorts": "Когортный анализ"
+    "financeSettings": "Настройки финансов"
   },
   "app": {
     "title": "GLS · Платежи",
@@ -152,12 +152,26 @@
     "lastInvoice": "Последний счет",
     "overpaymentsList": "Список переплат",
     "overpayment": "Переплата",
-    "totalCredit": "Итого на балансе"
+    "totalCredit": "Итого на балансе",
+    "contractorsSubtitle": "Управление базой контрагентов для B2B счетов",
+    "addContractor": "Добавить контрагента",
+    "editContractor": "Редактировать контрагента",
+    "companyInfo": "Данные компании",
+    "contractorName": "Название компании",
+    "companyPlaceholder": "ООО 'Пример'",
+    "contactInfo": "Контактные данные",
+    "location": "Адрес регистрации",
+    "street": "Улица",
+    "city": "Город",
+    "zipCode": "Почтовый индекс",
+    "taxId": "ИНН",
+    "lookup": "Найти в GUS"
   },
   "search": {
     "students": "Поиск по ученикам...",
     "groups": "Поиск по группам...",
     "teachers": "Поиск по учителям...",
+    "contractors": "Поиск контрагентов...",
     "leads": "Поиск по лидам (имя, телефон)...",
     "projects": "Поиск по проектам...",
     "refunds": "Поиск по возвратам...",

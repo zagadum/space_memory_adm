@@ -103,6 +103,35 @@ export interface OverpaymentsResponse {
   };
 }
 
+export interface Contractor {
+  id: number;
+  name: string;
+  tax_id?: string;
+  regon?: string;
+  krs?: string;
+  email?: string;
+  phone?: string;
+  street?: string;
+  house_number?: string;
+  flat_number?: string;
+  city?: string;
+  zip_code?: string;
+  country: string;
+  project_id?: number;
+  is_active: boolean;
+  notes?: string;
+  created_at?: string;
+}
+
+export interface ContractorsResponse {
+  data: Contractor[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    total: number;
+  };
+}
+
 export const invoicesApi = {
   /**
    * Fetch paginated invoices with filters
@@ -304,5 +333,25 @@ export const invoicesApi = {
 
   async getOverpayments(filters: any = {}): Promise<OverpaymentsResponse> {
     return (await http.get('/v1/finance/overpayments', { params: filters })).data;
+  },
+
+  async getContractors(filters: any = {}): Promise<ContractorsResponse> {
+    return (await http.get('/v1/finance/kontrahenci', { params: filters })).data;
+  },
+
+  async getContractorById(id: number | string): Promise<Contractor> {
+    return (await http.get(`/v1/finance/kontrahenci/${id}`)).data;
+  },
+
+  async createContractor(data: Partial<Contractor>): Promise<Contractor> {
+    return (await http.post('/v1/finance/kontrahenci', data)).data;
+  },
+
+  async updateContractor(id: number | string, data: Partial<Contractor>): Promise<Contractor> {
+    return (await http.patch(`/v1/finance/kontrahenci/${id}`, data)).data;
+  },
+
+  async deleteContractor(id: number | string): Promise<void> {
+    await http.delete(`/v1/finance/kontrahenci/${id}`);
   }
 };

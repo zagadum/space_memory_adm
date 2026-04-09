@@ -21,6 +21,30 @@
       </button>
     </div>
 
+    <!-- Contractor Search (B2B only) -->
+    <div v-if="mode === 'b2b'" class="search-section">
+      <div class="popup-label">{{ t('finance.contractorName') }} / NIP</div>
+      <div class="search-container">
+        <input 
+          class="popup-input" 
+          v-model="contractorSearch" 
+          @input="onContractorSearch"
+          :placeholder="t('search.contractors')"
+        />
+        <div v-if="contractorSearchResults.length > 0" class="search-results">
+          <div 
+            v-for="c in contractorSearchResults" 
+            :key="c.id" 
+            class="search-item" 
+            @click="selectContractor(c)"
+          >
+            <span class="s-name">{{ c.name }}</span>
+            <span class="s-email">{{ c.tax_id }} | {{ c.city }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Student Search (B2C only) -->
     <div v-if="mode === 'b2c'" class="search-section">
       <div class="popup-label">{{ t('info.fullName') }}</div>
@@ -161,24 +185,27 @@ import UiButton from '../../components/ui/UiButton.vue';
 import { useModalStore } from '../../stores/modal.store';
 import { useInvoicesStore } from '../../stores/invoices.store';
 import { useProjectsStore } from '../../stores/projects.store';
+import { useContractorsStore } from '../../stores/contractors.store';
 import { getStudents } from '../../api/studentApi';
 
 const { t } = useI18n();
 const modal = useModalStore();
 const invoicesStore = useInvoicesStore();
 const projectsStore = useProjectsStore();
+const contractorsStore = useContractorsStore();
 
 const mode = ref<'b2c' | 'b2b'>('b2c');
 const loading = ref(false);
 const lookupLoading = ref(false);
 const error = ref<string | null>(null);
 
-const studentSearch = ref('');
-const searchResults = ref<any[]>([]);
+const contractorSearch = ref('');
+const contractorSearchResults = ref<any[]>([]);
 let searchTimeout: any = null;
 
 const form = reactive({
   student_id: null as number | null,
+  contractor_id: null as number | null,
   project_id: projectsStore.projects[0] ? parseInt(projectsStore.projects[0].id) : 1,
   project_code: projectsStore.projects[0]?.code || 'SPACE',
   document_type: 'FA',
@@ -242,12 +269,41 @@ async function onStudentSearch() {
   }, 400);
 }
 
+const studentSearch = ref('');
+const searchResults = ref<any[]>([]);
+
+async function onContractorSearch() {
+  if (contractorSearch.value.length < 3) {
+    contractorSearchResults.value = [];
+    return;
+  }
+  if (searchTimeout) clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(async () => {
+    try {
+      contractorSearchResults.value = await contractorsStore.searchContractors(contractorSearch.value);
+    } catch (e) {
+      console.error(e);
+    }
+  }, 400);
+}
+
 function selectStudent(student: any) {
   form.student_id = student.id;
   form.buyer_name = student.name;
   form.buyer_address = student.address || '';
   studentSearch.value = student.name;
   searchResults.value = [];
+}
+
+function selectContractor(contractor: any) {
+  form.contractor_id = contractor.id;
+  form.buyer_name = contractor.name;
+  form.buyer_tax_id = contractor.tax_id || '';
+  // Format address from components
+  const addr = `${contractor.street} ${contractor.house_number}${contractor.flat_number ? '/' + contractor.flat_number : ''}, ${contractor.zip_code} ${contractor.city}`;
+  form.buyer_address = addr.trim();
+  contractorSearch.value = contractor.name;
+  contractorSearchResults.value = [];
 }
 
 function close() {

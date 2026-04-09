@@ -39,7 +39,8 @@
     "studentFinance": "Finanse uczniów",
     "debtors": "Dłużnicy",
     "nadplaty": "Nadpłaty",
-    "accounting": "Księgowość",
+    "contractors": "Kontrahenci",
+    "cohorts": "Analiza kohortowa",
     "qualityMonitoring": "Dział Jakości",
     "quality": "Dział Jakości",
     "rezygnacje": "Rezygnacje",
@@ -78,8 +79,7 @@
     "trainerMaterials": "Materiały szkoleniowe",
     "trainerExam": "Egzaminacja",
     "trainerMail": "Poczta / Powiadomienia",
-    "financeSettings": "Ustawienia finansowe",
-    "cohorts": "Analiza kohortowa"
+    "financeSettings": "Ustawienia finansowe"
   },
   "app": {
     "title": "GLS · Płatności",
@@ -146,12 +146,26 @@
     "lastInvoice": "Ostatnia faktura",
     "overpaymentsList": "Lista nadpłat",
     "overpayment": "Nadpłata",
-    "totalCredit": "Suma na balansie"
+    "totalCredit": "Łącznie na saldzie",
+    "contractorsSubtitle": "Zarządzaj bazą kontrahentów B2B dla faktur",
+    "addContractor": "Dodaj kontrahenta",
+    "editContractor": "Edytuj kontrahenta",
+    "companyInfo": "Dane firmy",
+    "contractorName": "Nazwa firmy",
+    "companyPlaceholder": "Firma Sp. z o.o.",
+    "contactInfo": "Dane kontaktowe",
+    "location": "Adres rejestrowy",
+    "street": "Ulica",
+    "city": "Miasto",
+    "zipCode": "Kod pocztowy",
+    "taxId": "NIP",
+    "lookup": "Szukaj w GUS"
   },
   "search": {
     "students": "Szukaj uczniów...",
     "groups": "Szukaj grup...",
     "teachers": "Szukaj nauczycieli...",
+    "contractors": "Szukaj kontrahentów...",
     "leads": "Szukaj leadów (imię, telefon)...",
     "projects": "Szukaj projektów...",
     "refunds": "Szukaj zwrotów...",

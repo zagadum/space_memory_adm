@@ -64,6 +64,8 @@
     "studentFinance": "Student Finance",
     "debtors": "Debtors",
     "nadplaty": "Overpayments",
+    "contractors": "Contractors",
+    "cohorts": "Cohort Analysis",
     "accounting": "Accounting",
     "qualityMonitoring": "Quality Department",
     "quality": "Quality Department",
@@ -103,8 +105,7 @@
     "trainerMaterials": "Training Materials",
     "trainerExam": "Examination",
     "trainerMail": "Mail / Notifications",
-    "financeSettings": "Finance Settings",
-    "cohorts": "Cohort Analysis"
+    "financeSettings": "Finance Settings"
   },
   "app": {
     "title": "GLS · Payments",
@@ -172,12 +173,26 @@
     "lastInvoice": "Last Invoice",
     "overpaymentsList": "Overpayments List",
     "overpayment": "Overpayment",
-    "totalCredit": "Total Credit"
+    "totalCredit": "Total Credit",
+    "contractorsSubtitle": "Manage B2B contractor database for invoicing",
+    "addContractor": "Add Contractor",
+    "editContractor": "Edit Contractor",
+    "companyInfo": "Company Information",
+    "contractorName": "Company Name",
+    "companyPlaceholder": "Example Ltd",
+    "contactInfo": "Contact Information",
+    "location": "Registration Address",
+    "street": "Street",
+    "city": "City",
+    "zipCode": "ZIP Code",
+    "taxId": "Tax ID",
+    "lookup": "Lookup in GUS"
   },
   "search": {
     "students": "Search students...",
     "groups": "Search groups...",
-    "teachers": "Search teachers...",
+    "teachers": "Search by teachers...",
+    "contractors": "Search contractors...",
     "leads": "Search leads (name, phone)...",
     "projects": "Search projects...",
     "refunds": "Search refunds...",

@@ -281,6 +281,9 @@
           <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
           <span class="nav-badge cyan">3</span>
         </div>
+        <div v-if="isVisible('contractors')" class="nav-item" :class="{ active: activeItem === 'contractors' }" @click="navigateTo('contractors', '/finance/contractors')">
+          <span class="nav-icon">🏢</span> {{ t('sidebar.contractors') }}
+        </div>
         <div v-if="isVisible('cohorts')" class="nav-item" :class="[{ active: activeItem === 'cohorts' }, accessClass('cohorts')]" @click="navigateTo('cohorts', '/finance/cohorts')">
           <span class="nav-icon">📊</span> {{ t('sidebar.cohorts') }}
         </div>

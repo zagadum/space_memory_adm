@@ -227,6 +227,7 @@ export const router = createRouter({
         { path: 'finance/students', name: 'finance-students', component: () => import('../views/errors/ComingSoonPage.vue') },
         { path: 'finance/debtors', name: 'finance-debtors', component: () => import('../views/finance/DebtorsPage.vue'), meta: { title: 'finance.debtors', icon: '🔴' } },
         { path: 'finance/nadplaty', name: 'finance-nadplaty', component: () => import('../views/finance/OverpaymentsPage.vue'), meta: { title: 'finance.overpayments', icon: '🟢' } },
+        { path: 'finance/contractors', name: 'finance-contractors', component: () => import('../views/finance/ContractorsListPage.vue'), meta: { title: 'sidebar.contractors', icon: '🏢' } },
         { path: 'finance/settings-ustawienia', name: 'finance-ustawienia', component: () => import('../views/finance/settings/SettingsIndex.vue') },
         { path: 'accounting/faktury', name: 'accounting-faktury', component: () => import('../views/accounting/InvoicesListPage.vue'), meta: { title: 'sidebar.faktury', icon: '🧾' } },
         { path: 'quality/rezygnacje', name: 'quality-rezygnacje', component: () => import('../views/errors/ComingSoonPage.vue') },

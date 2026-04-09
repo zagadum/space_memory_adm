@@ -22,6 +22,12 @@
   <InvoiceCorrectModal v-else-if="openId==='invoice-correct'" :invoice="modal.payload.invoice" />
   <SendEmailModal v-else-if="openId==='invoice-email'" :invoice="modal.payload.invoice" />
   <InvoicePreviewModal v-else-if="openId==='invoice-preview'" />
+  <CreateContractorModal
+    v-else-if="openId==='CreateContractorModal'"
+    :contractor="modal.payload.contractor"
+    :on-success="modal.payload.onSuccess"
+    @close="modal.close"
+  />
 </template>
 
 <script setup lang="ts">
@@ -51,6 +57,7 @@ import InvoiceCorrectModal from "./templates/InvoiceCorrectModal.vue";
 import SendEmailModal from "./templates/SendEmailModal.vue";
 import InvoiceSidePanel from "../views/accounting/components/InvoiceSidePanel.vue"; // Though usually it's not a modal, but checking if it's there
 import InvoicePreviewModal from "./templates/InvoicePreviewModal.vue";
+import CreateContractorModal from "./finance/CreateContractorModal.vue";
 
 const modal = useModalStore();
 const { openId } = storeToRefs(modal);

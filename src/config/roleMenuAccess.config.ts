@@ -118,7 +118,7 @@ const IMPORT_DB_ACTIONS: string[] = [
 ];
 
 const FINANCE: string[] = [
-  "finance", "student-finance", "debtors", "nadplaty", "cohorts", "settings",
+  "finance", "student-finance", "debtors", "nadplaty", "contractors", "cohorts", "settings",
 ];
 
 const ACCOUNTING: string[] = [

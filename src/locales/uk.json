@@ -38,6 +38,8 @@
     "studentFinance": "Рахунки учнів",
     "debtors": "Боржники",
     "nadplaty": "Переплати",
+    "contractors": "Контрагенти",
+    "cohorts": "Когортний аналіз",
     "accounting": "Бухгалтерія",
     "qualityMonitoring": "Відділ Якості",
     "quality": "Відділ Якості",
@@ -77,8 +79,7 @@
     "trainerMaterials": "Навчальні матеріали",
     "trainerExam": "Екзамінація",
     "trainerMail": "Пошта / Сповіщення",
-    "financeSettings": "Налаштування фінансів",
-    "cohorts": "Когортний аналіз"
+    "financeSettings": "Налаштування фінансів"
   },
   "app": {
     "title": "GLS · Платежі",
@@ -147,12 +148,26 @@
     "lastInvoice": "Останній рахунок",
     "overpaymentsList": "Список переплат",
     "overpayment": "Переплата",
-    "totalCredit": "Разом на балансі"
+    "totalCredit": "Разом на балансі",
+    "contractorsSubtitle": "Керування базою контрагентів для B2B рахунків",
+    "addContractor": "Додати контрагента",
+    "editContractor": "Редагувати контрагента",
+    "companyInfo": "Дані компанії",
+    "contractorName": "Назва компанії",
+    "companyPlaceholder": "ТОВ 'Приклад'",
+    "contactInfo": "Контактні дані",
+    "location": "Адреса реєстрації",
+    "street": "Вулиця",
+    "city": "Місто",
+    "zipCode": "Поштовий індекс",
+    "taxId": "ІПН",
+    "lookup": "Знайти в GUS"
   },
   "search": {
     "students": "Пошук за учнями...",
     "groups": "Пошук за групами...",
-    "teachers": "Пошук за вчителями...",
+    "teachers": "Пошук вчителів...",
+    "contractors": "Пошук контрагентів...",
     "leads": "Пошук за лідами (ім'я, телефон)...",
     "projects": "Пошук за проєктами...",
     "refunds": "Пошук за поверненнями...",
