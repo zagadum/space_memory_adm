@@ -1,13 +1,14 @@
 import { defineStore } from 'pinia';
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive } from 'vue';
 import { invoicesApi, type Debtor } from '../api/invoices.api';
 
 export const useDebtorsStore = defineStore('debtors', () => {
   const debtors = ref<Debtor[]>([]);
   const overpayments = ref<any[]>([]);
+  const overpaymentStats = ref<any>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
-  const stats = ref<any>(null);
+  const stats = ref<any>(null); // For debtors
 
   const pagination = reactive({
     currentPage: 1,
@@ -28,8 +29,6 @@ export const useDebtorsStore = defineStore('debtors', () => {
       const response = await invoicesApi.getDebtors(filters.project_id);
       debtors.value = response.debtors;
       stats.value = response.summary;
-      // Note: Backend debtors currently returns array without pagination wrapper for simpler view, 
-      // but if we add pagination later we'll update this.
       pagination.total = response.debtors.length;
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch debtors';
@@ -39,7 +38,6 @@ export const useDebtorsStore = defineStore('debtors', () => {
   }
 
   async function fetchStats() {
-    // Already unified in fetchDebtors for this specific implementation
     if (!stats.value) await fetchDebtors();
   }
 
@@ -58,12 +56,16 @@ export const useDebtorsStore = defineStore('debtors', () => {
   async function fetchOverpayments() {
     isLoading.value = true;
     try {
-      // Assuming existing finance/overpayments endpoint exists on backend
-      const response = await invoicesApi.getOverpayments({
-        ...filters,
-        page: pagination.currentPage,
-      });
-      overpayments.value = response.data;
+      const [listRes, statsRes] = await Promise.all([
+        invoicesApi.getOverpayments({
+          ...filters,
+          page: pagination.currentPage,
+        }),
+        invoicesApi.getOverpaymentsStats(filters)
+      ]);
+      overpayments.value = listRes.data;
+      overpaymentStats.value = statsRes;
+      pagination.total = listRes.meta.total;
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch overpayments';
     } finally {
@@ -79,6 +81,7 @@ export const useDebtorsStore = defineStore('debtors', () => {
   return {
     debtors,
     overpayments,
+    overpaymentStats,
     isLoading,
     error,
     stats,

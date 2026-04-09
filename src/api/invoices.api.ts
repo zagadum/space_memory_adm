@@ -367,6 +367,10 @@ export const invoicesApi = {
     return (await http.get('/v1/finance/overpayments', { params: filters })).data;
   },
 
+  async getOverpaymentsStats(filters: any = {}): Promise<any> {
+    return (await http.get('/v1/finance/overpayments/stats', { params: filters })).data;
+  },
+
   async getContractors(filters: any = {}): Promise<ContractorsResponse> {
     return (await http.get('/v1/finance/kontrahenci', { params: filters })).data;
   },

@@ -132,7 +132,8 @@
     "success": "Sukces",
     "error": "Błąd",
     "confirmAction": "Czy jesteś pewien?",
-    "noData": "Nie znaleziono danych"
+    "noData": "Nie znaleziono danych",
+    "allProjects": "Wszystkie projekty"
   },
   "finance": {
     "totalDebtors": "Wszystkich dłużników",
@@ -142,8 +143,13 @@
     "proformaDebt": "Dług (Proforma)",
     "debtorsList": "Lista dłużników",
     "totalDebt": "Suma zadłużenia",
-    "overdueCount": "Przeterminowane",
-    "lastInvoice": "Ostatnia faktura",
+    "overdueCount": "Zaległe",
+    "lastInvoice": "Ost. faktura",
+    "overpaymentsSubtitle": "Uczniowie z dodatnim saldem i nadpłatami",
+    "totalOverpaidStudents": "Uczniów z nadpłatą",
+    "totalOverpaymentSum": "Suma nadpłat",
+    "totalCreditAmount": "Suma kredytu",
+    "balanceOverpayment": "Konto nadpłat",
     "overpaymentsList": "Lista nadpłat",
     "overpayment": "Nadpłata",
     "totalCredit": "Łącznie na saldzie",

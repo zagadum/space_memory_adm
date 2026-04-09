@@ -167,7 +167,8 @@
     "success": "Success",
     "error": "Error",
     "confirmAction": "Are you sure?",
-    "noData": "No data found"
+    "noData": "No data found",
+    "allProjects": "All Projects"
   },
   "finance": {
     "totalDebtors": "Total Debtors",
@@ -179,6 +180,11 @@
     "totalDebt": "Total Debt",
     "overdueCount": "Overdue",
     "lastInvoice": "Last Invoice",
+    "overpaymentsSubtitle": "Students with positive balance and store credit",
+    "totalOverpaidStudents": "Overpaid Students",
+    "totalOverpaymentSum": "Total Overpayment",
+    "totalCreditAmount": "Total Store Credit",
+    "balanceOverpayment": "Credit Account",
     "overpaymentsList": "Overpayments List",
     "overpayment": "Overpayment",
     "totalCredit": "Total Credit",
@@ -2430,26 +2436,7 @@
     "bulkGenerateSubtitle": "Create draft invoices for all active students with subscriptions",
     "fetchEligibleStudents": "Fetch Eligible Students",
     "noStudentsDue": "No students are due for payment in this period",
-    "studentsFound": "Students Found",
-    "generateSelected": "Generate {count} Invoices",
-    "bulkSuccessMessage": "Successfully created {count} draft invoices.",
-    "proformaDebt": "Debt (Proforma)",
-    "debtorsList": "Debtors List",
-    "totalDebtors": "Total Debtors",
-    "totalDebtSum": "Total Debt Sum",
-    "invoiceDebt": "Debt (FA)",
-    "overdueCount": "Overdue",
-    "lastInvoice": "Last Invoice",
-    "totalDebt": "Total Debt"
-  },
-  "common": {
-    "remind": "Remind",
-    "remindAll": "Remind All",
-    "success": "Success",
-    "error": "Error",
-    "confirmAction": "Are you sure?",
-    "noData": "No data found",
-    "balance": "Balance"
+    "studentsFound": "Students Found"
   },
   "invoiceFields": {
     "number": "Number",

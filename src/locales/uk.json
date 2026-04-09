@@ -133,7 +133,8 @@
     "success": "Успішно",
     "error": "Помилка",
     "confirmAction": "Ви впевнені?",
-    "noData": "Даних не знайдено"
+    "noData": "Даних не знайдено",
+    "allProjects": "Всі проєкти"
   },
   "finance": {
     "totalDebtors": "Усього боржників",
@@ -143,8 +144,13 @@
     "proformaDebt": "Борг (Проформа)",
     "debtorsList": "Список боржників",
     "totalDebt": "Разом борг",
-    "overdueCount": "Прострочених",
-    "lastInvoice": "Останній рахунок",
+    "overdueCount": "Прострочено",
+    "lastInvoice": "Ост. рахунок",
+    "overpaymentsSubtitle": "Студенти з позитивним балансом та кредитом",
+    "totalOverpaidStudents": "Студентів з переплатою",
+    "totalOverpaymentSum": "Сума переплат",
+    "totalCreditAmount": "Загальний кредит",
+    "balanceOverpayment": "Кредитний рахунок",
     "overpaymentsList": "Список переплат",
     "overpayment": "Переплата",
     "totalCredit": "Разом на балансі",
