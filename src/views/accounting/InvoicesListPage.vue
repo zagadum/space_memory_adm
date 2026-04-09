@@ -103,6 +103,9 @@
         <UiButton variant="ghost" size="sm" @click="handleExport">
           📥 {{ t('faktury.exportXlsx') || 'Export XLSX' }}
         </UiButton>
+        <UiButton variant="ghost" size="sm" @click="handleBulkGenerate">
+          🪄 {{ t('faktury.generateInvoices') || 'Generate Invoices' }}
+        </UiButton>
         <UiButton variant="primary" size="sm" @click="handleCreateInvoice">
           + {{ t('faktury.createInvoice') }}
         </UiButton>
@@ -320,12 +323,24 @@ async function handleBulkPay() {
   if (!confirm(t('faktury.markAsPaidConfirm') || 'Mark selected as paid today?')) return;
   try {
     await invoicesStore.bulkMarkAsPaid(invoicesStore.selectedIds, date);
-    toast.success(t('common.success'));
     isBulkMenuOpen.value = false;
-    invoicesStore.selectedIds = [];
   } catch (err) {
-    toast.error(t('common.error'));
+    console.error(err);
   }
+}
+
+async function handleBatchStatus(status: string) {
+  if (!confirm(t('common.confirmAction') || 'Are you sure?')) return;
+  try {
+    await invoicesStore.batchStatusUpdate({ ids: invoicesStore.selectedIds, status });
+    isBulkMenuOpen.value = false;
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+function handleBulkGenerate() {
+  modal.open('BulkGenerateInvoicesModal');
 }
 
 function handleAccountingExport() {

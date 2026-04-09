@@ -52,6 +52,7 @@ import AttendanceModal from "./templates/AttendanceModal.vue";
 import ConsentConfirmModal from "./templates/ConsentConfirmModal.vue";
 import InviteLeadModal from "./templates/InviteLeadModal.vue";
 import CreateTeacherModal from "./templates/CreateTeacherModal.vue";
+import BulkGenerateInvoicesModal from "./finance/BulkGenerateInvoicesModal.vue";
 import InvoiceCreateModal from "./templates/InvoiceCreateModal.vue";
 import InvoiceCorrectModal from "./templates/InvoiceCorrectModal.vue";
 import SendEmailModal from "./templates/SendEmailModal.vue";

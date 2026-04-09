@@ -37,6 +37,16 @@ export interface Invoice {
   };
 }
 
+export interface BulkPreviewResponse {
+  count: number;
+  students: {
+    id: number;
+    name: string;
+    amount: number;
+    city: string;
+  }[];
+}
+
 export interface InvoicesResponse {
   data: Invoice[];
   meta: {
@@ -243,6 +253,21 @@ export const invoicesApi = {
       payment_date: paymentDate
     });
     return response.data;
+  },
+
+  async bulkGeneratePreview(params: { project_id: number, year: number, month: number }): Promise<BulkPreviewResponse> {
+    const { data } = await http.post(`${endpoints.INVOICES.BASE}/bulk/generate-preview`, params);
+    return data;
+  },
+
+  async bulkGenerate(params: { project_id: number, year: number, month: number, student_ids?: number[] }) {
+    const { data } = await http.post(`${endpoints.INVOICES.BASE}/bulk/generate`, params);
+    return data;
+  },
+
+  async batchStatusUpdate(params: { ids: number[], status: string, reason?: string }) {
+    const { data } = await http.post(`${endpoints.INVOICES.BASE}/bulk/status`, params);
+    return data;
   },
 
   getAccountingExportUrl(filters: any) {

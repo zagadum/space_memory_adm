@@ -21,6 +21,16 @@
     <div class="stat-card sc-amber">
       <div class="stat-icon">⏳</div>
       <div class="stat-info">
+        <div class="stat-label">{{ t('faktury.collectionRate') || 'Collection Rate' }}</div>
+        <div class="stat-value" :class="getRateColor(invoicesStore.collectionRate)">
+          {{ invoicesStore.collectionRate }}%
+        </div>
+        <div class="stat-sub">{{ t('faktury.paidVsIssued') || 'Paid vs Issued' }}</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-info">
         <div class="stat-label">{{ t('faktury.stats.unpaidCount') }}</div>
         <div class="stat-value">{{ stats.unpaid_count }}</div>
         <div class="stat-sub">{{ t('faktury.stats.needAttention') }}</div>
@@ -41,6 +51,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { useInvoicesStore } from '../../../stores/invoices.store';
 
 const props = defineProps<{
   stats: {
@@ -53,6 +64,7 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
+const invoicesStore = useInvoicesStore();
 
 const paidPercent = computed(() => {
   if (!props.stats || props.stats.gross_total_monthly === 0) return 0;
@@ -60,7 +72,13 @@ const paidPercent = computed(() => {
 });
 
 function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(amount);
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(amount || 0);
+}
+
+function getRateColor(rate: number) {
+  if (rate >= 90) return 'text-success';
+  if (rate >= 70) return 'text-warning';
+  return 'text-danger';
 }
 </script>
 

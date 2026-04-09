@@ -13,6 +13,12 @@ export const useInvoicesStore = defineStore('invoices', () => {
   const auditLogs = ref<any[]>([]);
   const stats = ref<any>(null);
   
+  // Stats individual refs for easier shortcut access
+  const grossMonthly = ref(0);
+  const paidMonthly = ref(0);
+  const collectionRate = ref(0);
+  const unpaidCount = ref(0);
+  
   const pagination = reactive({
     currentPage: 1,
     lastPage: 1,
@@ -252,9 +258,53 @@ export const useInvoicesStore = defineStore('invoices', () => {
 
   async function fetchStats() {
     try {
-      stats.value = await invoicesApi.getStats(filters);
-    } catch (err) {
-      console.error('Failed to fetch stats', err);
+      const data = await invoicesApi.getStats(filters);
+      grossMonthly.value = data.gross_total_monthly;
+      paidMonthly.value = data.paid_total_monthly;
+      collectionRate.value = data.collection_rate || 0;
+      unpaidCount.value = data.unpaid_count;
+    } catch (e) {
+      console.error('Failed to fetch stats', e);
+    }
+  }
+
+  async function bulkGenerate(params: { project_id: number, year: number, month: number, student_ids?: number[] }) {
+    isLoading.value = true;
+    try {
+      const res = await invoicesApi.bulkGenerate(params);
+      await fetchInvoices();
+      await fetchStats();
+      return res;
+    } catch (e: any) {
+      error.value = e.response?.data?.message || 'Failed to generate invoices';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function batchStatusUpdate(params: { ids: number[], status: string, reason?: string }) {
+    isLoading.value = true;
+    try {
+      const res = await invoicesApi.batchStatusUpdate(params);
+      await fetchInvoices();
+      await fetchStats();
+      return res;
+    } catch (e: any) {
+      error.value = e.response?.data?.message || 'Failed to update invoices';
+      throw e;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function bulkKsef(ids: number[]) {
+    try {
+      await invoicesApi.sendBulkToKsef(ids);
+      await fetchInvoices();
+    } catch (e: any) {
+      error.value = e.message;
+      throw e;
     }
   }
 
@@ -287,6 +337,12 @@ export const useInvoicesStore = defineStore('invoices', () => {
     issueCorrection,
     sendInvoiceEmail,
     fetchAuditLogs,
-    fetchStats
+    fetchStats,
+    bulkGenerate,
+    batchStatusUpdate,
+    grossMonthly,
+    paidMonthly,
+    collectionRate,
+    unpaidCount
   };
 });
