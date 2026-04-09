@@ -28,28 +28,26 @@
       </div>
 
       <div class="gpp-list">
-        <div v-if="!filteredGroups.length" class="gpp-empty">
+        <div v-if="loading" class="gpp-empty">⏳ Загрузка...</div>
+        <div v-else-if="!filteredGroups.length" class="gpp-empty">
           <div class="gpp-empty-icon">🔭</div>
           {{ t('newStudents.groupPicker.noResults') }}
         </div>
         <div
-          v-for="g in filteredGroups" :key="g.name"
+          v-for="g in filteredGroups" :key="g.id"
           class="gpp-item"
           @click="pick(g)"
         >
           <div class="gpp-item-left">
-            <div class="gpp-color-dot" :style="{ background: g.color, boxShadow: `0 0 6px ${g.color}66` }" />
+            <div class="gpp-color-dot" :style="{ background: ageColor(g.age), boxShadow: `0 0 6px ${ageColor(g.age)}66` }" />
             <div class="gpp-item-info">
               <div class="gpp-item-name">{{ g.name }}</div>
-              <div class="gpp-item-meta">{{ g.day }}, {{ g.time }} · {{ g.teacher }}</div>
+              <div class="gpp-item-meta">{{ g.day }}<template v-if="g.time">, {{ g.time }}</template> · {{ g.teacher?.name ?? '—' }}</div>
             </div>
           </div>
           <div class="gpp-item-right">
-            <span class="gpp-age-badge" :class="`gpp-age-${g.age === '5-7' ? 'j' : g.age === '8-10' ? 'm' : 's'}`">
-              {{ g.age === '5-7' ? '🟢' : g.age === '8-10' ? '🟡' : '🔴' }} {{ g.age }}
-            </span>
-            <span class="gpp-slots" :class="freeSlots(g) === 0 ? 'full' : freeSlots(g) <= 2 ? 'warn' : 'ok'">
-              {{ freeSlots(g) === 0 ? t('newStudents.groupPicker.noSlots') : `${freeSlots(g)}/${g.slots}` }}
+            <span v-if="g.age" class="gpp-age-badge" :class="`gpp-age-${ageClass(g.age)}`">
+              {{ ageEmoji(g.age) }} {{ g.age }}
             </span>
           </div>
         </div>
@@ -66,24 +64,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ALL_GROUPS } from '../../../stores/newStudents.store'
+
+interface ApiGroup {
+  id: number
+  name: string
+  teacher: { id: number; name: string } | null
+  day: string
+  time: string
+  age: string | null
+  status: string
+}
 
 const props = defineProps<{
   modelValue: boolean
   studentName?: string
+  backend?: 'default' | 'indigo'
 }>()
 
 const emit = defineEmits<{
   'update:modelValue': [val: boolean]
-  pick: [groupName: string, color: string]
+  pick: [groupId: number, groupName: string, teacherId: number | null]
 }>()
 
 const { t } = useI18n()
 
 const searchQ = ref('')
 const activeAge = ref<'all' | '5-7' | '8-10' | '11-14'>('all')
+const groups = ref<ApiGroup[]>([])
+const loading = ref(false)
 
 const ageChips = [
   { key: 'all' as const,    cls: 'j', label: 'Все' },
@@ -92,19 +102,55 @@ const ageChips = [
   { key: '11-14' as const, cls: 's', label: '🔴 11–14' },
 ]
 
+async function loadGroups() {
+  if (loading.value) return
+  loading.value = true
+  try {
+    const { getRecruitmentApi } = await import('../../../api/recruitmentApi')
+    const api = getRecruitmentApi(props.backend ?? 'default')
+    groups.value = await api.getGroupsForPicker()
+  } catch (e) {
+    console.error('GroupPickerPanel: failed to load groups', e)
+  } finally {
+    loading.value = false
+  }
+}
+
+watch(() => props.modelValue, (open) => {
+  if (open) loadGroups()
+})
+
 const filteredGroups = computed(() => {
   const q = searchQ.value.toLowerCase().trim()
-  return ALL_GROUPS.filter(g => {
+  return groups.value.filter(g => {
     if (activeAge.value !== 'all' && g.age !== activeAge.value) return false
-    if (q && !g.name.toLowerCase().includes(q) && !g.teacher.toLowerCase().includes(q) && !g.day.toLowerCase().includes(q)) return false
+    if (q) {
+      const haystack = [g.name, g.teacher?.name ?? '', g.day].join(' ').toLowerCase()
+      if (!haystack.includes(q)) return false
+    }
     return true
   })
 })
 
-function freeSlots(g: typeof ALL_GROUPS[0]) { return g.slots - g.taken }
+function ageColor(age: string | null) {
+  if (!age) return '#4f6ef7'
+  if (age === '5-7')   return '#10b981'
+  if (age === '8-10')  return '#f59e0b'
+  return '#ef4444'
+}
+function ageClass(age: string | null) {
+  if (age === '5-7')  return 'j'
+  if (age === '8-10') return 'm'
+  return 's'
+}
+function ageEmoji(age: string | null) {
+  if (age === '5-7')  return '🟢'
+  if (age === '8-10') return '🟡'
+  return '🔴'
+}
 
-function pick(g: typeof ALL_GROUPS[0]) {
-  emit('pick', g.name, g.color)
+function pick(g: ApiGroup) {
+  emit('pick', g.id, g.name, g.teacher?.id ?? null)
   emit('update:modelValue', false)
 }
 </script>

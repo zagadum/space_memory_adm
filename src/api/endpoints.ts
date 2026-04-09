@@ -181,6 +181,7 @@ export const SETTINGS = {
 // ═══════════════════════════════════════════════════════════════════════════
 export const TEACHERS = {
   LIST: 'teachers',
+  CREATE: 'teachers/create',
   BY_ID: (id: number | string) => `teachers/${id}`,
   PASSWORD: (id: number | string) => `teachers/${id}/change-password`,
   HISTORY: (id: number | string) => `teachers/${id}/history`,

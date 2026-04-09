@@ -74,7 +74,7 @@ export async function getTeacher(id: number): Promise<TeacherDetails> {
 }
 
 export async function createTeacher(payload: TeacherCreatePayload): Promise<TeacherDetails> {
-  const res = await http.post(TEACHERS.LIST, payload)
+  const res = await http.post(TEACHERS.CREATE, payload)
   return res.data as TeacherDetails
 }
 

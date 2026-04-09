@@ -295,6 +295,7 @@
     <GroupPickerPanel
       v-model="groupPickerOpen"
       :student-name="groupPickerForName"
+      :backend="recruitmentBackend"
       @pick="onGroupPicked"
     />
 
@@ -334,6 +335,7 @@ import type { RecruitmentBackend } from '../../api/http'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
 import { useLoginAsStudent } from '../../composables/useLoginAsStudent'
+import { getRecruitmentApi } from '../../api/recruitmentApi'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -343,6 +345,10 @@ const searchStore = useGlobalSearchStore()
 const modal = useModalStore()
 const { loginAsStudent } = useLoginAsStudent()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
+
+function resolveRecruitmentApi() {
+  return getRecruitmentApi(recruitmentBackend.value)
+}
 
 // ─── FILTERS ───
 const chips = computed(() => ({
@@ -552,12 +558,23 @@ function openGroupPicker(id: number) {
   groupPickerForId.value = id
   groupPickerOpen.value = true
 }
-function onGroupPicked(groupName: string, color: string) {
+async function onGroupPicked(groupId: number, groupName: string, _teacherId: number | null) {
   if (!groupPickerForId.value) return
-  const s = store.students.find(x => x.id === groupPickerForId.value)
-  store.assignGroup(groupPickerForId.value, groupName, color)
-  notif.addToast(`✅ ${s?.name} → «${groupName}»`, 'success')
+  const studentId = groupPickerForId.value
+  const s = store.students.find(x => x.id === studentId)
   groupPickerForId.value = null
+
+  try {
+    const api = resolveRecruitmentApi()
+    await api.setStudentGroup(studentId, groupId)
+    // Обновляем локальное состояние
+    store.assignGroup(studentId, groupName, '#4f6ef7')
+    notif.addToast(`✅ ${s?.name} → «${groupName}»`, 'success')
+    // Перезагружаем список чтобы увидеть актуальные данные
+    await store.fetchStudentsFromApi(store.pagination.currentPage, recruitmentBackend.value)
+  } catch (err: any) {
+    notif.addToast(`❌ Ошибка назначения группы: ${err?.response?.data?.message ?? err.message}`, 'error')
+  }
 }
 
 // ─── STUDENT PANEL ───
