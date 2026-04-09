@@ -23,7 +23,7 @@
   <SendEmailModal v-else-if="openId==='invoice-email'" :invoice="modal.payload.invoice" />
   <InvoicePreviewModal v-else-if="openId==='invoice-preview'" />
   <CreateContractorModal
-    v-else-if="openId==='CreateContractorModal'"
+    v-else-if="openId==='create-contractor'"
     :contractor="modal.payload.contractor"
     :on-success="modal.payload.onSuccess"
     @close="modal.close"

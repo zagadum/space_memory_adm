@@ -1,291 +1,269 @@
-<template>
-  <BaseModal popupClass="popup-korekta">
-    <div class="popup-title">📋 {{ t("modals.korekta.title") }}</div>
-    <div class="popup-sub">{{ t("modals.korekta.subtitle") }}</div>
-
-    <!-- ── Исходный документ ── -->
-    <div class="tx-info-card">
-      <div class="tx-info-title">{{ t("modals.korekta.sourceDoc") }}</div>
-      <div class="tx-info-grid">
-        <div class="tx-info-item">
-          <span class="tx-info-label">{{ t("modals.refund.fvLabel") }}</span>
-          <span class="tx-info-val">{{ fvnum }}</span>
-        </div>
-        <div class="tx-info-item">
-          <span class="tx-info-label">{{ t("modals.korekta.sumLabel") }}</span>
-          <span class="tx-info-val" style="color:var(--cyan)">{{ origAmount }} zł</span>
-        </div>
-        <div class="tx-info-item">
-          <span class="tx-info-label">KSeF</span>
-          <UiBadge :variant="getStatusVariant(ksefStatus)">
-            {{ t(`faktury.statuses.${ksefStatus}`) }}
-          </UiBadge>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Тип корректуры ── -->
-    <div class="popup-label">{{ t("modals.korekta.typeLabel") }}</div>
-    <div class="radio-grid">
-      <div class="radio-card" :class="{ active: corrType === 'full' }" @click="corrType = 'full'">
-        <div class="radio-dot"></div>
-        <div>
-          <div class="radio-title">{{ t("modals.korekta.typeFull") }}</div>
-          <div class="radio-desc">{{ t("modals.korekta.typeFullDesc") }}</div>
-        </div>
-      </div>
-      <div class="radio-card" :class="{ active: corrType === 'partial' }" @click="corrType = 'partial'">
-        <div class="radio-dot"></div>
-        <div>
-          <div class="radio-title">{{ t("modals.korekta.typePartial") }}</div>
-          <div class="radio-desc">{{ t("modals.korekta.typePartialDesc") }}</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── Новая сумма (только при частичной) ── -->
-    <div v-if="corrType === 'partial'" class="fade-in" style="margin-top:14px">
-      <div class="popup-2col">
-        <div>
-          <div class="popup-label">{{ t("modals.korekta.amount") }} <span style="color:var(--red)">*</span></div>
-          <input class="popup-input amt-input" v-model.number="newAmount" type="number" min="0" />
-        </div>
-        <div>
-          <div class="popup-label">{{ t("modals.korekta.corrDateLabel") }}</div>
-          <input class="popup-input" type="date" v-model="corrDate" />
-        </div>
-      </div>
-
-      <!-- diff preview -->
-      <div class="diff-preview" v-if="newAmount >= 0">
-        <div class="dp-row">
-          <span class="dp-lbl">{{ t("modals.korekta.wasLabel") }}</span>
-          <span class="dp-val">{{ origAmount }} zł</span>
-        </div>
-        <div class="dp-row">
-          <span class="dp-lbl">{{ t("modals.korekta.willBeLabel") }}</span>
-          <span class="dp-val" style="color:var(--blue)">{{ newAmount }} zł</span>
-        </div>
-        <div class="dp-divider"></div>
-        <div class="dp-row">
-          <span class="dp-lbl">{{ t("modals.korekta.diffLabel") }}</span>
-          <span class="dp-val" :style="{ color: diffAmount < 0 ? 'var(--green)' : 'var(--red)' }">
-            {{ diffAmount > 0 ? '+' : '' }}{{ diffAmount }} zł
-          </span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Дата коррекции (для полной) -->
-    <div v-if="corrType === 'full'" style="margin-top:14px">
-      <div class="popup-label">{{ t("modals.korekta.corrDateLabel") }}</div>
-      <input class="popup-input" type="date" v-model="corrDate" />
-    </div>
-
-    <!-- ── Причина ── -->
-    <div style="margin-top:16px">
-      <div class="popup-label">{{ t("modals.korekta.reasonLabel") }} <span style="color:var(--red)">*</span></div>
-      <select class="popup-input" v-model="reasonId">
-        <option value="" disabled>{{ t("modals.korekta.selectReasonPlaceholder") }}</option>
-        <option value="price_error">{{ t("modals.korekta.reasons.priceError") }}</option>
-        <option value="discount">{{ t("modals.korekta.reasons.discount") }}</option>
-        <option value="return">{{ t("modals.korekta.reasons.return") }}</option>
-        <option value="data_error">{{ t("modals.korekta.reasons.dataError") }}</option>
-        <option value="other">{{ t("modals.korekta.reasons.other") }}</option>
-      </select>
-    </div>
-
-    <!-- ── Комментарий ── -->
-    <div style="margin-top:14px">
-      <div class="popup-label">{{ t("modals.korekta.commentLabel") }}</div>
-      <textarea
-        class="popup-input popup-textarea"
-        v-model="comment"
-        :placeholder="t('modals.korekta.commentPlaceholder')"
-      ></textarea>
-    </div>
-
-    <!-- ── Warning ── -->
-    <div class="info-box info-amber" style="margin-top:16px">
-      <span>⚠️</span>
-      <div>{{ t("modals.korekta.ksefWarning", { fvnum }) }}</div>
-    </div>
-
-    <!-- ── Actions ── -->
-    <div class="popup-actions">
-      <UiButton variant="ghost" @click="close">{{ t("modals.korekta.cancel") }}</UiButton>
-      <div v-if="errorMessage" class="info-box info-red" style="margin-bottom:8px;font-size:11px"><span>⚠️</span><div>{{ errorMessage }}</div></div>
-      <UiButton variant="primary" :disabled="saving || !isValid" @click="save">
-        {{ saving ? t('common.sending') : t('modals.korekta.submit') }}
-      </UiButton>
-    </div>
-  </BaseModal>
-</template>
-
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useI18n } from "vue-i18n";
-import BaseModal from "../BaseModal.vue";
-import UiButton from "../../components/ui/UiButton.vue";
-import UiBadge from "../../components/ui/UiBadge.vue";
-import { useInvoicesStore } from "../../stores/invoices.store";
-import { useModalStore } from "../../stores/modal.store";
-import { invoicesApi } from "../../api/invoices.api";
+import { ref, computed } from "vue"
+import { useI18n } from "vue-i18n"
+import BaseModal from "../BaseModal.vue"
+import UiButton from "../../components/ui/UiButton.vue"
+import UiBadge from "../../components/ui/UiBadge.vue"
+import { useInvoicesStore } from "../../stores/invoices.store"
+import { useModalStore } from "../../stores/modal.store"
+import { invoicesApi } from "../../api/invoices.api"
 
-const { t } = useI18n();
-const invoicesStore = useInvoicesStore();
-const modal = useModalStore();
-const payload = modal.payload as any;
-const invoice = payload?.invoice || {};
+const { t } = useI18n()
+const invoicesStore = useInvoicesStore()
+const modal = useModalStore()
+const payload = modal.payload as any
+const invoice = payload?.invoice || {}
 
 // Data from invoice
-const fvnum = invoice.number || "FV/2026/01/???";
-const origAmount = invoice.amount_gross || 0;
-const ksefStatus = invoice.ksef_status || "draft";
+const fvnum = invoice.number || "FV/2026/01/???"
+const origAmount = invoice.amount_gross || 0
+const ksefStatus = invoice.ksef_status || "draft"
 
 // Form state
-const corrType = ref<"full" | "partial">("full");
-const newAmount = ref(0);
-const corrDate = ref(new Date().toISOString().split("T")[0]);
-const reasonId = ref("return");
-const comment = ref("");
-const saving = ref(false);
-const errorMessage = ref('');
+const corrType = ref<"full" | "partial">("full")
+const newAmount = ref(0)
+const corrDate = ref(new Date().toISOString().split("T")[0])
+const reasonId = ref("return")
+const comment = ref("")
+const saving = ref(false)
+const errorMessage = ref('')
 
 // Calculations
 const diffAmount = computed(() => {
-  if (corrType.value === 'full') return -origAmount;
-  return newAmount.value - origAmount;
-});
+  if (corrType.value === 'full') return -origAmount
+  return newAmount.value - origAmount
+})
 
-// getStatusVariant (replicated from ListPage for consistency)
 function getStatusVariant(status: string) {
   switch (status) {
-    case 'paid': return 'success';
-    case 'cancelled': return 'danger';
-    case 'draft': return 'warning';
+    case 'paid': return 'success'
+    case 'cancelled': return 'danger'
+    case 'draft': return 'warning'
     case 'wystawiona':
-    case 'sent': return 'info';
+    case 'sent': return 'info'
     case 'sending':
-    case 'pending': return 'warning';
-    case 'error': return 'danger';
-    default: return 'default';
+    case 'pending': return 'warning'
+    case 'error': return 'danger'
+    default: return 'neutral'
   }
 }
 
 const isValid = computed(() => {
-  if (!reasonId.value) return false;
-  if (corrType.value === "partial" && (newAmount.value < 0 || newAmount.value === origAmount)) return false;
-  return true;
-});
+  if (!reasonId.value) return false
+  if (corrType.value === "partial" && (newAmount.value < 0 || newAmount.value === origAmount)) return false
+  return true
+})
 
-function close() { modal.close(); }
+function close() { modal.close() }
 
 async function save() {
-  saving.value = true;
-  errorMessage.value = '';
+  saving.value = true
+  errorMessage.value = ''
   try {
-    const finalAmount = corrType.value === 'full' ? 0 : newAmount.value;
-    
+    const finalAmount = corrType.value === 'full' ? 0 : newAmount.value
     await invoicesApi.correct(invoice.id, {
       amount_gross: finalAmount,
       reason: reasonId.value,
       notes: comment.value || undefined,
       issue_date: corrDate.value || undefined,
-    });
-    
-    await invoicesStore.fetchInvoices();
-    modal.close();
+    })
+    await invoicesStore.fetchInvoices()
+    modal.close()
   } catch (e: unknown) {
-    errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.';
+    errorMessage.value = e instanceof Error ? e.message : 'Operation failed. Please try again.'
   } finally {
-    saving.value = false;
+    saving.value = false
   }
+}
+
+const formatCurrency = (val: number) => {
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(val)
 }
 </script>
 
+<template>
+  <BaseModal popupClass="popup-korekta">
+    <div class="modal-header">
+      <div class="header-icon">📋</div>
+      <div class="header-text">
+        <h2 class="popup-title">{{ t("modals.korekta.title") }}</h2>
+        <p class="popup-sub">{{ t("modals.korekta.subtitle") }}</p>
+      </div>
+    </div>
+
+    <div class="scroll-body">
+      <!-- Source Doc Card -->
+      <div class="section-card source-doc">
+        <div class="card-header">
+          <label class="section-label">{{ t("modals.korekta.sourceDoc") }}</label>
+          <UiBadge :variant="getStatusVariant(ksefStatus)">{{ t(`faktury.statuses.${ksefStatus}`) }}</UiBadge>
+        </div>
+        <div class="source-grid">
+          <div class="info-item">
+            <span class="info-label">{{ t("modals.refund.fvLabel") }}</span>
+            <span class="info-value font-mono">{{ fvnum }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">{{ t("modals.korekta.sumLabel") }}</span>
+            <span class="info-value amount-highlight">{{ formatCurrency(origAmount) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Correction Type -->
+      <div class="section-card">
+        <label class="section-label">🎯 {{ t("modals.korekta.typeLabel") }}</label>
+        <div class="segmented-control">
+          <button 
+            class="seg-btn" 
+            :class="{ active: corrType === 'full' }" 
+            @click="corrType = 'full'"
+          >
+            {{ t("modals.korekta.typeFull") }}
+          </button>
+          <button 
+            class="seg-btn" 
+            :class="{ active: corrType === 'partial' }" 
+            @click="corrType = 'partial'"
+          >
+            {{ t("modals.korekta.typePartial") }}
+          </button>
+        </div>
+        <p class="type-hint mt-2">
+          {{ corrType === 'full' ? t("modals.korekta.typeFullDesc") : t("modals.korekta.typePartialDesc") }}
+        </p>
+      </div>
+
+      <!-- Amounts & Date -->
+      <div class="section-card">
+        <div class="form-grid">
+          <div class="form-group" v-if="corrType === 'partial'">
+            <label class="mini-label">{{ t("modals.korekta.amount") }} *</label>
+            <input class="premium-input-raw highlight" v-model.number="newAmount" type="number" min="0" />
+          </div>
+          <div class="form-group" :class="{ 'col-span-2': corrType === 'full' }">
+            <label class="mini-label">{{ t("modals.korekta.corrDateLabel") }}</label>
+            <input class="premium-input-raw" type="date" v-model="corrDate" />
+          </div>
+        </div>
+
+        <Transition name="fade">
+          <div v-if="corrType === 'partial'" class="diff-preview">
+            <div class="diff-row">
+              <span class="diff-lbl">{{ t("modals.korekta.wasLabel") }}</span>
+              <span class="diff-val">{{ formatCurrency(origAmount) }}</span>
+            </div>
+            <div class="diff-divider"></div>
+            <div class="diff-row total">
+              <span class="diff-lbl">{{ t("modals.korekta.diffLabel") }}</span>
+              <span class="diff-val" :class="diffAmount < 0 ? 'text-emerald-500' : 'text-rose-500'">
+                {{ diffAmount > 0 ? '+' : '' }}{{ formatCurrency(diffAmount) }}
+              </span>
+            </div>
+          </div>
+        </Transition>
+      </div>
+
+      <!-- Reason & Comments -->
+      <div class="section-card">
+        <div class="form-group">
+          <label class="section-label">📑 {{ t("modals.korekta.reasonLabel") }} *</label>
+          <select class="premium-select" v-model="reasonId">
+            <option value="" disabled>{{ t("modals.korekta.selectReasonPlaceholder") }}</option>
+            <option value="price_error">{{ t("modals.korekta.reasons.priceError") }}</option>
+            <option value="discount">{{ t("modals.korekta.reasons.discount") }}</option>
+            <option value="return">{{ t("modals.korekta.reasons.return") }}</option>
+            <option value="data_error">{{ t("modals.korekta.reasons.dataError") }}</option>
+            <option value="other">{{ t("modals.korekta.reasons.other") }}</option>
+          </select>
+        </div>
+        <div class="form-group mt-4">
+          <label class="mini-label">{{ t("modals.korekta.commentLabel") }}</label>
+          <textarea
+            class="premium-input-raw textarea"
+            v-model="comment"
+            :placeholder="t('modals.korekta.commentPlaceholder')"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div class="info-alert">
+        <span class="info-emoji">⚠️</span>
+        <div class="info-text">{{ t("modals.korekta.ksefWarning", { fvnum }) }}</div>
+      </div>
+    </div>
+
+    <div v-if="errorMessage" class="error-toast">{{ errorMessage }}</div>
+
+    <div class="modal-footer">
+      <UiButton variant="ghost" @click="close">{{ t("modals.korekta.cancel") }}</UiButton>
+      <UiButton 
+        variant="primary" 
+        :loading="saving" 
+        :disabled="!isValid || saving" 
+        @click="save"
+      >
+        🔧 {{ t('modals.korekta.submit') }}
+      </UiButton>
+    </div>
+  </BaseModal>
+</template>
+
 <style scoped>
-.popup-korekta { max-width: 500px; }
-.popup-title { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
-.popup-sub { font-size: 12px; color: var(--dim); margin-bottom: 16px; }
+.popup-korekta { max-width: 540px; padding: 0 !important; overflow: hidden; }
 
-.popup-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .05em; color: var(--dim); margin-bottom: 5px;
-}
-.popup-input {
-  background: rgba(255,255,255,.04); border: 1px solid var(--b);
-  border-radius: 8px; padding: 9px 12px; color: var(--white);
-  font-family: inherit; width: 100%; outline: none; font-size: 13px;
-}
-.popup-input:focus { border-color: var(--blue); background: rgba(255,255,255,.07); }
-.popup-textarea { min-height: 70px; resize: vertical; line-height: 1.5; }
-.popup-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.amt-input { color: var(--blue); font-family: 'Space Mono', monospace; font-weight: 700; font-size: 15px; }
+.modal-header { padding: 24px 24px 16px; background: var(--app-card-hi); border-bottom: 1px solid var(--app-border); display: flex; gap: 16px; align-items: flex-start; }
+.header-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.popup-title { font-size: 18px; font-weight: 800; color: var(--app-text-main); margin: 0; }
+.popup-sub { font-size: 13px; color: var(--app-text-dim); margin: 4px 0 0; }
 
-/* Карточка исходного документа */
-.tx-info-card {
-  background: rgba(255,255,255,.03); border: 1px solid var(--b);
-  border-radius: 12px; padding: 14px; margin-bottom: 18px;
-}
-.tx-info-title { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--dim); margin-bottom: 12px; letter-spacing: .8px; }
-.tx-info-grid { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 10px; }
-.tx-info-item { display: flex; flex-direction: column; gap: 4px; }
-.tx-info-label { font-size: 10px; color: var(--dim); }
-.tx-info-val { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; }
+.scroll-body { padding: 24px; max-height: 60vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
 
-.kb { font-size: 10px; padding: 2px 8px; border-radius: 4px; font-weight: 800; width: fit-content; }
-.kb-ok { background: rgba(34,197,94,.1); color: #22c55e; border: 1px solid rgba(34,197,94,.2); }
-.kb-manual { background: rgba(100,120,255,.08); color: var(--dim); border: 1px solid var(--b); }
-.kb-pending { background: rgba(245,158,11,.1); color: var(--amber); border: 1px solid rgba(245,158,11,.2); }
-.kb-error { background: rgba(239,68,68,.1); color: var(--red); border: 1px solid rgba(239,68,68,.2); }
-.kb-conflict { background: rgba(249,115,22,.1); color: var(--orange); border: 1px solid rgba(249,115,22,.2); }
+.section-card { border: 1px solid var(--app-border); border-radius: 16px; padding: 16px; background: var(--app-card); }
+.section-label { font-size: 11px; font-weight: 800; color: var(--app-primary); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 12px; }
 
-/* Radio cards */
-.radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-.radio-card {
-  background: rgba(255,255,255,.02); border: 1px solid var(--b);
-  border-radius: 10px; padding: 12px;
-  display: flex; align-items: center; gap: 12px;
-  cursor: pointer; transition: all .2s ease;
-}
-.radio-card:hover { border-color: var(--bh); background: rgba(255,255,255,.05); }
-.radio-card.active { border-color: var(--blue); background: rgba(79,110,247,.08); }
-.radio-dot {
-  width: 16px; height: 16px; border-radius: 50%;
-  border: 2px solid var(--b); position: relative; flex-shrink: 0;
-}
-.radio-card.active .radio-dot { border-color: var(--blue); }
-.radio-card.active .radio-dot::after {
-  content: ''; position: absolute; width: 8px; height: 8px;
-  background: var(--blue); border-radius: 50%; top: 2px; left: 2px;
-}
-.radio-title { font-size: 13px; font-weight: 700; color: var(--white); }
-.radio-desc { font-size: 11px; color: var(--dim); }
+.source-doc { background: var(--app-card-hi); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.info-item { display: flex; flex-direction: column; }
+.info-label { font-size: 10px; font-weight: 700; color: var(--app-text-dim); text-transform: uppercase; margin-bottom: 4px; }
+.info-value { font-size: 15px; font-weight: 700; color: var(--app-text-main); }
+.amount-highlight { color: var(--app-primary); font-family: 'Outfit', sans-serif; }
 
-/* Diff preview */
-.diff-preview {
-  margin-top: 10px; padding: 12px;
-  background: rgba(79,110,247,.05); border: 1px solid rgba(79,110,247,.15);
-  border-radius: 9px; animation: fadeIn .18s ease;
-}
-.dp-row { display: flex; justify-content: space-between; padding: 3px 0; }
-.dp-lbl { font-size: 12px; color: var(--dim); }
-.dp-val { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
-.dp-divider { height: 1px; background: rgba(79,110,247,.15); margin: 5px 0; }
+.segmented-control { display: flex; background: var(--app-bg); padding: 4px; border-radius: 12px; border: 1px solid var(--app-border); }
+.seg-btn { flex: 1; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--app-text-dim); transition: all 0.2s; }
+.seg-btn.active { background: var(--app-primary); color: white; box-shadow: 0 4px 12px rgba(79, 110, 247, 0.2); }
+.type-hint { font-size: 11px; color: var(--app-text-dim); font-style: italic; }
 
-/* Info box */
-.info-box { border-radius: 8px; padding: 12px; font-size: 11px; display: flex; gap: 10px; line-height: 1.4; }
-.info-amber { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2); color: #F59E0B; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.col-span-2 { grid-column: span 2; }
+.mini-label { font-size: 11px; font-weight: 600; color: var(--app-text-dim); margin-bottom: 6px; display: block; }
 
-/* Actions */
-.popup-actions { display: flex; gap: 10px; margin-top: 18px; }
-.btn { flex: 1; padding: 11px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: .2s; }
-.btn-ghost { background: rgba(255,255,255,.05); color: var(--dim); border: 1px solid var(--b); }
-.btn-primary-grad { background: linear-gradient(135deg, var(--blue), var(--purple)); color: white; }
-.btn-primary-grad:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.1); }
-.btn:disabled { opacity: .3; cursor: not-allowed; }
+.premium-input-raw { width: 100%; background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 10px; padding: 10px 14px; color: var(--app-text-main); font-size: 14px; outline: none; }
+.premium-input-raw:focus { border-color: var(--app-primary); }
+.premium-input-raw.highlight { color: var(--app-primary); font-weight: 700; font-family: 'Space Mono', monospace; }
+.textarea { min-height: 80px; resize: vertical; font-size: 13px; }
 
-.fade-in { animation: fadeIn .2s ease-in-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+.diff-preview { margin-top: 12px; padding: 12px; background: rgba(79, 110, 247, 0.04); border: 1px solid rgba(79, 110, 247, 0.1); border-radius: 12px; }
+.diff-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.diff-lbl { font-size: 12px; color: var(--app-text-dim); }
+.diff-val { font-size: 13px; font-weight: 700; font-family: 'Space Mono', monospace; }
+.diff-divider { height: 1px; background: var(--app-border); margin: 8px 0; }
+.total .diff-lbl { font-weight: 700; color: var(--app-text-main); }
+.total .diff-val { font-size: 15px; }
+
+.premium-select { width: 100%; background: var(--app-bg); border: 1px solid var(--app-border); border-radius: 10px; padding: 10px 12px; color: var(--app-text-main); font-size: 13px; outline: none; arrival: none; cursor: pointer; }
+.premium-select:focus { border-color: var(--app-primary); }
+
+.info-alert { display: flex; gap: 12px; background: rgba(245, 158, 11, 0.08); padding: 12px 16px; border-radius: 14px; border: 1px solid rgba(245, 158, 11, 0.2); }
+.info-emoji { font-size: 18px; }
+.info-text { font-size: 12px; color: #f59e0b; line-height: 1.5; font-weight: 600; }
+
+.error-toast { margin: 0 24px 16px; padding: 10px 16px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); border-radius: 10px; color: #f43f5e; font-size: 12px; font-weight: 600; }
+
+.modal-footer { padding: 16px 24px 24px; background: var(--app-card-hi); border-top: 1px solid var(--app-border); display: flex; justify-content: flex-end; gap: 12px; }
+
+.fade-enter-active, .fade-leave-active { transition: all 0.2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; transform: translateY(-4px); }
 </style>

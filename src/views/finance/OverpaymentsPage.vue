@@ -1,81 +1,92 @@
 <template>
   <div class="content">
     <!-- Header -->
-    <div class="page-header">
-      <div class="header-left">
-        <h1 class="page-title">{{ t('finance.overpaymentsList') || 'Overpayments' }}</h1>
-        <p class="page-subtitle">{{ t('finance.overpaymentsSubtitle') || 'Students with positive balance and store credit' }}</p>
+    <header class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">{{ t('finance.overpaymentsList') }}</h1>
+        <p class="page-subtitle">{{ t('finance.overpaymentsSubtitle') }}</p>
       </div>
-      <div class="header-right">
-        <div class="filter-group">
-          <label class="filter-label">{{ t('faktury.filterByProject') }}</label>
-          <select class="dropdown-filter-btn" v-model="debtorsStore.filters.project_id" @change="debtorsStore.fetchOverpayments">
-            <option :value="undefined">{{ t('common.allProjects') || 'All Projects' }}</option>
+      <div class="header-actions">
+        <div class="filter-wrapper">
+          <select class="custom-select" v-model="debtorsStore.filters.project_id" @change="debtorsStore.fetchOverpayments">
+            <option :value="undefined">{{ t('common.allProjects') }}</option>
             <option v-for="project in projectsStore.projects" :key="project.id" :value="project.id">
               {{ project.name }}
             </option>
           </select>
         </div>
       </div>
-    </div>
+    </header>
 
     <!-- Stats Grid -->
     <div class="stats-grid" v-if="debtorsStore.overpaymentStats">
-      <div class="stat-card">
-        <div class="stat-icon persons">👥</div>
-        <div class="stat-info">
-          <div class="stat-label">{{ t('finance.totalOverpaidStudents') || 'Overpaid Students' }}</div>
-          <div class="stat-value">{{ debtorsStore.overpaymentStats.total_overpaid_count }}</div>
+      <UiCard glass class="stat-card platinum">
+        <div class="stat-icon-wrapper blue">
+          <span class="emoji-icon">👥</span>
         </div>
-      </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('finance.totalOverpaidStudents') }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value highlight">{{ debtorsStore.overpaymentStats.total_overpaid_count }}</span>
+          </div>
+          <span class="stat-sub">{{ t('common.total') }}</span>
+        </div>
+      </UiCard>
       
-      <div class="stat-card">
-        <div class="stat-icon money">💰</div>
-        <div class="stat-info">
-          <div class="stat-label">{{ t('finance.totalOverpaymentSum') || 'Total Overpayment' }}</div>
-          <div class="stat-value money-text">{{ formatCurrency(debtorsStore.overpaymentStats.total_overpayment_sum) }}</div>
+      <UiCard glass class="stat-card">
+        <div class="stat-icon-wrapper success">
+          <span class="emoji-icon">💰</span>
         </div>
-      </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('finance.totalOverpaymentSum') }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value text-success">{{ formatCurrency(debtorsStore.overpaymentStats.total_overpayment_sum) }}</span>
+          </div>
+          <span class="stat-sub">POS Balance</span>
+        </div>
+      </UiCard>
 
-      <div class="stat-card featured">
-        <div class="stat-icon credit">💳</div>
-        <div class="stat-info">
-          <div class="stat-label">{{ t('finance.totalCreditAmount') || 'Total Store Credit' }}</div>
-          <div class="stat-value featured-text">{{ formatCurrency(debtorsStore.overpaymentStats.total_credit_amount) }}</div>
+      <UiCard glass class="stat-card">
+        <div class="stat-icon-wrapper amber">
+          <span class="emoji-icon">💳</span>
         </div>
-      </div>
+        <div class="stat-info">
+          <span class="stat-label">{{ t('finance.totalCreditAmount') }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value highlight-amber">{{ formatCurrency(debtorsStore.overpaymentStats.total_credit_amount) }}</span>
+          </div>
+          <span class="stat-sub">{{ t('finance.totalCredit') }}</span>
+        </div>
+      </UiCard>
     </div>
 
-    <!-- Table Container -->
-    <div class="table-container">
-      <table>
-        <thead>
+    <!-- Table Section -->
+    <UiCard class="table-card">
+      <UiTable
+        :items="debtorsStore.overpayments"
+        :loading="debtorsStore.isLoading"
+      >
+        <template #head>
           <tr>
             <th>{{ t('faktury.buyer') }}</th>
             <th>{{ t('faktury.project') }}</th>
-            <th>{{ t('common.balance') || 'Balance' }}</th>
-            <th>{{ t('finance.balanceOverpayment') || 'Credit Account' }}</th>
-            <th>{{ t('finance.totalCredit') || 'Total Credit' }}</th>
-            <th class="actions-header">{{ t('common.actions') || 'Actions' }}</th>
+            <th>{{ t('common.balance') }}</th>
+            <th>{{ t('finance.balanceOverpayment') }}</th>
+            <th>{{ t('finance.totalCredit') }}</th>
+            <th class="actions-col"></th>
           </tr>
-        </thead>
+        </template>
 
-        <tbody v-if="debtorsStore.isLoading">
-          <tr v-for="i in 5" :key="i" class="skeleton-row">
-            <td colspan="6"><div class="skeleton-line"></div></td>
-          </tr>
-        </tbody>
-
-        <tbody v-else>
-          <tr v-for="item in debtorsStore.overpayments" :key="item.id" class="table-row">
+        <template #row="{ item }">
+          <tr class="clickable-row" @click="handleRowClick(item)">
             <td>
-              <div class="buyer-info">
+              <div class="buyer-cell">
                 <span class="buyer-name">{{ item.full_name }}</span>
                 <span class="buyer-nip">{{ item.email }}</span>
               </div>
             </td>
             <td>
-              <UiBadge variant="default" size="sm">
+              <UiBadge variant="default">
                 {{ item.project?.name || '—' }}
               </UiBadge>
             </td>
@@ -83,29 +94,20 @@
               <span class="amount-val text-success">{{ formatCurrency(item.balance) }}</span>
             </td>
             <td>
-              <span class="amount-val">{{ formatCurrency(item.balance_overpayment) }}</span>
+              <span class="amount-val dim">{{ formatCurrency(item.balance_overpayment) }}</span>
             </td>
             <td>
-              <span class="total-credit-val">{{ formatCurrency(item.total_credit) }}</span>
+              <span class="amount-val featured">{{ formatCurrency(item.total_credit) }}</span>
             </td>
-            <td class="td-actions">
-              <UiButton variant="ghost" size="sm" @click="handleRowClick(item)">
+            <td class="actions-col">
+              <UiButton variant="ghost" size="sm">
                 🔍 {{ t('faktury.viewDetails') }}
               </UiButton>
             </td>
           </tr>
-
-          <tr v-if="debtorsStore.overpayments.length === 0">
-            <td colspan="6" class="empty-cell">
-              <div class="empty-state">
-                <div class="empty-icon">📭</div>
-                <div class="empty-text">{{ t('common.noData') }}</div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        </template>
+      </UiTable>
+    </UiCard>
   </div>
 </template>
 
@@ -117,6 +119,8 @@ import { useProjectsStore } from '../../stores/projects.store';
 import { useRouter } from 'vue-router';
 import UiButton from '../../components/ui/UiButton.vue';
 import UiBadge from '../../components/ui/UiBadge.vue';
+import UiCard from '../../components/ui/UiCard.vue';
+import UiTable from '../../components/ui/UiTable.vue';
 
 const { t } = useI18n();
 const debtorsStore = useDebtorsStore();
@@ -124,7 +128,6 @@ const projectsStore = useProjectsStore();
 const router = useRouter();
 
 onMounted(async () => {
-  await projectsStore.fetchProjects();
   await debtorsStore.fetchOverpayments();
 });
 
@@ -138,185 +141,104 @@ function handleRowClick(item: any) {
 </script>
 
 <style scoped>
-.content { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+.content {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
+  align-items: center;
 }
 
 .page-title {
   font-size: 26px;
   font-weight: 800;
   color: var(--app-text-main);
-  margin: 0 0 4px 0;
+  margin: 0;
   letter-spacing: -0.5px;
 }
 
 .page-subtitle {
   font-size: 14px;
   color: var(--app-text-dim);
-  margin: 0;
+  margin-top: 4px;
 }
 
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.filter-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--app-text-dim);
-}
-
-.dropdown-filter-btn {
-  padding: 10px 16px;
+.custom-select {
+  background: var(--app-card-hi);
+  border: 1px solid var(--app-border);
   border-radius: 12px;
+  padding: 10px 16px;
   font-size: 14px;
   font-weight: 600;
-  border: 1px solid var(--app-border);
-  background: var(--app-card);
   color: var(--app-text-main);
   cursor: pointer;
+  min-width: 200px;
   transition: all 0.2s ease;
-  min-width: 180px;
 }
 
-.dropdown-filter-btn:hover {
-  border-color: var(--blue);
-  box-shadow: 0 4px 12px rgba(var(--blue-rgb), 0.1);
+.custom-select:hover {
+  border-color: var(--app-primary);
 }
 
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
 }
 
 .stat-card {
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
   padding: 24px;
   display: flex;
   align-items: center;
   gap: 20px;
-  box-shadow: var(--app-shadow);
-  transition: transform 0.2s ease;
 }
 
-.stat-card:hover {
-  transform: translateY(-4px);
-}
-
-.stat-card.featured {
-  background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
-  border: none;
-}
-
-.stat-icon {
+.stat-icon-wrapper {
   width: 52px;
   height: 52px;
   border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  background: var(--app-surface);
+  flex-shrink: 0;
 }
 
-.featured .stat-icon {
-  background: rgba(255, 255, 255, 0.2);
-}
+.emoji-icon { font-size: 28px; }
 
-.stat-label {
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--app-text-dim);
-  margin-bottom: 4px;
-  letter-spacing: 0.5px;
-}
+.stat-icon-wrapper.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.stat-icon-wrapper.success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.stat-icon-wrapper.amber { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 
-.featured .stat-label {
-  color: rgba(255, 255, 255, 0.8);
-}
+.stat-info { display: flex; flex-direction: column; }
+.stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--app-text-dim); margin-bottom: 4px; letter-spacing: 0.5px; }
+.stat-value-row { display: flex; align-items: baseline; gap: 8px; }
+.stat-value { font-size: 24px; font-weight: 800; color: var(--app-text-main); font-family: 'Outfit', sans-serif; }
+.stat-value.highlight { color: var(--app-primary); }
+.stat-value.highlight-amber { color: #f59e0b; }
+.text-success { color: #10b981; }
+.stat-sub { font-size: 12px; color: var(--app-text-dim); margin-top: 2px; }
 
-.stat-value {
-  font-size: 28px;
-  font-weight: 800;
-  color: var(--app-text-main);
-}
+/* Table Section */
+.table-card { padding: 0 !important; }
 
-.featured .stat-value {
-  color: #fff;
-}
+.clickable-row { cursor: pointer; transition: background 0.2s; }
+.clickable-row:hover { background: rgba(var(--app-primary-rgb), 0.03); }
 
-.money-text { color: var(--green); }
-.featured-text { color: #fff; }
-
-/* Table */
-.table-container {
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: var(--app-shadow);
-}
-
-table { width: 100%; border-collapse: collapse; text-align: left; }
-
-th {
-  padding: 16px 24px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--app-text-dim);
-  background: rgba(var(--app-text-main-rgb), 0.02);
-  border-bottom: 1px solid var(--app-border);
-}
-
-td { padding: 18px 24px; border-bottom: 1px solid var(--app-border); vertical-align: middle; }
-
-.table-row:hover { background: rgba(var(--blue-rgb), 0.03); }
-
-.buyer-info { display: flex; flex-direction: column; gap: 2px; }
+.buyer-cell { display: flex; flex-direction: column; gap: 2px; }
 .buyer-name { font-weight: 700; color: var(--app-text-main); font-size: 14px; }
 .buyer-nip { font-size: 12px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
 
-.amount-val { font-family: 'Space Mono', monospace; font-weight: 600; font-size: 14px; }
-.text-success { color: var(--green); }
-.total-credit-val { font-weight: 800; color: var(--green); font-family: 'Space Mono', monospace; font-size: 15px; }
+.amount-val { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; }
+.amount-val.featured { font-size: 16px; color: #10b981; }
+.amount-val.dim { font-weight: 500; opacity: 0.7; }
 
-.td-actions { text-align: right; }
-
-.empty-cell { padding: 80px 24px; text-align: center; }
-.empty-state { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.empty-icon { font-size: 48px; opacity: 0.5; }
-.empty-text { font-size: 16px; font-weight: 600; color: var(--app-text-dim); }
-
-.skeleton-line {
-  height: 16px;
-  background: linear-gradient(90deg, var(--app-border) 25%, var(--app-surface) 50%, var(--app-border) 75%);
-  background-size: 200% 100%;
-  animation: skeleton 1.5s infinite;
-  border-radius: 8px;
-}
-
-@keyframes skeleton {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@media (max-width: 1100px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .page-header { flex-direction: column; gap: 20px; }
-}
+.actions-col { text-align: right; width: 140px; }
 </style>

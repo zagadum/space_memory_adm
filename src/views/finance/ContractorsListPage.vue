@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useContractorsStore } from '@/stores/contractors.store';
-import UiButton from '@/components/ui/UiButton.vue';
-import UiInput from '@/components/ui/UiInput.vue';
-import UiTable from '@/components/ui/UiTable.vue';
-import UiBadge from '@/components/ui/UiBadge.vue';
-import { useModal } from '@/composables/useModal';
+import { useContractorsStore } from '../../stores/contractors.store';
+import UiButton from '../../components/ui/UiButton.vue';
+import UiInput from '../../components/ui/UiInput.vue';
+import UiTable from '../../components/ui/UiTable.vue';
+import UiBadge from '../../components/ui/UiBadge.vue';
+import { useModalStore } from '../../stores/modal.store';
 
 const { t } = useI18n();
 const store = useContractorsStore();
-const { openModal } = useModal();
+const modal = useModalStore();
 
 const searchQuery = ref('');
 const currentPage = ref(1);
@@ -34,13 +34,13 @@ const handlePageChange = (page: number) => {
 };
 
 const handleAddContractor = () => {
-  openModal('CreateContractorModal', {
+  modal.open('create-contractor', {
     onSuccess: () => fetch()
   });
 };
 
 const handleEditContractor = (contractor: any) => {
-  openModal('CreateContractorModal', {
+  modal.open('create-contractor', {
     contractor,
     onSuccess: () => fetch()
   });
@@ -62,36 +62,35 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="contractors-page">
-    <div class="page-header">
+  <div class="content">
+    <header class="page-header">
       <div class="header-content">
         <h1 class="page-title">{{ t('sidebar.contractors') }}</h1>
         <p class="page-subtitle">{{ t('finance.contractorsSubtitle') }}</p>
       </div>
       <div class="header-actions">
-        <UiButton type="primary" size="lg" @click="handleAddContractor">
-          <span class="icon">➕</span> {{ t('common.add') }}
+        <UiButton variant="primary" @click="handleAddContractor">
+          ➕ {{ t('common.add') }}
         </UiButton>
       </div>
-    </div>
+    </header>
 
     <!-- Filters -->
-    <div class="filters-card shadow-sm">
-      <div class="filter-group">
+    <div class="toolbar-section">
+      <div class="search-box">
         <UiInput
           v-model="searchQuery"
           :placeholder="t('search.contractors')"
-          class="search-input"
           @keyup.enter="handleSearch"
         >
           <template #prefix>🔍</template>
         </UiInput>
-        <UiButton type="secondary" @click="handleSearch">{{ t('common.search') }}</UiButton>
       </div>
+      <UiButton variant="secondary" @click="handleSearch">{{ t('common.search') }}</UiButton>
     </div>
 
-    <!-- List -->
-    <div class="content-card shadow-sm">
+    <!-- List Section -->
+    <UiCard class="table-card">
       <UiTable
         :loading="store.isLoading"
         :items="store.contractors"
@@ -103,148 +102,110 @@ onMounted(() => {
         <template #head>
           <tr>
             <th>{{ t('finance.contractorName') }}</th>
-            <th>{{ t('finance.taxId') }} (NIP)</th>
+            <th>{{ t('finance.taxId') }}</th>
             <th>{{ t('finance.contactInfo') }}</th>
             <th>{{ t('finance.location') }}</th>
             <th>{{ t('common.status') }}</th>
-            <th class="text-right">{{ t('common.actions') }}</th>
+            <th class="actions-col"></th>
           </tr>
         </template>
 
         <template #row="{ item }">
-          <tr>
+          <tr class="table-row">
             <td>
-              <div class="contractor-info">
+              <div class="contractor-cell">
                 <span class="contractor-name">{{ item.name }}</span>
                 <span v-if="item.notes" class="contractor-notes">{{ item.notes }}</span>
               </div>
             </td>
             <td>
-              <UiBadge type="neutral" bold>{{ item.tax_id || '—' }}</UiBadge>
+              <UiBadge variant="default" bold>{{ item.tax_id || '—' }}</UiBadge>
             </td>
             <td>
               <div class="contact-details">
-                <div v-if="item.email" class="detail"><span class="icon">📧</span> {{ item.email }}</div>
-                <div v-if="item.phone" class="detail"><span class="icon">📞</span> {{ item.phone }}</div>
+                <div v-if="item.email" class="detail">📧 {{ item.email }}</div>
+                <div v-if="item.phone" class="detail">📞 {{ item.phone }}</div>
               </div>
             </td>
             <td>
-              <div class="location-details">
-                {{ item.city }}, {{ item.country }}
+              <div class="location-cell">
+                <span class="location-text">{{ item.city }}, {{ item.country }}</span>
               </div>
             </td>
             <td>
-              <UiBadge :type="item.is_active ? 'success' : 'danger'">
+              <UiBadge :variant="item.is_active ? 'success' : 'danger'">
                 {{ item.is_active ? t('common.active') : t('common.inactive') }}
               </UiBadge>
             </td>
-            <td class="text-right">
+            <td class="actions-col">
               <div class="actions-group">
-                <UiButton size="sm" type="ghost" @click="handleEditContractor(item)">✏️</UiButton>
-                <UiButton size="sm" type="ghost" class="text-danger" @click="handleDeleteContractor(item.id)">🗑️</UiButton>
+                <UiButton size="sm" variant="ghost" @click="handleEditContractor(item)">✏️</UiButton>
+                <UiButton size="sm" variant="ghost" class="text-danger" @click="handleDeleteContractor(item.id)">🗑️</UiButton>
               </div>
             </td>
           </tr>
         </template>
       </UiTable>
-    </div>
+    </UiCard>
   </div>
 </template>
 
 <style scoped>
-.contractors-page {
+.content {
   padding: 24px;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .page-title {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0 0 4px 0;
-  color: var(--text-primary);
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--app-text-main);
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
 .page-subtitle {
-  color: var(--text-secondary);
-  margin: 0;
+  font-size: 14px;
+  color: var(--app-text-dim);
+  margin-top: 4px;
 }
 
-.filters-card {
-  background: var(--bg-card);
-  padding: 16px;
-  border-radius: 12px;
+/* Toolbar */
+.toolbar-section {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-.filter-group {
-  display: flex;
-  gap: 8px;
-  flex: 1;
-  max-width: 600px;
+.search-box {
+  width: 320px;
 }
 
-.search-input {
-  flex: 1;
-}
+/* Table Section */
+.table-card { padding: 0 !important; }
 
-.content-card {
-  background: var(--bg-card);
-  border-radius: 12px;
-  padding: 8px;
-  overflow: hidden;
-}
+.contractor-cell { display: flex; flex-direction: column; gap: 2px; }
+.contractor-name { font-weight: 700; color: var(--app-text-main); font-size: 14px; font-family: 'Outfit', sans-serif; }
+.contractor-notes { font-size: 11px; color: var(--app-text-dim); }
 
-.contractor-info {
-  display: flex;
-  flex-direction: column;
-}
+.contact-details { display: flex; flex-direction: column; gap: 2px; }
+.detail { font-size: 13px; color: var(--app-text-dim); }
 
-.contractor-name {
-  font-weight: 600;
-  color: var(--text-primary);
-}
+.location-cell { display: flex; align-items: center; }
+.location-text { font-size: 13px; color: var(--app-text-main); font-weight: 500; }
 
-.contractor-notes {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
+.actions-col { text-align: right; width: 120px; }
+.actions-group { display: flex; justify-content: flex-end; gap: 4px; }
 
-.contact-details {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.detail {
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--text-secondary);
-}
-
-.actions-group {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-}
-
-/* Transitions */
-.content-card :deep(tbody tr) {
-  transition: background 0.2s ease;
-}
-
-.content-card :deep(tbody tr:hover) {
-  background: var(--bg-hover);
-}
+:deep(.ui-badge.bold) { font-family: 'Space Mono', monospace; letter-spacing: 0.05em; font-size: 12px; }
 </style>

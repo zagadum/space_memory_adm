@@ -23,7 +23,8 @@ export type ModalId =
   | "invoice-create"
   | "invoice-correct"
   | "invoice-email"
-  | "invoice-preview";
+  | "invoice-preview"
+  | "create-contractor";
 
 export const useModalStore = defineStore("modal", {
   state: () => ({

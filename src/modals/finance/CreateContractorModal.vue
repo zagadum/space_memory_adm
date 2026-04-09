@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useContractorsStore } from '@/stores/contractors.store';
-import { invoicesApi, Contractor } from '@/api/invoices.api';
-import UiButton from '@/components/ui/UiButton.vue';
-import UiInput from '@/components/ui/UiInput.vue';
+import { useContractorsStore } from '../../stores/contractors.store';
+import { invoicesApi, type Contractor } from '../../api/invoices.api';
+import UiButton from '../../components/ui/UiButton.vue';
+import UiInput from '../../components/ui/UiInput.vue';
 
 const props = defineProps<{
   contractor?: Contractor;

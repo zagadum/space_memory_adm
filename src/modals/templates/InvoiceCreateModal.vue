@@ -1,207 +1,31 @@
-<template>
-  <BaseModal popupClass="popup-invoice-create">
-    <div class="popup-title">🧾 {{ t('faktury.createInvoice') }}</div>
-    <div class="popup-sub">{{ t('modals.invoice.subtitle') }}</div>
-
-    <!-- Mode Toggle -->
-    <div class="mode-toggle">
-      <button 
-        class="mode-btn" 
-        :class="{ active: mode === 'b2c' }" 
-        @click="mode = 'b2c'"
-      >
-        👤 B2C (Student)
-      </button>
-      <button 
-        class="mode-btn" 
-        :class="{ active: mode === 'b2b' }" 
-        @click="mode = 'b2b'"
-      >
-        🏢 B2B (Firma)
-      </button>
-    </div>
-
-    <!-- Contractor Search (B2B only) -->
-    <div v-if="mode === 'b2b'" class="search-section">
-      <div class="popup-label">{{ t('finance.contractorName') }} / NIP</div>
-      <div class="search-container">
-        <input 
-          class="popup-input" 
-          v-model="contractorSearch" 
-          @input="onContractorSearch"
-          :placeholder="t('search.contractors')"
-        />
-        <div v-if="contractorSearchResults.length > 0" class="search-results">
-          <div 
-            v-for="c in contractorSearchResults" 
-            :key="c.id" 
-            class="search-item" 
-            @click="selectContractor(c)"
-          >
-            <span class="s-name">{{ c.name }}</span>
-            <span class="s-email">{{ c.tax_id }} | {{ c.city }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Student Search (B2C only) -->
-    <div v-if="mode === 'b2c'" class="search-section">
-      <div class="popup-label">{{ t('info.fullName') }}</div>
-      <div class="search-container">
-        <input 
-          class="popup-input" 
-          v-model="studentSearch" 
-          @input="onStudentSearch"
-          :placeholder="t('faktury.searchPlaceholder')"
-        />
-        <div v-if="searchResults.length > 0" class="search-results">
-          <div 
-            v-for="s in searchResults" 
-            :key="s.id" 
-            class="search-item" 
-            @click="selectStudent(s)"
-          >
-            <span class="s-name">{{ s.name }}</span>
-            <span class="s-email">{{ s.email }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Buyer Details -->
-    <div class="client-card" :class="{ 'card-b2b': mode === 'b2b' }">
-      <div class="client-card-title">{{ t('faktury.buyer') }}</div>
-      <div class="popup-2col">
-        <div class="nip-input-wrapper">
-          <UiInput 
-            v-model="form.buyer_tax_id" 
-            :label="mode === 'b2b' ? 'NIP' : 'NIP (Optional)'" 
-            :required="mode === 'b2b'" 
-            @input="onNipInput"
-            placeholder="0000000000"
-          />
-          <button 
-            v-if="mode === 'b2b'"
-            class="nip-btn" 
-            @click="handleNipLookup" 
-            :disabled="lookupLoading || form.buyer_tax_id.length < 10"
-          >
-            <span v-if="lookupLoading" class="loader-inner"></span>
-            <span v-else>🔍 Check</span>
-          </button>
-        </div>
-        <UiInput 
-          v-model="form.buyer_name" 
-          :label="t('modals.invoice.buyerName')" 
-          required 
-          :placeholder="mode === 'b2b' ? 'Pełna nazwa firmy...' : 'Imię i nazwisko...'"
-        />
-      </div>
-      <div class="mt-2">
-        <UiInput 
-          v-model="form.buyer_address" 
-          :label="t('modals.invoice.buyerAddress')" 
-          required 
-          placeholder="Ulica, Kod Pocztowy, Miasto"
-        />
-      </div>
-    </div>
-
-    <!-- Invoice Details -->
-    <div class="popup-2col">
-      <div>
-        <div class="popup-label">{{ t('faktury.project') }}</div>
-        <select class="popup-input" v-model="form.project_id">
-          <option v-for="p in projectsStore.projects" :key="p.id" :value="parseInt(p.id)">
-            {{ p.name }}
-          </option>
-        </select>
-      </div>
-      <div>
-        <div class="popup-label">{{ t('faktury.type') }}</div>
-        <select class="popup-input" v-model="form.document_type">
-          <option value="FA">FA (Faktura)</option>
-          <option value="PF">PF (Proforma)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="popup-2col">
-      <UiInput 
-        type="date" 
-        v-model="form.issue_date" 
-        :label="t('faktury.date')" 
-        required 
-      />
-      <UiInput 
-        type="date" 
-        v-model="form.sale_date" 
-        :label="t('modals.invoice.saleDate')" 
-        required 
-      />
-    </div>
-
-    <div class="popup-2col">
-      <UiInput 
-        type="number" 
-        v-model="form.amount_gross" 
-        :label="t('faktury.amount')" 
-        required 
-      />
-      <div>
-        <div class="popup-label">{{ t('modals.invoice.formaPlatnosci') }}</div>
-        <select class="popup-input" v-model="form.payment_method">
-          <option value="transfer">Przelew</option>
-          <option value="card">Karta</option>
-          <option value="cash">Gotówka</option>
-          <option value="imoje">Imoje (Online)</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="mt-2 text-danger" v-if="error">{{ error }}</div>
-
-    <div class="popup-actions mt-4">
-      <UiButton variant="ghost" @click="close">{{ t('common.cancel') }}</UiButton>
-      <UiButton 
-        variant="primary" 
-        :loading="loading" 
-        :disabled="!isFormValid || loading" 
-        @click="submit"
-      >
-        {{ t('common.save') }}
-      </UiButton>
-    </div>
-  </BaseModal>
-</template>
-
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import BaseModal from '../BaseModal.vue';
-import UiInput from '../../components/ui/UiInput.vue';
-import UiButton from '../../components/ui/UiButton.vue';
-import { useModalStore } from '../../stores/modal.store';
-import { useInvoicesStore } from '../../stores/invoices.store';
-import { useProjectsStore } from '../../stores/projects.store';
-import { useContractorsStore } from '../../stores/contractors.store';
-import { getStudents } from '../../api/studentApi';
+import { ref, reactive, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import BaseModal from '../BaseModal.vue'
+import UiInput from '../../components/ui/UiInput.vue'
+import UiButton from '../../components/ui/UiButton.vue'
+import { useModalStore } from '../../stores/modal.store'
+import { useInvoicesStore } from '../../stores/invoices.store'
+import { useProjectsStore } from '../../stores/projects.store'
+import { useContractorsStore } from '../../stores/contractors.store'
+import { getStudents } from '../../api/studentApi'
 
-const { t } = useI18n();
-const modal = useModalStore();
-const invoicesStore = useInvoicesStore();
-const projectsStore = useProjectsStore();
-const contractorsStore = useContractorsStore();
+const { t } = useI18n()
+const modal = useModalStore()
+const invoicesStore = useInvoicesStore()
+const projectsStore = useProjectsStore()
+const contractorsStore = useContractorsStore()
 
-const mode = ref<'b2c' | 'b2b'>('b2c');
-const loading = ref(false);
-const lookupLoading = ref(false);
-const error = ref<string | null>(null);
+const mode = ref<'b2c' | 'b2b'>('b2c')
+const loading = ref(false)
+const lookupLoading = ref(false)
+const error = ref<string | null>(null)
 
-const contractorSearch = ref('');
-const contractorSearchResults = ref<any[]>([]);
-let searchTimeout: any = null;
+const studentSearch = ref('')
+const searchResults = ref<any[]>([])
+const contractorSearch = ref('')
+const contractorSearchResults = ref<any[]>([])
+let searchTimeout: any = null
 
 const form = reactive({
   student_id: null as number | null,
@@ -217,303 +41,321 @@ const form = reactive({
   sale_date: new Date().toISOString().split('T')[0],
   payment_method: 'transfer',
   notes: '',
-});
+})
 
 const isFormValid = computed(() => {
-  const common = form.buyer_name && form.buyer_address && form.amount_gross > 0 && form.issue_date && form.sale_date;
-  if (mode.value === 'b2c') return common && form.student_id;
-  if (mode.value === 'b2b') return common && form.buyer_tax_id.replace(/\D/g, '').length === 10;
-  return false;
-});
+  const common = form.buyer_name && form.buyer_address && form.amount_gross > 0 && form.issue_date && form.sale_date
+  if (mode.value === 'b2c') return common && (form.student_id || form.buyer_name)
+  if (mode.value === 'b2b') return common && form.buyer_tax_id.replace(/\D/g, '').length === 10
+  return false
+})
 
-async function handleNipLookup() {
-  const nip = form.buyer_tax_id.replace(/\D/g, '');
-  if (nip.length !== 10) return;
+const handleNipLookup = async () => {
+  const nip = form.buyer_tax_id.replace(/\D/g, '')
+  if (nip.length !== 10) return
 
-  lookupLoading.value = true;
-  error.value = null;
+  lookupLoading.value = true
+  error.value = null
   try {
-    const data = await invoicesStore.lookupNip(nip);
+    const data = await invoicesStore.lookupNip(nip)
     if (data) {
-      form.buyer_name = data.name;
-      form.buyer_address = data.address;
+      form.buyer_name = data.name
+      form.buyer_address = data.address
     }
   } catch (err: any) {
-    console.error(err);
-    error.value = t('modals.invoice.errors.nipNotFound') || 'Nie znaleziono firmy w GUS';
+    console.error(err)
+    error.value = t('modals.invoice.errors.nipNotFound') || 'Nie znaleziono firmy w GUS'
   } finally {
-    lookupLoading.value = false;
+    lookupLoading.value = false
   }
 }
 
-function onNipInput() {
-  const nip = form.buyer_tax_id.replace(/\D/g, '');
+const onNipInput = () => {
+  const nip = form.buyer_tax_id.replace(/\D/g, '')
   if (nip.length === 10 && mode.value === 'b2b') {
-    handleNipLookup();
+    handleNipLookup()
   }
 }
 
-async function onStudentSearch() {
+const onStudentSearch = async () => {
   if (studentSearch.value.length < 3) {
-    searchResults.value = [];
-    return;
+    searchResults.value = []
+    return
   }
-  if (searchTimeout) clearTimeout(searchTimeout);
+  if (searchTimeout) clearTimeout(searchTimeout)
   searchTimeout = setTimeout(async () => {
     try {
-      const res = await getStudents({ search: studentSearch.value, per_page: 5 });
-      searchResults.value = res.data;
+      const res = await getStudents({ search: studentSearch.value, per_page: 5 })
+      searchResults.value = res.data
     } catch (e) {
-      console.error(e);
+      console.error(e)
     }
-  }, 400);
+  }, 400)
 }
 
-const studentSearch = ref('');
-const searchResults = ref<any[]>([]);
-
-async function onContractorSearch() {
+const onContractorSearch = async () => {
   if (contractorSearch.value.length < 3) {
-    contractorSearchResults.value = [];
-    return;
+    contractorSearchResults.value = []
+    return
   }
-  if (searchTimeout) clearTimeout(searchTimeout);
+  if (searchTimeout) clearTimeout(searchTimeout)
   searchTimeout = setTimeout(async () => {
     try {
-      contractorSearchResults.value = await contractorsStore.searchContractors(contractorSearch.value);
+      contractorSearchResults.value = await contractorsStore.searchContractors(contractorSearch.value)
     } catch (e) {
-      console.error(e);
+      console.error(e)
     }
-  }, 400);
+  }, 400)
 }
 
-function selectStudent(student: any) {
-  form.student_id = student.id;
-  form.buyer_name = student.name;
-  form.buyer_address = student.address || '';
-  studentSearch.value = student.name;
-  searchResults.value = [];
+const selectStudent = (student: any) => {
+  form.student_id = student.id
+  form.buyer_name = student.name
+  form.buyer_address = student.address || ''
+  studentSearch.value = student.name
+  searchResults.value = []
 }
 
-function selectContractor(contractor: any) {
-  form.contractor_id = contractor.id;
-  form.buyer_name = contractor.name;
-  form.buyer_tax_id = contractor.tax_id || '';
-  // Format address from components
-  const addr = `${contractor.street} ${contractor.house_number}${contractor.flat_number ? '/' + contractor.flat_number : ''}, ${contractor.zip_code} ${contractor.city}`;
-  form.buyer_address = addr.trim();
-  contractorSearch.value = contractor.name;
-  contractorSearchResults.value = [];
+const selectContractor = (contractor: any) => {
+  form.contractor_id = contractor.id
+  form.buyer_name = contractor.name
+  form.buyer_tax_id = contractor.tax_id || ''
+  const addr = `${contractor.street} ${contractor.house_number}${contractor.flat_number ? '/' + contractor.flat_number : ''}, ${contractor.zip_code} ${contractor.city}`
+  form.buyer_address = addr.trim()
+  contractorSearch.value = contractor.name
+  contractorSearchResults.value = []
 }
 
-function close() {
-  modal.close();
-}
-
-async function submit() {
-  loading.value = true;
-  error.value = null;
+const submit = async () => {
+  loading.value = true
+  error.value = null
   
-  // Find project code
-  const project = projectsStore.projects.find(p => parseInt(p.id) === form.project_id);
-  if (project) {
-    form.project_code = project.code;
-  }
+  const project = projectsStore.projects.find(p => parseInt(p.id) === form.project_id)
+  if (project) form.project_code = project.code
 
   try {
-    await invoicesStore.createInvoice({ 
-      ...form,
-      mode: mode.value 
-    });
-    modal.close();
+    await invoicesStore.createInvoice({ ...form, mode: mode.value })
+    modal.close()
   } catch (err: any) {
-    error.value = err.message || 'Błąd podczas wystawiania faktury';
+    error.value = err.message || 'Błąd podczas wystawiania faktury'
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 </script>
 
+<template>
+  <BaseModal popupClass="popup-invoice-create">
+    <div class="modal-header">
+      <div class="header-icon">➕</div>
+      <div class="header-text">
+        <h2 class="popup-title">{{ t('faktury.createInvoice') }}</h2>
+        <p class="popup-sub">{{ t('faktury.createSubtitle') }}</p>
+      </div>
+    </div>
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle-wrap">
+      <div class="modern-toggle">
+        <button 
+          class="toggle-btn" 
+          :class="{ active: mode === 'b2c' }" 
+          @click="mode = 'b2c'"
+        >
+          👤 {{ t('faktury.b2c') }}
+        </button>
+        <button 
+          class="toggle-btn" 
+          :class="{ active: mode === 'b2b' }" 
+          @click="mode = 'b2b'"
+        >
+          🏢 {{ t('faktury.b2b') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="scroll-body">
+      <div class="section-card search-box-wrap">
+        <label class="section-label">🔍 {{ mode === 'b2b' ? t('faktury.searchContractor') : t('faktury.searchStudent') }}</label>
+        <div class="search-field">
+          <input 
+            v-if="mode === 'b2b'"
+            v-model="contractorSearch"
+            @input="onContractorSearch"
+            class="premium-input-raw"
+            :placeholder="t('faktury.searchPlaceholder')"
+          />
+          <input 
+            v-else
+            v-model="studentSearch"
+            @input="onStudentSearch"
+            class="premium-input-raw"
+            :placeholder="t('faktury.searchPlaceholder')"
+          />
+          
+          <Transition name="fade-down">
+            <div v-if="(mode === 'b2c' && searchResults.length) || (mode === 'b2b' && contractorSearchResults.length)" class="dropdown-results shadow-2xl">
+              <template v-if="mode === 'b2c'">
+                <div v-for="s in searchResults" :key="s.id" class="result-item" @click="selectStudent(s)">
+                  <div class="item-icon">👤</div>
+                  <div class="item-info">
+                    <span class="main-text">{{ s.name }}</span>
+                    <span class="sub-text">{{ s.email }}</span>
+                  </div>
+                </div>
+              </template>
+              <template v-else>
+                <div v-for="c in contractorSearchResults" :key="c.id" class="result-item" @click="selectContractor(c)">
+                  <div class="item-icon">🏢</div>
+                  <div class="item-info">
+                    <span class="main-text">{{ c.name }}</span>
+                    <span class="sub-text">{{ c.tax_id }} | {{ c.city }}</span>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </Transition>
+        </div>
+      </div>
+
+      <!-- Buyer Details -->
+      <div class="section-card buyer-details" :class="{ 'is-b2b': mode === 'b2b' }">
+        <div class="card-header">
+          <label class="section-label">📦 {{ t('faktury.buyerDetails') }}</label>
+          <div v-if="mode === 'b2b' && lookupLoading" class="mini-loader"></div>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group nip-field">
+            <UiInput 
+              v-model="form.buyer_tax_id" 
+              :label="mode === 'b2b' ? 'NIP' : 'NIP (Optional)'" 
+              :required="mode === 'b2b'" 
+              @input="onNipInput"
+              placeholder="0000000000"
+            />
+            <button 
+              v-if="mode === 'b2b' && form.buyer_tax_id.length >= 10"
+              class="nip-lookup-btn" 
+              @click="handleNipLookup" 
+              :disabled="lookupLoading"
+            >
+              Check
+            </button>
+          </div>
+          <div class="form-group">
+            <UiInput v-model="form.buyer_name" :label="t('common.name')" required />
+          </div>
+          <div class="form-group col-span-2">
+            <UiInput v-model="form.buyer_address" :label="t('common.address')" required />
+          </div>
+        </div>
+      </div>
+
+      <!-- Document Params -->
+      <div class="section-card params-section">
+        <label class="section-label">⚙️ {{ t('faktury.documentParams') }}</label>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="mini-label">{{ t('faktury.project') }}</label>
+            <select v-model="form.project_id" class="premium-select">
+              <option v-for="p in projectsStore.projects" :key="p.id" :value="parseInt(p.id)">{{ p.name }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="mini-label">{{ t('faktury.type') }}</label>
+            <select v-model="form.document_type" class="premium-select">
+              <option value="FA">FA (Faktura)</option>
+              <option value="PF">PF (Proforma)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <UiInput type="date" v-model="form.issue_date" :label="t('faktury.date')" required />
+          </div>
+          <div class="form-group">
+            <UiInput type="date" v-model="form.sale_date" :label="t('faktury.saleDate')" required />
+          </div>
+          <div class="form-group">
+            <UiInput type="number" v-model="form.amount_gross" :label="t('faktury.amount')" required />
+          </div>
+          <div class="form-group">
+            <label class="mini-label">{{ t('faktury.paymentMethod') }}</label>
+            <select v-model="form.payment_method" class="premium-select">
+              <option value="transfer">Przelew</option>
+              <option value="card">Karta</option>
+              <option value="cash">Gotówka</option>
+              <option value="imoje">Imoje (Online)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="error" class="error-toast">{{ error }}</div>
+
+    <div class="modal-footer">
+      <UiButton variant="ghost" @click="modal.close">{{ t('common.cancel') }}</UiButton>
+      <UiButton 
+        variant="primary" 
+        :loading="loading" 
+        :disabled="!isFormValid || loading" 
+        @click="submit"
+      >
+        ✨ {{ t('faktury.issueDocument') }}
+      </UiButton>
+    </div>
+  </BaseModal>
+</template>
+
 <style scoped>
-.popup-invoice-create { max-width: 580px; }
+.popup-invoice-create { max-width: 600px; padding: 0 !important; overflow: hidden; }
 
-.mode-toggle {
-  display: flex;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 4px;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
+.modal-header { padding: 24px 24px 16px; background: var(--app-card-hi); border-bottom: 1px solid var(--app-border); display: flex; gap: 16px; align-items: flex-start; }
+.header-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(79, 110, 247, 0.1); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+.popup-title { font-size: 18px; font-weight: 800; color: var(--app-text-main); margin: 0; }
+.popup-sub { font-size: 13px; color: var(--app-text-dim); margin: 4px 0 0; }
 
-.mode-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  background: transparent;
-  color: var(--dim, #8892b0);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border-radius: 10px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+.mode-toggle-wrap { padding: 16px 24px; display: flex; justify-content: center; background: var(--app-bg); }
+.modern-toggle { display: flex; background: var(--app-card-hi); padding: 4px; border-radius: 14px; border: 1px solid var(--app-border); width: 100%; max-width: 320px; }
+.toggle-btn { flex: 1; padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--app-text-dim); transition: all 0.2s; }
+.toggle-btn.active { background: var(--app-primary); color: white; box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3); }
 
-.mode-btn.active {
-  background: linear-gradient(135deg, var(--blue, #4f6ef7), #3b5bdb);
-  color: white;
-  box-shadow: 0 4px 15px rgba(79, 110, 247, 0.3);
-}
+.scroll-body { padding: 8px 24px 24px; max-height: 50vh; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
 
-.search-section { margin-bottom: 20px; }
-.search-container { position: relative; }
+.section-card { border: 1px solid var(--app-border); border-radius: 16px; padding: 16px; background: var(--app-card); transition: all 0.3s; }
+.section-label { font-size: 11px; font-weight: 800; color: var(--app-primary); text-transform: uppercase; letter-spacing: 0.1em; display: block; margin-bottom: 12px; }
 
-.search-results {
-  position: absolute;
-  top: calc(100% + 5px);
-  left: 0;
-  right: 0;
-  background: #1a1a3a;
-  border: 1px solid rgba(79, 110, 247, 0.3);
-  border-radius: 12px;
-  z-index: 100;
-  max-height: 240px;
-  overflow-y: auto;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
-}
+.search-field { position: relative; }
+.premium-input-raw { width: 100%; background: var(--app-card-hi); border: 1px solid var(--app-border); border-radius: 10px; padding: 12px 16px; color: var(--app-text-main); font-size: 14px; outline: none; }
+.premium-input-raw:focus { border-color: var(--app-primary); background: var(--app-bg); }
 
-.search-item {
-  padding: 12px 16px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  transition: background 0.2s;
-}
+.dropdown-results { position: absolute; top: calc(100% + 8px); left: 0; right: 0; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 12px; z-index: 1000; padding: 8px; max-height: 200px; overflow-y: auto; }
+.result-item { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 10px; cursor: pointer; transition: background 0.2s; }
+.result-item:hover { background: var(--app-card-hi); }
+.item-icon { font-size: 18px; }
+.item-info { display: flex; flex-direction: column; }
+.main-text { font-size: 13px; font-weight: 700; color: var(--app-text-main); }
+.sub-text { font-size: 11px; color: var(--app-text-dim); }
 
-.search-item:hover { background: rgba(79, 110, 247, 0.15); }
-.search-item:last-child { border-bottom: none; }
+.buyer-details.is-b2b { border-color: rgba(79, 110, 247, 0.2); background: rgba(79, 110, 247, 0.02); }
+.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.mini-loader { width: 14px; height: 14px; border: 2px solid var(--app-primary); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.s-name { font-weight: 600; color: white; font-size: 14px; }
-.s-email { font-size: 12px; color: var(--dim); }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.col-span-2 { grid-column: span 2; }
+.nip-field { position: relative; }
+.nip-lookup-btn { position: absolute; right: 10px; bottom: 8px; font-size: 10px; font-weight: 800; color: white; background: var(--app-primary); padding: 4px 10px; border-radius: 6px; }
 
-.client-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(100, 120, 255, 0.1);
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 24px;
-  transition: all 0.3s;
-}
+.mini-label { font-size: 11px; font-weight: 600; color: var(--app-text-dim); margin-bottom: 6px; display: block; }
+.premium-select { width: 100%; background: var(--app-card-hi); border: 1px solid var(--app-border); border-radius: 10px; padding: 10px 12px; color: var(--app-text-main); font-size: 13px; outline: none; appearance: none; cursor: pointer; }
+.premium-select:focus { border-color: var(--app-primary); }
 
-.card-b2b {
-  border-color: rgba(79, 110, 247, 0.2);
-  background: rgba(79, 110, 247, 0.02);
-}
+.error-toast { margin: 0 24px 16px; padding: 10px 16px; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.2); border-radius: 10px; color: #f43f5e; font-size: 12px; font-weight: 600; }
 
-.client-card-title {
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--blue);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 16px;
-}
+.modal-footer { padding: 16px 24px 24px; background: var(--app-card-hi); border-top: 1px solid var(--app-border); display: flex; justify-content: flex-end; gap: 12px; }
 
-.nip-input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: flex-end;
-}
-
-.nip-input-wrapper :deep(.ui-input) {
-  flex: 1;
-}
-
-.nip-btn {
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  height: 32px;
-  min-width: 70px;
-  background: var(--blue);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 0 12px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.2s;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.nip-btn:hover:not(:disabled) {
-  filter: brightness(1.2);
-  transform: translateY(-1px);
-}
-
-.nip-btn:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-.loader-inner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255,255,255,0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.popup-2col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 20px;
-}
-
-.popup-label {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--dim);
-  margin-bottom: 8px;
-}
-
-.popup-input {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(100, 120, 255, 0.2);
-  border-radius: 10px;
-  padding: 11px 14px;
-  color: white;
-  font-family: inherit;
-  font-size: 13px;
-  outline: none;
-  transition: all 0.2s;
-}
-
-.popup-input:focus { border-color: var(--blue); background: rgba(255,255,255,0.08); }
-
-.mt-2 { margin-top: 8px; }
-.mt-4 { margin-top: 24px; }
-.text-danger { 
-  color: #ff5555; 
-  font-size: 12px; 
-  padding: 8px 12px;
-  background: rgba(255, 0, 0, 0.05);
-  border-radius: 8px;
-  margin-bottom: 12px;
-}
+.fade-down-enter-active, .fade-down-leave-active { transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+.fade-down-enter-from, .fade-down-leave-to { opacity: 0; transform: translateY(-8px); }
 </style>

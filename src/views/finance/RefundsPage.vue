@@ -1,22 +1,14 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRefundsStore } from '@/stores/refunds.store'
-import { useProjectsStore } from '@/stores/projects.store'
-import UiCard from '@/components/ui/UiCard.vue'
-import UiButton from '@/components/ui/UiButton.vue'
-import UiBadge from '@/components/ui/UiBadge.vue'
-import UiInput from '@/components/ui/UiInput.vue'
-import { 
-  ArrowPathIcon,
-  BanknotesIcon,
-  ClockIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  MagnifyingGlassIcon,
-  CreditCardIcon,
-  BuildingLibraryIcon
-} from '@heroicons/vue/24/outline'
+import { useRefundsStore } from '../../stores/refunds.store'
+import { useProjectsStore } from '../../stores/projects.store'
+import UiCard from '../../components/ui/UiCard.vue'
+import UiButton from '../../components/ui/UiButton.vue'
+import UiBadge from '../../components/ui/UiBadge.vue'
+import UiInput from '../../components/ui/UiInput.vue'
+import UiTable from '../../components/ui/UiTable.vue'
+// Icons replaced with emojis as @heroicons/vue is not available
 
 const { t } = useI18n()
 const store = useRefundsStore()
@@ -36,10 +28,10 @@ const getStatusVariant = (status: string) => {
   switch (status) {
     case 'pending': return 'warning'
     case 'processing': return 'info'
-    case 'manual_pending': return 'neutral'
+    case 'manual_pending': return 'default'
     case 'completed': return 'success'
     case 'rejected': return 'danger'
-    default: return 'neutral'
+    default: return 'default'
   }
 }
 
@@ -58,58 +50,69 @@ const formatDate = (dateStr?: string) => {
         <p class="page-subtitle">{{ t('finance.refundSubtitle') }}</p>
       </div>
       <div class="header-actions">
-        <UiButton variant="neutral" @click="handleRefresh" :loading="store.isLoading">
-          <template #icon><ArrowPathIcon class="w-4 h-4" /></template>
-          {{ t('common.refresh') }}
+        <UiButton variant="primary" @click="handleRefresh" :loading="store.isLoading">
+          🔄 {{ t('common.refresh') }}
         </UiButton>
       </div>
     </header>
 
     <!-- Stats Grid -->
     <div class="stats-grid">
-      <UiCard class="stat-card platinum">
+      <UiCard glass class="stat-card platinum">
         <div class="stat-icon-wrapper warning">
-          <ClockIcon class="w-6 h-6" />
+          <span class="emoji-icon">⏳</span>
         </div>
         <div class="stat-info">
           <span class="stat-label">{{ t('finance.pendingRefundsCount') }}</span>
-          <span class="stat-value">{{ store.stats.pending_count }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value highlight-warning">{{ store.stats.pending_count }}</span>
+          </div>
+          <span class="stat-sub">{{ t('common.pending') }}</span>
         </div>
       </UiCard>
 
-      <UiCard class="stat-card glass">
+      <UiCard glass class="stat-card">
         <div class="stat-icon-wrapper info">
-          <BanknotesIcon class="w-6 h-6" />
+          <span class="emoji-icon">💰</span>
         </div>
         <div class="stat-info">
           <span class="stat-label">{{ t('finance.totalRefundAmount') }}</span>
-          <span class="stat-value highlight">{{ store.stats.pending_amount }} <span class="currency">PLN</span></span>
+          <div class="stat-value-row">
+            <span class="stat-value highlight">{{ store.stats.pending_amount }} <span class="currency">PLN</span></span>
+          </div>
+          <span class="stat-sub">Sum requested</span>
         </div>
       </UiCard>
 
-      <UiCard class="stat-card glass">
+      <UiCard glass class="stat-card">
         <div class="stat-icon-wrapper success">
-          <CheckCircleIcon class="w-6 h-6" />
+          <span class="emoji-icon">✅</span>
         </div>
         <div class="stat-info">
           <span class="stat-label">{{ t('finance.completedRefunds') }}</span>
-          <span class="stat-value">{{ store.stats.completed_month }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value text-success">{{ store.stats.completed_month }}</span>
+          </div>
+          <span class="stat-sub">{{ t('common.thisMonth') || 'This Month' }}</span>
         </div>
       </UiCard>
 
-      <UiCard class="stat-card glass">
+      <UiCard glass class="stat-card">
         <div class="stat-icon-wrapper danger">
-          <XCircleIcon class="w-6 h-6" />
+          <span class="emoji-icon">❌</span>
         </div>
         <div class="stat-info">
           <span class="stat-label">{{ t('finance.rejectedRefunds') }}</span>
-          <span class="stat-value">{{ store.stats.rejected_month }}</span>
+          <div class="stat-value-row">
+            <span class="stat-value text-danger">{{ store.stats.rejected_month }}</span>
+          </div>
+          <span class="stat-sub">{{ t('common.thisMonth') || 'This Month' }}</span>
         </div>
       </UiCard>
     </div>
 
     <!-- Filters & Table -->
-    <UiCard class="content-card">
+    <UiCard class="table-card">
       <div class="toolbar">
         <div class="search-box">
           <UiInput
@@ -117,12 +120,12 @@ const formatDate = (dateStr?: string) => {
             :placeholder="t('search.refunds')"
             @input="store.setFilter({ search: $event.target.value })"
           >
-            <template #prefix><MagnifyingGlassIcon class="w-4 h-4 text-gray-400" /></template>
+            <template #prefix>🔍</template>
           </UiInput>
         </div>
         <div class="filters">
           <select 
-            class="project-select" 
+            class="custom-select" 
             v-model="store.filters.project_id"
             @change="store.setFilter({ project_id: store.filters.project_id })"
           >
@@ -134,62 +137,58 @@ const formatDate = (dateStr?: string) => {
         </div>
       </div>
 
-      <div class="table-wrapper" :class="{ 'is-loading': store.isLoading }">
-        <table class="premium-table">
-          <thead>
-            <tr>
-              <th>{{ t('studentList.table.name') }}</th>
-              <th>{{ t('finance.refundType') }}</th>
-              <th>{{ t('payments.table.amount') }}</th>
-              <th>{{ t('payments.table.status') }}</th>
-              <th>{{ t('finance.iban') }}</th>
-              <th>{{ t('common.createdAt') }}</th>
-              <th class="actions"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="store.isLoading && !store.refunds.length" v-for="i in 5" :key="i">
-              <td colspan="7"><div class="skeleton-row"></div></td>
-            </tr>
-            <tr v-else v-for="refund in store.refunds" :key="refund.id">
-              <td>
-                <div class="student-info">
-                  <span class="student-name">{{ refund.student?.full_name || 'Student ID: ' + refund.student_id }}</span>
-                </div>
-              </td>
-              <td>
-                <UiBadge variant="neutral">{{ t('finance.' + refund.type) }}</UiBadge>
-              </td>
-              <td>
-                <span class="refund-amount">{{ refund.amount }} {{ refund.currency }}</span>
-              </td>
-              <td>
-                <UiBadge :variant="getStatusVariant(refund.status)">
-                  {{ t('payments.status.' + refund.status) }}
-                </UiBadge>
-              </td>
-              <td>
-                <div class="bank-details" v-if="refund.iban">
-                  <span class="iban">{{ refund.iban }}</span>
-                  <span class="bank-name">{{ refund.bank_name }}</span>
-                </div>
-                <span v-else class="text-gray-400">-</span>
-              </td>
-              <td>{{ formatDate(refund.created_at) }}</td>
-              <td class="actions">
-                <UiButton size="sm" variant="neutral" @click="() => {}">
-                  {{ t('common.view') }}
-                </UiButton>
-              </td>
-            </tr>
-            <tr v-if="!store.isLoading && !store.refunds.length">
-              <td colspan="7" class="empty-state">
-                {{ t('common.noData') }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <UiTable
+        :items="store.refunds"
+        :loading="store.isLoading"
+      >
+        <template #head>
+          <tr>
+            <th>{{ t('studentList.table.name') }}</th>
+            <th>{{ t('finance.refundType') }}</th>
+            <th>{{ t('payments.table.amount') }}</th>
+            <th>{{ t('payments.table.status') }}</th>
+            <th>{{ t('finance.iban') }}</th>
+            <th>{{ t('common.createdAt') }}</th>
+            <th class="actions-col"></th>
+          </tr>
+        </template>
+
+        <template #row="{ item }">
+          <tr class="table-row">
+            <td>
+              <div class="student-cell">
+                <span class="student-name">{{ item.student?.full_name || 'Student ID: ' + item.student_id }}</span>
+              </div>
+            </td>
+            <td>
+              <UiBadge variant="default">{{ t('finance.' + item.type) }}</UiBadge>
+            </td>
+            <td>
+              <span class="refund-amount">{{ item.amount }} {{ item.currency }}</span>
+            </td>
+            <td>
+              <UiBadge :variant="getStatusVariant(item.status)">
+                {{ t('payments.status.' + item.status) }}
+              </UiBadge>
+            </td>
+            <td>
+              <div class="bank-details" v-if="item.iban">
+                <span class="iban">{{ item.iban }}</span>
+                <span class="bank-name">{{ item.bank_name }}</span>
+              </div>
+              <span v-else class="dim">—</span>
+            </td>
+            <td>
+              <span class="date-mono">{{ formatDate(item.created_at) }}</span>
+            </td>
+            <td class="actions-col">
+              <UiButton size="sm" variant="ghost" @click="() => {}">
+                📄 {{ t('common.view') }}
+              </UiButton>
+            </td>
+          </tr>
+        </template>
+      </UiTable>
     </UiCard>
   </div>
 </template>
@@ -200,6 +199,8 @@ const formatDate = (dateStr?: string) => {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
 .page-header {
@@ -209,182 +210,99 @@ const formatDate = (dateStr?: string) => {
 }
 
 .page-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--app-text-main);
 }
 
 .page-subtitle {
   font-size: 14px;
-  color: var(--text-secondary);
+  color: var(--app-text-dim);
+  margin-top: 4px;
 }
 
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .stat-card {
+  padding: 24px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid var(--border-color);
-  transition: transform 0.2s;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
+  gap: 20px;
 }
 
 .stat-icon-wrapper {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
+
+.emoji-icon { font-size: 28px; }
 
 .stat-icon-wrapper.warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
 .stat-icon-wrapper.info { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 .stat-icon-wrapper.success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.stat-icon-wrapper.danger { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.stat-icon-wrapper.danger { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
 
-.stat-info {
-  display: flex;
-  flex-direction: column;
-}
+.stat-info { display: flex; flex-direction: column; }
+.stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--app-text-dim); margin-bottom: 4px; letter-spacing: 0.5px; }
+.stat-value-row { display: flex; align-items: baseline; gap: 8px; }
+.stat-value { font-size: 24px; font-weight: 800; color: var(--app-text-main); font-family: 'Outfit', sans-serif; }
+.stat-value.highlight { color: var(--app-primary); }
+.stat-value.highlight-warning { color: #f59e0b; }
+.text-success { color: #10b981; }
+.text-danger { color: #f43f5e; }
+.currency { font-size: 14px; font-weight: 600; color: var(--app-text-dim); margin-left: 4px; }
+.stat-sub { font-size: 12px; color: var(--app-text-dim); margin-top: 2px; }
 
-.stat-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-secondary);
-  font-weight: 600;
-}
+/* Content Card / Table */
+.table-card { padding: 0 !important; }
 
-.stat-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.stat-value.highlight {
-  color: var(--primary-color, #3b82f6);
-}
-
-.currency {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-left: 4px;
-}
-
-/* Toolbar */
 .toolbar {
+  padding: 20px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
   gap: 16px;
 }
 
-.search-box {
-  flex: 1;
-  max-width: 320px;
-}
+.search-box { flex: 1; max-width: 320px; }
 
-.project-select {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
+.custom-select {
+  background: var(--app-card-hi);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
   padding: 8px 12px;
   font-size: 14px;
-  color: var(--text-primary);
+  font-weight: 600;
+  color: var(--app-text-main);
   outline: none;
   min-width: 180px;
+  transition: all 0.2s;
 }
 
-/* Table Style */
-.table-wrapper {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
+.custom-select:hover { border-color: var(--app-primary); }
 
-.premium-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
+.student-cell { display: flex; flex-direction: column; }
+.student-name { font-weight: 700; color: var(--app-text-main); font-size: 14px; }
 
-.premium-table th {
-  background: var(--bg-secondary);
-  padding: 12px 16px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  letter-spacing: 0.05em;
-}
+.refund-amount { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 14px; color: var(--app-text-main); }
 
-.premium-table td {
-  padding: 16px;
-  border-top: 1px solid var(--border-color);
-  font-size: 14px;
-}
+.bank-details { display: flex; flex-direction: column; gap: 2px; }
+.iban { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--app-text-main); }
+.bank-name { font-size: 11px; color: var(--app-text-dim); }
 
-.student-name {
-  font-weight: 600;
-  color: var(--text-primary);
-}
+.date-mono { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--app-text-dim); }
 
-.refund-amount {
-  font-family: 'Outfit', sans-serif;
-  font-weight: 600;
-}
+.actions-col { text-align: right; width: 120px; }
 
-.bank-details {
-  display: flex;
-  flex-direction: column;
-}
-
-.iban {
-  font-family: 'Space Mono', monospace;
-  font-size: 12px;
-  color: var(--text-primary);
-}
-
-.bank-name {
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
-.actions {
-  text-align: right;
-}
-
-.skeleton-row {
-  height: 48px;
-  background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--border-color) 50%, var(--bg-secondary) 75%);
-  background-size: 200% 100%;
-  animation: loading 1.5s infinite;
-  border-radius: 4px;
-}
-
-@keyframes loading {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
-}
-
-.empty-state {
-  text-align: center;
-  padding: 48px !important;
-  color: var(--text-secondary);
-}
+.dim { color: var(--app-text-dim); font-size: 11px; }
 </style>
