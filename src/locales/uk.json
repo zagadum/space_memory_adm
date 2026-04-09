@@ -136,6 +136,19 @@
       "sunday": "Неділя"
     }
   },
+  "finance": {
+    "totalDebtors": "Усього боржників",
+    "totalDebtSum": "Загальна сума боргу",
+    "invoiceDebt": "Борг за рахунками",
+    "subscriptionDebt": "Борг за абонементом",
+    "debtorsList": "Список боржників",
+    "totalDebt": "Разом борг",
+    "overdueCount": "Прострочених",
+    "lastInvoice": "Останній рахунок",
+    "overpaymentsList": "Список переплат",
+    "overpayment": "Переплата",
+    "totalCredit": "Разом на балансі"
+  },
   "search": {
     "students": "Пошук за учнями...",
     "groups": "Пошук за групами...",

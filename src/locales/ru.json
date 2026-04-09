@@ -138,9 +138,21 @@
       "wednesday": "Среда",
       "thursday": "Четверг",
       "friday": "Пятница",
-      "saturday": "Суббота",
       "sunday": "Воскресенье"
     }
+  },
+  "finance": {
+    "totalDebtors": "Всего должников",
+    "totalDebtSum": "Общая сумма долга",
+    "invoiceDebt": "Долг по счетам",
+    "subscriptionDebt": "Долг по абонементу",
+    "debtorsList": "Список должников",
+    "totalDebt": "Итого долг",
+    "overdueCount": "Просроченных",
+    "lastInvoice": "Последний счет",
+    "overpaymentsList": "Список переплат",
+    "overpayment": "Переплата",
+    "totalCredit": "Итого на балансе"
   },
   "search": {
     "students": "Поиск по ученикам...",

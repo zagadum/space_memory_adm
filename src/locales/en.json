@@ -158,9 +158,21 @@
       "wednesday": "Wednesday",
       "thursday": "Thursday",
       "friday": "Friday",
-      "saturday": "Saturday",
       "sunday": "Sunday"
     }
+  },
+  "finance": {
+    "totalDebtors": "Total Debtors",
+    "totalDebtSum": "Total Debt Amount",
+    "invoiceDebt": "Invoice Debt",
+    "subscriptionDebt": "Subscription Debt",
+    "debtorsList": "Debtors List",
+    "totalDebt": "Total Debt",
+    "overdueCount": "Overdue",
+    "lastInvoice": "Last Invoice",
+    "overpaymentsList": "Overpayments List",
+    "overpayment": "Overpayment",
+    "totalCredit": "Total Credit"
   },
   "search": {
     "students": "Search students...",

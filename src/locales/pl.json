@@ -132,9 +132,21 @@
       "wednesday": "Środa",
       "thursday": "Czwartek",
       "friday": "Piątek",
-      "saturday": "Sobota",
       "sunday": "Niedziela"
     }
+  },
+  "finance": {
+    "totalDebtors": "Wszystkich dłużników",
+    "totalDebtSum": "Całkowita kwota długu",
+    "invoiceDebt": "Dług z faktur",
+    "subscriptionDebt": "Dług z abonamentu",
+    "debtorsList": "Lista dłużników",
+    "totalDebt": "Suma zadłużenia",
+    "overdueCount": "Przeterminowane",
+    "lastInvoice": "Ostatnia faktura",
+    "overpaymentsList": "Lista nadpłat",
+    "overpayment": "Nadpłata",
+    "totalCredit": "Suma na balansie"
   },
   "search": {
     "students": "Szukaj uczniów...",

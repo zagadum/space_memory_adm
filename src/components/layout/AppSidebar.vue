@@ -273,11 +273,11 @@
         <div v-if="isVisible('student-finance')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'student-finance' }" @click="navigateTo('student-finance', '/finance/students')">
           <span class="nav-icon">💰</span> {{ t('sidebar.studentFinance') }}
         </div>
-        <div v-if="isVisible('debtors')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
+        <div v-if="isVisible('debtors')" class="nav-item" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
           <span class="nav-icon">🔴</span> {{ t('sidebar.debtors') }}
           <span class="nav-badge" v-if="debtors > 0">{{ debtors }}</span>
         </div>
-        <div v-if="isVisible('nadplaty')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
+        <div v-if="isVisible('nadplaty')" class="nav-item" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
           <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
           <span class="nav-badge cyan">3</span>
         </div>

@@ -59,6 +59,50 @@ export interface InvoiceFilters {
   page?: number;
 }
 
+export interface Debtor {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  project?: { name: string };
+  group?: { group: string };
+  balance: number;
+  invoice_debt: number;
+  total_debt: number;
+  overdue_invoices_count: number;
+  last_invoice_date?: string;
+}
+
+export interface DebtorsResponse {
+  data: Debtor[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    total: number;
+  };
+}
+
+export interface Overpayment {
+  id: number;
+  full_name: string;
+  email: string;
+  phone: string;
+  project?: { name: string };
+  group?: { group: string };
+  balance: number;
+  balance_overpayment: number;
+  total_credit: number;
+}
+
+export interface OverpaymentsResponse {
+  data: Overpayment[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    total: number;
+  };
+}
+
 export const invoicesApi = {
   /**
    * Fetch paginated invoices with filters
@@ -248,5 +292,17 @@ export const invoicesApi = {
     if (filters.date_from) params.append('date_from', filters.date_from);
     if (filters.date_to) params.append('date_to', filters.date_to);
     return `/v1/invoices/export-jpk?${params.toString()}`;
+  },
+
+  async getDebtors(filters: any = {}): Promise<DebtorsResponse> {
+    return (await http.get('/v1/finance/debtors', { params: filters })).data;
+  },
+
+  async getDebtorsStats(filters: any = {}): Promise<any> {
+    return (await http.get('/v1/finance/debtors/stats', { params: filters })).data;
+  },
+
+  async getOverpayments(filters: any = {}): Promise<OverpaymentsResponse> {
+    return (await http.get('/v1/finance/overpayments', { params: filters })).data;
   }
 };
