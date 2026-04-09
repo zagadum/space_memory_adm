@@ -88,13 +88,23 @@ const getStatusVariant = (status: string) => {
   }
 }
 
-const formatCurrency = (amount: number, currency: string) => {
-  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: currency || 'PLN' }).format(amount)
+const formatCurrency = (amount: number | string | null | undefined, currency?: string) => {
+  const val = typeof amount === 'string' ? parseFloat(amount) : amount
+  if (val === undefined || val === null || isNaN(val)) return '—'
+  return new Intl.NumberFormat('pl-PL', { 
+    style: 'currency', 
+    currency: currency || 'PLN',
+    minimumFractionDigits: 2
+  }).format(val)
 }
 
-const formatDate = (dateStr: string) => {
+const formatDate = (dateStr: string | null | undefined) => {
   if (!dateStr) return '—'
-  return new Date(dateStr).toLocaleDateString('pl-PL')
+  try {
+    return new Date(dateStr).toLocaleDateString('pl-PL')
+  } catch (e) {
+    return '—'
+  }
 }
 
 // --- Filter Sync ---
@@ -141,10 +151,9 @@ const handleClickOutside = (event: MouseEvent) => {
     <!-- Page Header -->
     <div class="phdr">
       <div class="header-info">
-        <h1 class="ptitle">Faktury <span>GLS</span></h1>
+        <h1 class="ptitle">{{ t('faktury.pageTitle') || 'Faktury' }} <span>GLS</span></h1>
         <p class="psub">
-          B2C: automatyczne po Imoje · seria FA/[KOD]/RRRR/MM/NNN per projekt
-          &nbsp;·&nbsp; B2B: ręczne · seria FV/B2B/RRRR/MM/NNN (wspólna)
+          {{ activeTab === 'b2c' ? t('faktury.descriptionB2C') : t('faktury.descriptionB2B') }}
         </p>
       </div>
 
@@ -173,7 +182,7 @@ const handleClickOutside = (event: MouseEvent) => {
           :class="{ act: activeTab === 'b2b' }" 
           @click="switchTab('b2b')"
         >
-          🏢 {{ t('faktury.segments.b2b') }} <span class="badge-b2b">2 фирмы</span>
+          🏢 {{ t('faktury.segments.b2b') }} <span class="badge-b2b">{{ t('faktury.b2bCompanies') }}</span>
         </div>
       </div>
       
@@ -188,7 +197,7 @@ const handleClickOutside = (event: MouseEvent) => {
         </template>
         <template v-else>
           <UiButton variant="neutral" size="sm" @click="invoicesStore.exportFilteredExcel">
-            ⬇️ Eksport PDF
+            ⬇️ {{ t('faktury.exportPdf') }}
           </UiButton>
           <UiButton variant="primary" class="btn-amber" @click="modal.open('invoice-create-b2b')">
             ➕ {{ t('faktury.createInvoice') }} B2B
@@ -232,7 +241,7 @@ const handleClickOutside = (event: MouseEvent) => {
     <div class="export-panel">
       <div class="export-title">
         <span>📤</span> {{ t('faktury.exportPanel.title') }}
-        <span class="exp-count">— диапазон: <b>{{ invoicesStore.selectedIds.length }}</b> выбрано / <b>{{ invoicesStore.invoices.length }}</b> на странице</span>
+        <span class="exp-count">— {{ t('faktury.exportPanel.range') }}: <b>{{ invoicesStore.selectedIds.length }}</b> {{ t('faktury.exportPanel.selected') }} / <b>{{ invoicesStore.invoices.length }}</b> {{ t('faktury.exportPanel.onPage') }}</span>
       </div>
       <div class="exp-row">
         <button class="exp-btn exp-xlsx" @click="invoicesStore.exportFilteredExcel">
@@ -296,10 +305,10 @@ const handleClickOutside = (event: MouseEvent) => {
                 />
               </td>
               <td>
-                <div class="inv-num" :class="invoice.document_type.toLowerCase()">{{ invoice.number }}</div>
+                <div class="inv-num" :class="(invoice.document_type || 'fa').toLowerCase()">{{ invoice.number }}</div>
               </td>
               <td>
-                <span class="badge-type" :class="'b-' + invoice.document_type.toLowerCase()">
+                <span class="badge-type" :class="'b-' + (invoice.document_type || 'fa').toLowerCase()">
                   {{ invoice.document_type }}
                 </span>
               </td>
@@ -309,7 +318,7 @@ const handleClickOutside = (event: MouseEvent) => {
                 <div class="cli-id" v-if="invoice.buyer_tax_id">NIP: {{ invoice.buyer_tax_id }}</div>
               </td>
               <td>
-                <span class="proj-tag" :class="'pt-' + invoice.project?.code.toLowerCase()">{{ invoice.project?.name }}</span>
+                <span class="proj-tag" :class="'pt-' + (invoice.project?.code?.toLowerCase() || 'default')">{{ invoice.project?.name }}</span>
               </td>
               <td>
                 <div class="amt" :class="{ neg: invoice.amount_gross < 0 }">
@@ -341,8 +350,8 @@ const handleClickOutside = (event: MouseEvent) => {
             <tr v-if="!invoicesStore.isLoading && !invoicesStore.invoices.length">
               <td colspan="9" class="empty-state">
                 <div class="na-ico">📁</div>
-                <div class="na-title">Brak faktur</div>
-                <p>{{ t('common.noData') }}</p>
+                <div class="na-title">{{ t('faktury.empty.title') || t('common.noData') }}</div>
+                <p v-if="t('faktury.empty.sub')" class="na-sub">{{ t('faktury.empty.sub') }}</p>
               </td>
             </tr>
           </tbody>

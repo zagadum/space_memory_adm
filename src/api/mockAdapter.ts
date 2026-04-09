@@ -1,6 +1,6 @@
 import type { AxiosAdapter, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import { mockNewGroups, mockGroupStudents, mockMasterStudents, mockTeachers, mockManagers } from "./mockNewGroupsDb";
-import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes, StudentProfile, Program, MonthStatus, PayStatus, KsefStatus } from "./mockDb";
+import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes, StudentProfile, Program, MonthStatus, PayStatus, KsefStatus, MOCK_INVOICES, MOCK_DEBTORS, MOCK_KONTRAHENCI } from "./mockDb";
 import { MENU_ROUTE_KEY_MAP, MENU_SECTION_ITEMS } from "../config/menuAccess.config";
 import { ROLE_MENU_ACCESS, normalizeRole, type AppRole } from "../config/roleMenuAccess.config";
 
@@ -165,7 +165,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   const att: any = (globalThis as any).__mock_att ?? ((globalThis as any).__mock_att = JSON.parse(JSON.stringify(mockAttendance)));
   const notes: any[] = (globalThis as any).__mock_notes ?? ((globalThis as any).__mock_notes = JSON.parse(JSON.stringify(mockNotes)));
 
-  const url = (config.url || "").replace(/^\//, "");
+  const url = (config.url || "").replace(/^(\/v1\/|v1\/|\/api\/v1\/|api\/v1\/|\/)/, "").split("?")[0];
   const method = (config.method || "get").toLowerCase();
 
   console.log('[MOCK] incoming:', method.toUpperCase(), url);
@@ -1843,6 +1843,123 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { id: Date.now().toString(), ...body });
   }
 
+
+  // ── INVOICES & FINANCE ─────────────────────────────────────────────────────
+
+  if (method === 'get' && url.endsWith('invoices')) {
+    let items = [...MOCK_INVOICES];
+    const p = config.params as any || {};
+
+    const searchQuery = p.q || p.search;
+    if (searchQuery) {
+      const s = String(searchQuery).toLowerCase();
+      items = items.filter(i => 
+        i.number.toLowerCase().includes(s) || 
+        i.buyer_name.toLowerCase().includes(s)
+      );
+    }
+    if (p.project_id) {
+      items = items.filter(i => i.project_id === Number(p.project_id));
+    }
+    if (p.status) {
+      items = items.filter(i => i.ksef_status === p.status);
+    }
+
+    const page = Number(p.page) || 1;
+    const perPage = Number(p.per_page) || 25;
+    const total = items.length;
+    const from = (page - 1) * perPage;
+    const sliced = items.slice(from, from + perPage);
+
+    return ok(config, {
+      data: sliced,
+      meta: {
+        current_page: page,
+        last_page: Math.ceil(total / perPage) || 1,
+        per_page: perPage,
+        total,
+      }
+    });
+  }
+
+  if (method === 'get' && url.endsWith('invoices/stats')) {
+    return ok(config, {
+      issued_count: MOCK_INVOICES.filter(i => i.document_type === 'FA').length,
+      gross_total: MOCK_INVOICES.reduce((acc, i) => acc + i.amount_gross, 0),
+      corrections_count: MOCK_INVOICES.filter(i => i.document_type === 'FK').length,
+      refunds_total: 450.00, // This might need a separate mock if it's not from invoices
+      proforma_count: MOCK_INVOICES.filter(i => i.document_type === 'PROFORMA').length
+    });
+  }
+
+  if (method === 'get' && (url.endsWith('invoices/debtors') || url.endsWith('finance/debtors'))) {
+    return ok(config, {
+      debtors: MOCK_DEBTORS,
+      summary: {
+        total_debtors_count: MOCK_DEBTORS.length,
+        total_debt_amount: 1090,
+        invoice_debt: 640,
+        proforma_debt: 450
+      }
+    });
+  }
+
+  if (method === 'get' && url.endsWith('finance/debtors/stats')) {
+    return ok(config, {
+      total_debtors_count: MOCK_DEBTORS.length,
+      total_debt_amount: 1090,
+      invoice_debt: 640,
+      proforma_debt: 450
+    });
+  }
+
+  if (method === 'get' && url.endsWith('finance/kontrahenci')) {
+    return ok(config, {
+      data: MOCK_KONTRAHENCI,
+      meta: {
+        total: MOCK_KONTRAHENCI.length,
+        current_page: 1,
+        last_page: 1,
+        per_page: 25
+      }
+    });
+  }
+
+  if (method === 'get' && url.endsWith('finance/overpayments')) {
+    return ok(config, {
+      data: [
+        { id: 101, full_name: 'Анна Новак', email: 'anna@test.pl', phone: '+48 000 000', balance: 100, balance_overpayment: 100, total_credit: 100 }
+      ],
+      meta: { total: 1, current_page: 1, last_page: 1, per_page: 25 }
+    });
+  }
+
+  if (method === 'get' && url.endsWith('finance/overpayments/stats')) {
+    return ok(config, {
+      total_count: 1,
+      total_amount: 100
+    });
+  }
+
+  if (method === 'get' && url.endsWith('finance/refunds')) {
+    return ok(config, {
+      data: MOCK_REFUNDS,
+      total: MOCK_REFUNDS.length,
+      current_page: 1,
+      last_page: 1,
+      per_page: 25
+    });
+  }
+
+  if (method === 'get' && url.endsWith('finance/refunds/stats')) {
+    return ok(config, {
+      pending_count: MOCK_REFUNDS.filter(r => r.status === 'pending').length,
+      pending_amount: MOCK_REFUNDS.filter(r => r.status === 'pending').reduce((acc, r) => acc + r.amount, 0),
+      processing_count: MOCK_REFUNDS.filter(r => r.status === 'processing').length,
+      completed_month: MOCK_REFUNDS.filter(r => r.status === 'completed').length,
+      rejected_month: MOCK_REFUNDS.filter(r => r.status === 'rejected').length
+    });
+  }
 
   // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
 

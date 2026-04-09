@@ -54,12 +54,18 @@ export const useInvoicesStore = defineStore('invoices', () => {
         ...filters,
         page: pagination.currentPage,
       });
-      invoices.value = response.data;
-      pagination.currentPage = response.meta.current_page;
-      pagination.lastPage = response.meta.last_page;
-      pagination.total = response.meta.total;
+      // response is AxiosResponse<InvoicesResponse>
+      // response.data is InvoicesResponse = { data: Invoice[], meta: { ... } }
+      invoices.value = response.data.data || [];
+      
+      if (response.data.meta) {
+        pagination.currentPage = response.data.meta.current_page;
+        pagination.lastPage = response.data.meta.last_page;
+        pagination.total = response.data.meta.total;
+      }
     } catch (err: any) {
       error.value = err.message || 'Failed to fetch invoices';
+      console.error('Invoice fetch error:', err);
     } finally {
       isLoading.value = false;
     }

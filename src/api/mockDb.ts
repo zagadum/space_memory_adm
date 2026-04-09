@@ -465,6 +465,283 @@ export const mockDb: { me: AdminUser; students: Record<string, { profile: Studen
 };
 
 // ─────────────────────────────────────────────────────────────
+// NEW FINANCE MOCK DATA
+// ─────────────────────────────────────────────────────────────
+
+export const MOCK_INVOICES = [
+  {
+    id: 1,
+    student_id: 1,
+    project_id: 1,
+    number: 'FA/SM/2026/03/001',
+    document_type: 'FA',
+    issue_date: '2026-03-01',
+    sale_date: '2026-03-01',
+    due_date: '2026-03-15',
+    amount_net: 406.50,
+    vat_value: 0,
+    amount_gross: 406.50,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Иван Иванов',
+    buyer_address: 'Aleje Jerozolimskie 100, 00-001 Warszawa',
+    ksef_status: 'sent',
+    project: { id: 1, name: 'Space Memory', code: 'SM' }
+  },
+  {
+    id: 2,
+    student_id: 2,
+    project_id: 2,
+    number: 'FA/IND/2026/03/002',
+    document_type: 'FA',
+    issue_date: '2026-03-02',
+    sale_date: '2026-03-02',
+    due_date: '2026-03-16',
+    amount_net: 450.00,
+    vat_value: 0,
+    amount_gross: 450.00,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Мария Петрова',
+    buyer_address: 'Marszałkowska 10, 00-202 Warszawa',
+    ksef_status: 'paid',
+    payment_date: '2026-03-05',
+    project: { id: 2, name: 'Speedy Mind Indigo', code: 'IND' }
+  },
+  {
+    id: 3,
+    student_id: 3,
+    project_id: 1,
+    number: 'FA/SM/2026/03/003',
+    document_type: 'PROFORMA',
+    issue_date: '2026-03-10',
+    sale_date: '2026-03-10',
+    due_date: '2026-03-24',
+    amount_net: 490.00,
+    vat_value: 0,
+    amount_gross: 490.00,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Кирилл Козлов',
+    buyer_address: 'Nowy Świat 40, 00-303 Warszawa',
+    ksef_status: 'draft',
+    project: { id: 1, name: 'Space Memory', code: 'SM' }
+  },
+  {
+    id: 4,
+    student_id: 4,
+    project_id: 1,
+    number: 'FK/SM/2026/03/001',
+    document_type: 'FK',
+    issue_date: '2026-03-12',
+    sale_date: '2026-03-12',
+    due_date: '2026-03-12',
+    amount_net: -50.00,
+    vat_value: 0,
+    amount_gross: -50.00,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Елена Смирнова',
+    buyer_address: 'ul. Testowa 1, Warszawa',
+    ksef_status: 'sent',
+    project: { id: 1, name: 'Space Memory', code: 'SM' }
+  },
+  {
+    id: 5,
+    student_id: 5,
+    project_id: 2,
+    number: 'FV/B2B/2026/03/001',
+    document_type: 'FA',
+    issue_date: '2026-03-15',
+    sale_date: '2026-03-15',
+    due_date: '2026-03-29',
+    amount_net: 1000.00,
+    vat_value: 230.00,
+    amount_gross: 1230.00,
+    vat_rate: '23%',
+    currency: 'PLN',
+    buyer_name: 'Tech Solutions Sp. z o.o.',
+    buyer_tax_id: 'PL1234567890',
+    buyer_address: 'ul. Business 10, 00-002 Warszawa',
+    ksef_status: 'error',
+    project: { id: 2, name: 'Speedy Mind Indigo', code: 'IND' }
+  },
+  {
+    id: 6,
+    student_id: 1,
+    project_id: 1,
+    number: 'FA/SM/2026/01/045',
+    document_type: 'FA',
+    issue_date: '2026-01-05',
+    sale_date: '2026-01-05',
+    due_date: '2026-01-19',
+    amount_net: 441.00,
+    vat_value: 0,
+    amount_gross: 441.00,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Иван Иванов',
+    buyer_address: 'Aleje Jerozolimskie 100, 00-001 Warszawa',
+    ksef_status: 'paid',
+    payment_date: '2026-01-10',
+    project: { id: 1, name: 'Space Memory', code: 'SM' }
+  },
+  {
+    id: 7,
+    student_id: 6,
+    project_id: 1,
+    number: 'FA/SM/2026/03/010',
+    document_type: 'FA',
+    issue_date: '2026-03-20',
+    sale_date: '2026-03-20',
+    due_date: '2026-04-03',
+    amount_net: 490.00,
+    vat_value: 0,
+    amount_gross: 490.00,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Anna Nowak',
+    buyer_address: 'ul. Testowa 5, Warszawa',
+    ksef_status: 'draft',
+    project: { id: 1, name: 'Space Memory', code: 'SM' }
+  },
+  {
+    id: 8,
+    student_id: 7,
+    project_id: 2,
+    number: 'FA/IND/2026/03/011',
+    document_type: 'FA',
+    issue_date: '2026-03-21',
+    sale_date: '2026-03-21',
+    due_date: '2026-04-04',
+    amount_net: 450.00,
+    vat_value: 0,
+    amount_gross: 450.00,
+    vat_rate: 'zw',
+    currency: 'PLN',
+    buyer_name: 'Piotr Wiśniewski',
+    buyer_address: 'ul. Polna 12, Kraków',
+    ksef_status: 'sent',
+    project: { id: 2, name: 'Speedy Mind Indigo', code: 'IND' }
+  }
+];
+
+export const MOCK_REFUNDS = [
+  { 
+    id: 1, 
+    student_id: 1, 
+    project_id: 1, 
+    amount: 150.00, 
+    currency: 'PLN', 
+    type: 'resignation', 
+    reason: 'Переплата', 
+    status: 'pending', 
+    created_at: '2026-03-20',
+    iban: 'PL 12 3456 7890 1234 5678 9012 3456',
+    bank_name: 'PKO BP',
+    student: { first_name: 'Иван', last_name: 'Иванов', full_name: 'Иван Иванов' } 
+  },
+  { 
+    id: 2, 
+    student_id: 2, 
+    project_id: 2, 
+    amount: 300.00, 
+    currency: 'PLN', 
+    type: 'manualTransfer', 
+    reason: 'Отказ от обучения', 
+    status: 'completed', 
+    created_at: '2026-03-18', 
+    iban: 'PL 98 7654 3210 9876 5432 1098 7654',
+    bank_name: 'mBank',
+    student: { first_name: 'Мария', last_name: 'Петрова', full_name: 'Мария Петрова' } 
+  },
+  { 
+    id: 3, 
+    student_id: 3, 
+    project_id: 1, 
+    amount: 490.00, 
+    currency: 'PLN', 
+    type: 'resignation', 
+    reason: 'Болезнь ученика', 
+    status: 'processing', 
+    created_at: '2026-03-22', 
+    iban: 'PL 00 1111 2222 3333 4444 5555 6666',
+    bank_name: 'ING',
+    student: { first_name: 'Кирилл', last_name: 'Козлов', full_name: 'Кирилл Козлов' } 
+  },
+  { 
+    id: 4, 
+    student_id: 6, 
+    project_id: 2, 
+    amount: 100.00, 
+    currency: 'PLN', 
+    type: 'complaint', 
+    reason: 'Ошибка в расчетах', 
+    status: 'rejected', 
+    created_at: '2026-03-15', 
+    iban: 'PL 55 4444 3333 2222 1111 0000 9999',
+    bank_name: 'Santander',
+    student: { first_name: 'Анна', last_name: 'Новак', full_name: 'Анна Новак' } 
+  }
+];
+
+export const MOCK_DEBTORS = [
+  {
+    id: 1,
+    full_name: 'Кирилл Козлов',
+    email: 'kirill.kozlov@mail.ru',
+    phone: '+48 111 222 333',
+    project: { name: 'Space Memory' },
+    group: { group: 'Пт 19 Старшая' },
+    balance: -490,
+    invoice_debt: 490,
+    proforma_debt: 0,
+    total_debt: 490,
+    overdue_invoices_count: 1,
+    last_invoice_date: '2026-02-01'
+  },
+  {
+    id: 2,
+    full_name: 'Анна Новак (родитель)',
+    email: 'anna.nowak@test.pl',
+    phone: '+48 600 500 400',
+    project: { name: 'Indigo' },
+    group: { group: 'Вт 16 Средняя' },
+    balance: -150,
+    invoice_debt: 150,
+    proforma_debt: 450,
+    total_debt: 600,
+    overdue_invoices_count: 2,
+    last_invoice_date: '2026-03-01'
+  }
+];
+
+export const MOCK_KONTRAHENCI = [
+  {
+    id: 1,
+    name: 'Tech Solutions Sp. z o.o.',
+    tax_id: '1234567890',
+    email: 'contact@techsolutions.pl',
+    phone: '+48 123 456 789',
+    city: 'Warszawa',
+    zip_code: '00-002',
+    country: 'Polska',
+    is_active: true
+  },
+  {
+    id: 2,
+    name: 'EduGroup SA',
+    tax_id: '9876543210',
+    email: 'billing@edugroup.pl',
+    phone: '+48 987 654 321',
+    city: 'Kraków',
+    zip_code: '30-001',
+    country: 'Polska',
+    is_active: true
+  }
+];
+
+// ─────────────────────────────────────────────────────────────
 // Mock transactions / KSeF invoices
 // ─────────────────────────────────────────────────────────────
 export const mockTransactions: Record<string, Transaction[]> = {
