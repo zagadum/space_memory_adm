@@ -221,7 +221,15 @@
     "city": "City",
     "zipCode": "ZIP Code",
     "taxId": "Tax ID",
-    "lookup": "Lookup in GUS"
+    "lookup": "Lookup in GUS",
+    "confirmApprove": "Are you sure you want to approve the refund?",
+    "refundApproved": "Refund approved",
+    "refundRejected": "Refund rejected",
+    "sumRequested": "Sum Requested",
+    "studentId": "Student ID",
+    "rejectingRefund": "Rejecting Refund",
+    "confirmReject": "Reject",
+    "rejectReasonPlaceholder": "Enter reason (min. 5 chars)"
   },
   "search": {
     "students": "Search students...",
@@ -1438,7 +1446,66 @@
     "subscriptionStatus": {
       "active": "Active",
       "inactive": "Inactive",
-      "paused": "Paused"
+      "paused": "Paused",
+      "pdfHint": "ZIP · archive",
+      "comarchHint": "Import Optima",
+      "jpkHint": "XML · Tax Office"
+    },
+    "modals": {
+      "settings": {
+        "title": "Invoice Settings",
+        "subtitle": "Configure numbering, taxes, and KSeF integration",
+        "tabs": {
+          "series": "Numbering",
+          "vat": "VAT & Payment",
+          "email": "Email",
+          "ksef": "KSeF"
+        },
+        "b2cSeries": "B2C Series (Individual)",
+        "b2bSeries": "B2B Series (Business)",
+        "prefix": "Prefix",
+        "format": "Format",
+        "proformaPrefix": "Proforma FW Prefix",
+        "correctionPrefix": "Correction FK Prefix",
+        "nextNumber": "Next Number",
+        "seriesHint": "Use YYYY, MM, DD for date and NNN for number (e.g., 001)",
+        "vatDefaults": "VAT Settings",
+        "defaultVatRate": "Default VAT Rate",
+        "vatExempt": "zw (exempt)",
+        "vatNp": "np (not applicable)",
+        "defaultCurrency": "Default Currency",
+        "defaultPaymentMethod": "Default Payment Method",
+        "paymentMethods": {
+          "transfer": "Transfer",
+          "card": "Card",
+          "cash": "Cash",
+          "imoje": "Imoje"
+        },
+        "paymentDueDays": "Payment Due (days)",
+        "senderDetails": "Sender Details",
+        "senderName": "Sender Name",
+        "senderEmail": "Sender Email",
+        "ccAccounting": "CC to Accounting",
+        "ccPlaceholder": "accountant@example.com",
+        "emailTemplate": "Email Template",
+        "subjectTemplate": "Subject Template",
+        "subjectPlaceholder": "Invoice No. {{invoice_number}}",
+        "bodyTemplate": "Email Body",
+        "bodyPlaceholder": "Hello, please find your invoice attached...",
+        "availableVars": "Available Variables",
+        "attachPdf": "Attach PDF to email",
+        "ksefIntegration": "KSeF Integration",
+        "ksefDesc": "National e-Invoice System (Poland)",
+        "ksefCredentials": "KSeF Credentials",
+        "ksefEnv": "Environment",
+        "ksefTest": "Test",
+        "ksefProd": "Production",
+        "ksefToken": "Auth Token",
+        "ksefAutoSend": "Auto Send",
+        "ksefAutoSendOnIssue": "Send immediately on issue",
+        "ksefB2bOnly": "B2B Only (VAT ID)",
+        "ksefProdWarning": "Warning! You are using the Production environment. Invoices will be legally binding."
+      }
     },
     "startSubscription": "Start Subscription",
     "addDiscount": "Add Discount",
@@ -2080,6 +2147,16 @@
       "edit": "Edit",
       "delete": "Delete",
       "deleteConfirm": "Are you sure you want to delete this record?",
+      "issueDocument": "Issue Document",
+      "createSubtitle": "Creating a new invoice or proforma",
+      "b2c": "Person (B2C)",
+      "b2b": "Company (B2B)",
+      "searchContractor": "Search Contractor",
+      "searchStudent": "Search Student",
+      "errors": {
+        "creationFailed": "Error creating invoice",
+        "nipNotFound": "Company not found in GUS"
+      },
       "deleteSuccess": "Record deleted successfully",
       "updateSuccess": "Data updated",
       "resendSuccess": "Invitation sent successfully"
@@ -2527,7 +2604,17 @@
     "noStudentsDue": "No students are due for payment in this period",
     "studentsFound": "Students Found",
     "collectionRate": "Collection Rate",
-    "paidVsIssued": "Paid vs Issued"
+    "paidVsIssued": "Paid vs Issued",
+    "issueDocument": "Issue Document",
+    "createSubtitle": "Creating a new invoice or proforma",
+    "b2c": "Person (B2C)",
+    "b2b": "Company (B2B)",
+    "searchContractor": "Search Contractor",
+    "searchStudent": "Search Student",
+    "errors": {
+      "creationFailed": "Error creating invoice",
+      "nipNotFound": "Company not found in GUS"
+    }
   },
   "cohorts": {
     "title": "Cohort Payment Analysis",

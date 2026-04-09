@@ -10,13 +10,18 @@ import { useProjectsStore } from '../../stores/projects.store'
 import { useContractorsStore } from '../../stores/contractors.store'
 import { getStudents } from '../../api/studentApi'
 
+const props = defineProps<{
+  mode?: 'b2c' | 'b2b'
+  isProforma?: boolean
+}>()
+
 const { t } = useI18n()
 const modal = useModalStore()
 const invoicesStore = useInvoicesStore()
 const projectsStore = useProjectsStore()
 const contractorsStore = useContractorsStore()
 
-const mode = ref<'b2c' | 'b2b'>('b2c')
+const mode = ref<'b2c' | 'b2b'>(props.mode ?? 'b2c')
 const loading = ref(false)
 const lookupLoading = ref(false)
 const error = ref<string | null>(null)
@@ -32,7 +37,7 @@ const form = reactive({
   contractor_id: null as number | null,
   project_id: projectsStore.projects[0] ? parseInt(projectsStore.projects[0].id) : 1,
   project_code: projectsStore.projects[0]?.code || 'SPACE',
-  document_type: 'FA',
+  document_type: props.isProforma ? 'PF' : 'FA',
   buyer_name: '',
   buyer_tax_id: '',
   buyer_address: '',
@@ -64,7 +69,7 @@ const handleNipLookup = async () => {
     }
   } catch (err: any) {
     console.error(err)
-    error.value = t('modals.invoice.errors.nipNotFound') || 'Nie znaleziono firmy w GUS'
+    error.value = t('faktury.errors.nipNotFound')
   } finally {
     lookupLoading.value = false
   }
@@ -137,7 +142,7 @@ const submit = async () => {
     await invoicesStore.createInvoice({ ...form, mode: mode.value })
     modal.close()
   } catch (err: any) {
-    error.value = err.message || 'Błąd podczas wystawiania faktury'
+    error.value = err.message || t('faktury.errors.creationFailed')
   } finally {
     loading.value = false
   }
@@ -149,8 +154,8 @@ const submit = async () => {
     <div class="modal-header">
       <div class="header-icon">➕</div>
       <div class="header-text">
-        <h2 class="popup-title">{{ t('faktury.createInvoice') }}</h2>
-        <p class="popup-sub">{{ t('faktury.createSubtitle') }}</p>
+        <h2 class="popup-title">{{ $t('faktury.createInvoice') }}</h2>
+        <p class="popup-sub">{{ $t('faktury.createSubtitle') }}</p>
       </div>
     </div>
 
@@ -162,14 +167,14 @@ const submit = async () => {
           :class="{ active: mode === 'b2c' }" 
           @click="mode = 'b2c'"
         >
-          👤 {{ t('faktury.b2c') }}
+          👤 {{ $t('faktury.b2c') }}
         </button>
         <button 
           class="toggle-btn" 
           :class="{ active: mode === 'b2b' }" 
           @click="mode = 'b2b'"
         >
-          🏢 {{ t('faktury.b2b') }}
+          🏢 {{ $t('faktury.b2b') }}
         </button>
       </div>
     </div>
@@ -177,21 +182,21 @@ const submit = async () => {
     <!-- Search Section -->
     <div class="scroll-body">
       <div class="section-card search-box-wrap">
-        <label class="section-label">🔍 {{ mode === 'b2b' ? t('faktury.searchContractor') : t('faktury.searchStudent') }}</label>
+        <label class="section-label">🔍 {{ mode === 'b2b' ? $t('faktury.searchContractor') : $t('faktury.searchStudent') }}</label>
         <div class="search-field">
           <input 
             v-if="mode === 'b2b'"
             v-model="contractorSearch"
             @input="onContractorSearch"
             class="premium-input-raw"
-            :placeholder="t('faktury.searchPlaceholder')"
+            :placeholder="$t('faktury.searchPlaceholder')"
           />
           <input 
             v-else
             v-model="studentSearch"
             @input="onStudentSearch"
             class="premium-input-raw"
-            :placeholder="t('faktury.searchPlaceholder')"
+            :placeholder="$t('faktury.searchPlaceholder')"
           />
           
           <Transition name="fade-down">
@@ -230,7 +235,7 @@ const submit = async () => {
           <div class="form-group nip-field">
             <UiInput 
               v-model="form.buyer_tax_id" 
-              :label="mode === 'b2b' ? 'NIP' : 'NIP (Optional)'" 
+              :label="mode === 'b2b' ? $t('faktury.nip') : `${$t('faktury.nip')} (Optional)`" 
               :required="mode === 'b2b'" 
               @input="onNipInput"
               placeholder="0000000000"
@@ -241,7 +246,7 @@ const submit = async () => {
               @click="handleNipLookup" 
               :disabled="lookupLoading"
             >
-              Check
+              {{ $t('finance.lookup') }}
             </button>
           </div>
           <div class="form-group">
@@ -280,12 +285,12 @@ const submit = async () => {
             <UiInput type="number" v-model="form.amount_gross" :label="t('faktury.amount')" required />
           </div>
           <div class="form-group">
-            <label class="mini-label">{{ t('faktury.paymentMethod') }}</label>
+            <label class="mini-label">{{ $t('faktury.paymentMethod') }}</label>
             <select v-model="form.payment_method" class="premium-select">
-              <option value="transfer">Przelew</option>
-              <option value="card">Karta</option>
-              <option value="cash">Gotówka</option>
-              <option value="imoje">Imoje (Online)</option>
+              <option value="transfer">{{ $t('faktury.modals.settings.paymentMethods.transfer') }}</option>
+              <option value="card">{{ $t('faktury.modals.settings.paymentMethods.card') }}</option>
+              <option value="cash">{{ $t('faktury.modals.settings.paymentMethods.cash') }}</option>
+              <option value="imoje">{{ $t('faktury.modals.settings.paymentMethods.imoje') }}</option>
             </select>
           </div>
         </div>

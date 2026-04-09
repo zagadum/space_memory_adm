@@ -102,6 +102,21 @@ export const useInvoicesStore = defineStore('invoices', () => {
     }
   }
 
+  async function updateInvoice(id: number, data: any) {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const response = await invoicesApi.update(id, data);
+      await fetchInvoices();
+      return response;
+    } catch (err: any) {
+      error.value = err.message || 'Failed to update invoice';
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
   async function lookupNip(nip: string) {
     return await invoicesApi.lookupNip(nip);
   }
@@ -353,6 +368,7 @@ export const useInvoicesStore = defineStore('invoices', () => {
     setPage,
     resetFilters,
     createInvoice,
+    updateInvoice,
     lookupNip,
     sendToKsef,
     fetchKsefStatus,

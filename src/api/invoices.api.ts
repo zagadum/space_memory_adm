@@ -271,8 +271,13 @@ export const invoicesApi = {
     return data;
   },
 
-  async getDebtors(projectId?: number) {
-    const { data } = await http.get(`${endpoints.INVOICES.DEBTORS}`, { params: { project_id: projectId } });
+  async getDebtors(projectId?: number, search?: string) {
+    const { data } = await http.get(`${endpoints.INVOICES.DEBTORS}`, {
+      params: {
+        project_id: projectId,
+        search: search || undefined,
+      },
+    });
     return data;
   },
 
@@ -389,5 +394,13 @@ export const invoicesApi = {
 
   async deleteContractor(id: number | string): Promise<void> {
     await http.delete(`/v1/finance/kontrahenci/${id}`);
-  }
+  },
+
+  async getSettings(): Promise<any> {
+    return (await http.get('/v1/invoices/settings')).data;
+  },
+
+  async saveSettings(data: any): Promise<void> {
+    await http.post('/v1/invoices/settings', data);
+  },
 };

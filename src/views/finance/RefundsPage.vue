@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRefundsStore } from '../../stores/refunds.store'
 import { useProjectsStore } from '../../stores/projects.store'
+import { useNotificationStore } from '../../stores/notification.store'
 import UiCard from '../../components/ui/UiCard.vue'
 import UiButton from '../../components/ui/UiButton.vue'
 import UiBadge from '../../components/ui/UiBadge.vue'
 import UiInput from '../../components/ui/UiInput.vue'
 import UiTable from '../../components/ui/UiTable.vue'
-// Icons replaced with emojis as @heroicons/vue is not available
 
 const { t } = useI18n()
 const store = useRefundsStore()
 const projectsStore = useProjectsStore()
+const notifications = useNotificationStore()
+
+// --- Reject panel state ---
+const rejectTarget = ref<{ id: number; studentName: string; amount: number; currency: string; reason: string } | null>(null)
+const actionLoading = ref<number | null>(null)
 
 onMounted(() => {
   store.fetchRefunds()
@@ -22,6 +27,46 @@ onMounted(() => {
 const handleRefresh = () => {
   store.fetchRefunds()
   store.fetchStats()
+}
+
+// --- Search with debounce ---
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+const handleSearch = (value: string) => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    store.setFilter({ search: value })
+  }, 400)
+}
+
+// --- Approve ---
+async function handleApprove(item: any) {
+  if (!confirm(t('finance.confirmApprove'))) return
+  actionLoading.value = item.id
+  const ok = await store.approveRefund(item.id)
+  actionLoading.value = null
+  if (ok) notifications.addToast(t('finance.refundApproved'), 'success')
+  else notifications.addToast(t('common.error'), 'error')
+}
+
+// --- Reject ---
+function openReject(item: any) {
+  rejectTarget.value = {
+    id: item.id,
+    studentName: item.student?.full_name || `ID: ${item.student_id}`,
+    amount: item.amount,
+    currency: item.currency,
+    reason: '',
+  }
+}
+
+async function submitReject() {
+  if (!rejectTarget.value || rejectTarget.value.reason.trim().length < 5) return
+  actionLoading.value = rejectTarget.value.id
+  const ok = await store.rejectRefund(rejectTarget.value.id, rejectTarget.value.reason.trim())
+  actionLoading.value = null
+  rejectTarget.value = null
+  if (ok) notifications.addToast(t('finance.refundRejected'), 'success')
+  else notifications.addToast(t('common.error'), 'error')
 }
 
 const getStatusVariant = (status: string) => {
@@ -34,6 +79,8 @@ const getStatusVariant = (status: string) => {
     default: return 'default'
   }
 }
+
+const canAction = (status: string) => status === 'pending' || status === 'processing' || status === 'manual_pending'
 
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return '-'
@@ -80,7 +127,7 @@ const formatDate = (dateStr?: string) => {
           <div class="stat-value-row">
             <span class="stat-value highlight">{{ store.stats.pending_amount }} <span class="currency">PLN</span></span>
           </div>
-          <span class="stat-sub">Sum requested</span>
+          <span class="stat-sub">{{ t('finance.sumRequested') }}</span>
         </div>
       </UiCard>
 
@@ -93,7 +140,7 @@ const formatDate = (dateStr?: string) => {
           <div class="stat-value-row">
             <span class="stat-value text-success">{{ store.stats.completed_month }}</span>
           </div>
-          <span class="stat-sub">{{ t('common.thisMonth') || 'This Month' }}</span>
+          <span class="stat-sub">{{ t('common.thisMonth') }}</span>
         </div>
       </UiCard>
 
@@ -106,7 +153,7 @@ const formatDate = (dateStr?: string) => {
           <div class="stat-value-row">
             <span class="stat-value text-danger">{{ store.stats.rejected_month }}</span>
           </div>
-          <span class="stat-sub">{{ t('common.thisMonth') || 'This Month' }}</span>
+          <span class="stat-sub">{{ t('common.thisMonth') }}</span>
         </div>
       </UiCard>
     </div>
@@ -118,7 +165,7 @@ const formatDate = (dateStr?: string) => {
           <UiInput
             v-model="store.filters.search"
             :placeholder="t('search.refunds')"
-            @input="store.setFilter({ search: $event.target.value })"
+            @input="handleSearch(($event.target as HTMLInputElement).value)"
           >
             <template #prefix>🔍</template>
           </UiInput>
@@ -157,7 +204,7 @@ const formatDate = (dateStr?: string) => {
           <tr class="table-row">
             <td>
               <div class="student-cell">
-                <span class="student-name">{{ item.student?.full_name || 'Student ID: ' + item.student_id }}</span>
+                <span class="student-name">{{ item.student?.full_name || `${$t('finance.studentId')}: ${item.student_id}` }}</span>
               </div>
             </td>
             <td>
@@ -182,14 +229,63 @@ const formatDate = (dateStr?: string) => {
               <span class="date-mono">{{ formatDate(item.created_at) }}</span>
             </td>
             <td class="actions-col">
-              <UiButton size="sm" variant="ghost" @click="() => {}">
-                📄 {{ t('common.view') }}
-              </UiButton>
+              <template v-if="canAction(item.status)">
+                <UiButton
+                  size="sm"
+                  variant="success"
+                  :loading="actionLoading === item.id"
+                  @click="handleApprove(item)"
+                >
+                  ✅ {{ t('common.approve') }}
+                </UiButton>
+                <UiButton
+                  size="sm"
+                  variant="danger"
+                  :disabled="actionLoading === item.id"
+                  @click="openReject(item)"
+                >
+                  ❌ {{ t('common.reject') }}
+                </UiButton>
+              </template>
+              <UiBadge v-else-if="item.status === 'completed'" variant="success">
+                {{ t('common.done') }}
+              </UiBadge>
+              <span v-else class="dim">—</span>
             </td>
           </tr>
         </template>
       </UiTable>
     </UiCard>
+    <!-- Reject Panel (slide-up) -->
+    <Transition name="slide-up">
+      <div v-if="rejectTarget" class="reject-panel">
+        <div class="reject-panel-info">
+          <span class="reject-panel-label">{{ $t('finance.rejectingRefund') }}:</span>
+          <strong class="reject-panel-name">{{ rejectTarget.studentName }}</strong>
+          <span class="reject-panel-amount">{{ rejectTarget.amount }} {{ rejectTarget.currency }}</span>
+        </div>
+        <textarea
+          v-model="rejectTarget.reason"
+          class="reject-reason-input"
+          :placeholder="$t('finance.rejectReasonPlaceholder')"
+          rows="2"
+        />
+        <div class="reject-panel-actions">
+          <UiButton variant="ghost" size="sm" @click="rejectTarget = null">
+            {{ t('common.cancel') }}
+          </UiButton>
+          <UiButton
+            variant="danger"
+            size="sm"
+            :loading="actionLoading === rejectTarget.id"
+            :disabled="rejectTarget.reason.trim().length < 5"
+            @click="submitReject"
+          >
+            ❌ {{ $t('finance.confirmReject') }}
+          </UiButton>
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
@@ -302,7 +398,61 @@ const formatDate = (dateStr?: string) => {
 
 .date-mono { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--app-text-dim); }
 
-.actions-col { text-align: right; width: 120px; }
+.actions-col { text-align: right; width: 180px; }
+.actions-col :deep(.ui-button) + :deep(.ui-button) { margin-left: 6px; }
 
 .dim { color: var(--app-text-dim); font-size: 11px; }
+
+/* Reject panel */
+.reject-panel {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--app-card);
+  border: 1.5px solid rgba(244, 63, 94, 0.35);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  z-index: 1000;
+  box-shadow: 0 12px 40px rgba(244, 63, 94, 0.15);
+  min-width: 560px;
+  max-width: 720px;
+  flex-wrap: wrap;
+}
+
+.reject-panel-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.reject-panel-label { font-size: 11px; font-weight: 700; color: var(--app-text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+.reject-panel-name { font-size: 13px; font-weight: 800; color: var(--app-text-main); }
+.reject-panel-amount { font-size: 13px; font-weight: 700; color: #f43f5e; font-family: 'Space Mono', monospace; }
+
+.reject-reason-input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--app-text-main);
+  font-family: 'Outfit', sans-serif;
+  outline: none;
+  resize: none;
+  transition: border-color 0.15s;
+}
+.reject-reason-input:focus { border-color: #f43f5e; }
+
+.reject-panel-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+/* Transition */
+.slide-up-enter-active, .slide-up-leave-active { transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translate(-50%, 32px); }
 </style>

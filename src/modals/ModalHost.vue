@@ -26,6 +26,9 @@
   <InvoicePreviewModal v-else-if="openId==='invoice-preview-b2c'" :invoice="modal.payload" />
   <InvoicePreviewModal v-else-if="openId==='invoice-preview-b2b'" :invoice="modal.payload" />
   <SendEmailModal v-else-if="openId==='invoice-email'" :invoice="modal.payload" />
+  <InvoiceSettingsModal v-else-if="openId==='invoice-settings'" />
+  <InvoiceEditModal v-else-if="openId==='invoice-edit'" />
+  <InvoiceDeleteModal v-else-if="openId==='invoice-delete'" />
   <BulkGenerateInvoicesModal v-else-if="openId==='BulkGenerateInvoicesModal'" />
   <CreateContractorModal
     v-else-if="openId==='create-contractor'"
@@ -61,8 +64,10 @@ import BulkGenerateInvoicesModal from "./finance/BulkGenerateInvoicesModal.vue";
 import InvoiceCreateModal from "./templates/InvoiceCreateModal.vue";
 import InvoiceCorrectModal from "./templates/InvoiceCorrectModal.vue";
 import SendEmailModal from "./templates/SendEmailModal.vue";
-import InvoiceSidePanel from "../views/accounting/components/InvoiceSidePanel.vue"; // Though usually it's not a modal, but checking if it's there
 import InvoicePreviewModal from "./templates/InvoicePreviewModal.vue";
+import InvoiceSettingsModal from "./templates/InvoiceSettingsModal.vue";
+import InvoiceEditModal from "./templates/InvoiceEditModal.vue";
+import InvoiceDeleteModal from "./templates/InvoiceDeleteModal.vue";
 import CreateContractorModal from "./finance/CreateContractorModal.vue";
 
 const modal = useModalStore();

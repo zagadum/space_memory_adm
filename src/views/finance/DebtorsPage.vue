@@ -196,6 +196,7 @@ let searchTimeout: any = null;
 function handleSearch() {
   if (searchTimeout) clearTimeout(searchTimeout);
   searchTimeout = setTimeout(() => {
+    debtorsStore.pagination.currentPage = 1;
     debtorsStore.fetchDebtors();
   }, 400);
 }

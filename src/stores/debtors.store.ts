@@ -26,7 +26,7 @@ export const useDebtorsStore = defineStore('debtors', () => {
     isLoading.value = true;
     error.value = null;
     try {
-      const response = await invoicesApi.getDebtors(filters.project_id);
+      const response = await invoicesApi.getDebtors(filters.project_id, filters.search || undefined);
       debtors.value = response.debtors;
       stats.value = response.summary;
       pagination.total = response.debtors.length;
