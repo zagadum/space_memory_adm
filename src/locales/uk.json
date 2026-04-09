@@ -132,6 +132,11 @@
     "balance": "Баланс",
     "success": "Успішно",
     "error": "Помилка",
+    "refresh": "Оновити",
+    "pending": "Очікує",
+    "thisMonth": "Цього місяця",
+    "createdAt": "Дата створення",
+    "view": "Перегляд",
     "confirmAction": "Ви впевнені?",
     "noData": "Даних не знайдено",
     "allProjects": "Всі проєкти"

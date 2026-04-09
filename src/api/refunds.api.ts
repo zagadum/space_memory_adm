@@ -1,5 +1,5 @@
-import http from './http'
-import { ENDPOINTS } from './endpoints'
+import { http } from './http'
+import { endpoints } from './endpoints'
 
 export interface RefundRequest {
   id: number

@@ -131,6 +131,11 @@
     "balance": "Saldo",
     "success": "Sukces",
     "error": "Błąd",
+    "refresh": "Odśwież",
+    "pending": "Oczekujące",
+    "thisMonth": "W tym miesiącu",
+    "createdAt": "Data utworzenia",
+    "view": "Widok",
     "confirmAction": "Czy jesteś pewien?",
     "noData": "Nie znaleziono danych",
     "allProjects": "Wszystkie projekty"
