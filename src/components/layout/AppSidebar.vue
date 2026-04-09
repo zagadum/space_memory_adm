@@ -281,6 +281,9 @@
           <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
           <span class="nav-badge cyan">3</span>
         </div>
+        <div v-if="isVisible('cohorts')" class="nav-item" :class="[{ active: activeItem === 'cohorts' }, accessClass('cohorts')]" @click="navigateTo('cohorts', '/finance/cohorts')">
+          <span class="nav-icon">📊</span> {{ t('sidebar.cohorts') }}
+        </div>
         <div 
           v-if="isVisible('settings')"
           class="nav-item"
@@ -610,6 +613,7 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/finance/students'))  { activeItem.value = 'student-finance';  openSections.value.finance = true }
   else if (path.startsWith('/finance/debtors'))   { activeItem.value = 'debtors';          openSections.value.finance = true }
   else if (path.startsWith('/finance/nadplaty'))  { activeItem.value = 'nadplaty';         openSections.value.finance = true }
+  else if (path.startsWith('/finance/cohorts'))   { activeItem.value = 'cohorts';          openSections.value.finance = true }
   // Бухгалтерия
   else if (path.startsWith('/accounting/faktury'))         { activeItem.value = 'faktury';           openSections.value.accounting = true }
   else if (path.startsWith('/finance/settings-ustawienia')){ activeItem.value = 'settings';          openSections.value.accounting = true }

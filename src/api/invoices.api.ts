@@ -241,5 +241,12 @@ export const invoicesApi = {
     document.body.appendChild(link);
     link.click();
     link.remove();
+  },
+  
+  getJpkExportUrl(filters: { date_from?: string; date_to?: string }) {
+    const params = new URLSearchParams();
+    if (filters.date_from) params.append('date_from', filters.date_from);
+    if (filters.date_to) params.append('date_to', filters.date_to);
+    return `/v1/invoices/export-jpk?${params.toString()}`;
   }
 };

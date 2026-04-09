@@ -78,7 +78,8 @@
     "trainerMaterials": "Учебные материалы",
     "trainerExam": "Экзаменация",
     "trainerMail": "Почта / Уведомления",
-    "financeSettings": "Настройки финансов"
+    "financeSettings": "Настройки финансов",
+    "cohorts": "Когортный анализ"
   },
   "app": {
     "title": "GLS · Платежи",
@@ -2464,6 +2465,17 @@
     "markAsPaidConfirm": "Установите дату оплаты для выбранных счетов",
     "accountingExport": "Реестр продаж (XLSX)",
     "unpaid": "Не оплачен"
+  },
+  "cohorts": {
+    "title": "Когортный анализ оплат",
+    "subtitle": "Отслеживание удержания и активности платежей по месяцам регистрации",
+    "heatmapTitle": "Тепловая карта оплат (Conversion %)",
+    "cohort": "Когорта (Месяц регистрации)",
+    "size": "Размер",
+    "retention": "Удержание",
+    "avgRetention": "Среднее удержание",
+    "totalStudents": "Всего студентов",
+    "topCohort": "Лучшая когорта"
   }
 }
 

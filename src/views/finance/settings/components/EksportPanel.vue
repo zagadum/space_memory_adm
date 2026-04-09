@@ -108,13 +108,22 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSettingsExportStore } from '../../../../stores/settingsExport.store'
-
+import { invoicesApi } from '../../../../api/invoices.api'
 const { t } = useI18n()
 const store = useSettingsExportStore()
 
+const dateFrom = ref(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0])
+const dateTo = ref(new Date().toISOString().split('T')[0])
+
 function mockExport(fmt: string) {
+  if (fmt === 'JPK') {
+    const url = invoicesApi.getJpkExportUrl({ date_from: dateFrom.value, date_to: dateTo.value });
+    window.location.href = url;
+    return;
+  }
   alert(t('financeSettings.export.toastExporting', { fmt }))
   // logic to add to store history
 }

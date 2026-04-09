@@ -103,7 +103,8 @@
     "trainerMaterials": "Training Materials",
     "trainerExam": "Examination",
     "trainerMail": "Mail / Notifications",
-    "financeSettings": "Finance Settings"
+    "financeSettings": "Finance Settings",
+    "cohorts": "Cohort Analysis"
   },
   "app": {
     "title": "GLS · Payments",
@@ -2452,7 +2453,18 @@
     "paymentDate": "Payment Date",
     "markAsPaid": "Mark as Paid",
     "markAsPaidConfirm": "Set payment date for selected invoices",
-    "accountingExport": "Accounting Export (XLSX)",
+    "accountingExport": "Sales Registry (XLSX)",
     "unpaid": "Unpaid"
+  },
+  "cohorts": {
+    "title": "Cohort Payment Analysis",
+    "subtitle": "Tracking retention and payment activity by registration month",
+    "heatmapTitle": "Payment Heatmap (Conversion %)",
+    "cohort": "Cohort (Reg. Month)",
+    "size": "Size",
+    "retention": "Retention",
+    "avgRetention": "Avg Retention",
+    "totalStudents": "Total Students",
+    "topCohort": "Top Cohort"
   }
 }

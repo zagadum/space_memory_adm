@@ -144,6 +144,12 @@ export const router = createRouter({
           meta: { title: 'Zwroty', icon: '↩️', searchPlaceholder: 'search.zwroty' }
         },
         {
+          path: "finance/cohorts",
+          name: "finance-cohorts",
+          component: () => import("../views/finance/CohortAnalysisPage.vue"),
+          meta: { title: 'cohorts.title', icon: '📊' }
+        },
+        {
           path: "finance/settings",
           name: "settings",
           component: () => import("../views/finance/settings/SettingsIndex.vue"),
