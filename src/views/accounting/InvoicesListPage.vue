@@ -1,812 +1,493 @@
-  <div class="content">
-    <InvoicesStatsHeader :stats="invoicesStore.stats" />
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useRouter, useRoute } from 'vue-router'
+import { useInvoicesStore } from '../../stores/invoices.store'
+import { useProjectsStore } from '../../stores/projects.store'
+import { useGlobalSearchStore } from '../../stores/globalSearch.store'
+import { useModalStore } from '../../stores/modal.store'
+import { invoicesApi } from '../../api/invoices.api'
+import UiButton from '../../components/ui/UiButton.vue'
+import UiBadge from '../../components/ui/UiBadge.vue'
+import UiCard from '../../components/ui/UiCard.vue'
+import UiInput from '../../components/ui/UiInput.vue'
+import UiDateRangePicker from '../../components/ui/UiDateRangePicker.vue'
+import InvoicesStatsHeader from './components/InvoicesStatsHeader.vue'
+import InvoiceSidePanel from './components/InvoiceSidePanel.vue'
 
-    <!-- Toolbar -->
-    <div class="table-toolbar">
-      <div class="toolbar-left">
-        <div class="section-title">
-          {{ t('faktury.documentList') }}
-          <span class="section-count">{{ t('common.count', { n: invoicesStore.pagination.total }) }}</span>
-        </div>
+const { t } = useI18n()
+const invoicesStore = useInvoicesStore()
+const projectsStore = useProjectsStore()
+const searchStore = useGlobalSearchStore()
+const modal = useModalStore()
+const router = useRouter()
+const route = useRoute()
 
-        <!-- Unified Bulk Actions Menu -->
-        <div v-if="invoicesStore.selectedIds.length > 0" class="bulk-actions-wrap ml-4">
-          <UiButton variant="primary" size="sm" @click="toggleBulkMenu" class="bulk-active-btn">
-            ⚡ {{ t('common.bulkActions') || 'Bulk Actions' }} ({{ invoicesStore.selectedIds.length }})
-            <span class="chevron-icon">▼</span>
-          </UiButton>
-          
-          <div v-if="isBulkMenuOpen" class="bulk-dropdown-menu">
-            <div class="menu-item" @click="handleBulkEmails">
-              📧 {{ t('faktury.sendBulkEmails') || 'Send Emails' }}
-            </div>
-            <div class="menu-item" @click="handleBulkKsef">
-              🏛️ {{ t('faktury.sendToKsef') }}
-            </div>
-            <div class="menu-item" @click="handleBulkPay">
-              💰 {{ t('faktury.markAsPaid') || 'Mark as Paid' }}
-            </div>
-            <div class="menu-item dividing" @click="invoicesStore.bulkDownloadPDFs">
-              📄 {{ t('faktury.downloadZip') || 'Download PDFs (ZIP)' }}
-            </div>
-            <div class="menu-item" @click="handleAccountingExport">
-              📁 {{ t('faktury.accountingExport') || 'Accounting Export (XLSX)' }}
-            </div>
-            <div class="menu-item" @click="invoicesStore.exportFilteredExcel">
-              📊 {{ t('faktury.exportSelected') || 'Standard Export' }}
-            </div>
-          </div>
+const activeActionId = ref<number | null>(null)
+const selectedInvoice = ref<any | null>(null)
+
+// --- Lifecycle ---
+onMounted(async () => {
+  loadFiltersFromUrl()
+  await Promise.all([
+    projectsStore.fetchProjects(),
+    invoicesStore.fetchInvoices(),
+    invoicesStore.fetchStats()
+  ])
+  window.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
+
+// --- Handlers ---
+const handleRefresh = async () => {
+  await Promise.all([
+    invoicesStore.fetchInvoices(),
+    invoicesStore.fetchStats()
+  ])
+}
+
+const handleRowClick = (invoice: any) => {
+  selectedInvoice.value = invoice
+  invoicesStore.fetchAuditLogs(invoice.id)
+}
+
+const toggleSelectAll = () => {
+  if (invoicesStore.selectedIds.length === invoicesStore.invoices.length && invoicesStore.invoices.length > 0) {
+    invoicesStore.clearSelection()
+  } else {
+    invoicesStore.selectAllOnPage()
+  }
+}
+
+const getStatusVariant = (status: string) => {
+  switch (status) {
+    case 'paid': return 'success'
+    case 'cancelled': return 'danger'
+    case 'draft': return 'warning'
+    case 'wystawiona':
+    case 'sent': return 'info'
+    case 'sending':
+    case 'pending': return 'warning'
+    case 'error': return 'danger'
+    default: return 'neutral'
+  }
+}
+
+const formatCurrency = (amount: number, currency: string) => {
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: currency || 'PLN' }).format(amount)
+}
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return '—'
+  return new Date(dateStr).toLocaleDateString()
+}
+
+// --- Filter Sync ---
+const syncFiltersToUrl = () => {
+  const query: any = {}
+  Object.entries(invoicesStore.filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== '' && key !== 'page' && key !== 'per_page') {
+      query[key] = value
+    }
+  })
+  router.replace({ query })
+}
+
+const loadFiltersFromUrl = () => {
+  const query = route.query
+  if (query.project_id) invoicesStore.filters.project_id = Number(query.project_id)
+  if (query.type) invoicesStore.filters.type = String(query.type)
+  if (query.status) invoicesStore.filters.status = String(query.status)
+  if (query.date_from) invoicesStore.filters.date_from = String(query.date_from)
+  if (query.date_to) invoicesStore.filters.date_to = String(query.date_to)
+  if (query.search) {
+    invoicesStore.filters.search = String(query.search)
+    searchStore.query = String(query.search)
+  }
+}
+
+watch(() => invoicesStore.filters, () => {
+  syncFiltersToUrl()
+  invoicesStore.fetchStats()
+}, { deep: true })
+
+// --- Outside Clicks ---
+const handleClickOutside = (event: MouseEvent) => {
+  const target = event.target as HTMLElement
+  if (!target.closest('.actions-wrap')) activeActionId.value = null
+}
+</script>
+
+<template>
+  <div class="invoices-page">
+    <!-- Stats Header -->
+    <InvoicesStatsHeader />
+
+    <!-- Page Header & Main Toolbar -->
+    <div class="header-section">
+      <div class="header-info">
+        <h1 class="title">{{ t('faktury.documentList') }}</h1>
+        <div class="subtitle-row">
+          <span class="count-badge">{{ invoicesStore.pagination.total }}</span>
+          <span class="subtitle">{{ t('common.total') }}</span>
         </div>
       </div>
-      <div class="toolbar-right">
-        <!-- Project Filter -->
-        <select class="dropdown-filter-btn" v-model="invoicesStore.filters.project_id" @change="invoicesStore.fetchInvoices">
-          <option :value="undefined">{{ t('faktury.filterByProject') }}</option>
-          <option v-for="project in projectsStore.projects" :key="project.id" :value="project.id">
-            {{ project.name }}
-          </option>
-        </select>
 
-        <!-- Type Filter -->
-        <select class="dropdown-filter-btn" v-model="invoicesStore.filters.type" @change="invoicesStore.fetchInvoices">
-          <option :value="undefined">{{ t('faktury.filterByType') }}</option>
-          <option value="FA">FA (Faktura)</option>
-          <option value="FK">FK (Korekta)</option>
-          <option value="PF">PF (Proforma)</option>
-        </select>
-
-        <!-- Status Filter -->
-        <select class="dropdown-filter-btn" v-model="invoicesStore.filters.status" @change="invoicesStore.fetchInvoices">
-          <option :value="undefined">{{ t('faktury.filterByStatus') }}</option>
-          <option value="draft">{{ t('faktury.statuses.draft') }}</option>
-          <option value="wystawiona">{{ t('faktury.statuses.wystawiona') }}</option>
-          <option value="sent">{{ t('faktury.statuses.sent') }}</option>
-          <option value="paid">{{ t('faktury.statuses.paid') }}</option>
-          <option value="cancelled">{{ t('faktury.statuses.cancelled') }}</option>
-        </select>
-
-        <!-- Date Range Filter -->
-        <UiDateRangePicker 
-          v-model:startDate="invoicesStore.filters.date_from" 
-          v-model:endDate="invoicesStore.filters.date_to"
-          @change="invoicesStore.fetchInvoices"
-        />
-
-        <!-- Amount Filter Popover (Simplified for now as inputs) -->
-        <div class="amount-filter-group">
-          <input 
-            type="number" 
-            v-model.number="invoicesStore.filters.min_amount" 
-            placeholder="Min PLN"
-            class="filter-input-small"
-            @change="invoicesStore.fetchInvoices"
-          />
-          <input 
-            type="number" 
-            v-model.number="invoicesStore.filters.max_amount" 
-            placeholder="Max PLN"
-            class="filter-input-small"
-            @change="invoicesStore.fetchInvoices"
-          />
-        </div>
-
-        <UiButton 
-          v-if="invoicesStore.hasActiveFilters"
-          variant="ghost" 
-          size="sm" 
-          @click="invoicesStore.resetFilters"
-          class="reset-btn"
-        >
-          ✕ {{ t('faktury.clearFilters') || 'Clear' }}
+      <div class="header-actions">
+        <UiButton variant="neutral" @click="handleRefresh" :loading="invoicesStore.isLoading">
+          🔄
         </UiButton>
-
-        <UiButton variant="ghost" size="sm" @click="handleExport">
-          📥 {{ t('faktury.exportXlsx') || 'Export XLSX' }}
+        <UiButton variant="neutral" @click="invoicesStore.exportFilteredExcel">
+          📥 {{ t('faktury.exportXlsx') }}
         </UiButton>
-        <UiButton variant="ghost" size="sm" @click="handleBulkGenerate">
-          🪄 {{ t('faktury.generateInvoices') || 'Generate Invoices' }}
+        <UiButton variant="neutral" @click="modal.open('BulkGenerateInvoicesModal')">
+          ✨ {{ t('faktury.generateInvoices') }}
         </UiButton>
-        <UiButton variant="primary" size="sm" @click="handleCreateInvoice">
-          + {{ t('faktury.createInvoice') }}
+        <UiButton variant="primary" @click="modal.open('invoice-create')">
+          ➕ {{ t('faktury.createInvoice') }}
         </UiButton>
       </div>
     </div>
 
-    <!-- Table Container -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th class="selection-col">
-              <input 
-                type="checkbox" 
-                :checked="invoicesStore.selectedIds.length === invoicesStore.invoices.length && invoicesStore.invoices.length > 0"
-                @change="toggleSelectAll"
-              />
-            </th>
-            <th>{{ t('faktury.number') }}</th>
-            <th>{{ t('faktury.buyer') }}</th>
-            <th>{{ t('faktury.project') }}</th>
-            <th>{{ t('faktury.type') }}</th>
-            <th>{{ t('faktury.date') }}</th>
-            <th>{{ t('faktury.amount') }}</th>
-            <th>{{ t('faktury.status') }}</th>
-            <th class="actions-header">···</th>
-          </tr>
-        </thead>
+    <!-- Filters Strip -->
+    <UiCard class="filters-card">
+      <div class="filters-layout">
+        <div class="search-box">
+          <UiInput 
+            v-model="invoicesStore.filters.search" 
+            :placeholder="t('faktury.searchPlaceholder')"
+            @input="invoicesStore.fetchInvoices"
+          >
+            <template #prefix>🔍</template>
+          </UiInput>
+        </div>
 
-        <!-- Skeletons -->
-        <tbody v-if="invoicesStore.isLoading">
-          <tr v-for="i in 5" :key="i" class="skeleton-row">
-            <td colspan="8"><div class="skeleton-line"></div></td>
-          </tr>
-        </tbody>
+        <div class="filter-controls">
+          <div class="control-group">
+            <select v-model="invoicesStore.filters.project_id" @change="invoicesStore.fetchInvoices" class="custom-select">
+              <option :value="undefined">{{ t('faktury.filterByProject') }}</option>
+              <option v-for="p in projectsStore.projects" :key="p.id" :value="p.id">{{ p.name }}</option>
+            </select>
+          </div>
 
-        <!-- Data -->
-        <tbody v-else>
-          <tr v-for="invoice in invoicesStore.invoices" :key="invoice.id" class="table-row clickable-row" :class="{ selected: invoicesStore.selectedIds.includes(invoice.id) }" @click="handleRowClick(invoice)">
-            <td class="selection-col" @click.stop>
-              <input 
-                type="checkbox" 
-                :checked="invoicesStore.selectedIds.includes(invoice.id)"
-                @change="invoicesStore.toggleSelection(invoice.id)"
-              />
-            </td>
-            <td>
-              <div class="invoice-number">{{ invoice.number }}</div>
-            </td>
-            <td>
-              <div class="buyer-info">
-                <span class="buyer-name">{{ invoice.buyer_name }}</span>
-                <span v-if="invoice.buyer_tax_id" class="buyer-nip">NIP: {{ invoice.buyer_tax_id }}</span>
-              </div>
-            </td>
-            <td>
-              <UiBadge variant="default" size="sm">
-                {{ invoice.project?.name || '—' }}
-              </UiBadge>
-            </td>
-            <td>
-              <span class="doc-type">{{ invoice.document_type }}</span>
-            </td>
-            <td>
-              <span class="date-mono">{{ formatDate(invoice.issue_date) }}</span>
-            </td>
-            <td>
-              <div class="amount-cell">
-                <span class="amount-gross">{{ formatCurrency(invoice.amount_gross, invoice.currency) }}</span>
-                <span class="amount-net">{{ t('common.netto') }}: {{ formatCurrency(invoice.amount_net, invoice.currency) }}</span>
-              </div>
-            </td>
-            <td>
-              <UiBadge :variant="getStatusVariant(invoice.ksef_status)">
-                {{ t(`faktury.statuses.${invoice.ksef_status}`) }}
-              </UiBadge>
-            </td>
-            <td @click.stop>
-              <div class="actions-wrap">
-                <button class="actions-btn" @click.stop="toggleActions(invoice.id)">⋮</button>
-                <div class="actions-dropdown" :class="{ open: activeActionId === invoice.id }">
-                  <div class="action-item" @click="downloadPdf(invoice)">
-                    📄 {{ t('faktury.downloadPdf') }}
-                  </div>
-                  <div class="action-item" @click="viewDetails(invoice)">
-                    🔍 {{ t('faktury.viewDetails') }}
-                  </div>
-                  <div 
-                    v-if="['draft', 'error'].includes(invoice.ksef_status)" 
-                    class="action-item ksef-action" 
-                    @click="sendToKsef(invoice)"
-                  >
-                    🚀 {{ t('faktury.sendToKsef') || 'Send to KSeF' }}
+          <div class="control-group">
+            <select v-model="invoicesStore.filters.status" @change="invoicesStore.fetchInvoices" class="custom-select">
+              <option :value="undefined">{{ t('faktury.filterByStatus') }}</option>
+              <option v-for="s in ['draft', 'wystawiona', 'sent', 'paid', 'cancelled', 'error']" :key="s" :value="s">
+                {{ t('faktury.statuses.' + s) }}
+              </option>
+            </select>
+          </div>
+
+          <div class="control-group">
+            <UiDateRangePicker 
+              v-model:startDate="invoicesStore.filters.date_from" 
+              v-model:endDate="invoicesStore.filters.date_to"
+              @change="invoicesStore.fetchInvoices"
+            />
+          </div>
+
+          <UiButton 
+            v-if="invoicesStore.hasActiveFilters" 
+            variant="ghost" 
+            size="sm" 
+            class="text-rose-500"
+            @click="invoicesStore.resetFilters"
+          >
+            {{ t('faktury.clearFilters') }}
+          </UiButton>
+        </div>
+      </div>
+    </UiCard>
+
+    <!-- Table Section -->
+    <UiCard class="table-card">
+      <div class="table-wrapper" :class="{ 'is-loading': invoicesStore.isLoading }">
+        <table class="premium-table">
+          <thead>
+            <tr>
+              <th class="selection-col">
+                <input 
+                  type="checkbox" 
+                  class="custom-checkbox"
+                  :checked="invoicesStore.selectedIds.length === invoicesStore.invoices.length && invoicesStore.invoices.length > 0"
+                  @change="toggleSelectAll"
+                />
+              </th>
+              <th>{{ t('faktury.number') }}</th>
+              <th>{{ t('faktury.buyer') }}</th>
+              <th>{{ t('faktury.amount') }}</th>
+              <th>{{ t('faktury.status') }}</th>
+              <th>{{ t('faktury.date') }}</th>
+              <th class="actions-col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="invoicesStore.isLoading && !invoicesStore.invoices.length" v-for="i in 5" :key="i">
+              <td colspan="7"><div class="skeleton-row"></div></td>
+            </tr>
+            <tr 
+              v-else 
+              v-for="invoice in invoicesStore.invoices" 
+              :key="invoice.id" 
+              class="clickable-row"
+              :class="{ selected: invoicesStore.selectedIds.includes(invoice.id) }"
+              @click="handleRowClick(invoice)"
+            >
+              <td class="selection-col" @click.stop>
+                <input 
+                  type="checkbox" 
+                  class="custom-checkbox"
+                  :checked="invoicesStore.selectedIds.includes(invoice.id)"
+                  @change="invoicesStore.toggleSelection(invoice.id)"
+                />
+              </td>
+              <td>
+                <div class="invoice-number">{{ invoice.number }}</div>
+                <div class="invoice-type-sub">
+                  <span class="type-tag">{{ invoice.document_type }}</span>
+                  <span class="project-tag">{{ invoice.project?.name }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="buyer-cell">
+                  <span class="buyer-name">{{ invoice.buyer_name }}</span>
+                  <span v-if="invoice.buyer_tax_id" class="buyer-nip">NIP: {{ invoice.buyer_tax_id }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="amount-cell">
+                  <span class="amount-gross">{{ formatCurrency(invoice.amount_gross, invoice.currency) }}</span>
+                  <span class="amount-net">{{ t('common.netto') }}: {{ formatCurrency(invoice.amount_net, invoice.currency) }}</span>
+                </div>
+              </td>
+              <td>
+                <UiBadge :variant="getStatusVariant(invoice.ksef_status)">
+                  {{ t('faktury.statuses.' + invoice.ksef_status) }}
+                </UiBadge>
+              </td>
+              <td>
+                <span class="issue-date">{{ formatDate(invoice.issue_date) }}</span>
+              </td>
+              <td class="actions-col" @click.stop>
+                <div class="actions-wrap">
+                  <button class="action-trigger" @click.stop="activeActionId = activeActionId === invoice.id ? null : invoice.id">
+                    ⋮
+                  </button>
+                  <div v-if="activeActionId === invoice.id" class="action-dropdown shadow-lg">
+                    <button @click="handleRowClick(invoice)" class="dropdown-item">
+                      📄 {{ t('faktury.viewDetails') }}
+                    </button>
+                    <button 
+                      v-if="['draft', 'error'].includes(invoice.ksef_status)"
+                      @click="invoicesStore.sendToKsef(invoice.id)" 
+                      class="dropdown-item text-blue-500"
+                    >
+                      🚀 {{ t('faktury.sendToKsef') }}
+                    </button>
+                    <button @click="() => {}" class="dropdown-item">
+                      📥 {{ t('faktury.downloadPdf') }}
+                    </button>
                   </div>
                 </div>
-              </div>
-            </td>
-          </tr>
-
-          <!-- Empty state -->
-          <tr v-if="invoicesStore.invoices.length === 0">
-            <td colspan="8" class="empty-cell">
-              {{ t('common.noData') }}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Pagination -->
-    <div class="pagination-footer" v-if="invoicesStore.pagination.total > 0">
-      <div class="pagination-info">
-        {{ (invoicesStore.pagination.currentPage - 1) * invoicesStore.pagination.perPage + 1 }}-{{ Math.min(invoicesStore.pagination.currentPage * invoicesStore.pagination.perPage, invoicesStore.pagination.total) }} / {{ invoicesStore.pagination.total }}
+              </td>
+            </tr>
+            <tr v-if="!invoicesStore.isLoading && !invoicesStore.invoices.length">
+              <td colspan="7" class="empty-state">
+                <div class="empty-icon">📁</div>
+                <p>{{ t('common.noData') }}</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="pagination-controls">
-        <button class="dropdown-filter-btn" :disabled="invoicesStore.pagination.currentPage <= 1" @click="invoicesStore.setPage(invoicesStore.pagination.currentPage - 1)">←</button>
-        <span class="section-count">{{ invoicesStore.pagination.currentPage }} / {{ invoicesStore.pagination.lastPage }}</span>
-        <button class="dropdown-filter-btn" :disabled="invoicesStore.pagination.currentPage >= invoicesStore.pagination.lastPage" @click="invoicesStore.setPage(invoicesStore.pagination.currentPage + 1)">→</button>
-      </div>
-    </div>
 
-    <!-- Bulk Actions Toolbar -->
-    <Transition name="slide-up">
-      <div v-if="invoicesStore.selectedIds.length > 0" class="bulk-toolbar">
-        <div class="bulk-info">
-          <span class="bulk-count">{{ invoicesStore.selectedIds.length }}</span>
-          {{ t('common.selected') }}
+      <!-- Pagination Footer -->
+      <div class="pagination-footer" v-if="invoicesStore.pagination.total > 0">
+        <div class="page-info">
+          {{ (invoicesStore.pagination.currentPage - 1) * invoicesStore.pagination.perPage + 1 }}-{{ Math.min(invoicesStore.pagination.currentPage * invoicesStore.pagination.perPage, invoicesStore.pagination.total) }} 
+          <span class="dim">/ {{ invoicesStore.pagination.total }}</span>
         </div>
-        <div class="bulk-actions">
-          <UiButton variant="primary" size="sm" @click="handleBulkKsef">
-            🚀 {{ t('faktury.sendToKsef') }}
+        <div class="page-controls">
+          <UiButton 
+            variant="ghost" 
+            size="sm" 
+            :disabled="invoicesStore.pagination.currentPage <= 1"
+            @click="invoicesStore.setPage(invoicesStore.pagination.currentPage - 1)"
+          >
+            ←
           </UiButton>
-          <UiButton variant="cyan" size="sm" @click="invoicesStore.bulkDownloadPDFs">
-            📦 {{ t('faktury.downloadZip') || 'Download ZIP' }}
+          <span class="current-page">{{ invoicesStore.pagination.currentPage }} / {{ invoicesStore.pagination.lastPage }}</span>
+          <UiButton 
+            variant="ghost" 
+            size="sm" 
+            :disabled="invoicesStore.pagination.currentPage >= invoicesStore.pagination.lastPage"
+            @click="invoicesStore.setPage(invoicesStore.pagination.currentPage + 1)"
+          >
+            →
           </UiButton>
-          <UiButton variant="ghost" size="sm" @click="invoicesStore.clearSelection">
-            ✕ {{ t('common.cancel') }}
-          </UiButton>
+        </div>
+      </div>
+    </UiCard>
+
+    <!-- Bulk Toolbar -->
+    <Transition name="slide-up">
+      <div v-if="invoicesStore.selectedIds.length > 0" class="bulk-toolbar-fixed">
+        <div class="bulk-content">
+          <div class="bulk-info">
+            <span class="selection-indicator">{{ invoicesStore.selectedIds.length }}</span>
+            <span class="selection-label">{{ t('common.selected') }}</span>
+          </div>
+          <div class="divider" />
+          <div class="bulk-actions-row">
+            <UiButton variant="primary" size="sm" @click="invoicesStore.bulkSendToKsef">
+              🚀 {{ t('faktury.sendToKsef') }}
+            </UiButton>
+            <UiButton variant="neutral" size="sm" @click="invoicesStore.bulkSendEmails">
+              📧 Email
+            </UiButton>
+            <UiButton variant="neutral" size="sm" @click="invoicesStore.bulkDownloadPDFs">
+              📦 ZIP
+            </UiButton>
+            <UiButton variant="ghost" size="sm" @click="invoicesStore.clearSelection">
+              ✕ {{ t('common.cancel') }}
+            </UiButton>
+          </div>
         </div>
       </div>
     </Transition>
 
-    <!-- Side Panel -->
-    <InvoiceSidePanel
-      :invoice="selectedInvoice"
+    <!-- Details Sidebar -->
+    <InvoiceSidePanel 
+      :invoice="selectedInvoice" 
       :audit-logs="invoicesStore.auditLogs"
       @close="selectedInvoice = null"
-      @convert="handleConvert"
-      @send-to-ksef="sendToKsef"
-      @refresh="invoicesStore.fetchInvoices"
-      @select="handleSelect"
+      @refresh="handleRefresh"
+      @convert="invoicesStore.convertProforma"
+      @send-to-ksef="invoicesStore.sendToKsef"
     />
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useInvoicesStore } from '../../stores/invoices.store';
-import { useProjectsStore } from '../../stores/projects.store';
-import { useGlobalSearchStore } from '../../stores/globalSearch.store';
-import { useModalStore } from '../../stores/modal.store';
-import { useInvoicePermissions } from '../../composables/useInvoicePermissions';
-import { useRouter, useRoute } from 'vue-router';
-import UiButton from '../../components/ui/UiButton.vue';
-import UiDateRangePicker from '../../components/ui/UiDateRangePicker.vue';
-import { invoicesApi } from '../../api/invoices.api';
-import InvoiceSidePanel from './components/InvoiceSidePanel.vue';
-import InvoicesStatsHeader from './components/InvoicesStatsHeader.vue';
-
-const { t } = useI18n();
-const invoicesStore = useInvoicesStore();
-const projectsStore = useProjectsStore();
-const searchStore = useGlobalSearchStore();
-const modal = useModalStore();
-const router = useRouter();
-const route = useRoute();
-const { can, canEdit } = useInvoicePermissions();
-const activeActionId = ref<number | null>(null);
-const isBulkMenuOpen = ref(false);
-const selectedInvoice = ref<any | null>(null);
-
-function toggleActions(id: number) {
-  activeActionId.value = activeActionId.value === id ? null : id;
-}
-
-function toggleSelectAll() {
-  if (invoicesStore.selectedIds.length === invoicesStore.invoices.length) {
-    invoicesStore.clearSelection();
-  } else {
-    invoicesStore.selectAllOnPage();
-  }
-}
-
-async function handleBulkKsef() {
-  if (confirm(t('modals.korekta.ksefBulkConfirm') || 'Send selected invoices to KSeF?')) {
-    await invoicesStore.bulkSendToKsef();
-    isBulkMenuOpen.value = false;
-  }
-}
-
-async function handleBulkEmails() {
-  if (!confirm(t('faktury.bulkEmailConfirm') || 'Send emails to all selected students?')) return;
-  try {
-    await invoicesStore.bulkSendEmails(invoicesStore.selectedIds);
-    toast.success(t('common.success') || 'Success');
-    isBulkMenuOpen.value = false;
-  } catch (err) {
-    toast.error(t('common.error') || 'Error');
-  }
-}
-
-async function handleBulkPay() {
-  const date = new Date().toISOString().split('T')[0];
-  if (!confirm(t('faktury.markAsPaidConfirm') || 'Mark selected as paid today?')) return;
-  try {
-    await invoicesStore.bulkMarkAsPaid(invoicesStore.selectedIds, date);
-    isBulkMenuOpen.value = false;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-async function handleBatchStatus(status: string) {
-  if (!confirm(t('common.confirmAction') || 'Are you sure?')) return;
-  try {
-    await invoicesStore.batchStatusUpdate({ ids: invoicesStore.selectedIds, status });
-    isBulkMenuOpen.value = false;
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function handleBulkGenerate() {
-  modal.open('BulkGenerateInvoicesModal');
-}
-
-function handleAccountingExport() {
-  const url = invoicesApi.getAccountingExportUrl(invoicesStore.filters);
-  window.open(url, '_blank');
-  isBulkMenuOpen.value = false;
-}
-
-function toggleBulkMenu() {
-  isBulkMenuOpen.value = !isBulkMenuOpen.value;
-}
-
-async function handleConvert(id: number) {
-  try {
-    await invoicesStore.convertProforma(id);
-    if (selectedInvoice.value?.id === id) {
-      selectedInvoice.value = invoicesStore.invoices.find(i => i.id === id);
-    }
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-function handleRowClick(invoice: any) {
-  selectedInvoice.value = invoice;
-  invoicesStore.fetchAuditLogs(invoice.id);
-}
-
-async function handleSelect(id: number) {
-  const invoice = await invoicesApi.getById(id);
-  handleRowClick(invoice);
-}
-
-function handleExport() {
-  invoicesStore.exportFilteredExcel();
-}
-
-function formatDate(dateStr: string) {
-  if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString();
-}
-
-function formatCurrency(amount: number, currency: string) {
-  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: currency || 'PLN' }).format(amount);
-}
-
-function getStatusVariant(status: string) {
-  switch (status) {
-    case 'paid': return 'success';
-    case 'cancelled': return 'danger';
-    case 'draft': return 'warning';
-    case 'wystawiona':
-    case 'sent': return 'info';
-    case 'sending':
-    case 'pending': return 'warning';
-    case 'error': return 'danger';
-    default: return 'default';
-  }
-}
-
-async function sendToKsef(invoice: any) {
-  try {
-    await invoicesStore.sendToKsef(invoice.id);
-  } catch (err) {
-    console.error(err);
-  }
-  activeActionId.value = null;
-}
-
-function handleCreateInvoice() {
-  modal.open('invoice-create');
-}
-
-
-function downloadPdf(invoice: any) {
-  const url = invoicesApi.getPdfUrl(invoice.id);
-  window.open(url, '_blank');
-  activeActionId.value = null;
-}
-
-function viewDetails(invoice: any) {
-  modal.open('invoice-preview', invoice);
-  activeActionId.value = null;
-}
-
-// Search debounce
-let searchDebounce: any = null;
-watch(() => searchStore.query, (val) => {
-  if (searchDebounce) clearTimeout(searchDebounce);
-  searchDebounce = setTimeout(() => {
-    invoicesStore.filters.search = val.trim();
-    invoicesStore.fetchInvoices();
-  }, 400);
-});
-
-// URL Sync & Persistence
-function syncFiltersToUrl() {
-  const query: any = {};
-  Object.entries(invoicesStore.filters).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '' && key !== 'page' && key !== 'per_page') {
-      query[key] = value;
-    }
-  });
-  router.replace({ query });
-}
-
-function loadFiltersFromUrl() {
-  const query = route.query;
-  if (query.project_id) invoicesStore.filters.project_id = Number(query.project_id);
-  if (query.type) invoicesStore.filters.type = String(query.type);
-  if (query.status) invoicesStore.filters.status = String(query.status);
-  if (query.date_from) invoicesStore.filters.date_from = String(query.date_from);
-  if (query.date_to) invoicesStore.filters.date_to = String(query.date_to);
-  if (query.min_amount) invoicesStore.filters.min_amount = Number(query.min_amount);
-  if (query.max_amount) invoicesStore.filters.max_amount = Number(query.max_amount);
-  if (query.search) {
-    invoicesStore.filters.search = String(query.search);
-    searchStore.query = String(query.search);
-  }
-}
-
-onMounted(async () => {
-  loadFiltersFromUrl();
-  await projectsStore.fetchProjects();
-  await invoicesStore.fetchInvoices();
-  await invoicesStore.fetchStats();
-});
-
-watch(() => invoicesStore.filters, () => {
-  syncFiltersToUrl();
-  invoicesStore.fetchStats();
-}, { deep: true });
-
-const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement;
-  if (!target.closest('.actions-wrap')) {
-    activeActionId.value = null;
-  }
-  if (!target.closest('.bulk-actions-wrap')) {
-    isBulkMenuOpen.value = false;
-  }
-};
-
-onMounted(() => {
-  window.addEventListener('click', handleClickOutside);
-  invoicesStore.fetchInvoices();
-});
-
-onUnmounted(() => {
-  window.removeEventListener('click', handleClickOutside);
-});
-</script>
-
 <style scoped>
-.content { padding: 24px 28px; }
-
-.table-toolbar {
+.invoices-page {
+  padding: 24px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.header-section {
+  display: flex;
   justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.toolbar-left { display: flex; align-items: center; gap: 12px; }
-
-.section-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--app-text-main);
-  display: flex;
   align-items: center;
-  gap: 10px;
 }
 
-.section-count {
-  font-size: 11px;
-  font-family: 'Space Mono', monospace;
-  background: var(--status-info-bg);
-  color: var(--blue);
+.title { font-size: 24px; font-weight: 800; color: var(--app-text-main); margin: 0; }
+.subtitle-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+.count-badge { font-size: 11px; font-weight: 700; background: var(--app-card-hi); color: var(--app-primary); padding: 2px 8px; border-radius: 6px; }
+.subtitle { font-size: 13px; color: var(--app-text-dim); }
+
+.header-actions { display: flex; gap: 10px; }
+
+/* Filters */
+.filters-card { padding: 16px; border: 1px solid var(--app-border); background: var(--app-card); }
+.filters-layout { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.search-box { flex: 1; max-width: 320px; }
+.filter-controls { display: flex; align-items: center; gap: 12px; }
+
+.custom-select {
+  background: var(--app-card-hi);
   border: 1px solid var(--app-border);
-  padding: 2px 8px;
-  border-radius: 8px;
-}
-
-.toolbar-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-
-.amount-filter-group {
-  display: flex;
-  gap: 4px;
-}
-
-.filter-input-small {
-  width: 80px;
-  padding: 8px 10px;
   border-radius: 10px;
-  font-size: 13px;
-  border: 1px solid var(--app-border);
-  background: var(--app-card);
-  color: var(--app-text-main);
-  outline: none;
-}
-
-.filter-input-small:focus { border-color: var(--blue); }
-
-.reset-btn { color: var(--red) !important; }
-
-/* Bulk Actions Menu Styles */
-.bulk-actions-wrap {
-  position: relative;
-  display: inline-block;
-}
-
-.bulk-active-btn {
-  background: var(--blue) !important;
-  color: white !important;
-  border: none;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3);
-}
-
-.chevron-icon {
-  font-size: 10px;
-  margin-left: 6px;
-  opacity: 0.8;
-}
-
-.bulk-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 8px;
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-  z-index: 100;
-  min-width: 240px;
-  padding: 8px;
-  overflow: hidden;
-}
-
-.menu-item {
-  padding: 10px 14px;
-  font-size: 14px;
-  color: var(--app-text-main);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-}
-
-.menu-item:hover {
-  background: var(--app-surface);
-  color: var(--blue);
-}
-
-.menu-item.dividing {
-  border-top: 1px solid var(--app-border);
-  margin-top: 4px;
-  padding-top: 14px;
-}
-
-.dropdown-filter-btn {
   padding: 8px 12px;
-  border-radius: 10px;
   font-size: 13px;
-  border: 1px solid var(--app-border);
-  background: var(--app-card);
   color: var(--app-text-main);
-  cursor: pointer;
-  transition: all 0.2s;
   outline: none;
+  min-width: 160px;
+  transition: border-color 0.2s;
 }
+.custom-select:focus { border-color: var(--app-primary); }
 
-.dropdown-filter-btn:hover { border-color: var(--blue); }
+/* Table Section */
+.table-card { border: 1px solid var(--app-border); padding: 0; overflow: hidden; background: var(--app-card); }
+.table-wrapper { position: relative; }
 
-.table-container {
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--app-shadow);
-}
+.premium-table { width: 100%; border-collapse: collapse; text-align: left; }
+.premium-table th { background: var(--app-card-hi); padding: 14px 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--app-text-dim); letter-spacing: 0.05em; }
+.premium-table td { padding: 16px 20px; border-top: 1px solid var(--app-border); }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-}
+.clickable-row { cursor: pointer; transition: background 0.15s; }
+.clickable-row:hover { background: rgba(79, 110, 247, 0.03); }
+.clickable-row.selected { background: rgba(79, 110, 247, 0.06); }
 
-th {
-  padding: 14px 20px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: var(--app-text-dim);
-  background: var(--app-surface);
-  border-bottom: 1px solid var(--app-border);
-}
+.selection-col { width: 44px; text-align: center; }
+.custom-checkbox { width: 16px; height: 16px; accent-color: var(--app-primary); cursor: pointer; }
 
-td {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--app-border);
-  vertical-align: middle;
-}
+.invoice-number { font-family: 'Space Mono', monospace; font-weight: 700; font-size: 14px; color: var(--app-text-main); }
+.invoice-type-sub { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.type-tag { font-size: 10px; font-weight: 800; color: var(--app-primary); background: rgba(79, 110, 247, 0.1); padding: 1px 4px; border-radius: 4px; }
+.project-tag { font-size: 11px; color: var(--app-text-dim); }
 
-.table-row:hover { background: var(--status-info-bg); }
-
-.invoice-number {
-  font-family: 'Space Mono', monospace;
-  font-weight: 700;
-  color: var(--blue);
-}
-
-.buyer-info { display: flex; flex-direction: column; }
-.buyer-name { font-weight: 600; color: var(--app-text-main); }
+.buyer-cell { display: flex; flex-direction: column; }
+.buyer-name { font-weight: 600; font-size: 14px; color: var(--app-text-main); }
 .buyer-nip { font-size: 11px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
 
-.date-mono { font-family: 'Space Mono', monospace; font-size: 13px; }
-
 .amount-cell { display: flex; flex-direction: column; }
-.amount-gross { font-weight: 700; color: var(--app-text-main); }
+.amount-gross { font-family: 'Outfit', sans-serif; font-weight: 700; color: var(--app-text-main); }
 .amount-net { font-size: 11px; color: var(--app-text-dim); }
 
-.actions-header { width: 60px; text-align: center; }
+.issue-date { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--app-text-dim); }
+
+.actions-col { width: 60px; text-align: center; }
+.action-trigger { padding: 6px; border-radius: 8px; color: var(--app-text-dim); transition: all 0.2s; font-size: 20px; line-height: 1; }
+.action-trigger:hover { background: var(--app-card-hi); color: var(--app-text-main); }
 
 .actions-wrap { position: relative; display: flex; justify-content: center; }
-.actions-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  border: 1px solid var(--app-border);
-  background: var(--app-surface);
-  color: var(--app-text-dim);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-  opacity: 0.6;
+.action-dropdown {
+  position: absolute; right: 0; top: 100%; margin-top: 8px;
+  background: var(--app-card); border: 1px solid var(--app-border);
+  border-radius: 12px; width: 180px; z-index: 100;
+  padding: 6px; display: flex; flex-direction: column;
 }
-
-.actions-btn:hover { border-color: var(--blue); color: var(--blue); opacity: 1; }
-
-.actions-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 12px;
-  padding: 6px;
-  min-width: 160px;
-  z-index: 100;
-  box-shadow: var(--app-shadow-lg);
-  display: none;
+.dropdown-item {
+  padding: 10px 12px; font-size: 13px; border-radius: 8px; color: var(--app-text-dim);
+  display: flex; align-items: center; gap: 10px; transition: all 0.15s;
 }
+.dropdown-item:hover { background: var(--app-card-hi); color: var(--app-text-main); }
 
-.actions-dropdown.open { display: block; }
+.pagination-footer { padding: 16px 24px; border-top: 1px solid var(--app-border); display: flex; justify-content: space-between; align-items: center; }
+.page-info { font-size: 13px; color: var(--app-text-main); font-weight: 600; }
+.dim { color: var(--app-text-dim); font-weight: 400; }
+.page-controls { display: flex; align-items: center; gap: 16px; }
+.current-page { font-size: 13px; font-weight: 600; color: var(--app-primary); }
 
-.action-item {
-  padding: 10px 14px;
-  font-size: 13px;
-  color: var(--app-text-dim);
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.2s;
+.skeleton-row { height: 60px; background: linear-gradient(90deg, var(--app-card-hi) 25%, var(--app-border) 50%, var(--app-card-hi) 75%); background-size: 200% 100%; animation: skeleton-loading 1.5s infinite; border-radius: 8px; }
+@keyframes skeleton-loading { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+.empty-state { text-align: center; padding: 64px !important; color: var(--app-text-dim); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+/* Bulk Toolbar */
+.bulk-toolbar-fixed {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%);
+  background: var(--app-bg); border: 1px solid var(--app-border);
+  border-radius: 20px; padding: 12px 24px; z-index: 500;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
 }
+.bulk-content { display: flex; align-items: center; gap: 20px; }
+.bulk-info { display: flex; align-items: center; gap: 8px; }
+.selection-indicator { background: var(--app-primary); color: white; border-radius: 6px; padding: 2px 8px; font-weight: 700; font-size: 13px; }
+.selection-label { font-size: 14px; font-weight: 600; color: var(--app-text-dim); }
+.divider { width: 1px; height: 24px; background: var(--app-border); }
+.bulk-actions-row { display: flex; gap: 10px; }
 
-.action-item:hover { background: var(--status-info-bg); color: var(--app-text-main); }
-
-.empty-cell { padding: 40px; text-align: center; color: var(--app-text-dim); }
-
-.pagination-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
-.pagination-info { font-size: 13px; color: var(--app-text-dim); }
-.pagination-controls { display: flex; align-items: center; gap: 12px; }
-
-.skeleton-row td { padding: 24px 20px; }
-.skeleton-line {
-  height: 12px;
-  background: linear-gradient(90deg, var(--app-border) 25%, var(--app-surface) 50%, var(--app-border) 75%);
-  background-size: 200% 100%;
-  animation: skeleton 1.5s infinite;
-  border-radius: 6px;
-}
-
-@keyframes skeleton {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-.table-row.selected {
-  background-color: var(--color-bg-hover);
-}
-
-.selection-col {
-  width: 40px;
-  text-align: center;
-}
-
-.bulk-toolbar {
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--color-bg-card);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 12px 24px;
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
-  z-index: 100;
-  backdrop-filter: blur(8px);
-}
-
-.bulk-info {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-}
-
-.bulk-count {
-  background: var(--app-primary);
-  color: white;
-  padding: 2px 8px;
-  border-radius: 6px;
-  font-weight: 700;
-}
-
-.bulk-actions {
-  display: flex;
-  gap: 12px;
-}
-
-.clickable-row {
-  cursor: pointer;
-  transition: background 0.15s;
-}
-
-.clickable-row:hover {
-  background: rgba(79, 110, 247, 0.05) !important;
-}
-
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.slide-up-enter-from,
-.slide-up-leave-to {
-  opacity: 0;
-  transform: translate(-50%, 20px);
-}
+/* Transitions */
+.slide-up-enter-active, .slide-up-leave-active { transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.slide-up-enter-from, .slide-up-leave-to { opacity: 0; transform: translate(-50%, 40px); }
 </style>

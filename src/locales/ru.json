@@ -144,7 +144,6 @@
     "remindAll": "Напомнить всем",
     "balance": "Баланс",
     "success": "Успешно",
-    "error": "Ошибка",
     "confirmAction": "Вы уверены?",
     "noData": "Данные не найдены",
     "allProjects": "Все проекты"
@@ -2453,7 +2452,6 @@
       "errorsDetected": "Обнаружены ошибки"
     },
     "documentList": "Список счетов",
-  "invoiceFields": {
     "number": "Номер",
     "buyer": "Покупатель",
     "amount": "Сумма",
@@ -2519,7 +2517,17 @@
     "markAsPaid": "Отметить оплаченным",
     "markAsPaidConfirm": "Установите дату оплаты для выбранных счетов",
     "accountingExport": "Реестр продаж (XLSX)",
-    "unpaid": "Не оплачен"
+    "unpaid": "Не оплачен",
+    "exportXlsx": "Экспорт XLSX",
+    "createInvoice": "Выставить счет",
+    "generateInvoices": "Сгенерировать счета",
+    "bulkGenerateTitle": "Массовая генерация счетов",
+    "bulkGenerateSubtitle": "Создание черновиков счетов для всех активных студентов с подписками",
+    "fetchEligibleStudents": "Найти подходящих студентов",
+    "noStudentsDue": "Нет студентов, которым нужно выставить счет в этом периоде",
+    "studentsFound": "Найдено студентов",
+    "collectionRate": "Процент сборов",
+    "paidVsIssued": "Оплачено vs Выставлено"
   },
   "cohorts": {
     "title": "Когортный анализ оплат",

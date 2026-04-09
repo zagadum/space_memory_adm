@@ -28,6 +28,7 @@
     :on-success="modal.payload.onSuccess"
     @close="modal.close"
   />
+  <BulkGenerateInvoicesModal v-else-if="openId==='BulkGenerateInvoicesModal'" />
 </template>
 
 <script setup lang="ts">

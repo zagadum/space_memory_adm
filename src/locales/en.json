@@ -2441,20 +2441,9 @@
       "paidSum": "Paid",
       "unpaidCount": "Unpaid",
       "needAttention": "Need Attention",
-      "errorsDetected": "Errors Detected",
-      "topCohort": "Best cohort"
+      "errorsDetected": "Errors Detected"
     },
     "documentList": "Invoices List",
-    "exportXlsx": "Export XLSX",
-    "createInvoice": "Issue Invoice",
-    "generateInvoices": "Generate Invoices",
-    "bulkGenerateTitle": "Mass Invoice Generation",
-    "bulkGenerateSubtitle": "Create draft invoices for all active students with subscriptions",
-    "fetchEligibleStudents": "Fetch Eligible Students",
-    "noStudentsDue": "No students are due for payment in this period",
-    "studentsFound": "Students Found"
-  },
-  "invoiceFields": {
     "number": "Number",
     "buyer": "Buyer",
     "amount": "Amount",
@@ -2520,7 +2509,17 @@
     "markAsPaid": "Mark as Paid",
     "markAsPaidConfirm": "Set payment date for selected invoices",
     "accountingExport": "Sales Registry (XLSX)",
-    "unpaid": "Unpaid"
+    "unpaid": "Unpaid",
+    "exportXlsx": "Export XLSX",
+    "createInvoice": "Issue Invoice",
+    "generateInvoices": "Generate Invoices",
+    "bulkGenerateTitle": "Mass Invoice Generation",
+    "bulkGenerateSubtitle": "Create draft invoices for all active students with subscriptions",
+    "fetchEligibleStudents": "Fetch Eligible Students",
+    "noStudentsDue": "No students are due for payment in this period",
+    "studentsFound": "Students Found",
+    "collectionRate": "Collection Rate",
+    "paidVsIssued": "Paid vs Issued"
   },
   "cohorts": {
     "title": "Cohort Payment Analysis",

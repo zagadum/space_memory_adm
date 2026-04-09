@@ -1,171 +1,212 @@
-<template>
-  <div class="stats-header" v-if="stats">
-    <div class="stat-card sc-blue">
-      <div class="stat-icon">💰</div>
-      <div class="stat-info">
-        <div class="stat-label">{{ t('faktury.stats.monthlyTurnover') }}</div>
-        <div class="stat-value">{{ formatCurrency(stats.gross_total_monthly) }}</div>
-        <div class="stat-sub">{{ stats.month }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card sc-green">
-      <div class="stat-icon">✅</div>
-      <div class="stat-info">
-        <div class="stat-label">{{ t('faktury.stats.paidSum') }}</div>
-        <div class="stat-value">{{ formatCurrency(stats.paid_total_monthly) }}</div>
-        <div class="stat-sub">{{ paidPercent }}% {{ t('common.total') }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card sc-amber">
-      <div class="stat-icon">⏳</div>
-      <div class="stat-info">
-        <div class="stat-label">{{ t('faktury.collectionRate') || 'Collection Rate' }}</div>
-        <div class="stat-value" :class="getRateColor(invoicesStore.collectionRate)">
-          {{ invoicesStore.collectionRate }}%
-        </div>
-        <div class="stat-sub">{{ t('faktury.paidVsIssued') || 'Paid vs Issued' }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card">
-      <div class="stat-info">
-        <div class="stat-label">{{ t('faktury.stats.unpaidCount') }}</div>
-        <div class="stat-value">{{ stats.unpaid_count }}</div>
-        <div class="stat-sub">{{ t('faktury.stats.needAttention') }}</div>
-      </div>
-    </div>
-
-    <div class="stat-card sc-red" :class="{ 'sc-green': stats.ksef_error_count === 0 }">
-      <div class="stat-icon">{{ stats.ksef_error_count === 0 ? '🛡️' : '⚠️' }}</div>
-      <div class="stat-info">
-        <div class="stat-label">KSeF Health</div>
-        <div class="stat-value">{{ stats.ksef_error_count }}</div>
-        <div class="stat-sub">{{ stats.ksef_error_count === 0 ? 'All systems nominal' : t('faktury.stats.errorsDetected') }}</div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useInvoicesStore } from '../../../stores/invoices.store';
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useInvoicesStore } from '../../../stores/invoices.store'
+import UiCard from '../../../components/ui/UiCard.vue'
 
-const props = defineProps<{
-  stats: {
-    gross_total_monthly: number;
-    paid_total_monthly: number;
-    unpaid_count: number;
-    ksef_error_count: number;
-    month: string;
-  } | null;
-}>();
+const { t } = useI18n()
+const store = useInvoicesStore()
 
-const { t } = useI18n();
-const invoicesStore = useInvoicesStore();
-
-const paidPercent = computed(() => {
-  if (!props.stats || props.stats.gross_total_monthly === 0) return 0;
-  return Math.round((props.stats.paid_total_monthly / props.stats.gross_total_monthly) * 100);
-});
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(amount || 0);
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(amount || 0)
 }
 
-function getRateColor(rate: number) {
-  if (rate >= 90) return 'text-success';
-  if (rate >= 70) return 'text-warning';
-  return 'text-danger';
+const paidPercent = computed(() => {
+  if (!store.grossMonthly) return 0
+  return Math.round((store.paidMonthly / store.grossMonthly) * 100)
+})
+
+const getRateVariant = (rate: number) => {
+  if (rate >= 90) return 'text-emerald-500'
+  if (rate >= 70) return 'text-amber-500'
+  return 'text-rose-500'
 }
 </script>
 
+<template>
+  <div class="stats-grid">
+    <!-- Turnover -->
+    <UiCard class="stat-card glass platinum">
+      <div class="stat-icon-wrapper blue">
+        <span class="emoji-icon">💰</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{ t('faktury.stats.monthlyTurnover') }}</span>
+        <div class="stat-value-row">
+          <span class="stat-value highlight">{{ formatCurrency(store.grossMonthly) }}</span>
+        </div>
+        <span class="stat-sub">{{ store.stats?.month || '-' }}</span>
+      </div>
+    </UiCard>
+
+    <!-- Paid -->
+    <UiCard class="stat-card glass">
+      <div class="stat-icon-wrapper emerald">
+        <span class="emoji-icon">✅</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{ t('faktury.stats.paidSum') }}</span>
+        <div class="stat-value-row">
+          <span class="stat-value">{{ formatCurrency(store.paidMonthly) }}</span>
+          <span class="stat-badge success">{{ paidPercent }}%</span>
+        </div>
+        <span class="stat-sub">{{ t('common.total') }}</span>
+      </div>
+    </UiCard>
+
+    <!-- Collection Rate -->
+    <UiCard class="stat-card glass">
+      <div class="stat-icon-wrapper amber">
+        <span class="emoji-icon">📈</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{ t('faktury.collectionRate') }}</span>
+        <div class="stat-value-row">
+          <span class="stat-value" :class="getRateVariant(store.collectionRate)">{{ store.collectionRate }}%</span>
+        </div>
+        <span class="stat-sub">{{ t('faktury.paidVsIssued') }}</span>
+      </div>
+    </UiCard>
+
+    <!-- Unpaid -->
+    <UiCard class="stat-card glass">
+      <div class="stat-icon-wrapper rose">
+        <span class="emoji-icon">⏳</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">{{ t('faktury.stats.unpaidCount') }}</span>
+        <div class="stat-value-row">
+          <span class="stat-value text-rose-500">{{ store.unpaidCount }}</span>
+        </div>
+        <span class="stat-sub">{{ t('faktury.stats.needAttention') }}</span>
+      </div>
+    </UiCard>
+
+    <!-- KSeF Health -->
+    <UiCard class="stat-card glass health-card" :class="{ 'has-errors': (store.stats?.ksef_error_count || 0) > 0 }">
+      <div class="stat-icon-wrapper" :class="(store.stats?.ksef_error_count || 0) === 0 ? 'emerald' : 'rose'">
+        <span class="emoji-icon">{{ (store.stats?.ksef_error_count || 0) === 0 ? '🛡️' : '⚠️' }}</span>
+      </div>
+      <div class="stat-info">
+        <span class="stat-label">KSeF Status</span>
+        <div class="stat-value-row">
+          <span class="stat-value">{{ store.stats?.ksef_error_count || 0 }}</span>
+        </div>
+        <span class="stat-sub">
+          {{ (store.stats?.ksef_error_count || 0) === 0 ? 'All systems nominal' : t('faktury.stats.errorsDetected') }}
+        </span>
+      </div>
+    </UiCard>
+  </div>
+</template>
+
 <style scoped>
-.stats-header {
+.stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
 
 .stat-card {
-  background: var(--app-card);
-  border: 1px solid var(--app-border);
-  border-radius: 14px;
   padding: 18px 20px;
-  position: relative;
-  overflow: hidden;
   display: flex;
   align-items: center;
   gap: 16px;
+  border: 1px solid var(--app-border);
+  background: var(--app-card);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.15;
-  z-index: 0;
+.stat-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.sc-blue::before { background: #4f6ef7; }
-.sc-green::before { background: #10b981; }
-.sc-amber::before { background: #f59e0b; }
-.sc-red::before { background: #ef4444; }
-
-.stat-icon {
-  font-size: 28px;
-  z-index: 1;
+.emoji-icon {
+  font-size: 24px;
 }
+
+.stat-icon-wrapper.blue { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+.stat-icon-wrapper.emerald { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.stat-icon-wrapper.amber { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.stat-icon-wrapper.rose { background: rgba(244, 63, 94, 0.1); color: #f43f5e; }
 
 .stat-info {
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .stat-label {
   font-size: 11px;
-  font-weight: 700;
-  color: var(--app-text-dim);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 4px;
+  letter-spacing: 0.05em;
+  color: var(--app-text-dim);
+  margin-bottom: 2px;
+}
+
+.stat-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .stat-value {
-  font-size: 20px;
-  font-weight: 800;
+  font-size: 18px;
+  font-weight: 700;
   color: var(--app-text-main);
   font-family: 'Outfit', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-value.highlight {
+  color: var(--app-primary);
 }
 
 .stat-sub {
   font-size: 11px;
   color: var(--app-text-dim);
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
-@media (max-width: 1200px) {
-  .stats-header {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.stat-badge {
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid transparent;
 }
 
-@media (max-width: 600px) {
-  .stats-header {
-    grid-template-columns: 1fr;
-  }
+.stat-badge.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.health-card.has-errors {
+  border-color: rgba(244, 63, 94, 0.3);
+  background: rgba(244, 63, 94, 0.02);
+}
+
+@media (max-width: 1024px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
 }
 </style>
