@@ -140,8 +140,8 @@ export const router = createRouter({
         {
           path: "finance/returns",
           name: "finance-returns",
-          component: () => import("../views/finance/ZwrotyView.vue"),
-          meta: { title: 'Zwroty', icon: '↩️', searchPlaceholder: 'search.zwroty' }
+          component: () => import("../views/finance/RefundsPage.vue"),
+          meta: { title: 'finance.refundsTitle', icon: '↩️', searchPlaceholder: 'search.refunds' }
         },
         {
           path: "finance/cohorts",
