@@ -130,6 +130,16 @@ function normalizeTeacherNote(raw: any): TeacherNote {
   }
 }
 
+function normalizeTeacherGroup(raw: any): TeacherGroupItem {
+  return {
+    id: Number(raw?.id ?? 0),
+    name: String(raw?.name ?? raw?.group_name ?? raw?.title ?? 'Unknown Group'),
+    schedule: String(raw?.schedule ?? raw?.description ?? ''),
+    studentsCount: Number(raw?.studentsCount ?? raw?.students_count ?? raw?.count ?? 0),
+    school: String(raw?.school ?? raw?.branch ?? 'Space Memory'),
+  }
+}
+
 export async function getTeacherHistory(id: number): Promise<TeacherHistoryItem[]> {
   const res = await http.get(TEACHERS.HISTORY(id))
   return res.data as TeacherHistoryItem[]
@@ -137,7 +147,10 @@ export async function getTeacherHistory(id: number): Promise<TeacherHistoryItem[
 
 export async function getTeacherGroups(id: number): Promise<TeacherGroupItem[]> {
   const res = await http.get(TEACHERS.GROUPS(id))
-  return res.data as TeacherGroupItem[]
+  // Handle wrapped collections (data, items, groups) or direct arrays
+  const payload = res.data?.data ?? res.data?.items ?? res.data?.groups ?? res.data ?? []
+  if (!Array.isArray(payload)) return []
+  return payload.map((item: any) => normalizeTeacherGroup(item))
 }
 
 export async function getTeacherNotes(id: number): Promise<TeacherNote[]> {
