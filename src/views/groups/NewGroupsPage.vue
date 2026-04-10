@@ -88,7 +88,7 @@
                 <span v-else class="empty-cell">—</span>
               </td>
               <td>
-                <button class="btn-start" @click.stop="openStartModal(g)">{{ t('newGroups.startBtn') }}</button>
+                <button v-if="g.totalSlots > 0" class="btn-start" @click.stop="openStartModal(g)">{{ t('newGroups.startBtn') }}</button>
               </td>
             </tr>
             <tr v-if="sortedGroups.length === 0">
