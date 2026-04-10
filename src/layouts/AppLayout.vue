@@ -26,10 +26,12 @@ import AppTopbar from "../components/layout/AppTopbar.vue";
 import ToastContainer from "../components/ui/ToastContainer.vue";
 import ModalHost from "../modals/ModalHost.vue";
 import { useAuthStore } from "../stores/auth.store";
+import { useAccessStore } from "../stores/access.store";
 import { useAppStore } from "../stores/app.store";
 import { usePaymentsStore } from "../stores/payments.store";
 
 const auth = useAuthStore();
+const access = useAccessStore();
 const appStore = useAppStore();
 const payments = usePaymentsStore();
 const route = useRoute();
@@ -40,7 +42,9 @@ watch(() => route.path, () => {
 });
 
 onMounted(async () => {
-  await auth.loadMe();
+  if (!auth.user || !access.initialized) {
+    await auth.loadMe();
+  }
 });
 </script>
 

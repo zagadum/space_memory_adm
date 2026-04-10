@@ -15,6 +15,11 @@ export type RecruitmentBackend = "default" | "indigo";
 
 const MOCK_ONLY_PREFIXES = APP_ENV.mockOnlyPrefixes;
 const REAL_ONLY_PREFIXES = APP_ENV.realOnlyPrefixes;
+let onUnauthorizedLogout: (() => void) | null = null;
+
+export function setUnauthorizedLogoutHandler(handler: (() => void) | null) {
+  onUnauthorizedLogout = handler;
+}
 
 function normalizeRequestUrl(config: InternalAxiosRequestConfig): string {
   const rawUrl = String(config.url || "");
@@ -125,9 +130,11 @@ function attachInterceptors(
     // 401 Unauthorized → automatic logout only for main API; recruitment shows toast
     if (error.response?.status === 401) {
       if (logoutOn401) {
-        import('../stores/auth.store').then(({ useAuthStore }) => {
-          useAuthStore().logout();
-        });
+        if (onUnauthorizedLogout) {
+          onUnauthorizedLogout();
+        } else {
+          localStorage.removeItem("token");
+        }
       } else {
         const label = apiLabel ? `[${apiLabel}] ` : '';
         useNotificationStore().addToast(

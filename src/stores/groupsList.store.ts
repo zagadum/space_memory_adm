@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getGroups, type GroupListParams, type GroupListItem } from '../api/groupsApi'
+import { getGroups, getGroupsTeacherFilter, type GroupListParams, type GroupListItem } from '../api/groupsApi'
 
 export interface SelectOption {
   id: number
@@ -156,8 +156,7 @@ export const useGroupsListStore = defineStore('groupsList', () => {
 
   async function fetchTeacherFilterOptions() {
     try {
-      const groupsApi = await import('../api/groupsApi')
-      const res = await (groupsApi as any).getGroupsTeacherFilter({
+      const res = await getGroupsTeacherFilter({
         search: filters.value.search || undefined,
       })
       teachersFilterOptions.value = res.items || []

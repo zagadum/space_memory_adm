@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
-import { authApi } from "../api/authApi";
+import { authApi, clearSessionBootstrapCache } from "../api/authApi";
+import { setUnauthorizedLogoutHandler } from "../api/http";
 import { useProjectStore } from "./project.store";
 import { useAccessStore } from "./access.store";
 import type { ProjectCode } from "../config/projectApi";
@@ -28,6 +29,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   // ── Actions ──
   function setToken(newToken: string) {
+    clearSessionBootstrapCache();
     token.value = newToken;
     localStorage.setItem("token", newToken);
   }
@@ -70,23 +72,23 @@ export const useAuthStore = defineStore("auth", () => {
   async function loadMe() {
     if (!token.value) return;
     try {
-      const u = await authApi.me();
-      if (!u.initials && u.email) {
-        u.initials = u.email.substring(0, 2).toUpperCase();
-      }
-      user.value = u;
-      await useAccessStore().initAfterLogin();
+      const bootstrap = await authApi.getSessionBootstrap();
+      user.value = bootstrap.user;
+      useAccessStore().applyMyAccessControl(bootstrap.access);
     } catch {
       logout();
     }
   }
 
   function logout() {
+    clearSessionBootstrapCache();
     token.value = null;
     user.value = null;
     localStorage.removeItem("token");
     useAccessStore().clear();
   }
+
+  setUnauthorizedLogoutHandler(logout);
 
   return {
     token,

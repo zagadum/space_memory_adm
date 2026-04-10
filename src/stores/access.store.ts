@@ -1,6 +1,6 @@
 import { computed, ref } from "vue";
 import { defineStore } from "pinia";
-import { accessControlApi, type AccessMatrix, type AccessMode } from "../api/accessControlApi";
+import { accessControlApi, type AccessMatrix, type AccessMode, type MeAccessControlResponse } from "../api/accessControlApi";
 import { ROLE_MENU_ACCESS, normalizeRole } from "../config/roleMenuAccess.config";
 import { MENU_ROUTE_KEY_MAP, MENU_SECTION_ITEMS } from "../config/menuAccess.config";
 
@@ -70,19 +70,22 @@ export const useAccessStore = defineStore("access", () => {
 
   const hasMatrix = computed(() => Object.keys(matrix.value).length > 0);
 
-  async function initAfterLogin() {
+  function applyMyAccessControl(data: MeAccessControlResponse) {
+    const normalizedMatrix = normalizeMatrix(data.matrix ?? {});
+    logMissingResourceKeysDev(normalizedMatrix, data.role ?? "");
+
+    matrix.value = withPrivilegedFullAccess(normalizedMatrix, data.role ?? "");
+    role.value = data.role ?? "";
+    version.value = Number(data.version || 0);
+    initialized.value = true;
+  }
+
+  async function initAfterLogin(prefetched?: MeAccessControlResponse) {
     if (loading.value) return;
     loading.value = true;
     try {
-      const data = await accessControlApi.getMyAccessControl();
-      
-      const normalizedMatrix = normalizeMatrix(data.matrix ?? {});
-      logMissingResourceKeysDev(normalizedMatrix, data.role ?? "");
-      
-      matrix.value = withPrivilegedFullAccess(normalizedMatrix, data.role ?? "");
-      role.value = data.role ?? "";
-      version.value = Number(data.version || 0);
-      initialized.value = true;
+      const data = prefetched ?? await accessControlApi.getMyAccessControl();
+      applyMyAccessControl(data);
     } catch (err) {
       console.error('[AccessStore] Failed to init:', err);
     } finally {
@@ -150,6 +153,7 @@ export const useAccessStore = defineStore("access", () => {
     canEdit,
     isHidden,
     applyMatrix,
+    applyMyAccessControl,
   };
 });
 

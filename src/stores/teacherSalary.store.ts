@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { salaryApi } from '../api/salaryApi';
 import { parseApiError } from '../api/errorHelper';
+import { useAuthStore } from './auth.store';
 
 const DEFAULT_TEACHER_ID = 1;
 const DEFAULT_PROJECT_ID = 1;
@@ -200,7 +201,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
     actions: {
         async fetchSalary(month: string) {
             // Берём teacherId из auth store, fallback = 1
-            const { useAuthStore } = await import('./auth.store');
             const authStore = useAuthStore();
             const teacherId = authStore.user?.teacherId ?? (Number(authStore.user?.id) || 1);
             const projectId = 1; // TODO: брать из выбранного проекта
@@ -257,7 +257,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
 
         async disputeSalary(reason: string) {
             if (!this.salaryData) return;
-            const { useAuthStore } = await import('./auth.store');
             const { useNotificationStore } = await import('./notification.store');
             const authStore = useAuthStore();
             const notify = useNotificationStore();

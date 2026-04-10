@@ -2191,6 +2191,7 @@
       "willWait": "{n} ожидают",
       "signedContract": "Подписали договор",
       "paid": "Оплатили",
+      "paidStatus": "Все оплачено",
       "startGroup": "🚀 Старт группы",
       "studentList": "Список учеников",
       "addStudents": "➕ Добавить учеников",
@@ -2673,5 +2674,6 @@
     "totalStudents": "Всего студентов",
     "topCohort": "Лучшая когорта"
   }
+
 }
 

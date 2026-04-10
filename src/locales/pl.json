@@ -2189,6 +2189,7 @@
       "willWait": "{n} oczekuje",
       "signedContract": "Podpisali umowę",
       "paid": "Zapłacili",
+      "paidStatus": "Wszystko opłacone",
       "startGroup": "🚀 Start grupy",
       "studentList": "Lista uczniów",
       "addStudents": "➕ Dodaj uczniów",
@@ -2638,4 +2639,5 @@
     "totalStudents": "Suma studentów",
     "topCohort": "Najlepsza kohorta"
   }
+
 }

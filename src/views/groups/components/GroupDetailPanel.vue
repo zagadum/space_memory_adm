@@ -56,14 +56,17 @@
               <div class="gp-bar-track"><div class="gp-bar-fill green" :style="{ width: contractPct + '%' }"></div></div>
               <span class="gp-bar-val" style="color:var(--green)">{{ contractCount }}</span>
             </div>
-            <div class="gp-bar-row">
-              <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
-              <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
-              <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">{{ actualPaid }}</span>
-            </div>
+             <div class="gp-bar-row">
+               <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
+               <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
+               <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">
+                 <template v-if="actualPaid === actualTotal && actualTotal > 0">{{ t('newGroups.detail.paidStatus') }}</template>
+                 <template v-else>{{ notPaid }}</template>
+               </span>
+             </div>
           </div>
         </div>
-        <button class="gp-start-btn" @click="$emit('start')">{{ t('newGroups.detail.startGroup') }}</button>
+        <button class="gp-start-btn" :disabled="actualTotal === 0" @click="$emit('start')">{{ t('newGroups.detail.startGroup') }}</button>
       </div>
 
       <!-- BODY -->
@@ -137,10 +140,10 @@
                 </td>
                 <td>
                   <div class="row-actions">
-                    <div class="ra-btn archive" :data-tip="t('newGroups.detail.tipArchive')" @click="notify.addToast(t('newGroups.toasts.archivedToast', { name: s.name }), 'warning')">📦</div>
-                    <div class="ra-btn remove"  :data-tip="t('newGroups.detail.tipRemove')" @click="removeStudent(s.id, s.name)">✕</div>
-                    <div class="ra-btn transfer" :data-tip="t('newGroups.detail.tipTransfer')" @click="notify.addToast(t('newGroups.toasts.transferToast', { name: s.name }), 'warning')">🔀</div>
-                    <div class="ra-btn email" :data-tip="t('newGroups.detail.tipEmail')" @click="notify.addToast(t('newGroups.toasts.emailToast', { name: s.name }), 'success')">✉</div>
+                    <div class="ra-btn archive" :data-tip="t('newGroups.detail.tipArchive')" @click="archiveStudent(s.id, s.name)">📦</div>
+                    <div class="ra-btn remove"  :data-tip="t('newGroups.detail.tipRemove')" @click="removeStudent(s.id)">✕</div>
+                    <div class="ra-btn transfer" :data-tip="t('newGroups.detail.tipTransfer')" @click="transferStudent(s.id, s.name)">🔀</div>
+                    <div class="ra-btn email" :data-tip="t('newGroups.detail.tipEmail')" @click="emailStudent(s.id, s.name)">✉</div>
                   </div>
                 </td>
               </tr>
@@ -234,6 +237,9 @@ const emit = defineEmits<{
   delete: [id: number]
   'students-added': [payload: { groupId: number; studentIds: number[] }]
   'student-removed': [payload: { groupId: number; studentId: number }]
+  'student-archived': [payload: { groupId: number; studentId: number; name: string }]
+  'student-transferred': [payload: { groupId: number; studentId: number; name: string }]
+  'student-email': [payload: { groupId: number; studentId: number; name: string }]
 }>()
 
 const addPanelOpen = ref(false)
@@ -290,9 +296,20 @@ async function confirmAdd() {
   notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
 }
 
-function removeStudent(studentId: number | string, name: string) {
+function removeStudent(studentId: number | string) {
   emit('student-removed', { groupId: props.group.id, studentId: Number(studentId) })
-  notify.addToast(t('newGroups.toasts.removedToast', { name }), 'warning')
+}
+
+function archiveStudent(studentId: number | string, name: string) {
+  emit('student-archived', { groupId: props.group.id, studentId: Number(studentId), name })
+}
+
+function transferStudent(studentId: number | string, name: string) {
+  emit('student-transferred', { groupId: props.group.id, studentId: Number(studentId), name })
+}
+
+function emailStudent(studentId: number | string, name: string) {
+  emit('student-email', { groupId: props.group.id, studentId: Number(studentId), name })
 }
 
 function confirmDelete() {

@@ -120,6 +120,13 @@
       @confirmed="onGroupStarted"
     />
 
+    <GroupPickerPanel
+      v-model="transferPickerOpen"
+      :student-name="transferPickerStudentName"
+      :backend="recruitmentBackend"
+      @pick="onTransferGroupPicked"
+    />
+
     <!-- GROUP PANEL -->
     <GroupDetailPanel
       v-if="panelGroup"
@@ -132,6 +139,9 @@
       @delete="onDeleteGroup"
       @students-added="onStudentsAdded"
       @student-removed="onStudentRemoved"
+      @student-archived="onStudentArchived"
+      @student-transferred="onStudentTransferred"
+      @student-email="onStudentEmail"
     />
   </div>
 </template>
@@ -141,12 +151,14 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
-import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup } from '../../api/newGroupsApi'
+import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
+import { getRecruitmentApi } from '../../api/recruitmentApi'
 import CreateGroupModal from './components/CreateGroupModal.vue'
 import StartGroupModal from './components/StartGroupModal.vue'
 import GroupDetailPanel from './components/GroupDetailPanel.vue'
+import GroupPickerPanel from '../recruitment/components/GroupPickerPanel.vue'
 import { useNotificationStore } from '../../stores/notification.store'
 import { parseApiError } from '../../api/errorHelper'
 import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
@@ -168,6 +180,8 @@ const loadingStudents = ref(false)
 // ── Modals ──
 const showCreateModal = ref(false)
 const startGroup = ref<NewGroup | null>(null)
+const transferPickerOpen = ref(false)
+const transferStudent = ref<{ groupId: number; studentId: number; name: string } | null>(null)
 
 // ── Sort ──
 const sortCol = ref<string>('')
@@ -198,6 +212,10 @@ const sortedGroups = computed(() => {
     const vb = getSortVal(b, sortCol.value)
     return va < vb ? -sortDir.value : va > vb ? sortDir.value : 0
   })
+})
+
+const transferPickerStudentName = computed(() => {
+  return transferStudent.value ? `${t('newStudents.groupPicker.for')}: ${transferStudent.value.name}` : ''
 })
 
 // ── Helpers ──
@@ -333,6 +351,47 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
     notify.addToast(t('newGroups.toasts.studentRemoved'), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentRemoveError')), 'error')
+  }
+}
+
+async function onStudentArchived(payload: { groupId: number; studentId: number; name: string }) {
+  try {
+    await archiveStudentFromGroup({ groupId: payload.groupId, studentId: payload.studentId }, recruitmentBackend.value)
+    panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    notify.addToast(t('newGroups.toasts.archivedToast', { name: payload.name }), 'warning')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
+function onStudentTransferred(payload: { groupId: number; studentId: number; name: string }) {
+  transferStudent.value = payload
+  transferPickerOpen.value = true
+}
+
+async function onTransferGroupPicked(groupId: number, groupName: string, _teacherId: number | null) {
+  const payload = transferStudent.value
+  if (!payload) return
+
+  transferPickerOpen.value = false
+  transferStudent.value = null
+
+  try {
+    const api = getRecruitmentApi(recruitmentBackend.value)
+    await api.setStudentGroup(payload.studentId, groupId)
+    panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    notify.addToast(`✅ ${payload.name} -> ${groupName}`, 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
+async function onStudentEmail(payload: { groupId: number; studentId: number; name: string }) {
+  try {
+    await emailStudentFromGroup({ groupId: payload.groupId, studentId: payload.studentId }, recruitmentBackend.value)
+    notify.addToast(t('newGroups.toasts.emailToast', { name: payload.name }), 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
   }
 }
 

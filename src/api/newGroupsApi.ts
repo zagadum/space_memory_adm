@@ -166,6 +166,21 @@ export async function removeStudentFromGroup(payload: { groupId: number; student
     return res.data as { ok: true };
 }
 
+export async function archiveStudentFromGroup(payload: { groupId: number; studentId: number }, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post(NEW_GROUPS.ARCHIVE_STUDENT, payload);
+    return res.data as { ok: true };
+}
+
+export async function transferStudentFromGroup(payload: { groupId: number; studentId: number }, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post(NEW_GROUPS.TRANSFER_STUDENT, payload);
+    return res.data as { ok: true };
+}
+
+export async function emailStudentFromGroup(payload: { groupId: number; studentId: number }, backend: RecruitmentBackend = "default") {
+    const res = await getClient(backend).post(NEW_GROUPS.EMAIL_STUDENT, payload);
+    return res.data as { ok: true };
+}
+
 export async function editGroup(payload: {
     group_id: number;
     name?: string;
