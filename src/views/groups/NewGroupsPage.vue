@@ -55,8 +55,8 @@
                 </div>
               </td>
               <td>
-                <span :class="['type-badge', g.type === 'individual' ? 'type-individual' : 'type-group']">
-                  {{ g.type === 'individual' ? t('newGroups.typeIndividual') : t('newGroups.typeGroup') }}
+                <span :class="['type-badge', (g.type_group ?? g.type) === 'individual' ? 'type-individual' : 'type-group']">
+                  {{ (g.type_group ?? g.type) === 'individual' ? t('newGroups.typeIndividual') : t('newGroups.typeGroup') }}
                 </span>
               </td>
               <td><span class="date-mono">{{ fmtDate(g.createdDate) }}</span></td>
@@ -236,7 +236,7 @@ function timerCls(days: number) {
 function getSortVal(g: NewGroup, col: string): string | number {
   switch (col) {
     case 'name':        return g.name.toLowerCase()
-    case 'type':        return g.type
+    case 'type':        return g.type_group || g.type
     case 'startDate':   return g.startDate || ''
     case 'createdDate': return g.createdDate
     case 'totalSlots':  return g.totalSlots

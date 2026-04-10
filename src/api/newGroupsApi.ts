@@ -29,6 +29,7 @@ export interface NewGroup {
     id: number;
     name: string;
     type: "group" | "individual";
+    type_group: "group" | "individual";
     startDate: string;
     createdDate: string;
     totalSlots: number;
@@ -101,9 +102,35 @@ function getClient(backend: RecruitmentBackend = "default") {
     return backend === "indigo" ? httpRecruitmentIndigo : http;
 }
 
+function normalizeTypeGroup(raw: any): "group" | "individual" {
+    const value = String(raw ?? '').trim()
+    return value === 'individual' || value === 'prv' ? 'individual' : 'group'
+}
+
+function normalizeNewGroup(raw: any): NewGroup {
+    const typeGroup = normalizeTypeGroup(raw?.type_group ?? raw?.type)
+    return {
+        id: Number(raw?.id ?? 0),
+        name: String(raw?.name ?? ''),
+        type: typeGroup,
+        type_group: typeGroup,
+        startDate: String(raw?.startDate ?? ''),
+        createdDate: String(raw?.createdDate ?? ''),
+        totalSlots: Number(raw?.totalSlots ?? raw?.total_slot ?? 0),
+        paid: Number(raw?.paid ?? 0),
+        manager: raw?.manager ?? null,
+        teacher: raw?.teacher ?? null,
+        day: String(raw?.day ?? ''),
+        time: String(raw?.time ?? ''),
+        age: raw?.age ?? raw?.age_name ?? null,
+        students: Array.isArray(raw?.students) ? raw.students : [],
+    }
+}
+
 export async function getNewGroups(backend: RecruitmentBackend = "default") {
     const res = await getClient(backend).get(NEW_GROUPS.LIST);
-    return res.data as { items: NewGroup[]; data?: NewGroup[] };
+    const items = Array.isArray(res.data?.items) ? res.data.items.map((item: any) => normalizeNewGroup(item)) : []
+    return { items, data: items } as { items: NewGroup[]; data?: NewGroup[] };
 }
 
 export async function getNewGroupStudents(groupId: number, backend: RecruitmentBackend = "default") {
@@ -134,9 +161,11 @@ export async function createNewGroup(payload: {
     const workdays = buildWorkdayFlags(payload.day)
     const body = {
         name: payload.name,
-        type_group: payload.type === 'individual' ? 'prv' : 'all',
+        type_group: payload.type,
+        type: payload.type,
         time: payload.time,
         start_date: payload.startDate,
+        age: payload.age,
         age_name: payload.age,
         teacher_id: payload.teacherId,
         student_ids: payload.studentIds,
@@ -184,8 +213,9 @@ export async function emailStudentFromGroup(payload: { groupId: number; studentI
 export async function editGroup(payload: {
     group_id: number;
     name?: string;
-    type_group?: 'all' | 'prv';
+    type_group?: 'group' | 'individual' | 'all' | 'prv';
     age_name?: '5-7' | '8-10' | '11-14' | '15+';
+    age?: 'junior' | 'middle' | 'senior' | 'adult' | null;
     status_group?: 'new' | 'archive' | 'start' | 'wait_start';
     teacher_id?: number | null;
     start_date?: string | null;
