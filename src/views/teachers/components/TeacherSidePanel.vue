@@ -187,8 +187,33 @@
             <div v-else class="sp-data-list" style="margin-top: 20px;">
               <div v-for="note in listStore.teacherNotes" :key="note.id" class="sp-data-item note-item">
                 <div class="sp-item-info">
-                  <div class="sp-item-text">{{ note.text }}</div>
-                  <div class="sp-item-sub">{{ note.userName }} • {{ note.createdAt }}</div>
+                  <div v-if="editingNoteId === note.id" class="sp-note-edit-wrap">
+                    <textarea class="sp-input sp-textarea" v-model="editingNoteText" />
+                    <div class="sp-note-actions-row">
+                      <button
+                        class="sp-note-btn sp-note-btn-primary"
+                        :disabled="!editingNoteText.trim() || savingNoteId === note.id"
+                        @click="onSaveNote(note.id)"
+                      >
+                        {{ savingNoteId === note.id ? '⏳' : '✓' }} Сохранить
+                      </button>
+                      <button class="sp-note-btn" @click="onCancelEditNote">Отмена</button>
+                    </div>
+                  </div>
+                  <template v-else>
+                    <div class="sp-item-text">{{ note.text }}</div>
+                    <div class="sp-item-sub">{{ note.userName }} • {{ note.createdAt }}</div>
+                  </template>
+                </div>
+                <div class="sp-note-actions" v-if="editingNoteId !== note.id">
+                  <button class="sp-note-btn" @click="onEditNote(note.id, note.text)">Ред.</button>
+                  <button
+                    class="sp-note-btn sp-note-btn-danger"
+                    :disabled="deletingNoteId === note.id"
+                    @click="onDeleteNote(note.id)"
+                  >
+                    {{ deletingNoteId === note.id ? '⏳' : 'Удалить' }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -209,6 +234,10 @@ const listStore = useTeachersListStore()
 const activeTab = ref('profile')
 const newNoteText = ref('')
 const isAddingNote = ref(false)
+const editingNoteId = ref<number | null>(null)
+const editingNoteText = ref('')
+const savingNoteId = ref<number | null>(null)
+const deletingNoteId = ref<number | null>(null)
 
 const props = defineProps<{
   teacherId: number | null
@@ -278,6 +307,8 @@ watch(() => props.teacherId, (id) => {
   confirmPassword.value = ''
   activeTab.value = 'profile'
   newNoteText.value = ''
+  editingNoteId.value = null
+  editingNoteText.value = ''
 })
 
 watch(activeTab, (tab) => {
@@ -295,6 +326,40 @@ async function onAddNote() {
     newNoteText.value = ''
   } finally {
     isAddingNote.value = false
+  }
+}
+
+function onEditNote(noteId: number, text: string) {
+  editingNoteId.value = noteId
+  editingNoteText.value = text
+}
+
+function onCancelEditNote() {
+  editingNoteId.value = null
+  editingNoteText.value = ''
+}
+
+async function onSaveNote(noteId: number) {
+  if (!props.teacherId || !editingNoteText.value.trim()) return
+  savingNoteId.value = noteId
+  try {
+    await listStore.updateNote(props.teacherId, noteId, editingNoteText.value)
+    onCancelEditNote()
+  } finally {
+    savingNoteId.value = null
+  }
+}
+
+async function onDeleteNote(noteId: number) {
+  if (!props.teacherId) return
+  deletingNoteId.value = noteId
+  try {
+    await listStore.deleteNote(props.teacherId, noteId)
+    if (editingNoteId.value === noteId) {
+      onCancelEditNote()
+    }
+  } finally {
+    deletingNoteId.value = null
   }
 }
 
@@ -468,4 +533,19 @@ function onSave() {
 .sp-item-text { font-size: 13.5px; color: var(--app-text-main); line-height: 1.45; white-space: pre-wrap; }
 
 .sp-add-note { display: flex; flex-direction: column; gap: 10px; }
+
+.sp-note-actions { display: flex; gap: 8px; align-self: flex-end; }
+.sp-note-actions-row { display: flex; gap: 8px; margin-top: 8px; }
+.sp-note-edit-wrap { width: 100%; }
+.sp-note-btn {
+  border: 1px solid var(--app-border);
+  background: var(--app-card);
+  color: var(--app-text-main);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.sp-note-btn-primary { border-color: rgba(79,110,247,0.5); color: var(--blue); }
+.sp-note-btn-danger { border-color: rgba(239,68,68,0.35); color: #ef4444; }
 </style>

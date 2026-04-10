@@ -105,10 +105,22 @@ export interface TeacherGroupItem {
 
 export interface TeacherNote {
   id: number
-  userId: number
+  userId: number | null
   userName: string
   text: string
   createdAt: string
+  updatedAt?: string
+}
+
+function normalizeTeacherNote(raw: any): TeacherNote {
+  return {
+    id: Number(raw?.id ?? 0),
+    userId: raw?.userId ?? raw?.createdBy ?? null,
+    userName: String(raw?.userName ?? raw?.who ?? 'System'),
+    text: String(raw?.text ?? ''),
+    createdAt: String(raw?.createdAt ?? ''),
+    updatedAt: raw?.updatedAt ? String(raw.updatedAt) : undefined,
+  }
 }
 
 export async function getTeacherHistory(id: number): Promise<TeacherHistoryItem[]> {
@@ -123,10 +135,21 @@ export async function getTeacherGroups(id: number): Promise<TeacherGroupItem[]> 
 
 export async function getTeacherNotes(id: number): Promise<TeacherNote[]> {
   const res = await http.get(TEACHERS.NOTES(id))
-  return res.data as TeacherNote[]
+  const payload = res.data?.items ?? res.data ?? []
+  if (!Array.isArray(payload)) return []
+  return payload.map((item: any) => normalizeTeacherNote(item))
 }
 
 export async function addTeacherNote(id: number, text: string): Promise<TeacherNote> {
   const res = await http.post(TEACHERS.NOTES(id), { text })
-  return res.data as TeacherNote
+  return normalizeTeacherNote(res.data?.note ?? res.data)
+}
+
+export async function updateTeacherNote(id: number, noteId: number, text: string): Promise<TeacherNote> {
+  const res = await http.patch(`${TEACHERS.NOTES(id)}/${noteId}`, { text })
+  return normalizeTeacherNote(res.data?.note ?? res.data)
+}
+
+export async function deleteTeacherNote(id: number, noteId: number): Promise<void> {
+  await http.delete(`${TEACHERS.NOTES(id)}/${noteId}`)
 }

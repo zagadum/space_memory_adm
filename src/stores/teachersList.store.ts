@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getTeachers, getTeacher, createTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails } from '../api/teachersApi'
+import { getTeachers, getTeacher, createTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails, type TeacherNote } from '../api/teachersApi'
 
 export const useTeachersListStore = defineStore('teachersList', () => {
   const teachers = ref<TeacherListItem[]>([])
@@ -31,7 +31,7 @@ export const useTeachersListStore = defineStore('teachersList', () => {
   // Profile data
   const teacherHistory = ref<any[]>([])
   const teacherGroups = ref<any[]>([])
-  const teacherNotes = ref<any[]>([])
+  const teacherNotes = ref<TeacherNote[]>([])
 
   const totalTeachers = computed(() => pagination.value.total || teachers.value.length)
 
@@ -135,6 +135,31 @@ export const useTeachersListStore = defineStore('teachersList', () => {
     }
   }
 
+  async function updateNote(id: number, noteId: number, text: string) {
+    try {
+      const { updateTeacherNote } = await import('../api/teachersApi')
+      const updated = await updateTeacherNote(id, noteId, text)
+      const index = teacherNotes.value.findIndex((note) => note.id === noteId)
+      if (index !== -1) {
+        teacherNotes.value[index] = updated
+      }
+    } catch (e) {
+      console.error('Failed to update note', e)
+      throw e
+    }
+  }
+
+  async function deleteNote(id: number, noteId: number) {
+    try {
+      const { deleteTeacherNote } = await import('../api/teachersApi')
+      await deleteTeacherNote(id, noteId)
+      teacherNotes.value = teacherNotes.value.filter((note) => note.id !== noteId)
+    } catch (e) {
+      console.error('Failed to delete note', e)
+      throw e
+    }
+  }
+
   async function updateTeacherComment(id: number, comment: string) {
     try {
       await updateTeacherDetails(id, { comment })
@@ -197,6 +222,6 @@ export const useTeachersListStore = defineStore('teachersList', () => {
     teacherHistory, teacherGroups, teacherNotes,
     totalTeachers, fetchTeachers, applyFilters, setSort, setPage,
     fetchTeacherDetails, updateTeacherDetails, changePassword, addTeacher,
-    fetchTeacherHistory, fetchTeacherGroups, fetchTeacherNotes, addNote, updateTeacherComment
+    fetchTeacherHistory, fetchTeacherGroups, fetchTeacherNotes, addNote, updateNote, deleteNote, updateTeacherComment
   }
 })
