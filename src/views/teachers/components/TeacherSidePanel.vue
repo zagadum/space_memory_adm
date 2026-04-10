@@ -53,9 +53,16 @@
         <div class="sp-body">
           <!-- PROFILE TAB -->
           <div v-if="activeTab === 'profile'" class="sp-tab-content">
-            <div class="sp-section-title">{{ t('newStudents.panel.sectionAccount') || 'Данные аккаунта' }}</div>
-            <div class="sp-grid cols-1">
-              <div class="sp-field"><div class="sp-label">Email</div><input class="sp-input" v-model="form.email" type="email" /></div>
+             <div class="sp-section-title">{{ t('newStudents.panel.sectionAccount') || 'Данные аккаунта' }}</div>
+            <div class="sp-grid">
+              <div class="sp-field">
+                <div class="sp-label">{{ t('teachersList.modal.fields.loginEmail') || 'Email для логина' }}</div>
+                <input class="sp-input" v-model="form.email" type="email" />
+              </div>
+              <div class="sp-field">
+                <div class="sp-label">{{ t('teachersList.modal.fields.personalEmail') || 'Email личный' }}</div>
+                <input class="sp-input" v-model="form.personalEmail" type="email" />
+              </div>
             </div>
 
             <!-- Change Password block -->
@@ -281,7 +288,7 @@ const passwordMismatch = computed(() => confirmPassword.value !== '' && newPassw
 const daysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
 
 const defaultForm: Partial<TeacherDetails> = {
-  email: '', firstName: '', lastName: '', birthDate: '',
+  email: '', personalEmail: '', firstName: '', lastName: '', birthDate: '',
   country: '', voivodeship: '', city: '', street: '', apt: '', postCode: '',
   phone: '', passport: '', pesel: '', idCard: '', languages: [],
   availability: [] as string[], comment: ''
@@ -298,6 +305,7 @@ function mapDetailsToForm(d: TeacherDetails): Partial<TeacherDetails> {
     firstName: d.firstName ?? '',
     lastName: d.lastName ?? '',
     email: d.email ?? '',
+    personalEmail: d.personalEmail ?? '',
     phone: d.phone ?? '',
     birthDate: d.birthDate ?? '',
     country: d.country ?? '',

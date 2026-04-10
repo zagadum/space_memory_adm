@@ -16,6 +16,7 @@ export interface TeacherListItem {
   lastName: string
   phone: string
   email: string
+  personalEmail?: string | null
   groupLessonsCount: number
   individualLessonsCount: number
   groupsCount?: number
@@ -52,6 +53,7 @@ export interface TeacherDetails extends TeacherListItem {
   pesel?: string | null
   idCard?: string | null
   languages?: string[]
+  personalEmail?: string | null
 }
 
 export interface TeacherCreatePayload {
