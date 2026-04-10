@@ -17,7 +17,16 @@
               <span>{{ group.time }}</span>
               <template v-if="group.teacher">
                 <span class="sep">·</span>
-                <span>{{ group.teacher.name }}</span>
+                <span class="teacher-link" @click="teacherPanelOpen = true">
+                  {{ group.teacher.name }}
+                  <span class="edit-icon">✎</span>
+                </span>
+              </template>
+              <template v-else>
+                <span class="sep">·</span>
+                <span class="assign-teacher-link" @click="teacherPanelOpen = true">
+                  {{ t('newGroups.detail.assignTeacher') }}
+                </span>
               </template>
               <span class="sep">·</span>
               <span>{{ t('newGroups.detail.start') }} {{ fmtDate(group.startDate) }}</span>
@@ -211,13 +220,59 @@
     </div>
 
     <!-- TOAST REMOVED -->
+    
+    <!-- TEACHER SELECTION SUB-PANEL -->
+    <div v-if="teacherPanelOpen" :class="['asp-panel', 'open']">
+      <div class="asp-header">
+        <div>
+          <div class="asp-title">{{ t('newGroups.detail.selectTeacherTitle') }}</div>
+          <div class="asp-sub">{{ t('newGroups.detail.selectTeacherSub') }}</div>
+        </div>
+        <div class="gp-close" @click="teacherPanelOpen = false">✕</div>
+      </div>
+      <div class="asp-search-wrap">
+        <div class="asp-search-box">
+          <span style="color:var(--dim);font-size:14px">🔍</span>
+          <input v-model="teacherQuery" type="text" :placeholder="t('newGroups.detail.searchTeacherPlaceholder')" style="flex:1;background:none;border:none;outline:none;color:var(--text-main);font-family:'Outfit',sans-serif;font-size:13px" />
+        </div>
+      </div>
+      <div class="asp-list">
+        <!-- Option to remove teacher -->
+        <div 
+          v-if="group.teacher" 
+          class="asp-item remove-teacher" 
+          @click="selectTeacher(null)"
+        >
+          <div class="asp-avatar" style="background:var(--red);opacity:0.8">✕</div>
+          <div class="asp-info">
+            <div class="asp-name" style="color:var(--red)">Убрать преподавателя</div>
+          </div>
+        </div>
+
+        <div
+          v-for="tr in filteredTeachers"
+          :key="tr.id"
+          :class="['asp-item', group.teacher?.id === tr.id ? 'selected' : '']"
+          @click="selectTeacher(tr.id)"
+        >
+          <div class="asp-avatar" :style="{ background: tr.color }">{{ tr.initials }}</div>
+          <div class="asp-info">
+            <div class="asp-name">{{ tr.name }}</div>
+          </div>
+          <span v-if="group.teacher?.id === tr.id" class="asp-status already">{{ t('newGroups.detail.selected') }}</span>
+        </div>
+      </div>
+      <div class="asp-footer">
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" @click="teacherPanelOpen = false">{{ t('newGroups.detail.cancel') }}</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { NewGroup, NewGroupStudent, MasterStudent } from '../../../api/newGroupsApi'
+import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../../api/newGroupsApi'
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
 
@@ -228,6 +283,7 @@ const props = defineProps<{
   group: NewGroup
   students: NewGroupStudent[]
   masterStudents: MasterStudent[]
+  teachers: NewGroupTeacher[]
   loadingStudents: boolean
 }>()
 
@@ -240,12 +296,16 @@ const emit = defineEmits<{
   'student-archived': [payload: { groupId: number; studentId: number; name: string }]
   'student-transferred': [payload: { groupId: number; studentId: number; name: string }]
   'student-email': [payload: { groupId: number; studentId: number; name: string }]
+  'teacher-assigned': [payload: { groupId: number; teacherId: number | null }]
 }>()
 
 const addPanelOpen = ref(false)
 const aspQuery = ref('')
 const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
+
+const teacherPanelOpen = ref(false)
+const teacherQuery = ref('')
 
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
 // Когда студенты загружены — считаем из них. Иначе fallback на group.paid
@@ -274,6 +334,11 @@ const filteredMaster = computed(() => {
   return q ? props.masterStudents.filter(s => s.name.toLowerCase().includes(q)) : props.masterStudents
 })
 
+const filteredTeachers = computed(() => {
+  const q = teacherQuery.value.toLowerCase().trim()
+  return q ? props.teachers.filter(t => t.name.toLowerCase().includes(q)) : props.teachers
+})
+
 function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
@@ -282,6 +347,11 @@ function toggleAsp(id: number) {
   const s = new Set(aspSelected.value)
   s.has(id) ? s.delete(id) : s.add(id)
   aspSelected.value = s
+}
+
+function selectTeacher(teacherId: number | null) {
+  emit('teacher-assigned', { groupId: props.group.id, teacherId })
+  teacherPanelOpen.value = false
 }
 
 async function confirmAdd() {
@@ -366,6 +436,23 @@ function doDelete() {
   font-size: 12.5px; color: var(--dim);
   margin-top: 4px; display: flex; align-items: center; gap: 8px;
 }
+.teacher-link {
+  color: var(--blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.teacher-link:hover { text-decoration: underline; }
+.edit-icon { font-size: 10px; opacity: 0.6; }
+
+.assign-teacher-link {
+  color: var(--amber);
+  cursor: pointer;
+  font-weight: 500;
+}
+.assign-teacher-link:hover { text-decoration: underline; }
+
 .sep { opacity: 0.4; }
 
 .gp-close {

@@ -133,6 +133,7 @@
       :group="panelGroup"
       :students="panelStudents"
       :master-students="masterStudents"
+      :teachers="teachers"
       :loading-students="loadingStudents"
       @close="closePanel"
       @start="openStartModal(panelGroup!)"
@@ -142,6 +143,7 @@
       @student-archived="onStudentArchived"
       @student-transferred="onStudentTransferred"
       @student-email="onStudentEmail"
+      @teacher-assigned="onTeacherAssigned"
     />
   </div>
 </template>
@@ -151,7 +153,7 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
-import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, emailStudentFromGroup } from '../../api/newGroupsApi'
+import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup, editGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
 import { getRecruitmentApi } from '../../api/recruitmentApi'
@@ -413,6 +415,28 @@ async function onStudentEmail(payload: { groupId: number; studentId: number; nam
   try {
     await emailStudentFromGroup({ groupId: payload.groupId, studentId: payload.studentId }, recruitmentBackend.value)
     notify.addToast(t('newGroups.toasts.emailToast', { name: payload.name }), 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
+async function onTeacherAssigned(payload: { groupId: number; teacherId: number | null }) {
+  try {
+    const res = await editGroup({ 
+      group_id: payload.groupId, 
+      teacher_id: payload.teacherId 
+    }, recruitmentBackend.value)
+    
+    // Update local state
+    const index = groups.value.findIndex(g => g.id === payload.groupId)
+    if (index !== -1) {
+      groups.value[index] = { ...groups.value[index], teacher: res.data.teacher }
+      if (panelGroup.value?.id === payload.groupId) {
+        panelGroup.value = { ...panelGroup.value, teacher: res.data.teacher }
+      }
+    }
+    
+    notify.addToast(t('common.success'), 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')
   }

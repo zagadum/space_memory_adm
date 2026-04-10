@@ -690,25 +690,25 @@ export const mockAdapter: AxiosAdapter = async (config) => {
   const ng: any[] = (globalThis as any).__mock_new_groups ?? ((globalThis as any).__mock_new_groups = JSON.parse(JSON.stringify(mockNewGroups)));
   const ngStudents: any = (globalThis as any).__mock_ng_students ?? ((globalThis as any).__mock_ng_students = JSON.parse(JSON.stringify(mockGroupStudents)));
 
-  if (method === "get" && url === "new-groups") {
+  if (method === "get" && (url === "groups/new-groups" || url === "new-groups")) {
     return ok(config, { items: ng });
   }
 
-  if (method === "get" && url === "new-groups/students") {
+  if (method === "get" && (url === "groups/students" || url === "new-groups/students")) {
     const groupId = Number((config.params as any)?.groupId);
     if (!groupId) return err(config, 400, "groupId is required");
     return ok(config, { items: ngStudents[groupId] ?? [] });
   }
 
-  if (method === "get" && url === "new-groups/master-students") {
+  if (method === "get" && (url === "groups/master-students" || url === "new-groups/master-students")) {
     return ok(config, { items: mockMasterStudents });
   }
 
-  if (method === "get" && url === "new-groups/teachers") {
+  if (method === "get" && (url === "groups/teachers" || url === "new-groups/teachers")) {
     return ok(config, { items: mockTeachers });
   }
 
-  if (method === "post" && url === "new-groups/create") {
+  if (method === "post" && (url === "groups/new-groups" || url === "new-groups/create")) {
     const body = readBody(config);
     if (!body?.name || !body?.day) return err(config, 400, "name/day required");
     const today = new Date().toISOString().slice(0, 10);
@@ -732,7 +732,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true, group: newGroup });
   }
 
-  if (method === "post" && url === "new-groups/start") {
+  if (method === "post" && (url === "groups/start-group" || url === "new-groups/start")) {
     const body = readBody(config);
     if (!body?.groupId) return err(config, 400, "groupId required");
     const idx = ng.findIndex(x => x.id === body.groupId);
@@ -740,7 +740,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url === "new-groups/delete") {
+  if (method === "post" && (url === "groups/delete-groups" || url === "new-groups/delete")) {
     const body = readBody(config);
     if (!body?.groupId) return err(config, 400, "groupId required");
     const idx = ng.findIndex(x => x.id === body.groupId);
@@ -748,7 +748,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && url.match(/^new-groups\/\d+\/students$/)) {
+  if (method === "post" && (url.match(/^groups\/new-groups\/\d+\/students$/) || url.match(/^new-groups\/\d+\/students$/))) {
     const groupId = Number(url.split('/')[1]);
     const body = readBody(config);
     if (!groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
@@ -766,13 +766,53 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true, added });
   }
 
-  if (method === "post" && url === "new-groups/remove-student") {
+  if (method === "post" && (url === "groups/remove-student" || url === "new-groups/remove-student")) {
     const body = readBody(config);
     if (!body?.groupId || !body?.studentId) return err(config, 400, "groupId/studentId required");
     if (ngStudents[body.groupId]) {
       ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
     }
     return ok(config, { ok: true });
+  }
+
+  if (method === "post" && (url === "groups/edit-groups" || url === "edit-groups")) {
+    const body = readBody(config);
+    if (!body?.group_id) return err(config, 400, "group_id required");
+    const idx = ng.findIndex(x => x.id === body.group_id);
+    if (idx === -1) return err(config, 404, "Group not found");
+    
+    // Update fields
+    if (body.name !== undefined) ng[idx].name = body.name;
+    if (body.teacher_id !== undefined) {
+      ng[idx].teacher = body.teacher_id ? mockTeachers.find(t => t.id === body.teacher_id) ?? null : null;
+    }
+    if (body.start_date !== undefined) ng[idx].startDate = body.start_date;
+    if (body.time !== undefined) ng[idx].time = body.time;
+    if (body.day !== undefined) ng[idx].day = body.day;
+    if (body.age !== undefined) ng[idx].age = body.age;
+
+    return ok(config, { success: true, data: ng[idx] });
+  }
+
+  if (method === "post" && (url === "groups/full-info" || url === "full-info")) {
+    const body = readBody(config);
+    if (!body?.group_id) return err(config, 400, "group_id required");
+    const g = ng.find(x => x.id === body.group_id);
+    if (!g) return err(config, 404, "Group not found");
+    
+    return ok(config, {
+      success: true,
+      data: {
+        group: g,
+        students: ngStudents[g.id] ?? [],
+        counters: { 
+          students_count: (ngStudents[g.id] ?? []).length, 
+          paid_count: (ngStudents[g.id] ?? []).filter(s => s.contract === 'signed').length,
+          contract_signed_count: (ngStudents[g.id] ?? []).filter(s => s.contract === 'signed').length,
+          age_name: g.age
+        }
+      }
+    });
   }
 
   // --- TEACHERS PROFILE ---

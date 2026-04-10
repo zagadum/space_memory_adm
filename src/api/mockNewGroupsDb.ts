@@ -41,6 +41,8 @@ export const mockNewGroups = [
     { id: 6, name: "Пт 14 инд АВиш", type: "individual", startDate: "2026-02-26", totalSlots: 0, paid: 0, createdDate: "2026-02-15", manager: null, teacher: mockTeachers[5], day: "Пятница", time: "14:00", age: "senior", students: [] },
     { id: 7, name: "Пн 16 взрослая ЕЛа", type: "group", startDate: "2026-03-24", totalSlots: 8, paid: 3, createdDate: "2026-02-17", manager: mockManagers[2], teacher: mockTeachers[0], day: "Понедельник", time: "16:00", age: "adult", students: [1, 2, 3, 4, 5, 6, 7, 8] },
     { id: 8, name: "Ср 17 средняя МВой", type: "group", startDate: "2026-03-31", totalSlots: 10, paid: 7, createdDate: "2026-02-14", manager: null, teacher: mockTeachers[2], day: "Среда", time: "17:00", age: "middle", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+    { id: 9, name: "Чт 15 младшая (НЕТ УЧИТЕЛЯ)", type: "group", startDate: "2026-04-05", totalSlots: 10, paid: 0, createdDate: "2026-03-10", manager: mockManagers[0], teacher: null, day: "Четверг", time: "15:00", age: "junior", students: [] },
+    { id: 10, name: "Пн 10 инд (НЕТ УЧИТЕЛЯ)", type: "individual", startDate: "2026-04-01", totalSlots: 1, paid: 0, createdDate: "2026-03-12", manager: null, teacher: null, day: "Понедельник", time: "10:00", age: "adult", students: [] },
 ];
 
 export const mockGroupStudents: Record<number, any[]> = {
