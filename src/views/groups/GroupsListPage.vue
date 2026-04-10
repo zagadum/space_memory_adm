@@ -184,7 +184,9 @@ function parsePositiveInt(value: unknown): number {
 
 async function applyRouteTeacherFilter() {
   const routeTeacherId = parsePositiveInt(route.query.teacherId)
+  const routeGroupId = parsePositiveInt(route.query.groupId)
   selectedTeacherId.value = routeTeacherId
+  listStore.filters.groupId = routeGroupId > 0 ? routeGroupId : null
   listStore.filters.teacherId = routeTeacherId > 0 ? routeTeacherId : null
   await listStore.applyFilters()
 }
@@ -269,9 +271,9 @@ function formatDuration(startDate: string | null): string {
 }
 
 watch(
-  () => route.query.teacherId,
-  async (nextTeacherId, prevTeacherId) => {
-    if (nextTeacherId === prevTeacherId) return
+  () => [route.query.teacherId, route.query.groupId],
+  async ([nextTeacherId, nextGroupId], [prevTeacherId, prevGroupId]) => {
+    if (nextTeacherId === prevTeacherId && nextGroupId === prevGroupId) return
     await applyRouteTeacherFilter()
   }
 )
@@ -279,7 +281,7 @@ watch(
 onMounted(async () => {
   await listStore.fetchTeacherFilterOptions()
 
-  if (route.query.teacherId) {
+  if (route.query.teacherId || route.query.groupId) {
     await applyRouteTeacherFilter()
     return
   }

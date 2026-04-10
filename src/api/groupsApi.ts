@@ -9,6 +9,7 @@ export interface GroupListParams {
   page?: number
   per_page?: number
   type?: string | null          // 'group' | 'individual' | 'mini' | null
+  group_id?: number | null
   teacher_id?: number | null
   orderBy?: string
   orderDirection?: 'asc' | 'desc'

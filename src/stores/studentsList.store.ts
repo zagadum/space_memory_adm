@@ -14,7 +14,7 @@ export interface Student {
     phone?: string;
     startDate?: string;
     daysInSystem?: number;
-    enrollments?: any[];
+    enrollments?: StudentEnrollment[];
     groupColor?: string;
     lastContact?: string;
     daysSinceContact?: number;
@@ -23,6 +23,13 @@ export interface Student {
     avatarColor?: string;
     comment?: string;
     paid?: boolean;
+}
+
+export interface StudentEnrollment {
+    school: string;
+    group: string;
+    teacher: string;
+    groupId?: number | null;
 }
 
 export interface SelectOption {
@@ -82,10 +89,6 @@ export const useStudentsListStore = defineStore("studentsList", {
                 const items = result.data || [];
                 
                 this.students = items.map((u: any) => {
-                    // Extract group and teacher info from the new unified response
-                    // Usually backend returns 'groups' as an array of objects
-                    const primaryEnrollment = u.groups?.[0] || {};
-
                     return {
                         id: u.id,
                         name: u.name || "Unknown Student",
@@ -95,11 +98,19 @@ export const useStudentsListStore = defineStore("studentsList", {
                         email: u.email || "",
                         startDate: u.startDate || u.created_at || "-",
                         daysInSystem: u.trainingTermDays || u.training_term_days || 0,
-                        enrollments: u.enrollments?.length ? u.enrollments : u.groups?.map((g: any) => ({
-                            school: g.school_name || "Space Memory",
-                            group: g.name || "-",
-                            teacher: g.teacher_name || "-"
-                        })) || [],
+                        enrollments: u.enrollments?.length
+                            ? u.enrollments.map((en: any) => ({
+                                school: en.school || "Space Memory",
+                                group: en.group || "-",
+                                teacher: en.teacher || "-",
+                                groupId: Number(en.groupId ?? en.group_id ?? u.groupId ?? 0) || null,
+                            }))
+                            : u.groups?.map((g: any) => ({
+                                school: g.school_name || "Space Memory",
+                                group: g.name || "-",
+                                teacher: g.teacher_name || "-",
+                                groupId: Number(g.id ?? g.group_id ?? u.groupId ?? 0) || null,
+                            })) || [],
                         lastContact: u.lastContact || u.last_contact_at || null,
                         daysSinceContact: u.daysSinceContact || u.days_since_last_contact || null,
                         staff: u.staff || u.manager_name || "-",

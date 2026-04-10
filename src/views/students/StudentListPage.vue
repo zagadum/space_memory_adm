@@ -79,10 +79,10 @@
             <td>
               <div class="enrollment-list">
                 <div v-for="(en, idx) in student.enrollments" :key="idx" class="enrollment-item">
-                  <div class="group-cell">
+                  <button class="group-cell" type="button" @click.stop="openGroupsByGroup(en.groupId, en.group)">
                     <span class="group-dot" :style="{ background: student.groupColor || '#4f6ef7' }"></span>
                     <span class="group-name">{{ en.group }}</span>
-                  </div>
+                  </button>
                 </div>
               </div>
             </td>
@@ -178,6 +178,21 @@ const searchStore = useGlobalSearchStore()
 
 function openStudent(id: number | string) {
   router.push({ name: 'student-payments', params: { id: id.toString() } })
+}
+
+function openGroupsByGroup(groupId: number | null | undefined, groupName?: string | null) {
+  const normalizedGroupId = Number(groupId ?? 0)
+  if (!Number.isInteger(normalizedGroupId) || normalizedGroupId <= 0) return
+
+  const query: Record<string, string> = { groupId: normalizedGroupId.toString() }
+  if (groupName && groupName.trim()) {
+    query.groupName = groupName.trim()
+  }
+
+  router.push({
+    name: 'groups-list',
+    query,
+  })
 }
 
 const selectedGroupId = ref(0);
@@ -403,7 +418,17 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 .timer-days.high-alert { color: #ef4444; }
 .timer-label { font-size: 10px; color: #8892b0; text-transform: uppercase; }
 
-.group-cell { display: flex; align-items: center; gap: 7px; }
+.group-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+.group-cell:hover .group-name { text-decoration: underline; }
 .group-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 .group-name { font-size: 12.5px; }
 

@@ -106,6 +106,7 @@ export const useGroupsListStore = defineStore('groupsList', () => {
   const filters = ref({
     search: '',
     type: null as string | null,
+    groupId: null as number | null,
     teacherId: null as number | null,
   })
 
@@ -127,6 +128,7 @@ export const useGroupsListStore = defineStore('groupsList', () => {
         per_page: pagination.value.perPage,
         search: filters.value.search || undefined,
         type: filters.value.type,
+        group_id: filters.value.groupId,
         teacher_id: filters.value.teacherId,
         orderBy: sorting.value.orderBy,
         orderDirection: sorting.value.orderDirection,
