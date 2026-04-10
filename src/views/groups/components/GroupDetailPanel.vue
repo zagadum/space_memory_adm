@@ -335,12 +335,17 @@ function doDelete() {
 .gp-panel {
   position: fixed; top: 0; right: 0; bottom: 0;
   width: 820px; max-width: 100vw;
+  --app-surface-hi: #e2e8f0;
   background: var(--app-bg);
   border-left: 1px solid var(--bh);
   backdrop-filter: blur(30px);
   z-index: 400;
   display: flex; flex-direction: column;
   overflow: hidden;
+}
+
+:global(.dark) .gp-panel {
+  --app-surface-hi: #151533;
 }
 
 .gp-header {
@@ -439,7 +444,7 @@ function doDelete() {
 .gp-table th { padding: 10px 13px; text-align: left; font-size: 10.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--dim); white-space: nowrap; }
 .gp-table tbody tr { border-bottom: 1px solid rgba(100,120,255,0.06); transition: background 0.12s; }
 .gp-table tbody tr:last-child { border-bottom: none; }
-.gp-table tbody tr:hover { background: rgba(79,110,247,0.05); }
+.gp-table tbody tr:hover { background: var(--app-surface-hi); }
 .gp-table td { padding: 11px 13px; font-size: 13px; vertical-align: middle; }
 .row-not-ready td:first-child { border-left: 2px solid rgba(245,158,11,0.45); }
 

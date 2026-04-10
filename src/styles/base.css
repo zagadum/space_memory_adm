@@ -15,6 +15,7 @@
   --app-content-bg: #ffffff;
   --app-card: #ffffff;
   --app-surface: #f1f5f9;
+  --app-surface-hi: #e2e8f0;
   --app-text-main: #0f172a;
   --app-text-dim: #64748b;
   --app-border: rgba(0, 0, 0, 0.08);
@@ -58,6 +59,7 @@
   --app-content-bg: #04040f;
   --app-card: rgba(12, 12, 36, .98);
   --app-surface: #0d0d24;
+  --app-surface-hi: #151533;
   --app-text-main: #e8eeff;
   --app-text-dim: #8892b0;
   --app-border: rgba(100, 120, 255, .13);
