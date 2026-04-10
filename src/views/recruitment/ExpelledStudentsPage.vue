@@ -226,14 +226,18 @@
 
             <td>
               <div class="actions-wrap">
-                <div class="act-btn" @click.stop="toggleActMenu(s.id)">···</div>
-                <div class="act-dd" :class="{ open: actMenuId === s.id }">
-                  <div v-if="isManager" class="act-item success" @click="openTransfer(s)">⭐ {{ t('expelled.actions.transferAny') }}</div>
-                  <div class="act-item" @click="openTransfer(s)">🔄 {{ t('expelled.actions.transfer') }}</div>
-                  <div class="act-item" @click="markToday(s.id)">📞 {{ t('expelled.actions.callToday') }}</div>
-                  <div class="act-item" @click="openHistory(s)">📋 {{ t('expelled.actions.history') }}</div>
-                  <div class="act-item danger" @click="openArchive(s)">🗃️ {{ t('expelled.actions.archive') }}</div>
-                </div>
+                <UiDropdown align="right">
+                  <template #trigger>
+                    <div class="act-btn">⋯</div>
+                  </template>
+                  <template #default="{ close }">
+                    <div v-if="isManager" class="act-item success" @click="openTransfer(s); close()">⭐ {{ t('expelled.actions.transferAny') }}</div>
+                    <div class="act-item" @click="openTransfer(s); close()">🔄 {{ t('expelled.actions.transfer') }}</div>
+                    <div class="act-item" @click="markToday(s.id); close()">📞 {{ t('expelled.actions.callToday') }}</div>
+                    <div class="act-item" @click="openHistory(s); close()">📋 {{ t('expelled.actions.history') }}</div>
+                    <div class="act-item danger" @click="openArchive(s); close()">🗃️ {{ t('expelled.actions.archive') }}</div>
+                  </template>
+                </UiDropdown>
               </div>
             </td>
           </tr>
@@ -336,6 +340,7 @@ import { useAuthStore } from '../../stores/auth.store'
 import type { ExpelledStudent } from '../../api/expelledStudentsApi'
 import type { RecruitmentBackend } from '../../api/http'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
+import { UiDropdown } from '../../components/ui'
 import ExpelledHistoryPanel from './components/expelled/ExpelledHistoryPanel.vue'
 import ExpelledTransferPanel from './components/expelled/ExpelledTransferPanel.vue'
 
@@ -434,21 +439,13 @@ function onFieldChange(id: number, field: 'lastContact' | 'manager' | 'comment',
 function markToday(id: number) {
   const today = new Date().toISOString().split('T')[0]
   store.updateStudent(id, { lastContact: today }, recruitmentBackend.value)
-  actMenuId.value = null
 }
 
 // ── МЕНЮ ДЕЙСТВИЙ ───────────────────────────────────────
-const actMenuId = ref<number | null>(null)
-
-function toggleActMenu(id: number) {
-  actMenuId.value = actMenuId.value === id ? null : id
-}
 
 // Закрытие меню по клику вне
 function onDocClick(e: MouseEvent) {
-  if (!(e.target as HTMLElement).closest('.relative')) {
-    actMenuId.value = null
-  }
+  // Moved to UiDropdown
 }
 onMounted(() => {
   document.addEventListener('click', onDocClick)
@@ -466,7 +463,6 @@ watch(recruitmentBackend, () => {
   activeStudent.value = null
   showHistory.value = false
   showTransfer.value = false
-  actMenuId.value = null
   store.clearSelection()
   store.fetchList(1, undefined, recruitmentBackend.value)
 }, { immediate: true })
@@ -481,7 +477,6 @@ function openHistory(s: ExpelledStudent) {
 function openTransfer(s: ExpelledStudent) {
   activeStudent.value = s
   showTransfer.value = true
-  actMenuId.value = null
 }
 
 async function onTransfer(groupId: number) {
@@ -501,7 +496,6 @@ function openArchive(s: ExpelledStudent) {
   archiveReason.value = ''
   archiveReasonOther.value = ''
   showArchiveModal.value = true
-  actMenuId.value = null
 }
 
 async function confirmArchive() {
@@ -687,8 +681,7 @@ td{padding:10px 11px;font-size:12.5px;vertical-align:middle;white-space:nowrap;}
 .actions-wrap{position:relative;display:flex;justify-content:center;}
 .act-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--dim);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;font-size:16px;}
 .act-btn:hover{background:var(--hover);border-color:var(--blue);color:var(--text);}
-.act-dd{position:absolute;right:0;top:calc(100% + 5px);background:var(--surface);border:1px solid var(--border);border-radius:10px;min-width:200px;z-index:300;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.3);overflow:hidden;}
-.act-dd.open{display:block;}
+
 .act-item{display:flex;align-items:center;gap:9px;padding:9px 13px;font-size:12.5px;cursor:pointer;transition:background 0.15s;color:var(--dim);font-weight:500;}
 .act-item:hover{background:var(--hover);color:var(--text);}
 .act-item+.act-item{border-top:1px solid var(--border);}

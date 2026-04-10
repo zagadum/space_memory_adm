@@ -252,12 +252,16 @@
               <!-- Actions -->
               <td class="actions-td">
                 <div class="actions-wrap">
-                  <div class="actions-btn" @click.stop="toggleActions(s.id)">⋯</div>
-                  <div class="actions-dropdown" :class="{ open: openActions === s.id }">
-                    <div class="action-item" @click="openPanel(s)"><span class="ai">👤</span>{{ t('newStudents.actions.open') }}</div>
-                    <div class="action-item" @click="onInvite(s)"><span class="ai">✉️</span>{{ t('newStudents.actions.email') }}</div>
-                    <div class="action-item danger" @click="onArchive(s.id)"><span class="ai">📦</span>{{ t('newStudents.actions.archive') }}</div>
-                  </div>
+                  <UiDropdown align="right">
+                    <template #trigger>
+                      <div class="actions-btn">⋯</div>
+                    </template>
+                    <template #default="{ close }">
+                      <div class="action-item" @click="openPanel(s); close()"><span class="ai">👤</span>{{ t('newStudents.actions.open') }}</div>
+                      <div class="action-item" @click="onInvite(s); close()"><span class="ai">✉️</span>{{ t('newStudents.actions.email') }}</div>
+                      <div class="action-item danger" @click="onArchive(s.id); close()"><span class="ai">📦</span>{{ t('newStudents.actions.archive') }}</div>
+                    </template>
+                  </UiDropdown>
                 </div>
               </td>
             </tr>
@@ -331,6 +335,7 @@ import { useNewStudentsStore, type NewStudent, type StudentPayments, MANAGER_COL
 import { useNotificationStore } from '../../stores/notification.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import { useModalStore } from '../../stores/modal.store'
+import { UiDropdown } from '../../components/ui'
 import type { RecruitmentBackend } from '../../api/http'
 import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
@@ -361,7 +366,6 @@ const chips = computed(() => ({
 const groupFilter = computed(() => store.filters.group)
 const managerFilter = computed(() => store.filters.manager)
 const openDf = ref<string | null>(null)
-const openActions = ref<number | null>(null)
 const exportFormat = ref<'xlsx' | 'xls'>('xlsx')
 
 const groupFilterLabel = computed(() => {
@@ -467,17 +471,12 @@ function timerCls(d: number) { return d <= 3 ? 'low' : d <= 10 ? 'mid' : 'high' 
 function managerColor(name: string) { return MANAGER_COLORS[name] || 'linear-gradient(135deg,#4f6ef7,#8b5cf6)' }
 
 // ─── ACTIONS ───
-function toggleActions(id: number) {
-  openActions.value = openActions.value === id ? null : id
-}
 function onInvite(s: NewStudent) {
-  openActions.value = null
   modal.open('invite-lead', { student: s, backend: recruitmentBackend.value })
 }
 function onArchive(id: number) {
   const s = store.students.find(x => x.id === id)
   store.archiveStudent(id, recruitmentBackend.value)
-  openActions.value = null
   notif.addToast(`📦 ${s?.name} — ${t('newStudents.archived')}`, 'success')
 }
 async function exportToExcel() {
@@ -537,7 +536,6 @@ function reloadCurrentPage() {
 // Close dropdowns on outside click
 function onDocClick(_e: MouseEvent) {
   openDf.value = null
-  openActions.value = null
 }
 onMounted(() => {
   document.addEventListener('click', onDocClick)
@@ -619,12 +617,10 @@ const activePayments = computed<StudentPayments | null>(() => {
 
 watch(recruitmentBackend, () => {
   activeStudent.value = null
-  openActions.value = null
   store.fetchStudentsFromApi(1, recruitmentBackend.value)
 }, { immediate: true })
 
 function openPanel(s: NewStudent) {
-  openActions.value = null
   activeStudent.value = s
   store.fetchStudentById(s.id, recruitmentBackend.value)
   store.fetchStudentHistory(s.id, recruitmentBackend.value)

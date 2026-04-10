@@ -14,6 +14,7 @@ import UiInput from '../../components/ui/UiInput.vue'
 import UiDateRangePicker from '../../components/ui/UiDateRangePicker.vue'
 import InvoicesStatsHeader from './components/InvoicesStatsHeader.vue'
 import InvoiceSidePanel from './components/InvoiceSidePanel.vue'
+import { UiDropdown } from '../../components/ui'
 
 const { t } = useI18n()
 const invoicesStore = useInvoicesStore()
@@ -25,7 +26,6 @@ const route = useRoute()
 const { can } = useInvoicePermissions()
 
 const activeTab = ref<'b2c' | 'b2b'>( (route.query.tab as any) || 'b2c' )
-const activeActionId = ref<number | null>(null)
 const selectedInvoice = ref<any | null>(null)
 
 // Permission check: Trainer/Teacher cannot access this module
@@ -138,8 +138,7 @@ watch(() => invoicesStore.filters, () => {
 
 // --- Outside Clicks ---
 const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-  if (!target.closest('.actions-wrap')) activeActionId.value = null
+  // Moved to UiDropdown
 }
 </script>
 
@@ -334,17 +333,19 @@ const handleClickOutside = (event: MouseEvent) => {
                 </div>
               </td>
               <td class="actions-wrap" @click.stop>
-                <div class="dd-wrap">
-                  <button class="dd-btn" @click.stop="activeActionId = activeActionId === invoice.id ? null : invoice.id">⋯</button>
-                  <div v-if="activeActionId === invoice.id" class="dd-menu open">
-                    <div class="dditem" @click="handleRowClick(invoice)">👁 {{ t('faktury.viewDetails') }}</div>
-                    <div class="dditem" @click="modal.open('invoice-email', invoice)">✉ {{ t('faktury.sendEmail') }}</div>
-                    <div class="dditem dditem-am" v-if="can.createInvoice.value" @click="modal.open('invoice-correct-b2c', invoice)">FK {{ t('faktury.correct') }}</div>
+                <UiDropdown align="right">
+                  <template #trigger>
+                    <button class="dd-btn">⋯</button>
+                  </template>
+                  <template #default="{ close }">
+                    <div class="dditem" @click="handleRowClick(invoice); close()">👁 {{ t('faktury.viewDetails') }}</div>
+                    <div class="dditem" @click="modal.open('invoice-email', invoice); close()">✉ {{ t('faktury.sendEmail') }}</div>
+                    <div class="dditem dditem-am" v-if="can.createInvoice.value" @click="modal.open('invoice-correct-b2c', invoice); close()">FK {{ t('faktury.correct') }}</div>
                     <div class="separator"></div>
-                    <div class="dditem" @click="modal.open('invoice-edit', invoice)">✏ {{ t('common.edit') }}</div>
-                    <div class="dditem dditem-red" v-if="can.deleteInvoice.value" @click="modal.open('invoice-delete', invoice)">🗑 {{ t('common.delete') }}</div>
-                  </div>
-                </div>
+                    <div class="dditem" @click="modal.open('invoice-edit', invoice); close()">✏ {{ t('common.edit') }}</div>
+                    <div class="dditem dditem-red" v-if="can.deleteInvoice.value" @click="modal.open('invoice-delete', invoice); close()">🗑 {{ t('common.delete') }}</div>
+                  </template>
+                </UiDropdown>
               </td>
             </tr>
             <tr v-if="!invoicesStore.isLoading && !invoicesStore.invoices.length">
@@ -485,11 +486,10 @@ const handleClickOutside = (event: MouseEvent) => {
 
 .paid-stamp { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; color: #059669; margin-top: 4px; font-family: 'Space Mono', monospace; }
 
-/* Dropdown */
-.dd-wrap { position: relative; display: flex; justify-content: center; }
+.actions-wrap { display: flex; justify-content: center; position: relative; }
 .dd-btn { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--app-border); background: var(--app-bg); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: var(--app-text-dim); transition: all 0.15s; }
 .dd-btn:hover { background: var(--app-card-hi); color: var(--app-primary); border-color: var(--app-primary); }
-.dd-menu { position: absolute; right: 0; top: 100%; margin-top: 8px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 12px; width: 220px; z-index: 100; padding: 6px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
+
 .dditem { padding: 10px 14px; font-size: 13px; font-weight: 500; color: var(--app-text-main); cursor: pointer; border-radius: 8px; display: flex; align-items: center; gap: 10px; transition: all 0.1s; }
 .dditem:hover { background: var(--app-card-hi); }
 .dditem-am { color: #d97706; }

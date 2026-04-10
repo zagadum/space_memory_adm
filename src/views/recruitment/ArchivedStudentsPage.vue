@@ -10,6 +10,7 @@ import UiInput from '../../components/ui/UiInput.vue';
 import UiBadge from '../../components/ui/UiBadge.vue';
 import { useNotificationStore } from '../../stores/notification.store';
 import { useGlobalSearchStore } from '../../stores/globalSearch.store';
+import { UiDropdown } from '../../components/ui';
 
 const { t } = useI18n();
   const route = useRoute();
@@ -55,7 +56,6 @@ const reasonFilter = computed({
   set: (v) => { archivedStore.filters.reason = v; archivedStore.applyFilters(); }
 });
 const openDf = ref<string | null>(null);
-const openActions = ref<number | null>(null);
 
 const isInfoOpen = ref(false); // Default to closed for cleaner look
 const historyPanelOpen = ref(false);
@@ -132,9 +132,6 @@ const managerColor = (name: string | null) => {
 };
 
 // --- ACTIONS ---
-function toggleActions(id: number) {
-  openActions.value = openActions.value === id ? null : id;
-}
 
 const openHistory = (student: ArchivedStudent) => {
   selectedStudent.value = student;
@@ -180,7 +177,6 @@ const handleTransfer = async () => {
 
 const onDocClick = () => {
   openDf.value = null;
-  openActions.value = null;
 };
 
 onMounted(() => {
@@ -194,7 +190,6 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
     historyPanelOpen.value = false;
     transferPanelOpen.value = false;
     returnModalOpen.value = false;
-    openActions.value = null;
     archivedStore.fetchStudents(1, undefined, recruitmentBackend.value);
   }, { immediate: true });
 </script>
@@ -349,12 +344,16 @@ onBeforeUnmount(() => document.removeEventListener('click', onDocClick));
               </td>
               <td class="actions-td">
                 <div class="actions-wrap">
-                  <div class="actions-btn" @click.stop="toggleActions(s.id)">⋯</div>
-                  <div class="actions-dropdown" :class="{ open: openActions === s.id }">
-                    <div class="action-item success" @click="openReturn(s)"><span class="ai">🌟</span>{{ t('archived.actions.return') }}</div>
-                    <div class="action-item" @click="openTransfer(s)"><span class="ai">🔄</span>{{ t('archived.actions.transfer') }}</div>
-                    <div class="action-item" @click="openHistory(s)"><span class="ai">📋</span>{{ t('archived.actions.history') }}</div>
-                  </div>
+                  <UiDropdown align="right">
+                    <template #trigger>
+                      <div class="actions-btn">⋯</div>
+                    </template>
+                    <template #default="{ close }">
+                      <div class="action-item success" @click="openReturn(s); close()"><span class="ai">🌟</span>{{ t('archived.actions.return') }}</div>
+                      <div class="action-item" @click="openTransfer(s); close()"><span class="ai">🔄</span>{{ t('archived.actions.transfer') }}</div>
+                      <div class="action-item" @click="openHistory(s); close()"><span class="ai">📋</span>{{ t('archived.actions.history') }}</div>
+                    </template>
+                  </UiDropdown>
                 </div>
               </td>
             </tr>
@@ -577,8 +576,7 @@ td { padding: 12px 16px; font-size: 13.5px; vertical-align: middle; }
 .actions-wrap { position: relative; display: inline-flex; justify-content: center; }
 .actions-btn { width: 32px; height: 32px; border-radius: 8px; background: var(--app-surface); border: 1px solid var(--app-border); color: var(--app-text-dim); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; }
 .actions-btn:hover { background: rgba(79,110,247,0.1); border-color: var(--app-border-hi); color: var(--app-text-main); }
-.actions-dropdown { position: absolute; right: 0; top: calc(100% + 6px); background: var(--app-surface); border: 1px solid var(--app-border-hi); border-radius: 10px; min-width: 180px; z-index: 300; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.15); overflow: hidden; }
-.actions-dropdown.open { display: block; }
+
 .action-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; font-size: 13px; cursor: pointer; color: var(--app-text-dim); font-weight: 500; transition: background 0.15s; }
 .action-item:hover { background: rgba(79,110,247,0.08); color: var(--app-text-main); }
 .action-item.success { color: #10b981; }

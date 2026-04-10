@@ -103,16 +103,20 @@
               <div class="comment-cell" :title="student.comment">{{ student.comment || "—" }}</div>
             </td>
             <td>
-              <div class="actions-wrap" @click.stop>
-                <button class="actions-btn" @click="toggleActions(student.id)">⋮</button>
-                <div class="actions-dropdown" :class="{ open: activeActionId === student.id }">
-                  <div class="action-item" @click="openStudent(student.id); activeActionId = null">👤 {{ t('studentList.actions.openProfile') }}</div>
-                  <div class="action-item" @click="openContactModal(student); activeActionId = null">📞 {{ t('studentList.actions.updateContact') }}</div>
-                  <div class="action-item" @click="activeActionId = null">👥 {{ t('studentList.actions.changeManager') }}</div>
-                  <div class="action-item" @click="activeActionId = null">✉️ {{ t('studentList.actions.sendEmail') }}</div>
-                  <div class="action-divider"></div>
-                  <div class="action-item danger" @click="activeActionId = null">📂 {{ t('studentList.actions.toArchive') }}</div>
-                </div>
+              <div class="actions-wrap">
+                <UiDropdown align="right">
+                  <template #trigger>
+                    <button class="actions-btn">⋮</button>
+                  </template>
+                  <template #default="{ close }">
+                    <div class="action-item" @click="openStudent(student.id); close()">👤 {{ t('studentList.actions.openProfile') }}</div>
+                    <div class="action-item" @click="openContactModal(student); close()">📞 {{ t('studentList.actions.updateContact') }}</div>
+                    <div class="action-item" @click="close()">👥 {{ t('studentList.actions.changeManager') }}</div>
+                    <div class="action-item" @click="close()">✉️ {{ t('studentList.actions.sendEmail') }}</div>
+                    <div class="action-divider"></div>
+                    <div class="action-item danger" @click="close()">📂 {{ t('studentList.actions.toArchive') }}</div>
+                  </template>
+                </UiDropdown>
               </div>
             </td>
           </tr>
@@ -166,6 +170,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { UiDropdown } from '../../components/ui'
 import { useStudentsListStore } from '../../stores/studentsList.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 
@@ -208,13 +213,6 @@ watch(() => searchStore.query, (val) => {
     await listStore.applyFilters()
   }, 400)
 })
-
-// ── ВЫПАДАЮЩЕЕ МЕНЮ ДЕЙСТВИЙ ──
-const activeActionId = ref<number | string | null>(null);
-
-function toggleActions(id: number | string) {
-  activeActionId.value = activeActionId.value === id ? null : id;
-}
 
 // ── СОРТИРОВКА ──
 async function sortBy(col: string) {
@@ -312,19 +310,8 @@ function saveContact() {
   closeContactModal()
 }
 
-// ── ВЫПАДАЮЩЕЕ МЕНЮ ДЕЙСТВИЙ ──
-const activeDropdownId = ref<string | null>(null)
-
-function toggleDropdown(id: string | number) {
-  const sId = id.toString()
-  activeDropdownId.value = activeDropdownId.value === sId ? null : sId
-}
-
 const handleClickOutside = (event: MouseEvent) => {
-  const target = event.target as HTMLElement
-  if (!target.closest('.actions-wrap')) {
-    activeDropdownId.value = null
-  }
+  // logic moved to UiDropdown
 }
 
 watch(
@@ -445,9 +432,6 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
 .actions-wrap { display: flex; justify-content: center; position: relative; }
 .actions-btn { width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.04); border: 1px solid transparent; color: #8892b0; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; font-size: 16px; }
 .actions-btn:hover { background: rgba(79,110,247,0.1); border-color: rgba(120,140,255,0.35); color: #e8eeff; }
-
-.actions-dropdown { position: absolute; top: calc(100% + 5px); right: 0; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 10px; padding: 6px; min-width: 180px; z-index: 300; display: none; box-shadow: var(--app-shadow); backdrop-filter: blur(10px); }
-.actions-dropdown.open { display: block; }
 
 .action-item { padding: 8px 12px; font-size: 12.5px; border-radius: 6px; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 8px; color: var(--app-text-dim); }
 .action-item:hover { background: var(--status-info-bg); color: var(--app-text-main); }
