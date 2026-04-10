@@ -49,6 +49,9 @@ export interface TeacherDetails extends TeacherListItem {
   apt?: string | null
   postCode?: string | null
   passport?: string | null
+  pesel?: string | null
+  idCard?: string | null
+  languages?: string[]
 }
 
 export interface TeacherCreatePayload {
@@ -64,6 +67,10 @@ export interface TeacherCreatePayload {
   postCode: string
   street: string
   apt: string
+  birthDate?: string | null
+  pesel?: string | null
+  idCard?: string | null
+  languages?: string[]
   comment?: string | null
   availability?: string[] // days of the week, e.g. ['monday', 'tuesday']
 }

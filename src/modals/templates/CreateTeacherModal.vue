@@ -65,12 +65,41 @@
             class="premium-input"
           />
           <UiInput
+            v-model="form.birthDate"
+            type="date"
+            :label="t('teachersList.modal.fields.birthDate')"
+            class="premium-input"
+          />
+          <UiInput
+            v-model="form.idCard"
+            :label="t('teachersList.modal.fields.idCard')"
+            placeholder="ABC 123456"
+            class="premium-input"
+          />
+          <UiInput
+            v-model="form.pesel"
+            :label="t('teachersList.modal.fields.pesel')"
+            placeholder="00000000000"
+            class="premium-input"
+          />
+          <UiInput
             v-model="form.country"
             :label="t('teachersList.modal.fields.country')"
             placeholder="Poland"
             required
-            class="premium-input"
+            class="premium-input full-width"
           />
+        </div>
+      </div>
+
+      <!-- 🌍 LANGUAGES -->
+      <div class="form-card language-card mt-4">
+        <div class="section-badge info">{{ t('teachersList.modal.fields.languages') }}</div>
+        <div class="languages-pills mt-2">
+          <label v-for="lang in ['PL', 'EN', 'UK']" :key="lang" class="lang-pill" :class="{ active: form.languages.includes(lang) }">
+            <input type="checkbox" v-model="form.languages" :value="lang" class="hidden-check">
+            <span class="pill-text">{{ lang }}</span>
+          </label>
         </div>
       </div>
 
@@ -183,6 +212,10 @@ const form = reactive({
   password: "",
   firstName: "",
   lastName: "",
+  birthDate: "",
+  languages: [] as string[],
+  idCard: "",
+  pesel: "",
   phone: "",
   country: "",
   voivodeship: "",
@@ -371,6 +404,43 @@ async function submit() {
 }
 
 .day-pill.active .pill-text {
+  color: #fff;
+}
+
+/* Languages pills */
+.languages-pills {
+  display: flex;
+  gap: 12px;
+}
+
+.lang-pill {
+  flex: 1;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card, #ffffff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.lang-pill:hover {
+  background: var(--status-info-bg, rgba(6, 182, 212, 0.05));
+  border-color: rgba(6, 182, 212, 0.2);
+  transform: translateY(-1px);
+}
+
+.lang-pill.active {
+  background: var(--blue, #4f6ef7);
+  border-color: var(--blue, #4f6ef7);
+  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.3);
+  color: white;
+}
+
+.lang-pill.active .pill-text {
   color: #fff;
 }
 
