@@ -20,7 +20,7 @@
             <th @click="sort('type')">{{ t('newGroups.table.type') }} <span class="sort-icon">{{ sortIcon('type') }}</span></th>
             <th @click="sort('createdDate')">{{ t('newGroups.table.createdDate') }} <span class="sort-icon">{{ sortIcon('createdDate') }}</span></th>
             <th @click="sort('startDate')">{{ t('newGroups.table.startDate') }} <span class="sort-icon">{{ sortIcon('startDate') }}</span></th>
-            <th @click="sort('totalSlots')">{{ t('newGroups.table.count') }} <span class="sort-icon">{{ sortIcon('totalSlots') }}</span></th>
+            <th @click="sort('studentsCount')">{{ t('newGroups.table.count') }} <span class="sort-icon">{{ sortIcon('studentsCount') }}</span></th>
             <th @click="sort('paid')">{{ t('newGroups.table.paidContract') }} <span class="sort-icon">{{ sortIcon('paid') }}</span></th>
             <th @click="sort('days')">{{ t('newGroups.table.waiting') }} <span class="sort-icon">{{ sortIcon('days') }}</span></th>
             <th @click="sort('manager')">{{ t('newGroups.table.responsible') }} <span class="sort-icon">{{ sortIcon('manager') }}</span></th>
@@ -61,7 +61,7 @@
               </td>
               <td><span class="date-mono">{{ fmtDate(g.createdDate) }}</span></td>
               <td><span class="date-mono">{{ fmtDate(g.startDate) }}</span></td>
-              <td><span class="slots-val">{{ g.totalSlots }}</span><span class="slots-label"> {{ t('newGroups.persons') }}</span></td>
+              <td><span class="slots-val">{{ g.studentsCount }}/{{ g.totalSlots }}</span><span class="slots-label"> {{ t('newGroups.persons') }}</span></td>
               <td>
                 <div class="payment-ratio">
                   <span class="ratio-text" :style="{ color: ratioColor(g) }">{{ g.paid }}/{{ g.totalSlots }}</span>
@@ -151,7 +151,7 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
-import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup } from '../../api/newGroupsApi'
+import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, emailStudentFromGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
 import { getRecruitmentApi } from '../../api/recruitmentApi'
@@ -221,6 +221,7 @@ const transferPickerStudentName = computed(() => {
 // ── Helpers ──
 
 function pct(g: NewGroup) {
+  if (g.totalSlots <= 0) return 0
   return Math.round(g.paid / g.totalSlots * 100)
 }
 
@@ -233,13 +234,31 @@ function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
 
+function syncGroupStudentsCount(groupId: number, studentsCount: number) {
+  const nextCount = Math.max(0, studentsCount)
+  const group = groups.value.find(x => x.id === groupId)
+  if (group) {
+    group.studentsCount = nextCount
+    if (group.totalSlots <= 0) {
+      group.totalSlots = nextCount
+    }
+  }
+
+  if (panelGroup.value?.id === groupId) {
+    panelGroup.value.studentsCount = nextCount
+    if (panelGroup.value.totalSlots <= 0) {
+      panelGroup.value.totalSlots = nextCount
+    }
+  }
+}
+
 function getSortVal(g: NewGroup, col: string): string | number {
   switch (col) {
     case 'name':        return g.name.toLowerCase()
     case 'type':        return g.type_group || g.type
     case 'startDate':   return g.startDate || ''
     case 'createdDate': return g.createdDate
-    case 'totalSlots':  return g.totalSlots
+    case 'studentsCount': return g.studentsCount
     case 'paid':        return g.paid
     case 'days':        return daysDiff(g.createdDate)
     case 'manager':     return g.manager ? g.manager.name.toLowerCase() : 'яя'
@@ -338,6 +357,7 @@ async function onStudentsAdded(payload: { groupId: number; studentIds: number[] 
     await addStudentsToGroup(payload, recruitmentBackend.value)
     const res = await getNewGroupStudents(payload.groupId, recruitmentBackend.value)
     panelStudents.value = res.items
+    syncGroupStudentsCount(payload.groupId, res.items.length)
     notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentsAddError')), 'error')
@@ -348,6 +368,7 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
   try {
     await removeStudentFromGroup(payload, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
     notify.addToast(t('newGroups.toasts.studentRemoved'), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentRemoveError')), 'error')
@@ -358,6 +379,7 @@ async function onStudentArchived(payload: { groupId: number; studentId: number; 
   try {
     await archiveStudentFromGroup({ groupId: payload.groupId, studentId: payload.studentId }, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
     notify.addToast(t('newGroups.toasts.archivedToast', { name: payload.name }), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')
@@ -380,6 +402,7 @@ async function onTransferGroupPicked(groupId: number, groupName: string, _teache
     const api = getRecruitmentApi(recruitmentBackend.value)
     await api.setStudentGroup(payload.studentId, groupId)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
+    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
     notify.addToast(`✅ ${payload.name} -> ${groupName}`, 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')

@@ -32,6 +32,7 @@ export interface NewGroup {
     type_group: "group" | "individual";
     startDate: string;
     createdDate: string;
+    studentsCount: number;
     totalSlots: number;
     paid: number;
     manager: NewGroupManager | null;
@@ -109,6 +110,8 @@ function normalizeTypeGroup(raw: any): "group" | "individual" {
 
 function normalizeNewGroup(raw: any): NewGroup {
     const typeGroup = normalizeTypeGroup(raw?.type_group ?? raw?.type)
+    const students = Array.isArray(raw?.students) ? raw.students : []
+    const studentsCount = Number(raw?.studentsCount ?? raw?.students_count ?? students.length ?? 0)
     return {
         id: Number(raw?.id ?? 0),
         name: String(raw?.name ?? ''),
@@ -116,6 +119,7 @@ function normalizeNewGroup(raw: any): NewGroup {
         type_group: typeGroup,
         startDate: String(raw?.startDate ?? ''),
         createdDate: String(raw?.createdDate ?? ''),
+        studentsCount,
         totalSlots: Number(raw?.totalSlots ?? raw?.total_slot ?? 0),
         paid: Number(raw?.paid ?? 0),
         manager: raw?.manager ?? null,
@@ -123,7 +127,7 @@ function normalizeNewGroup(raw: any): NewGroup {
         day: String(raw?.day ?? ''),
         time: String(raw?.time ?? ''),
         age: raw?.age ?? raw?.age_name ?? null,
-        students: Array.isArray(raw?.students) ? raw.students : [],
+        students,
     }
 }
 
