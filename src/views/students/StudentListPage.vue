@@ -40,7 +40,6 @@
             <th @click="sortBy('training_term_days')" style="cursor:pointer; user-select:none">
               {{ t('studentList.table.trainingTerm') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'training_term_days' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'training_term_days' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th>{{ t('studentList.table.school') }}</th>
             <th>{{ t('studentList.table.teacher') }}</th>
             <th>{{ t('studentList.table.group') }}</th>
             <th @click="sortBy('last_contact_at')" style="cursor:pointer; user-select:none">
@@ -53,9 +52,11 @@
         </thead>
         <tbody v-if="!listStore.loading">
           <tr v-for="student in students" :key="student.id" class="table-row" @click="openStudent(student.id)">
+            <!-- Фамилия + ID -->
             <td>
               <div class="name-cell">
                 <span class="student-name">{{ student.name }}</span>
+                <span class="student-meta">ID: {{ student.id }}</span>
                 <span class="student-meta">{{ student.phone }}</span>
               </div>
             </td>
@@ -66,13 +67,6 @@
                   {{ student.daysInSystem || 0 }}
                 </span>
                 <span class="timer-label">дн.</span>
-              </div>
-            </td>
-            <td>
-              <div class="enrollment-list">
-                <div v-for="(en, idx) in student.enrollments" :key="idx" class="enrollment-item">
-                  <span class="school-name">{{ en.school }}</span>
-                </div>
               </div>
             </td>
             <td>
