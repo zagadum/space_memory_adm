@@ -97,7 +97,18 @@
             </div>
             <div class="sp-grid">
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPhone') || 'Телефон' }}</div><input class="sp-input" v-model="form.phone" type="tel" /></div>
-              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPassport') || 'ID паспорта' }}</div><input class="sp-input" v-model="form.passport" /></div>
+              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldPesel') || 'PESEL' }}</div><input class="sp-input" v-model="form.pesel" /></div>
+            </div>
+            <div class="sp-grid cols-1">
+              <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldIdCard') || 'ID Карты / Паспорт' }}</div><input class="sp-input" v-model="form.idCard" /></div>
+            </div>
+
+            <div class="sp-section-title">{{ t('newStudents.panel.fieldLanguages') || 'Языки преподавания' }}</div>
+            <div class="sp-languages-grid">
+              <label v-for="lang in ['PL', 'EN', 'UK']" :key="lang" class="sp-lang-item" :class="{ active: form.languages?.includes(lang) }">
+                <input type="checkbox" v-model="form.languages" :value="lang" class="sp-hidden-check">
+                <span class="sp-lang-text">{{ lang }}</span>
+              </label>
             </div>
 
             <div class="sp-section-title">{{ t('newStudents.panel.sectionAddress') || 'Адрес' }}</div>
@@ -116,11 +127,19 @@
               <div class="sp-field"><div class="sp-label">{{ t('newStudents.panel.fieldApt') || 'Квартира' }}</div><input class="sp-input" v-model="form.apt" /></div>
             </div>
 
-            <div class="sp-section-title">{{ t('newStudents.panel.sectionComments') || 'Комментарий' }}</div>
+            <div class="sp-section-title">{{ t('teachersList.modal.fields.availability') || 'Доступность' }}</div>
+            <div class="sp-days-grid">
+              <label v-for="day in daysOfWeek" :key="day" class="sp-day-item" :class="{ active: form.availability?.includes(day) }">
+                <input type="checkbox" v-model="form.availability" :value="day" class="sp-hidden-check">
+                <span class="sp-day-text">{{ t('newGroups.weekdays.' + day).slice(0, 3) }}</span>
+              </label>
+            </div>
+
+            <div class="sp-section-title">{{ t('teachersList.modal.fields.comment') || 'Комментарий' }}</div>
             <div class="sp-grid cols-1">
               <div class="sp-field">
-                <div class="sp-label">{{ t('newStudents.panel.fieldComment') || 'Комментарий' }}</div>
-                <textarea class="sp-input sp-textarea" v-model="form.comment" />
+                <div class="sp-label">{{ t('teachersList.modal.fields.comment') || 'Комментарий' }}</div>
+                <textarea class="sp-input sp-textarea" v-model="form.comment" :placeholder="t('teachersList.modal.fields.commentPlaceholder')" />
               </div>
             </div>
 
@@ -259,10 +278,13 @@ const confirmPassword = ref('')
 const isSavingPassword = ref(false)
 const passwordMismatch = computed(() => confirmPassword.value !== '' && newPassword.value !== confirmPassword.value)
 
+const daysOfWeek = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+
 const defaultForm: Partial<TeacherDetails> = {
   email: '', firstName: '', lastName: '', birthDate: '',
   country: '', voivodeship: '', city: '', street: '', apt: '', postCode: '',
-  phone: '', passport: '', comment: ''
+  phone: '', passport: '', pesel: '', idCard: '', languages: [],
+  availability: [] as string[], comment: ''
 }
 
 const form = ref<Partial<TeacherDetails>>({ ...defaultForm })
@@ -285,6 +307,10 @@ function mapDetailsToForm(d: TeacherDetails): Partial<TeacherDetails> {
     apt: d.apt ?? '',
     postCode: d.postCode ?? '',
     passport: d.passport ?? '',
+    pesel: d.pesel ?? '',
+    idCard: d.idCard ?? '',
+    languages: d.languages ?? [],
+    availability: d.availability ?? [],
     comment: d.comment ?? '',
   }
 }
@@ -548,4 +574,76 @@ function onSave() {
 }
 .sp-note-btn-primary { border-color: rgba(79,110,247,0.5); color: var(--blue); }
 .sp-note-btn-danger { border-color: rgba(239,68,68,0.35); color: #ef4444; }
+
+/* Languages selection in panel */
+.sp-languages-grid {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.sp-lang-item {
+  flex: 1;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+.sp-lang-item:hover {
+  border-color: var(--app-border-hi);
+  background: var(--status-info-bg);
+}
+.sp-lang-item.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: white;
+}
+.sp-lang-text {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Day pills in panel */
+.sp-days-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.sp-day-item {
+  flex: 1;
+  min-width: 44px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-card);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+.sp-day-item:hover {
+  background: var(--status-danger-bg, rgba(236, 72, 153, 0.05));
+  border-color: rgba(236, 72, 153, 0.2);
+  transform: translateY(-1px);
+}
+.sp-day-item.active {
+  background: var(--pink, #ec4899);
+  border-color: var(--pink, #ec4899);
+  color: white;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+}
+.sp-day-text {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+.sp-hidden-check { display: none; }
 </style>
