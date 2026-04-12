@@ -236,20 +236,27 @@ function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
 
-function syncGroupStudentsCount(groupId: number, studentsCount: number) {
-  const nextCount = Math.max(0, studentsCount)
+function updateGroupCounters(groupId: number, studentList: NewGroupStudent[]) {
   const group = groups.value.find(x => x.id === groupId)
-  if (group) {
-    group.studentsCount = nextCount
-    if (group.totalSlots <= 0) {
-      group.totalSlots = nextCount
-    }
+  if (!group) return
+
+  const count = studentList.length
+  const paid = studentList.filter(s => s.contract === 'signed').length
+
+  group.studentsCount = count
+  group.paid = paid
+  
+  // Если вместимость не задана, ставим её равной текущему количеству (для новых групп)
+  if (group.totalSlots <= 0) {
+    group.totalSlots = count
   }
 
+  // Также обновляем данные в открытой панели, если это та же группа
   if (panelGroup.value?.id === groupId) {
-    panelGroup.value.studentsCount = nextCount
+    panelGroup.value.studentsCount = count
+    panelGroup.value.paid = paid
     if (panelGroup.value.totalSlots <= 0) {
-      panelGroup.value.totalSlots = nextCount
+      panelGroup.value.totalSlots = count
     }
   }
 }
@@ -310,6 +317,7 @@ async function openPanel(id: number) {
   try {
     const res = await getNewGroupStudents(id, recruitmentBackend.value)
     panelStudents.value = res.items
+    updateGroupCounters(id, res.items)
   } finally {
     loadingStudents.value = false
   }
@@ -359,7 +367,7 @@ async function onStudentsAdded(payload: { groupId: number; studentIds: number[] 
     await addStudentsToGroup(payload, recruitmentBackend.value)
     const res = await getNewGroupStudents(payload.groupId, recruitmentBackend.value)
     panelStudents.value = res.items
-    syncGroupStudentsCount(payload.groupId, res.items.length)
+    updateGroupCounters(payload.groupId, res.items)
     notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentsAddError')), 'error')
@@ -370,7 +378,7 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
   try {
     await removeStudentFromGroup(payload, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
+    updateGroupCounters(payload.groupId, panelStudents.value)
     notify.addToast(t('newGroups.toasts.studentRemoved'), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentRemoveError')), 'error')
@@ -381,7 +389,7 @@ async function onStudentArchived(payload: { groupId: number; studentId: number; 
   try {
     await archiveStudentFromGroup({ groupId: payload.groupId, studentId: payload.studentId }, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
+    updateGroupCounters(payload.groupId, panelStudents.value)
     notify.addToast(t('newGroups.toasts.archivedToast', { name: payload.name }), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')
@@ -404,7 +412,7 @@ async function onTransferGroupPicked(groupId: number, groupName: string, _teache
     const api = getRecruitmentApi(recruitmentBackend.value)
     await api.setStudentGroup(payload.studentId, groupId)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
+    updateGroupCounters(payload.groupId, panelStudents.value)
     notify.addToast(`✅ ${payload.name} -> ${groupName}`, 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')

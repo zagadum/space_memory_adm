@@ -308,10 +308,12 @@ const teacherPanelOpen = ref(false)
 const teacherQuery = ref('')
 
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
-// Когда студенты загружены — считаем из них. Иначе fallback на group.paid
-const actualTotal = computed(() =>
-  props.students.length > 0 ? props.students.length : props.group.totalSlots
-)
+// Когда студенты загружены — считаем оплативших из них.
+// Знаменатель всегда totalSlots (вместимость), если только она не 0 (тогда используем кол-во студентов)
+const actualTotal = computed(() => {
+  if (props.group.totalSlots > 0) return props.group.totalSlots
+  return props.students.length
+})
 const actualPaid = computed(() =>
   props.students.length > 0
     ? props.students.filter(s => s.contract === 'signed').length
