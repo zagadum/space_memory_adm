@@ -763,6 +763,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
           id: Date.now() + Math.random(), 
           name: ms.name, 
           age: ms.age, 
+          phone: ms.phone,
+          email: ms.email,
           contract: "pending", 
           paymentStr: "0 zł", 
           enrollDate: today, 

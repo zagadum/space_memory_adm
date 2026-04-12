@@ -18,6 +18,8 @@ export interface NewGroupStudent {
     id: number | string;
     name: string;
     age: number;
+    phone?: string;
+    email?: string;
     meta?: string;
     contract: "signed" | "pending";
     isPaid: boolean;

@@ -95,6 +95,7 @@
             <thead>
               <tr>
                 <th>{{ t('newGroups.detail.thName') }}</th>
+                <th>{{ t('newGroups.detail.thEmail') }}</th>
                 <th>{{ t('newGroups.detail.thAge') }}</th>
                 <th>{{ t('newGroups.detail.thContract') }}</th>
                 <th>{{ t('newGroups.detail.thPayment') }}</th>
@@ -119,14 +120,23 @@
                 :class="s.contract !== 'signed' ? 'row-not-ready' : ''"
               >
                 <td>
-                  <div style="display:flex;align-items:center;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px">
                     <div class="status-dot" :style="{ background: s.contract === 'signed' ? 'var(--green)' : 'var(--amber)', boxShadow: '0 0 4px ' + (s.contract === 'signed' ? 'var(--green)' : 'var(--amber)') }"></div>
-                    <span style="font-weight:500">{{ s.name }}</span>
+                    <div>
+                      <div class="student-name">{{ s.name }}</div>
+                      <div class="student-info-sub">
+                        <span class="sub-id">#{{ s.id }}</span>
+                        <span v-if="s.phone" class="sub-phone">{{ s.phone }}</span>
+                      </div>
+                    </div>
                   </div>
                 </td>
                 <td>
+                  <div class="student-email" :title="s.email || ''">{{ s.email || '—' }}</div>
+                </td>
+                <td>
                   <span class="age-mono">{{ s.age }}</span>
-                  <span style="color:var(--dim);font-size:11px"> {{ t('newGroups.detail.years') }}</span>
+                  <span class="age-label"> {{ pluralizeYears(s.age) }}</span>
                 </td>
                 <td>
                   <span :class="['contract-badge', s.contract === 'signed' ? 'contract-signed' : 'contract-pending']">
@@ -289,7 +299,17 @@ import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+function pluralizeYears(n: number): string {
+  if (locale.value !== 'ru' && locale.value !== 'uk') return t('newGroups.detail.years')
+  
+  const m10 = n % 10
+  const m100 = n % 100
+  if (m10 === 1 && m100 !== 11) return locale.value === 'ru' ? 'год' : 'рік'
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return locale.value === 'ru' ? 'года' : 'роки'
+  return locale.value === 'ru' ? 'лет' : 'років'
+}
 const notify = useNotificationStore()
 
 const props = defineProps<{
@@ -573,6 +593,13 @@ function doDelete() {
 .timer-days.mid { color: var(--amber); }
 .timer-days.high { color: var(--red); }
 .empty-cell { color: rgba(136,146,176,0.35); font-size: 12px; font-style: italic; }
+
+.student-name { font-weight: 600; font-size: 13.5px; color: var(--app-text-main); }
+.student-info-sub { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.sub-id { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--dim); background: rgba(255,255,255,0.05); padding: 1px 4px; border-radius: 4px; }
+.sub-phone { font-size: 11px; color: var(--dim); font-weight: 500; }
+.student-email { font-size: 12.5px; color: var(--dim); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.age-label { font-size: 11px; color: var(--dim); }
 
 .row-actions { display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.15s; }
 .gp-table tbody tr:hover .row-actions { opacity: 1; }
