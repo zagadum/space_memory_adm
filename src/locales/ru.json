@@ -8,7 +8,7 @@
     "filterGroups": "Группы",
     "filterPayments": "Платежи",
     "filterLeads": "Лиды",
-    "filterTeachers": "Преподаватели",
+    "filterTeachers": "Учителя",
     "dateFrom": "Дата с",
     "dateTo": "Дата по",
     "totalRecords": "Записей: {n}",
@@ -98,7 +98,7 @@
       "student-finance": "Финансы ученика",
       "students": "Список учеников",
       "target-mail": "Target Mail",
-      "teachers": "Преподаватели",
+      "teachers": "Учителя",
       "trainer": "Тренер (секция)",
       "trainer-dashboard": "Панель тренера",
       "trainer-exam": "Экзамены",
@@ -1706,7 +1706,7 @@
       "searchStudent": "Поиск ученика по имени...",
       "searchTeacherPlaceholder": "Поиск учителя по имени...",
       "selectTeacherSub": "Выберите учителя для этой группы",
-      "selectTeacherTitle": "Выбор преподавателя",
+      "selectTeacherTitle": "Выбор учителя",
       "selected": "Выбран",
       "selectedCount1": "{n} ученик выбран",
       "selectedCount2": "{n} ученика выбрано",
@@ -2307,7 +2307,7 @@
     "sales": "Отдел продаж",
     "secretariat": "Секретариат",
     "super-admin": "Супер Администратор",
-    "teacher": "Преподаватель"
+    "teacher": "Учитель"
   },
   "salaryCalc": {
     "components": {
@@ -2342,8 +2342,8 @@
       "noCalculation": "Расчёт для этого месяца не найден",
       "noCalculationHint": "За выбранный месяц расчёт ещё не создан. Нажмите кнопку ниже, чтобы произвести расчёт.",
       "rezygnacjeBonus": "0 rezygnacji → +1%",
-      "selectTrainer": "Выберите преподавателя",
-      "selectTrainerHint": "Выберите преподавателя из списка, чтобы загрузить расчёт зарплаты",
+      "selectTrainer": "Выберите учителя",
+      "selectTrainerHint": "Выберите учителя из списка, чтобы загрузить расчёт зарплаты",
       "status": "Статус:",
       "summary": "Сводка",
       "trainer": "Тренер:"
@@ -2684,11 +2684,11 @@
         "personal": "Личные данные"
       },
       "success": "Учитель успешно создан",
-      "title": "Создание нового преподавателя"
+      "title": "Создание нового учителя"
     },
-    "noTeachers": "Нет преподавателей по заданным фильтрам",
+    "noTeachers": "Нет учителей по заданным фильтрам",
     "pageSubTitle": "Секретариат — список учителей",
-    "pageTitle": "Преподаватели",
+    "pageTitle": "Учителя",
     "panel": {
       "groups": {
         "empty": "Нет активных групп",
@@ -2708,7 +2708,7 @@
         "placeholder": "Напишите заметку..."
       },
       "sections": {
-        "groups": "Группы преподавателя",
+        "groups": "Группы учителя",
         "history": "История изменений",
         "notes": "Заметки по учителю"
       },
@@ -2716,7 +2716,7 @@
       "tabHistory": "История",
       "tabNotes": "Заметки",
       "tabProfile": "Профиль",
-      "teacherRole": "Преподаватель"
+      "teacherRole": "Учитель"
     },
     "table": {
       "city": "Город",
@@ -2733,7 +2733,7 @@
     "toolbar": {
       "addBtn": "Добавить учителя",
       "allCities": "Все города",
-      "listTitle": "СПИСОК ПРЕПОДАВАТЕЛЕЙ"
+      "listTitle": "СПИСОК УЧИТЕЛЕЙ"
     }
   },
   "trainerGroups": {
@@ -2741,7 +2741,7 @@
     "empty": "У вас нет назначенных групп",
     "pupils": "уч.",
     "students": "всего учеников",
-    "subtitle": "Кабинет преподавателя · только ваши группы",
+    "subtitle": "Кабинет учителя · только ваши группы",
     "title": "Мои группы",
     "total": "всего групп",
     "typeAll": "Все",
@@ -2752,7 +2752,7 @@
   "trainerStudents": {
     "empty": "У вас нет назначенных учеников",
     "lastContact": "Последний контакт",
-    "subtitle": "Кабинет преподавателя · только ваши ученики",
+    "subtitle": "Кабинет учителя · только ваши ученики",
     "title": "Мои ученики",
     "total": "всего учеников"
   },
