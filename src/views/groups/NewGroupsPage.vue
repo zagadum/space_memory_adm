@@ -153,7 +153,8 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
-import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup, editGroup } from '../../api/newGroupsApi'
+import { useNewGroupsStore } from '../../stores/newGroups.store'
+import { getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup, editGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
 import { getRecruitmentApi } from '../../api/recruitmentApi'
@@ -170,9 +171,10 @@ const { t } = useI18n()
 const route = useRoute()
 const notify = useNotificationStore()
 const searchStore = useGlobalSearchStore()
+const newGroupsStore = useNewGroupsStore()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 const isLoading = ref(false)
-const groups = ref<NewGroup[]>([])
+const groups = computed(() => newGroupsStore.groups)
 const masterStudents = ref<MasterStudent[]>([])
 const teachers = ref<NewGroupTeacher[]>([])
 const panelGroup = ref<NewGroup | null>(null)
@@ -331,7 +333,7 @@ function closePanel() {
 async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
   try {
     const res = await createNewGroup(payload, recruitmentBackend.value)
-    groups.value.unshift(res.group)
+    newGroupsStore.setGroups([res.group, ...newGroupsStore.groups])
     showCreateModal.value = false
     notify.addToast(t('newGroups.toasts.created'), 'success')
   } catch (err: unknown) {
@@ -342,7 +344,7 @@ async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
 async function onGroupStarted(id: number) {
   try {
     await apiStartGroup(id, recruitmentBackend.value)
-    groups.value = groups.value.filter(g => g.id !== id)
+    newGroupsStore.setGroups(newGroupsStore.groups.filter(g => g.id !== id))
     startGroup.value = null
     if (panelGroup.value?.id === id) closePanel()
     notify.addToast(t('newGroups.toasts.started'), 'success')
@@ -354,7 +356,7 @@ async function onGroupStarted(id: number) {
 async function onDeleteGroup(id: number) {
   try {
     await deleteNewGroup(id, recruitmentBackend.value)
-    groups.value = groups.value.filter(g => g.id !== id)
+    newGroupsStore.setGroups(newGroupsStore.groups.filter(g => g.id !== id))
     closePanel()
     notify.addToast(t('newGroups.toasts.deleted'), 'warning')
   } catch (err: unknown) {
@@ -457,12 +459,11 @@ watch(recruitmentBackend, async () => {
   closePanel()
   isLoading.value = true
   try {
-    const [gRes, sRes, tRes] = await Promise.all([
-      getNewGroups(recruitmentBackend.value),
+    const [_, sRes, tRes] = await Promise.all([
+      newGroupsStore.fetchGroups(recruitmentBackend.value),
       getMasterStudents(recruitmentBackend.value),
       getTeachers(recruitmentBackend.value),
     ])
-    groups.value = gRes.items
     masterStudents.value = sRes.items
     teachers.value = tRes.items
   } catch (err: unknown) {
