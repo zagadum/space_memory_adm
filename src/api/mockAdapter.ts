@@ -198,10 +198,16 @@ export const mockAdapter: AxiosAdapter = async (config) => {
 
     return ok(config, {
       totalStudents: nsDb.length,
+      studentsWeeklyTrend: 3,
       activeGroups: 12,
-      pendingInvoices: 3,
+      groupsFillRate: 85,
+      pendingInvoices: 14,
+      unpaidSum: 2450,
+      overdueInvoices: 3,
       newLeads: 5,
+      criticalLeads: 4,
       newStudents: newStudentsCount,
+      studentsWithoutGroup: 7,
     });
   }
 

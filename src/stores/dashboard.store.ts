@@ -3,10 +3,16 @@ import { getDashboardStats } from '../api/dashboardApi'
 
 export interface DashboardStats {
     totalStudents: number
+    studentsWeeklyTrend: number
     activeGroups: number
+    groupsFillRate: number
     pendingInvoices: number
+    unpaidSum: number
+    overdueInvoices: number
     newLeads: number
+    criticalLeads: number
     newStudents: number
+    studentsWithoutGroup: number
 }
 
 export interface ActivityEvent {
@@ -31,10 +37,16 @@ export const useDashboardStore = defineStore('dashboard', {
         isLoadingStats: false,
         stats: {
             totalStudents: 0,
+            studentsWeeklyTrend: 0,
             activeGroups: 0,
+            groupsFillRate: 0,
             pendingInvoices: 0,
+            unpaidSum: 0,
+            overdueInvoices: 0,
             newLeads: 0,
-            newStudents: 0
+            criticalLeads: 0,
+            newStudents: 0,
+            studentsWithoutGroup: 0
         } as DashboardStats,
 
         recentActivity: [
@@ -99,10 +111,16 @@ export const useDashboardStore = defineStore('dashboard', {
                 // Keep initial zeros or previous values
                 this.stats = {
                     totalStudents: 0,
+                    studentsWeeklyTrend: 0,
                     activeGroups: 0,
+                    groupsFillRate: 0,
                     pendingInvoices: 0,
+                    unpaidSum: 0,
+                    overdueInvoices: 0,
                     newLeads: 0,
-                    newStudents: 0
+                    criticalLeads: 0,
+                    newStudents: 0,
+                    studentsWithoutGroup: 0
                 }
             } finally {
                 this.isLoadingStats = false

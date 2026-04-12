@@ -21,7 +21,7 @@
           <div class="stat-value">{{ store.stats.totalStudents }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.totalStudents') }}</div>
         </div>
-        <div class="stat-trend">{{ $t('dashboard.stats.studentsTrend', { n: 0 }) }}</div>
+        <div class="stat-trend">{{ $t('dashboard.stats.studentsTrend', { n: store.stats.studentsWeeklyTrend }) }}</div>
       </div>
       
       <div class="stat-card green">
@@ -30,7 +30,7 @@
           <div class="stat-value">{{ store.stats.activeGroups }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.activeGroups') }}</div>
         </div>
-        <div class="stat-trend">{{ $t('dashboard.stats.groupsTrend', { n: 0 }) }}</div>
+        <div class="stat-trend">{{ $t('dashboard.stats.groupsTrend', { n: store.stats.groupsFillRate }) }}</div>
       </div>
       
       <div class="stat-card amber">
@@ -39,7 +39,10 @@
           <div class="stat-value">{{ store.stats.pendingInvoices }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.pendingInvoices') }}</div>
         </div>
-        <div class="stat-trend warning">{{ $t('dashboard.stats.invoicesTrend') }}</div>
+        <div class="stat-trend warning">
+          <span v-if="store.stats.overdueInvoices > 0">🔴 {{ store.stats.overdueInvoices }} {{ $t('finance.overdueCount') }}</span>
+          <span v-else>{{ $t('dashboard.stats.invoicesTrend') }}</span>
+        </div>
       </div>
       
       <div class="stat-card purple">
@@ -48,7 +51,10 @@
           <div class="stat-value">{{ store.stats.newLeads }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.newLeads') }}</div>
         </div>
-        <div class="stat-trend info">{{ $t('dashboard.stats.leadsTrend') }}</div>
+        <div class="stat-trend info">
+          <span v-if="store.stats.criticalLeads > 0">🔴 {{ store.stats.criticalLeads }} {{ $t('dashboard.stats.leadsTrend') }}</span>
+          <span v-else>{{ store.stats.newLeads }} {{ $t('dashboard.stats.leadsTrend') }}</span>
+        </div>
       </div>
 
       <div class="stat-card teal">
@@ -57,7 +63,10 @@
           <div class="stat-value">{{ store.stats.newStudents }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.newStudents') }}</div>
         </div>
-        <div class="stat-trend info">{{ $t('dashboard.stats.newStudentsTrend') }}</div>
+        <div class="stat-trend info">
+          <span v-if="store.stats.studentsWithoutGroup > 0">⏳ {{ store.stats.studentsWithoutGroup }} {{ $t('dashboard.stats.newStudentsTrend') }}</span>
+          <span v-else>{{ $t('dashboard.stats.newStudentsTrend') }}</span>
+        </div>
       </div>
     </section>
 
