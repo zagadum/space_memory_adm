@@ -153,7 +153,45 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Reuse gp-* panel styles from GroupDetailPanel */
+/* PANEL & OVERLAY */
+.sp-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--glass-bg, rgba(0, 0, 0, 0.4));
+  backdrop-filter: blur(4px);
+  z-index: 450;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.sp-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gp-panel {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  bottom: 0;
+  background: var(--app-bg, #fff);
+  border-left: 1px solid var(--app-border);
+  z-index: 500;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark) .gp-panel {
+  background: var(--app-surface, #1e1e2d);
+}
+
+.gp-panel.open {
+  right: 0;
+}
+
 .gp-header {
   padding: 20px 20px 0;
   border-bottom: 1px solid var(--app-border);
