@@ -33,6 +33,9 @@
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
+            <button class="gp-btn-history" @click="historyPanelOpen = true">
+              📋 {{ t('activity.groupHistory') }}
+            </button>
             <button class="gp-btn-delete" @click="confirmDelete">{{ t('newGroups.detail.deleteGroup') }}</button>
             <div class="gp-close" @click="$emit('close')">✕</div>
           </div>
@@ -243,7 +246,15 @@
     </div>
 
     <!-- TOAST REMOVED -->
-    
+
+    <!-- GROUP HISTORY PANEL -->
+    <GroupHistoryPanel
+      v-if="historyPanelOpen"
+      :group-id="group.id"
+      :group-name="group.name"
+      @close="historyPanelOpen = false"
+    />
+
     <!-- TEACHER SELECTION SUB-PANEL -->
     <div v-if="teacherPanelOpen" :class="['asp-panel', 'open']">
       <div class="asp-header">
@@ -298,6 +309,7 @@ import { useI18n } from 'vue-i18n'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../../api/newGroupsApi'
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
+import GroupHistoryPanel from './GroupHistoryPanel.vue'
 
 const { t, locale } = useI18n()
 
@@ -336,6 +348,7 @@ const addPanelOpen = ref(false)
 const aspQuery = ref('')
 const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
+const historyPanelOpen = ref(false)
 
 const teacherPanelOpen = ref(false)
 const teacherQuery = ref('')
@@ -628,6 +641,15 @@ function doDelete() {
 }
 
 /* PANEL ACTION BTNS */
+.gp-btn-history {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s;
+  background: rgba(79,110,247,0.08); color: #4f6ef7;
+  border: 1px solid rgba(79,110,247,0.25);
+}
+.gp-btn-history:hover { background: rgba(79,110,247,0.16); border-color: rgba(79,110,247,0.5); }
+
 .gp-btn-delete {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 13px; border-radius: 8px; font-size: 12.5px; font-weight: 600;

@@ -61,6 +61,15 @@
         <span class="nav-icon">📊</span> {{ t('sidebar.dashboard') }}
       </div>
 
+      <!-- ИСТОРИЯ АКТИВНОСТИ -->
+      <div
+        class="nav-standalone"
+        :class="{ active: activeItem === 'activity-log' }"
+        @click="navigateTo('activity-log', '/activity')"
+      >
+        <span class="nav-icon">📋</span> {{ t('sidebar.activityLog') }}
+      </div>
+
       <div 
         v-if="isSectionAllowed('secretariat')"
         class="nav-section"

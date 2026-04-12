@@ -192,6 +192,13 @@ export const router = createRouter({
           component: () => import("../views/teacher/TeacherSalaryPage.vue"),
           meta: { title: 'teacherSalary.pageTitle', icon: '💰' }
         },
+        // ─── Activity Log ───
+        {
+          path: 'activity',
+          name: 'activity-log',
+          component: () => import('../views/activity/ActivityPage.vue'),
+          meta: { title: 'activity.pageTitle', icon: '📋' }
+        },
         // ─── Stub routes for new sidebar sections ───
         { path: 'my-cabinet', name: 'my-cabinet', component: () => import('../views/dashboard/DashboardIndex.vue') },
         {

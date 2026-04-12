@@ -209,6 +209,20 @@ export const INVOICES = {
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ACTIVITY LOG — Журнал активности / Аудит
+// ═══════════════════════════════════════════════════════════════════════════
+export const ACTIVITY = {
+  /** Полный журнал для страницы /activity (с пагинацией и фильтрами) */
+  LIST: 'activity',
+  /** Последние N событий для дашборда */
+  RECENT: 'activity/recent',
+  /** История конкретного ученика */
+  STUDENT: (id: number | string) => `activity/student/${id}`,
+  /** История конкретной группы */
+  GROUP: (id: number | string) => `activity/group/${id}`,
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Backwards compatible export (для существующих импортов)
 // ═══════════════════════════════════════════════════════════════════════════
 export const endpoints = {
@@ -225,6 +239,7 @@ export const endpoints = {
   SETTINGS,
   TEACHERS,
   INVOICES,
+  ACTIVITY,
 } as const;
 
 export const API_ENDPOINTS = {
