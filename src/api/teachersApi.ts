@@ -110,6 +110,7 @@ export interface TeacherGroupItem {
   schedule: string
   studentsCount: number
   school: string
+  age?: string | null
 }
 
 export interface TeacherNote {
@@ -139,6 +140,7 @@ function normalizeTeacherGroup(raw: any): TeacherGroupItem {
     schedule: String(raw?.schedule ?? raw?.description ?? ''),
     studentsCount: Number(raw?.studentsCount ?? raw?.students_count ?? raw?.count ?? 0),
     school: String(raw?.school ?? raw?.branch ?? 'Space Memory'),
+    age: raw?.age_name ?? raw?.age ?? null
   }
 }
 

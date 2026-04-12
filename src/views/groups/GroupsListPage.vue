@@ -84,7 +84,10 @@
               <span class="person-name">{{ formatWorkdays(group.workdays) }}</span>
             </td>
             <td>
-              <span class="person-name">{{ group.age || '—' }}</span>
+              <span v-if="ageMap[group.age ?? '']" :class="['age-badge', ageMap[group.age!].cls]">
+                {{ ageMap[group.age!].icon }} {{ ageMap[group.age!].label }}
+              </span>
+              <span v-else class="empty-cell">—</span>
             </td>
             <td>
               <span class="date-mono">{{ formatDate(group.lastCommentDate) }}</span>
@@ -131,6 +134,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGroupsListStore } from '../../stores/groupsList.store'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
+import { ageMap } from '../../utils/newGroupsUtils'
 
 const router = useRouter()
 const route = useRoute()
@@ -365,5 +369,12 @@ td { padding: 12px 14px; font-size: 13.5px; color: var(--app-text-main); border-
   font-size: 12px;
   color: var(--app-text-dim);
 }
+
+.age-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; font-family: 'Outfit', sans-serif; border: 1px solid rgba(255,255,255,0.08); }
+.age-junior { background: rgba(16,185,129,0.12); color: #10b981; border-color: rgba(16,185,129,0.25); }
+.age-middle { background: rgba(245,158,11,0.12); color: #f59e0b; border-color: rgba(245,158,11,0.25); }
+.age-senior { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.25); }
+.age-adult  { background: rgba(139,92,246,0.12); color: #8b5cf6; border-color: rgba(139,92,246,0.25); }
+.empty-cell { color: rgba(136,146,176,0.35); font-size: 12px; font-style: italic; }
 
 </style>
