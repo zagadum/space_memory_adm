@@ -20,8 +20,11 @@ export interface NewGroupStudent {
     age: number;
     meta?: string;
     contract: "signed" | "pending";
+    isPaid: boolean;
     paymentStr: string;
-    createdDate: string;
+    enrollDate: string;
+    registeredAt: string;
+    createdDate: string; // Legacy
     manager: string | null;
 }
 

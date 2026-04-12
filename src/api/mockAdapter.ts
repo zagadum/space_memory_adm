@@ -759,7 +759,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     for (const sid of body.studentIds) {
       const ms = mockMasterStudents.find(s => s.id === sid);
       if (ms && !existing.has(ms.name)) {
-        ngStudents[groupId].push({ id: Date.now() + Math.random(), name: ms.name, age: ms.age, contract: "pending", paymentStr: "0 zł", createdDate: today, manager: null });
+        ngStudents[groupId].push({ 
+          id: Date.now() + Math.random(), 
+          name: ms.name, 
+          age: ms.age, 
+          contract: "pending", 
+          paymentStr: "0 zł", 
+          enrollDate: today, 
+          registeredAt: today, // In mock, we can just use today or a fixed past date
+          createdDate: today, 
+          manager: null 
+        });
         added++;
       }
     }

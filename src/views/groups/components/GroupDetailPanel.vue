@@ -134,12 +134,25 @@
                   </span>
                 </td>
                 <td>
-                  <span :class="['payment-mono', s.paymentStr === '0 zł' ? 'payment-zero' : '']">{{ s.paymentStr }}</span>
+                  <span 
+                    v-if="s.paymentStr !== '0 zł'"
+                    :class="['payment-mono', s.isPaid ? 'payment-paid' : 'payment-expected']"
+                  >
+                    {{ s.paymentStr }}
+                    <template v-if="s.isPaid"> · {{ t('newStudents.table.paid') }}</template>
+                    <template v-else> · {{ t('newStudents.table.pending') }}</template>
+                  </span>
+                  <span v-else class="payment-mono payment-zero">{{ s.paymentStr }}</span>
                 </td>
-                <td><span class="date-mono">{{ fmtDate(s.createdDate) }}</span></td>
                 <td>
                   <div class="timer-cell">
-                    <span :class="['timer-days', timerCls(daysDiff(s.createdDate))]">{{ daysDiff(s.createdDate) }}</span>
+                    <span :class="['timer-days', timerCls(daysDiff(s.enrollDate || s.createdDate))]">{{ daysDiff(s.enrollDate || s.createdDate) }}</span>
+                    <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="timer-cell">
+                    <span :class="['timer-days', timerCls(daysDiff(s.registeredAt || s.createdDate))]">{{ daysDiff(s.registeredAt || s.createdDate) }}</span>
                     <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
                   </div>
                 </td>
@@ -547,8 +560,10 @@ function doDelete() {
 .contract-signed  { background: rgba(16,185,129,0.13); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
 .contract-pending { background: rgba(245,158,11,0.12);  color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
 
-.payment-mono { font-family: 'Space Mono', monospace; font-size: 12.5px; font-weight: 700; color: var(--green); }
-.payment-zero { color: var(--dim); }
+.payment-mono { font-family: 'Space Mono', monospace; font-size: 12.5px; font-weight: 700; color: var(--app-text-main); }
+.payment-paid { color: #10b981 !important; }
+.payment-expected { color: #f59e0b !important; }
+.payment-zero { color: var(--dim); font-style: italic; opacity: 0.6; }
 
 .date-mono { font-family: 'Space Mono', monospace; font-size: 12px; }
 .timer-cell { display: flex; flex-direction: column; align-items: flex-start; }
