@@ -1673,6 +1673,8 @@
     },
     "createBtn": "✦ Створити нову групу",
     "days": "днів",
+    "daysPassed": "минуло {n} дн.",
+    "daysLeft": "залишилось {n} дн.",
     "detail": {
       "addSelected": "✅ Додати вибраних",
       "addStudents": "➕ Додати учнів",
@@ -1760,8 +1762,15 @@
       "whatHappens": "Що станеться при запуску"
     },
     "startBtn": "🚀 Старт",
+    "status": {
+      "recruiting": "Набір",
+      "ready": "Готова до старту",
+      "overfilled": "Перебір / Оптимізація",
+      "unpaidToRemove": "{n} ос. не оплатили",
+      "allPaid": "Всі оплатили"
+    },
     "table": {
-      "age": "Вік",
+      "typeAge": "Тип / Вік",
       "count": "К-сть",
       "createdDate": "Дата створення",
       "name": "Назва групи",

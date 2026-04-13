@@ -1640,6 +1640,8 @@
     },
     "createBtn": "✦ Utwórz nową grupę",
     "days": "dni",
+    "daysPassed": "minęło {n} dni",
+    "daysLeft": "zostało {n} dni",
     "detail": {
       "addSelected": "✅ Dodaj wybranych",
       "addStudents": "➕ Dodaj uczniów",
@@ -1727,8 +1729,15 @@
       "whatHappens": "Co się stanie po uruchomieniu"
     },
     "startBtn": "🚀 Start",
+    "status": {
+      "recruiting": "Rekrutacja",
+      "ready": "Gotowa do startu",
+      "overfilled": "Nadmiar / Optymalizacja",
+      "unpaidToRemove": "{n} os. nie zapłaciło",
+      "allPaid": "Wszystko opłacone"
+    },
     "table": {
-      "age": "Wiek",
+      "typeAge": "Typ / Wiek",
       "count": "Ilość",
       "createdDate": "Data utworzenia",
       "name": "Nazwa grupy",

@@ -213,8 +213,15 @@
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
           <span class="nav-badge red" v-if="newStudentsStore.totalCount > 0">{{ newStudentsStore.totalCount }}</span>
         </div>
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/space/new-groups')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+          <span class="nav-badge blue" v-if="newGroupsStore.totalCount > 0">{{ newGroupsStore.totalCount }}</span>
+        </div>
         <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads' }, accessClass('leads')]" @click="navigateTo('leads', '/recruitment/space/leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db' }, accessClass('import-db')]" @click="navigateTo('import-db', '/recruitment/space/import-db')">
+          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
         <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail' }, accessClass('target-mail')]" @click="navigateTo('target-mail', '/recruitment/space/target-mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
@@ -223,15 +230,8 @@
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
           <span class="nav-badge" v-if="expelledStudentsStore.pagination.total > 0">{{ expelledStudentsStore.pagination.total }}</span>
         </div>
-        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/space/new-groups')">
-          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
-          <span class="nav-badge blue" v-if="newGroupsStore.totalCount > 0">{{ newGroupsStore.totalCount }}</span>
-        </div>
         <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived' }, accessClass('archived')]" @click="navigateTo('archived', '/recruitment/space/archived-students')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
-        </div>
-        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db' }, accessClass('import-db')]" @click="navigateTo('import-db', '/recruitment/space/import-db')">
-          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
       </div>
 
@@ -251,8 +251,15 @@
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
           <span class="nav-badge red" v-if="newStudentsStore.totalCount > 0">{{ newStudentsStore.totalCount }}</span>
         </div>
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups-indigo' }, accessClass('new-groups')]" @click="navigateTo('new-groups-indigo', '/recruitment/indigo/new-groups', 'new-groups')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+          <span class="nav-badge blue" v-if="newGroupsStore.totalCount > 0">{{ newGroupsStore.totalCount }}</span>
+        </div>
         <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads-indigo' }, accessClass('leads')]" @click="navigateTo('leads-indigo', '/recruitment/indigo/leads', 'leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db-indigo' }, accessClass('import-db')]" @click="navigateTo('import-db-indigo', '/recruitment/indigo/import-db', 'import-db')">
+          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
         <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail-indigo' }, accessClass('target-mail')]" @click="navigateTo('target-mail-indigo', '/recruitment/indigo/target-mail', 'target-mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
@@ -261,15 +268,8 @@
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
           <span class="nav-badge" v-if="expelledStudentsStore.pagination.total > 0">{{ expelledStudentsStore.pagination.total }}</span>
         </div>
-        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups-indigo' }, accessClass('new-groups')]" @click="navigateTo('new-groups-indigo', '/recruitment/indigo/new-groups', 'new-groups')">
-          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
-          <span class="nav-badge blue" v-if="newGroupsStore.totalCount > 0">{{ newGroupsStore.totalCount }}</span>
-        </div>
         <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived-indigo' }, accessClass('archived')]" @click="navigateTo('archived-indigo', '/recruitment/indigo/archived-students', 'archived')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
-        </div>
-        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db-indigo' }, accessClass('import-db')]" @click="navigateTo('import-db-indigo', '/recruitment/indigo/import-db', 'import-db')">
-          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
       </div>
 

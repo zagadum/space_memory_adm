@@ -1687,6 +1687,8 @@
     },
     "createBtn": "✦ Create New Group",
     "days": "days",
+    "daysPassed": "{n} days ago",
+    "daysLeft": "{n} days left",
     "detail": {
       "addSelected": "✅ Add selected",
       "addStudents": "➕ Add students",
@@ -1773,8 +1775,15 @@
       "whatHappens": "What happens on launch"
     },
     "startBtn": "🚀 Start",
+    "status": {
+      "recruiting": "Recruiting",
+      "ready": "Ready to Start",
+      "overfilled": "Overfilled / Optimizing",
+      "unpaidToRemove": "{n} persons unpaid",
+      "allPaid": "All paid"
+    },
     "table": {
-      "age": "Age",
+      "typeAge": "Type / Age",
       "count": "Count",
       "createdDate": "Created Date",
       "name": "Group Name",
