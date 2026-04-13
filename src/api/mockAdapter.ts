@@ -1,6 +1,6 @@
 import type { AxiosAdapter, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import { mockNewGroups, mockGroupStudents, mockMasterStudents, mockTeachers, mockManagers } from "./mockNewGroupsDb";
-import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes, StudentProfile, Program, MonthStatus, PayStatus, KsefStatus, MOCK_INVOICES, MOCK_DEBTORS, MOCK_KONTRAHENCI } from "./mockDb";
+import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes, StudentProfile, Program, MonthStatus, PayStatus, KsefStatus, MOCK_INVOICES, MOCK_DEBTORS, MOCK_KONTRAHENCI, MOCK_REFUNDS } from "./mockDb";
 import { MENU_ROUTE_KEY_MAP, MENU_SECTION_ITEMS } from "../config/menuAccess.config";
 import { ROLE_MENU_ACCESS, normalizeRole, type AppRole } from "../config/roleMenuAccess.config";
 
@@ -754,9 +754,10 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { ok: true });
   }
 
-  if (method === "post" && (url.match(/^groups\/new-groups\/\d+\/students$/) || url.match(/^new-groups\/\d+\/students$/))) {
-    const groupId = Number(url.split('/')[1]);
+  if (method === "post" && (url === "groups/add-student" || url.match(/^groups\/new-groups\/\d+\/students$/) || url.match(/^new-groups\/\d+\/students$/))) {
     const body = readBody(config);
+    // Support both body.groupId and URL-embedded groupId
+    const groupId = Number(body?.groupId ?? url.split('/').find((_p, i, arr) => /^\d+$/.test(arr[i]) && i > 0));
     if (!groupId || !body?.studentIds) return err(config, 400, "groupId/studentIds required");
     const today = new Date().toISOString().slice(0, 10);
     if (!ngStudents[groupId]) ngStudents[groupId] = [];
@@ -765,22 +766,26 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     for (const sid of body.studentIds) {
       const ms = mockMasterStudents.find(s => s.id === sid);
       if (ms && !existing.has(ms.name)) {
-        ngStudents[groupId].push({ 
-          id: Date.now() + Math.random(), 
-          name: ms.name, 
-          age: ms.age, 
+        ngStudents[groupId].push({
+          id: Date.now() + Math.random(),
+          name: ms.name,
+          age: ms.age,
           phone: ms.phone,
           email: ms.email,
-          contract: "pending", 
-          paymentStr: "0 zł", 
-          enrollDate: today, 
-          registeredAt: today, // In mock, we can just use today or a fixed past date
-          createdDate: today, 
-          manager: null 
+          contract: "pending",
+          isPaid: false,
+          paymentStr: "0 zł",
+          enrollDate: today,
+          registeredAt: today,
+          createdDate: today,
+          manager: null,
         });
         added++;
       }
     }
+    // Sync studentsCount on the group object
+    const ngIdx = ng.findIndex((x: any) => x.id === groupId);
+    if (ngIdx !== -1) ng[ngIdx].studentsCount = (ngStudents[groupId] ?? []).length;
     return ok(config, { ok: true, added });
   }
 
@@ -790,7 +795,54 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     if (ngStudents[body.groupId]) {
       ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
     }
+    const ngIdx = ng.findIndex((x: any) => x.id === body.groupId);
+    if (ngIdx !== -1) {
+      ng[ngIdx].studentsCount = (ngStudents[body.groupId] ?? []).length;
+      ng[ngIdx].paid = (ngStudents[body.groupId] ?? []).filter((s: any) => s.isPaid === true).length;
+    }
     return ok(config, { ok: true });
+  }
+
+  if (method === "post" && (url === "groups/archive-student" || url === "new-groups/archive-student")) {
+    const body = readBody(config);
+    if (!body?.groupId || !body?.studentId) return err(config, 400, "groupId/studentId required");
+    if (ngStudents[body.groupId]) {
+      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
+    }
+    const ngIdx = ng.findIndex((x: any) => x.id === body.groupId);
+    if (ngIdx !== -1) {
+      ng[ngIdx].studentsCount = (ngStudents[body.groupId] ?? []).length;
+      ng[ngIdx].paid = (ngStudents[body.groupId] ?? []).filter((s: any) => s.isPaid === true).length;
+    }
+    return ok(config, { ok: true });
+  }
+
+  if (method === "post" && (url === "groups/transfer-student" || url === "new-groups/transfer-student")) {
+    const body = readBody(config);
+    if (!body?.groupId || !body?.studentId) return err(config, 400, "groupId/studentId required");
+    if (ngStudents[body.groupId]) {
+      ngStudents[body.groupId] = ngStudents[body.groupId].filter((s: any) => s.id !== body.studentId);
+    }
+    const ngIdx = ng.findIndex((x: any) => x.id === body.groupId);
+    if (ngIdx !== -1) {
+      ng[ngIdx].studentsCount = (ngStudents[body.groupId] ?? []).length;
+      ng[ngIdx].paid = (ngStudents[body.groupId] ?? []).filter((s: any) => s.isPaid === true).length;
+    }
+    return ok(config, { ok: true });
+  }
+
+  if (method === "post" && (url === "groups/email-student" || url === "new-groups/email-student")) {
+    return ok(config, { ok: true });
+  }
+
+  if (method === "post" && (url === "groups/update-status" || url === "new-groups/update-status")) {
+    const body = readBody(config);
+    if (!body?.group_id || !body?.status_group) return err(config, 400, "group_id/status_group required");
+    const ngIdx = ng.findIndex((x: any) => x.id === body.group_id);
+    if (ngIdx === -1) return err(config, 404, "Group not found");
+    const oldStatus = ng[ngIdx].status_group ?? 'new';
+    ng[ngIdx].status_group = body.status_group;
+    return ok(config, { success: true, data: { group_id: body.group_id, old_status: oldStatus, new_status: body.status_group } });
   }
 
   if (method === "post" && (url === "groups/edit-groups" || url === "edit-groups")) {
@@ -825,8 +877,8 @@ export const mockAdapter: AxiosAdapter = async (config) => {
         students: ngStudents[g.id] ?? [],
         counters: { 
           students_count: (ngStudents[g.id] ?? []).length, 
-          paid_count: (ngStudents[g.id] ?? []).filter(s => s.contract === 'signed').length,
-          contract_signed_count: (ngStudents[g.id] ?? []).filter(s => s.contract === 'signed').length,
+          paid_count: (ngStudents[g.id] ?? []).filter((s: any) => s.isPaid === true).length,
+          contract_signed_count: (ngStudents[g.id] ?? []).filter((s: any) => s.contract === 'signed').length,
           age_name: g.age
         }
       }

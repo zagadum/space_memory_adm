@@ -105,7 +105,7 @@
               </td>
               <td>
                 <div v-if="g.studentsCount > 0" class="start-action-cell">
-                  <button :class="['btn-start', { 'btn-start-ready': g.paid >= 5 && g.paid <= 10 }]" @click.stop="openStartModal(g)">
+                  <button :class="['btn-start', { 'btn-start-ready': isReadyToStart(g) }]" @click.stop="openStartModal(g)">
                     {{ t('newGroups.startBtn') }}
                   </button>
                   <div v-if="g.studentsCount > g.paid" class="unpaid-reminder">
@@ -250,14 +250,26 @@ const transferPickerStudentName = computed(() => {
 
 // ── Status Helpers ──
 
-// Progress % для полосы (на базе минимального порога 5 чел)
+function isIndividual(g: NewGroup) {
+  return (g.type_group ?? g.type) === 'individual'
+}
+
+// Группа готова к запуску: инд. — минимум 1 оплата, группа — от 5 до 10
+function isReadyToStart(g: NewGroup) {
+  if (isIndividual(g)) return g.paid >= 1
+  return g.paid >= 5 && g.paid <= 10
+}
+
+// Progress % для полосы (база — порог минимума: 1 для инд., 5 для группы)
 function pct(g: NewGroup) {
+  if (isIndividual(g)) return g.paid >= 1 ? 100 : 0
   if (g.paid >= 5) return 100
   return Math.round(g.paid / 5 * 100)
 }
 
 // Цвет текста для оплат
 function ratioColor(g: NewGroup) {
+  if (isIndividual(g)) return g.paid >= 1 ? 'var(--green)' : 'var(--red)'
   if (g.paid < 5)   return 'var(--red)'
   if (g.paid <= 10) return 'var(--green)'
   return 'var(--blue)'
@@ -265,6 +277,7 @@ function ratioColor(g: NewGroup) {
 
 // Статус готовности (текст)
 function readinessLabel(g: NewGroup) {
+  if (isIndividual(g)) return g.paid >= 1 ? t('newGroups.status.ready') : t('newGroups.status.recruiting')
   if (g.paid < 5)   return t('newGroups.status.recruiting')
   if (g.paid <= 10) return t('newGroups.status.ready')
   return t('newGroups.status.overfilled')
@@ -272,13 +285,10 @@ function readinessLabel(g: NewGroup) {
 
 // Цвет бейджа статуса
 function readinessCls(g: NewGroup) {
+  if (isIndividual(g)) return g.paid >= 1 ? 'status-ready' : 'status-recruiting'
   if (g.paid < 5)   return 'status-recruiting'
   if (g.paid <= 10) return 'status-ready'
   return 'status-overfilled'
-}
-
-function timerCls(days: number) {
-  return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
 
 function updateGroupCounters(groupId: number, studentList: NewGroupStudent[]) {
@@ -286,7 +296,7 @@ function updateGroupCounters(groupId: number, studentList: NewGroupStudent[]) {
   if (!group) return
 
   const count = studentList.length
-  const paid = studentList.filter(s => s.contract === 'signed').length
+  const paid = studentList.filter(s => s.isPaid === true).length
 
   group.studentsCount = count
   group.paid = paid

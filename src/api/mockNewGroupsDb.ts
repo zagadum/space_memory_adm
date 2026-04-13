@@ -33,14 +33,14 @@ export const mockMasterStudents = [
 ];
 
 export const mockNewGroups = [
-    { id: 1, name: "Пн 18 старшая ЕЛа", type: "group", startDate: "2026-03-02", totalSlots: 10, paid: 8, createdDate: "2026-02-05", manager: mockManagers[0], teacher: mockTeachers[0], day: "Понедельник", time: "18:00", age: "senior", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
-    { id: 2, name: "Вт 16 младшая АНв", type: "group", startDate: "2026-03-10", totalSlots: 8, paid: 4, createdDate: "2026-02-10", manager: mockManagers[1], teacher: mockTeachers[1], day: "Вторник", time: "16:00", age: "junior", students: [1, 2, 3, 4, 5, 6, 7, 8] },
+    { id: 1, name: "Пн 18 старшая ЕЛа", type: "group", startDate: "2026-03-02", totalSlots: 10, paid: 4, createdDate: "2026-02-05", manager: mockManagers[0], teacher: mockTeachers[0], day: "Понедельник", time: "18:00", age: "senior", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+    { id: 2, name: "Вт 16 младшая АНв", type: "group", startDate: "2026-03-10", totalSlots: 8, paid: 2, createdDate: "2026-02-10", manager: mockManagers[1], teacher: mockTeachers[1], day: "Вторник", time: "16:00", age: "junior", students: [1, 2, 3, 4, 5, 6, 7, 8] },
     { id: 3, name: "Ср 10 инд МВой", type: "individual", startDate: "2026-02-24", totalSlots: 1, paid: 1, createdDate: "2026-02-01", manager: null, teacher: mockTeachers[2], day: "Среда", time: "10:00", age: "adult", students: [1] },
-    { id: 4, name: "Чт 19 средняя ПЗел", type: "group", startDate: "2026-03-17", totalSlots: 12, paid: 6, createdDate: "2026-02-12", manager: mockManagers[0], teacher: mockTeachers[3], day: "Четверг", time: "19:00", age: "middle", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+    { id: 4, name: "Чт 19 средняя ПЗел", type: "group", startDate: "2026-03-17", totalSlots: 12, paid: 2, createdDate: "2026-02-12", manager: mockManagers[0], teacher: mockTeachers[3], day: "Четверг", time: "19:00", age: "middle", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
     { id: 5, name: "Сб 11 младшая СКов", type: "group", startDate: "2026-03-02", totalSlots: 10, paid: 10, createdDate: "2026-02-03", manager: mockManagers[1], teacher: mockTeachers[4], day: "Суббота", time: "11:00", age: "junior", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
     { id: 6, name: "Пт 14 инд АВиш", type: "individual", startDate: "2026-02-26", totalSlots: 0, paid: 0, createdDate: "2026-02-15", manager: null, teacher: mockTeachers[5], day: "Пятница", time: "14:00", age: "senior", students: [] },
     { id: 7, name: "Пн 16 взрослая ЕЛа", type: "group", startDate: "2026-03-24", totalSlots: 8, paid: 3, createdDate: "2026-02-17", manager: mockManagers[2], teacher: mockTeachers[0], day: "Понедельник", time: "16:00", age: "adult", students: [1, 2, 3, 4, 5, 6, 7, 8] },
-    { id: 8, name: "Ср 17 средняя МВой", type: "group", startDate: "2026-03-31", totalSlots: 10, paid: 7, createdDate: "2026-02-14", manager: null, teacher: mockTeachers[2], day: "Среда", time: "17:00", age: "middle", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+    { id: 8, name: "Ср 17 средняя МВой", type: "group", startDate: "2026-03-31", totalSlots: 10, paid: 5, createdDate: "2026-02-14", manager: null, teacher: mockTeachers[2], day: "Среда", time: "17:00", age: "middle", students: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
     { id: 9, name: "Чт 15 младшая (НЕТ УЧИТЕЛЯ)", type: "group", startDate: "2026-04-05", totalSlots: 10, paid: 0, createdDate: "2026-03-10", manager: mockManagers[0], teacher: null, day: "Четверг", time: "15:00", age: "junior", students: [] },
     { id: 10, name: "Пн 10 инд (НЕТ УЧИТЕЛЯ)", type: "individual", startDate: "2026-04-01", totalSlots: 1, paid: 0, createdDate: "2026-03-12", manager: null, teacher: null, day: "Понедельник", time: "10:00", age: "adult", students: [] },
 ];

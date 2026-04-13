@@ -279,7 +279,7 @@
         >
           <div class="asp-avatar" style="background:var(--red);opacity:0.8">✕</div>
           <div class="asp-info">
-            <div class="asp-name" style="color:var(--red)">Убрать преподавателя</div>
+            <div class="asp-name" style="color:var(--red)">{{ t('newGroups.detail.removeTeacher') }}</div>
           </div>
         </div>
 
@@ -362,7 +362,7 @@ const actualTotal = computed(() => {
 })
 const actualPaid = computed(() =>
   props.students.length > 0
-    ? props.students.filter(s => s.contract === 'signed').length
+    ? props.students.filter(s => s.isPaid === true).length
     : props.group.paid
 )
 const pct = computed(() =>
