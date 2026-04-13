@@ -164,7 +164,10 @@ export const NEW_GROUPS = {
 // ═══════════════════════════════════════════════════════════════════════════
 export const SALARY = {
   TEACHER: (teacherId: number | string) => `salary/teacher/${teacherId}`,
+  RECALCULATE: (teacherId: number | string) => `salary/teacher/${teacherId}/recalculate`,
+  HISTORY: (salaryId: string | number) => `salary/${salaryId}/history`,
   CONFIRM: (salaryId: string | number) => `salary/${salaryId}/confirm`,
+  PAID: (salaryId: string | number) => `salary/${salaryId}/paid`,
   DISPUTE: (salaryId: string | number) => `salary/${salaryId}/dispute`,
 } as const;
 

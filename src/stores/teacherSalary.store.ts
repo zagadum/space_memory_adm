@@ -3,9 +3,40 @@ import { salaryApi } from '../api/salaryApi';
 import { parseApiError } from '../api/errorHelper';
 import { useAuthStore } from './auth.store';
 
-const DEFAULT_TEACHER_ID = 1;
-const DEFAULT_PROJECT_ID = 1;
 type ExcelFormat = 'xlsx' | 'xls';
+
+const SECTION_EXPORT_KEY_MAP: Record<string, string> = {
+    subscriptions: 'subscriptions',
+    substitutions: 'substitutions',
+    methodology_meetings: 'methodical',
+    individual_lessons: 'individual',
+    olympiad_lessons: 'olympiad',
+    admin_duty: 'admin3pct',
+    trial_lessons: 'trialLessons',
+    retention_bonus: 'retentionBonus',
+    rekompensata: 'bonuses',
+    dojazd: 'bonuses',
+    kara_umowna: 'Штрафы',
+};
+
+interface SalarySectionDto {
+    id: number;
+    key: string;
+    title: string;
+    amount: number;
+    sign: 'add' | 'subtract';
+    sortOrder: number;
+    isVisible: boolean;
+    meta: Record<string, unknown>;
+}
+
+export interface SalaryHistoryItemDto {
+    id: number;
+    action: string;
+    actorRole?: string | null;
+    comment: string | null;
+    createdAt: string | null;
+}
 
 export interface Child {
     name: string;
@@ -35,6 +66,12 @@ export interface SalaryData {
     trainerName: string;
     status: 'draft' | 'confirmed' | 'paid' | 'disputed';
     confirmedAt: string | null;
+    paidAt?: string | null;
+    calculatedAt?: string | null;
+    total: number;
+    sections?: SalarySectionDto[];
+    subscriptionItems?: Array<Record<string, unknown>>;
+    confirmations?: SalaryHistoryItemDto[];
 
     subscriptions: {
         amount: number;
@@ -150,51 +187,40 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
         activeSections: (state) => {
             if (!state.salaryData) return [];
             const d = state.salaryData;
-            const sections = [];
-            if (d.subscriptions.amount > 0) sections.push({ label: 'teacherSalary.sections.subscriptions', amount: d.subscriptions.amount, type: 'subscription', subtext: `${d.subscriptions.childrenCount} kids · ${d.subscriptions.rate}%` });
-            if (d.substitutions.amount > 0) sections.push({ label: 'teacherSalary.sections.substitutions', amount: d.substitutions.amount, type: 'replacement', subtext: `${d.substitutions.rows.length} replacements` });
-            if (d.methodical.amount > 0) sections.push({ label: 'teacherSalary.sections.methodical', amount: d.methodical.amount, type: 'meetings', subtext: `${d.methodical.rows.filter(r => r.present).length} attended` });
-            if (d.individual.amount > 0) sections.push({ label: 'teacherSalary.sections.individual', amount: d.individual.amount, type: 'individual', subtext: `${d.individual.rows.length} pupils` });
-            if (d.olympiad.amount > 0) sections.push({ label: 'teacherSalary.sections.olympiad', amount: d.olympiad.amount, type: 'olympiad', subtext: `${d.olympiad.rows.length} lessons` });
-            if (d.admin3pct.amount > 0) sections.push({ label: 'teacherSalary.sections.admin3pct', amount: d.admin3pct.amount, type: 'admin', subtext: `QA Score: ${d.admin3pct.pct}%` });
-            if (d.bonuses.amount > 0) sections.push({ label: 'teacherSalary.sections.bonuses', amount: d.bonuses.amount, type: 'bonus', subtext: `${d.bonuses.rows.length} positions` });
+            const keyMap: Record<string, { label: string; type: string; subtext?: string }> = {
+                subscriptions: { label: 'teacherSalary.sections.subscriptions', type: 'subscription', subtext: `${d.subscriptions.childrenCount} kids · ${d.subscriptions.rate}%` },
+                substitutions: { label: 'teacherSalary.sections.substitutions', type: 'replacement', subtext: `${d.substitutions.rows.length} replacements` },
+                methodology_meetings: { label: 'teacherSalary.sections.methodical', type: 'meetings', subtext: `${d.methodical.rows.filter(r => r.present).length} attended` },
+                individual_lessons: { label: 'teacherSalary.sections.individual', type: 'individual', subtext: `${d.individual.rows.length} pupils` },
+                olympiad_lessons: { label: 'teacherSalary.sections.olympiad', type: 'olympiad', subtext: `${d.olympiad.rows.length} lessons` },
+                admin_duty: { label: 'teacherSalary.sections.admin3pct', type: 'admin', subtext: `QA Score: ${d.admin3pct.pct}%` },
+                trial_lessons: { label: 'teacherSalary.sections.trialLessons', type: 'trial', subtext: `${d.trialLessons.rows.filter(r => r.paid).length} qualified` },
+                retention_bonus: { label: 'teacherSalary.sections.retentionBonus', type: 'bonus', subtext: '0 rezygnacji (+1%)' },
+                rekompensata: { label: 'teacherSalary.sections.bonuses', type: 'bonus', subtext: `${d.bonuses.rows.length} positions` },
+                dojazd: { label: 'teacherSalary.sections.bonuses', type: 'bonus', subtext: `${d.bonuses.rows.length} positions` },
+                kara_umowna: { label: 'Штрафы', type: 'rezygnacje', subtext: 'Penalty' },
+            };
 
-            const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
-                const conversion = row.won / row.attended;
-                return sum + (conversion >= 0.51 ? 35 : 0);
-            }, 0);
-            if (trialAmount > 0) {
-                sections.push({ label: 'teacherSalary.sections.trialLessons', amount: trialAmount, type: 'trial', subtext: `${d.trialLessons.rows.filter(r => (r.won / r.attended) >= 0.51).length} qualified` });
+            if (Array.isArray(d.sections) && d.sections.length > 0) {
+                return d.sections
+                    .filter(section => section.isVisible)
+                    .map(section => {
+                        const mapped = keyMap[section.key] ?? { label: 'teacherSalary.pageTitle', type: 'bonus', subtext: section.title };
+                        return {
+                            label: mapped.label,
+                            amount: section.sign === 'subtract' ? -section.amount : section.amount,
+                            type: mapped.type,
+                            subtext: mapped.subtext ?? section.title,
+                        };
+                    });
             }
 
-            if (d.rezygnacje.length === 0) {
-                const bonus = d.subscriptions.base * 0.01;
-                sections.push({ label: 'teacherSalary.sections.retentionBonus', amount: bonus, type: 'bonus', subtext: '0 rezygnacji (+1%)' });
-            }
-
-            return sections;
+            return [];
         },
 
         totalPayout: (state) => {
             if (!state.salaryData) return 0;
-            const d = state.salaryData;
-
-            const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
-                const conversion = row.won / row.attended;
-                return sum + (conversion >= 0.51 ? 35 : 0);
-            }, 0);
-
-            const retentionBonus = d.rezygnacje.length === 0 ? d.subscriptions.base * 0.01 : 0;
-
-            return d.subscriptions.amount +
-                d.substitutions.amount +
-                d.methodical.amount +
-                d.individual.amount +
-                d.olympiad.amount +
-                d.admin3pct.amount +
-                d.bonuses.amount +
-                trialAmount +
-                retentionBonus;
+            return state.salaryData.total;
         }
     },
 
@@ -208,11 +234,9 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             this.isLoading = true;
             this.error = null;
             try {
-                const data = await salaryApi.getTeacherSalary(teacherId, month, projectId);
-                this.salaryData = data;
+                this.salaryData = await salaryApi.getTeacherSalary(teacherId, month, projectId);
             } catch (err: unknown) {
-                const msg = parseApiError(err, 'Ошибка загрузки зарплаты');
-                this.error = msg;
+                this.error = parseApiError(err, 'Ошибка загрузки зарплаты');
                 const errObj = err as any;
                 // 404 — расчёт ещё не создан за этот месяц
                 if (errObj?.response?.status === 404) {
@@ -269,7 +293,7 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await salaryApi.disputeSalary(
+                await salaryApi.disputeSalary(
                     this.salaryData.id,
                     teacherId,
                     reason
@@ -301,14 +325,11 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
             const d = this.salaryData;
 
             const activeSections = [
-                { id: 'subscriptions', amount: d.subscriptions.amount },
-                { id: 'substitutions', amount: d.substitutions.amount },
-                { id: 'methodical', amount: d.methodical.amount },
-                { id: 'individual', amount: d.individual.amount },
-                { id: 'olympiad', amount: d.olympiad.amount },
-                { id: 'bonuses', amount: d.bonuses.amount },
-                { id: 'admin3pct', amount: d.admin3pct.amount }
-            ].filter(s => s.amount > 0);
+                ...(d.sections ?? []).filter(section => section.isVisible).map(section => ({
+                    id: SECTION_EXPORT_KEY_MAP[section.key] ?? section.key,
+                    amount: section.sign === 'subtract' ? -section.amount : section.amount,
+                }))
+            ];
 
             activeSections.forEach(sec => {
                 rows.push({
@@ -319,29 +340,6 @@ export const useTeacherSalaryStore = defineStore('teacherSalary', {
                 });
             });
 
-            if (d.rezygnacje.length === 0) {
-                const bonus = d.subscriptions.base * 0.01;
-                rows.push({
-                    category: t('teacherSalary.sections.retentionBonus') || 'Bonus (Retention)',
-                    description: '0 rezygnacji (+1%)',
-                    rateQty: '+1%',
-                    amount: bonus
-                });
-            }
-
-            const trialAmount = d.trialLessons.rows.reduce((sum, row) => {
-                const conversion = row.won / row.attended;
-                return sum + (conversion >= 0.51 ? 35 : 0);
-            }, 0);
-
-            if (trialAmount > 0) {
-                rows.push({
-                    category: t('teacherSalary.sections.trialLessons'),
-                    description: '',
-                    rateQty: '-',
-                    amount: trialAmount
-                });
-            }
 
             const dateStr = new Date().toISOString().split('T')[0];
             const fileName = `Salary_Export_${d.trainerName}_${d.month}_${dateStr}`;

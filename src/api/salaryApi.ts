@@ -1,5 +1,19 @@
 import { http } from "./http";
+import { SALARY } from "./endpoints";
 import type { SalaryData } from "../stores/teacherSalary.store";
+
+export interface SalaryHistoryItem {
+  id: number;
+  salaryCalculationId?: number;
+  projectId?: number;
+  teacherId?: number | null;
+  actorId?: number | null;
+  actorRole?: string | null;
+  action: string;
+  comment: string | null;
+  payload?: Record<string, unknown>;
+  createdAt: string | null;
+}
 
 export const salaryApi = {
   /**
@@ -11,9 +25,21 @@ export const salaryApi = {
     month: string,
     projectId = 1
   ): Promise<SalaryData> {
-    const { data } = await http.get<SalaryData>(`salary/teacher/${teacherId}`, {
+    const { data } = await http.get<SalaryData>(SALARY.TEACHER(teacherId), {
       params: { month, project_id: projectId },
     });
+    return data;
+  },
+
+  async recalculateSalary(
+    teacherId: number | string,
+    month: string,
+    projectId = 1
+  ): Promise<SalaryData> {
+    const { data } = await http.post<SalaryData>(
+      SALARY.RECALCULATE(teacherId),
+      { month, project_id: projectId }
+    );
     return data;
   },
 
@@ -26,8 +52,21 @@ export const salaryApi = {
     projectId = 1
   ): Promise<{ id: number; status: string; confirmedAt: string | null }> {
     const { data } = await http.post<{ id: number; status: string; confirmedAt: string | null }>(
-      `salary/${salaryId}/confirm`,
+      SALARY.CONFIRM(salaryId),
       { project_id: projectId }
+    );
+    return data;
+  },
+
+  async markSalaryPaid(
+    salaryId: string | number,
+    actorId?: number,
+    projectId = 1,
+    comment?: string
+  ): Promise<{ id: number; status: string; paidAt: string | null }> {
+    const { data } = await http.post<{ id: number; status: string; paidAt: string | null }>(
+      SALARY.PAID(salaryId),
+      { project_id: projectId, actor_id: actorId, comment }
     );
     return data;
   },
@@ -44,8 +83,19 @@ export const salaryApi = {
     projectId = 1
   ): Promise<{ id: number; salary_calculation_id: number; status: string }> {
     const { data } = await http.post<{ id: number; salary_calculation_id: number; status: string }>(
-      `salary/${salaryId}/dispute`,
+      SALARY.DISPUTE(salaryId),
       { project_id: projectId, teacher_id: teacherId, reason }
+    );
+    return data;
+  },
+
+  async getSalaryHistory(
+    salaryId: string | number,
+    projectId = 1
+  ): Promise<{ data: SalaryHistoryItem[] }> {
+    const { data } = await http.get<{ data: SalaryHistoryItem[] }>(
+      SALARY.HISTORY(salaryId),
+      { params: { project_id: projectId } }
     );
     return data;
   },

@@ -17,6 +17,9 @@ const openSections = ref<Record<string, boolean>>({
   s5: false,
   s6: true,
   s7: true,
+  s8: false,
+  s9: false,
+  s10: false,
 })
 
 const openGroups = ref<Record<string, boolean>>({})
@@ -27,6 +30,28 @@ const canSendDispute = computed(() => {
   return disputeReason.value.trim().length > 0 && !store.isLoading
 })
 
+const historyActionLabels: Record<string, string> = {
+  teacher_confirmed: 'Teacher confirmed',
+  accountant_confirmed: 'Accountant confirmed',
+  admin_confirmed: 'Admin confirmed',
+  disputed: 'Disputed',
+  dispute_resolved: 'Dispute resolved',
+  recalculated: 'Recalculated',
+  manual_section_added: 'Manual section added',
+  paid: 'Paid',
+}
+
+function formatHistoryAction(action: string) {
+  return historyActionLabels[action] || action
+}
+
+function getHistoryChipClass(action: string) {
+  if (action === 'paid') return 'chip-green'
+  if (action === 'disputed') return 'chip-amber'
+  if (action.includes('confirmed')) return 'chip-blue'
+  return 'chip'
+}
+
 function toggleSection(id: string) {
   openSections.value[id] = !openSections.value[id]
 }
@@ -35,9 +60,13 @@ function toggleGroup(id: string) {
   openGroups.value[id] = !openGroups.value[id]
 }
 
-function collapseAllGroups() {
-  openGroups.value = {}
-}
+const totalTrialAttended = computed(() =>
+  (store.rawSalary?.trialLessons?.rows ?? []).reduce((sum: number, row: any) => sum + Number(row.attended || 0), 0)
+)
+
+const totalTrialWon = computed(() =>
+  (store.rawSalary?.trialLessons?.rows ?? []).reduce((sum: number, row: any) => sum + Number(row.won || 0), 0)
+)
 
 const formatCurrency = (val: number) => {
   return new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(val)
@@ -166,6 +195,15 @@ async function submitDispute() {
           >
             🔄 {{ t('common.retry') }}
           </button>
+          <button
+            v-if="store.selectedTeacherId"
+            class="btn btn-ghost"
+            style="margin-top: auto;"
+            :disabled="store.isLoading"
+            @click="store.createCalculation()"
+          >
+            ⚡ {{ store.hasCalculation ? 'Przelicz ponownie' : t('salaryCalc.labels.createCalculation') }}
+          </button>
         </div>
 
         <!-- ── STATE 1: No teacher selected ── -->
@@ -260,7 +298,7 @@ async function submitDispute() {
 
 
         <!-- Detailed Sections -->
-        <div class="calc-details" v-if="!store.isLoading">
+        <div class="calc-details" v-if="store.hasCalculation && !store.isLoading">
           <!-- Section 1: Subscriptions -->
           <div class="section">
             <div class="section-header" @click="toggleSection('s1')">
@@ -277,47 +315,41 @@ async function submitDispute() {
               <div class="grad-indicator">
                 <span class="fs-11 dim">{{ t('salaryCalc.labels.graduation') }}:</span>
                 <div class="grad-pills">
-                  <span class="grad-pill inactive">0–50 → 10%</span>
+                  <span class="grad-pill" :class="store.salaryData.graduationPct === 10 ? 'active' : 'inactive'">0–50 → 10%</span>
                   <span class="grad-pill" :class="store.salaryData.graduationPct === 11 ? 'active' : 'inactive'">51–69 → 11%</span>
-                  <span class="grad-pill inactive">70–99 → 12%</span>
+                  <span class="grad-pill" :class="store.salaryData.graduationPct === 12 ? 'active' : 'inactive'">70–99 → 12%</span>
+                  <span class="grad-pill" :class="store.salaryData.graduationPct === 13 ? 'active' : 'inactive'">100+ → 13%</span>
                 </div>
                 <div class="ml-auto mono fs-11 blue">
                   {{ store.salaryData.activeKids }} {{ t('salaryCalc.labels.activeKids') }} → {{ store.salaryData.graduationPct }}%
                 </div>
               </div>
 
-              <!-- Group List -->
-              <div class="group-list">
-                <!-- Example Group 1 -->
-                <div class="group-row">
-                  <div class="group-header" @click="toggleGroup('g1')">
-                    <span class="group-toggle-icon" :class="{ open: openGroups.g1 }">▶</span>
-                    <span class="group-name">G_2026_SM_01</span>
-                    <span class="group-meta">PN 16:00 · Anna K.</span>
-                    <span class="group-count">8 kids</span>
-                    <span class="group-pct-badge">100% attendance</span>
-                    <span class="ml-auto group-sum">{{ formatCurrency(490.00) }}</span>
+              <div class="group-list" v-if="store.subscriptionGroups.length">
+                <div class="group-row" v-for="group in store.subscriptionGroups" :key="group.name">
+                  <div class="group-header" @click="toggleGroup(group.name)">
+                    <span class="group-toggle-icon" :class="{ open: openGroups[group.name] }">▶</span>
+                    <span class="group-name">{{ group.name }}</span>
+                    <span class="group-meta">{{ group.day || '—' }}</span>
+                    <span class="group-count">{{ group.kids }} kids</span>
+                    <span class="group-pct-badge">{{ store.salaryData.graduationPct }}%</span>
+                    <span class="ml-auto group-sum">{{ formatCurrency(group.salary) }}</span>
                   </div>
-                  <div class="group-students" v-if="openGroups.g1">
+                  <div class="group-students" v-if="openGroups[group.name]">
                     <table class="data-table">
                       <tbody>
-                        <tr>
-                          <td>Jan Kowalski</td>
-                          <td><span class="chip chip-green">Paid</span></td>
-                          <td>Active</td>
-                          <td class="text-right">{{ formatCurrency(490.00) }}</td>
-                        </tr>
-                        <tr>
-                          <td>Marek Wójcik</td>
-                          <td><span class="chip chip-green">Paid</span></td>
-                          <td>Active</td>
-                          <td class="text-right">{{ formatCurrency(490.00) }}</td>
+                        <tr v-for="child in group.children" :key="`${group.name}-${child.name}`">
+                          <td>{{ child.name }}</td>
+                          <td><span class="chip" :class="child.status === 'paid' ? 'chip-green' : child.status === 'overdue' ? 'chip-amber' : 'chip-blue'">{{ child.status }}</span></td>
+                          <td>{{ child.conducted }}/{{ child.lessons.length }}</td>
+                          <td class="text-right">{{ formatCurrency(child.abonFinal || child.abon) }}</td>
                         </tr>
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
+              <div v-else class="p-20 dim fs-12 mono">No subscription items yet</div>
             </div>
           </div>
 
@@ -344,17 +376,14 @@ async function submitDispute() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>12.02.2026</td>
-                    <td>G_2026_SM_05 (Marek W.)</td>
+                  <tr v-for="(row, idx) in (store.rawSalary?.substitutions?.rows ?? [])" :key="idx">
+                    <td>{{ row.date || '—' }}</td>
+                    <td>{{ row.group }} ({{ row.forTrainer }})</td>
                     <td><span class="chip chip-blue">Done</span></td>
-                    <td class="text-right">{{ formatCurrency(75.35) }}</td>
+                    <td class="text-right">{{ formatCurrency(row.salary) }}</td>
                   </tr>
-                  <tr>
-                    <td>24.02.2026</td>
-                    <td>G_2026_SM_09 (Jan K.)</td>
-                    <td><span class="chip chip-blue">Done</span></td>
-                    <td class="text-right">{{ formatCurrency(75.35) }}</td>
+                  <tr v-if="!(store.rawSalary?.substitutions?.rows?.length)">
+                    <td colspan="4" class="dim">No substitutions</td>
                   </tr>
                 </tbody>
               </table>
@@ -384,17 +413,14 @@ async function submitDispute() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>05.02.2026</td>
-                    <td>Metodyka Space Memory (Luty)</td>
-                    <td>60 min</td>
-                    <td class="text-right">{{ formatCurrency(60.00) }}</td>
+                  <tr v-for="(row, idx) in (store.rawSalary?.methodical?.rows ?? [])" :key="idx">
+                    <td>{{ row.date || '—' }}</td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.hours || 0 }} h</td>
+                    <td class="text-right">{{ formatCurrency(row.total) }}</td>
                   </tr>
-                  <tr>
-                    <td>19.02.2026</td>
-                    <td>Workshop: AI w edukacji</td>
-                    <td>60 min</td>
-                    <td class="text-right">{{ formatCurrency(65.60) }}</td>
+                  <tr v-if="!(store.rawSalary?.methodical?.rows?.length)">
+                    <td colspan="4" class="dim">No methodical meetings</td>
                   </tr>
                 </tbody>
               </table>
@@ -414,8 +440,11 @@ async function submitDispute() {
                   <span class="section-chevron" :class="{ open: openSections.s4 }">▼</span>
                 </div>
               </div>
-              <div class="section-body" v-if="openSections.s4">
-                <div class="p-20 dim fs-12 mono">2 x 140.00 zł = {{ formatCurrency(store.salaryData.individual) }}</div>
+                <div class="section-body" v-if="openSections.s4">
+                  <div class="p-20 dim fs-12 mono" v-for="(row, idx) in (store.rawSalary?.individual?.rows ?? [])" :key="idx">
+                    {{ row.child }} · {{ row.count }} x {{ formatCurrency(row.total / Math.max(row.count || 1, 1)) }} = {{ formatCurrency(row.total) }}
+                  </div>
+                  <div class="p-20 dim fs-12 mono" v-if="!(store.rawSalary?.individual?.rows?.length)">No individual lessons</div>
               </div>
             </div>
             <div class="section half">
@@ -429,8 +458,11 @@ async function submitDispute() {
                   <span class="section-chevron" :class="{ open: openSections.s5 }">▼</span>
                 </div>
               </div>
-              <div class="section-body" v-if="openSections.s5">
-                <div class="p-20 dim fs-12 mono">1 x 160.00 zł = {{ formatCurrency(store.salaryData.olympiad) }}</div>
+                <div class="section-body" v-if="openSections.s5">
+                  <div class="p-20 dim fs-12 mono" v-for="(row, idx) in (store.rawSalary?.olympiad?.rows ?? [])" :key="idx">
+                    {{ row.name }} · {{ row.date || '—' }} = {{ formatCurrency(row.total) }}
+                  </div>
+                  <div class="p-20 dim fs-12 mono" v-if="!(store.rawSalary?.olympiad?.rows?.length)">No olympiad lessons</div>
               </div>
             </div>
           </div>
@@ -448,16 +480,16 @@ async function submitDispute() {
               </div>
             </div>
             <div class="section-body" v-if="openSections.s6">
-              <div class="admin-status-banner admin-status-ok p-20">
+                <div class="admin-status-banner admin-status-ok p-20">
                 <div class="admin-status-icon">✅</div>
                 <div class="admin-status-text">
-                  <div class="fw-700 green">QA Score: 85%</div>
-                  <div class="fs-11 dim">Evaluated on 01.03.2026 by QA Admin</div>
+                    <div class="fw-700 green">QA Score: {{ store.rawSalary?.admin3pct?.pct ?? 0 }}%</div>
+                    <div class="fs-11 dim">Evaluated on {{ store.rawSalary?.admin3pct?.evaluatedAt || '—' }} by {{ store.rawSalary?.admin3pct?.evaluatedBy || '—' }}</div>
                 </div>
                 <div class="admin-pct-display admin-pct-ok">3%</div>
               </div>
               <div class="admin-formula-box">
-                {{ formatCurrency(store.salaryData.subscriptions / 0.11) }} (Total Pool) x 3% = {{ formatCurrency(store.salaryData.adminDuty) }}
+                {{ formatCurrency(store.rawSalary?.admin3pct?.base ?? 0) }} x 3% = {{ formatCurrency(store.salaryData.adminDuty) }}
               </div>
             </div>
           </div>
@@ -475,20 +507,142 @@ async function submitDispute() {
               </div>
             </div>
             <div class="section-body" v-if="openSections.s7">
-              <div class="trial-qa-banner trial-qa-ok p-20">
+              <div class="trial-qa-banner trial-qa-ok p-20" v-for="(row, idx) in (store.rawSalary?.trialLessons?.rows ?? [])" :key="idx">
                 <div class="trial-qa-text">
-                  <div class="fw-700 green">Conversion Rate: 66% (2/3)</div>
-                  <div class="fs-11 dim">Target: > 50% for full payout</div>
+                  <div class="fw-700 green">{{ row.name }}: {{ row.won }}/{{ row.attended }}</div>
+                  <div class="fs-11 dim">Target: > {{ store.rawSalary?.trialLessons?.threshold ?? 51 }}% for full payout</div>
                 </div>
                 <div class="ml-auto">
-                  <span class="ok-badge ok-done">Qualified</span>
+                  <span class="ok-badge" :class="row.paid ? 'ok-done' : 'ok-wait'">{{ row.paid ? 'Qualified' : 'Not qualified' }}</span>
                 </div>
               </div>
               <div class="trial-formula-box">
-                <div class="fline"><span>Trial Lessons (Attended)</span> <span>3</span></div>
-                <div class="fline"><span>Lessons Won</span> <span>2</span></div>
+                <div class="fline"><span>Trial Lessons (Attended)</span> <span>{{ totalTrialAttended }}</span></div>
+                <div class="fline"><span>Lessons Won</span> <span>{{ totalTrialWon }}</span></div>
                 <div class="fline total"><span>Total Trial Payout</span> <span>{{ formatCurrency(store.salaryData.trialLessons) }}</span></div>
               </div>
+            </div>
+          </div>
+
+          <!-- Section 8: Rezygnacje / Retention Bonus -->
+          <div class="section">
+            <div class="section-header" @click="toggleSection('s8')">
+              <div class="section-title">
+                <div class="section-icon si-excep">🎁</div>
+                <span>Retencja (brak rezygnacji)</span>
+              </div>
+              <div class="section-amount">
+                <span :class="store.rezygnacjeBonusAmount > 0 ? 'c-green' : 'c-d'">
+                  {{ store.rezygnacjeBonusAmount > 0 ? '+' : '' }}{{ formatCurrency(store.rezygnacjeBonusAmount) }}
+                </span>
+                <span class="section-chevron" :class="{ open: openSections.s8 }">▼</span>
+              </div>
+            </div>
+            <div class="section-body" v-if="openSections.s8">
+              <div class="admin-status-banner" :class="store.salaryData.rezygnacje === 0 ? 'admin-status-ok' : 'admin-status-late'" style="margin:12px 16px;">
+                <div class="admin-status-icon">{{ store.salaryData.rezygnacje === 0 ? '🎉' : '⚠️' }}</div>
+                <div class="admin-status-text">
+                  <div class="fw-700" :class="store.salaryData.rezygnacje === 0 ? 'green' : 'c-r'">
+                    {{ store.salaryData.rezygnacje === 0 ? 'Brak rezygnacji — bonus +1%' : `Rezygnacje: ${store.salaryData.rezygnacje}` }}
+                  </div>
+                  <div class="fs-11 dim">Podstawa: {{ formatCurrency(store.rawSalary?.totals?.baseSubscriptions ?? 0) }}</div>
+                </div>
+                <div class="admin-pct-display" :class="store.salaryData.rezygnacje === 0 ? 'admin-pct-ok' : 'admin-pct-late'">
+                  {{ store.salaryData.rezygnacje === 0 ? '+1%' : '0%' }}
+                </div>
+              </div>
+              <table class="data-table" v-if="(store.rawSalary?.rezygnacje ?? []).length">
+                <thead><tr><th>Okres</th><th>Opis</th><th class="text-right">Zapis</th></tr></thead>
+                <tbody>
+                  <tr v-for="(row, idx) in (store.rawSalary?.rezygnacje ?? [])" :key="idx">
+                    <td>{{ row.date || '—' }}</td>
+                    <td>{{ row.reason || '—' }}</td>
+                    <td class="text-right">{{ row.name }}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="p-20 dim fs-12" v-else>Brak rezygnacji w tym okresie</div>
+            </div>
+          </div>
+
+          <!-- Section 9: Extra Bonuses (Rekompensata + Dojazd) -->
+          <div class="section" v-if="store.salaryData.extraBonus > 0 || (store.rawSalary?.manualSections?.rekompensata?.length || store.rawSalary?.manualSections?.dojazd?.length)">
+            <div class="section-header" @click="toggleSection('s9')">
+              <div class="section-title">
+                <div class="section-icon si-premia">💰</div>
+                <span>Rekompensata / Dojazd</span>
+              </div>
+              <div class="section-amount">
+                <span class="c-pink">+{{ formatCurrency(store.salaryData.extraBonus) }}</span>
+                <span class="section-chevron" :class="{ open: openSections.s9 }">▼</span>
+              </div>
+            </div>
+            <div class="section-body" v-if="openSections.s9">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Typ</th>
+                    <th>Data</th>
+                    <th>Powód / Trasa</th>
+                    <th class="text-right">Kwota</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template v-for="(row, idx) in (store.rawSalary?.manualSections?.rekompensata ?? [])" :key="`rek-${idx}`">
+                    <tr>
+                      <td><span class="chip chip-pink">Rekompensata</span></td>
+                      <td>{{ row.date || '—' }}</td>
+                      <td>{{ row.reason || row.comment || '—' }}</td>
+                      <td class="text-right">+{{ formatCurrency(row.amount) }}</td>
+                    </tr>
+                  </template>
+                  <template v-for="(row, idx) in (store.rawSalary?.manualSections?.dojazd ?? [])" :key="`doj-${idx}`">
+                    <tr>
+                      <td><span class="chip chip-blue">Dojazd</span></td>
+                      <td>{{ row.date || '—' }}</td>
+                      <td>{{ row.reason || row.comment || '—' }}</td>
+                      <td class="text-right">+{{ formatCurrency(row.amount) }}</td>
+                    </tr>
+                  </template>
+                  <tr v-if="!(store.rawSalary?.manualSections?.rekompensata?.length) && !(store.rawSalary?.manualSections?.dojazd?.length)">
+                    <td colspan="4" class="dim">Brak zapisów</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Section 10: Penalties / Kara umowna -->
+          <div class="section" v-if="store.salaryData.penalties > 0 || (store.rawSalary?.penalties?.rows?.length)">
+            <div class="section-header" @click="toggleSection('s10')">
+              <div class="section-title">
+                <div class="section-icon si-kara">⚡</div>
+                <span>Kara umowna / Potrącenia</span>
+              </div>
+              <div class="section-amount">
+                <span class="c-r">-{{ formatCurrency(store.salaryData.penalties) }}</span>
+                <span class="section-chevron" :class="{ open: openSections.s10 }">▼</span>
+              </div>
+            </div>
+            <div class="section-body" v-if="openSections.s10">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Typ</th>
+                    <th>Data</th>
+                    <th>Powód</th>
+                    <th class="text-right">Kwota</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(row, idx) in (store.rawSalary?.penalties?.rows ?? [])" :key="idx">
+                    <td><span class="chip chip-red">{{ row.type || 'Kara' }}</span></td>
+                    <td>{{ row.date || '—' }}</td>
+                    <td>{{ row.reason || '—' }}</td>
+                    <td class="text-right c-r">-{{ formatCurrency(row.amount) }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
@@ -498,11 +652,15 @@ async function submitDispute() {
               <div class="fs-14 dim fw-600">{{ t('salaryCalc.components.total') }} for {{ store.selectedTeacher.name }}</div>
               <div class="final-amount">{{ formatCurrency(store.totalPayout) }}</div>
               <div class="final-bd-row">
-                <span>Base: {{ formatCurrency(store.subtotalBeforeBonus) }}</span>
-                <span>Bonus: +{{ formatCurrency(store.rezygnacjeBonusAmount) }}</span>
+                <span>Base: {{ formatCurrency(store.rawSalary ? (store.totalPayout - store.rezygnacjeBonusAmount + store.salaryData.penalties) : store.subtotalBeforeBonus) }}</span>
+                <span v-if="store.rezygnacjeBonusAmount > 0">Bonus: +{{ formatCurrency(store.rezygnacjeBonusAmount) }}</span>
+                <span v-if="store.salaryData.penalties > 0" class="c-r">Potrącenia: -{{ formatCurrency(store.salaryData.penalties) }}</span>
               </div>
             </div>
             <div class="final-actions">
+              <UiButton variant="primary" :disabled="store.isLoading || !store.selectedTeacherId || store.status === 'paid'" @click="store.updateStatus('paid')">
+                💳 {{ t('teacherSalary.status.paid') }}
+              </UiButton>
               <UiButton variant="amber" :disabled="store.isLoading || !store.selectedTeacherId" @click="openDisputeModal">
                 ⚠️ {{ t('teacherSalary.actions.dispute') }}
               </UiButton>
@@ -564,27 +722,23 @@ async function submitDispute() {
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>Month</th>
-                    <th>Status</th>
-                    <th>Base Amount</th>
-                    <th>Bonus</th>
-                    <th class="text-right">Total Payout</th>
+                    <th>Data</th>
+                    <th>Akcja</th>
+                    <th>Aktor</th>
+                    <th>Komentarz</th>
+                    <th class="text-right">Ref #</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>Styczeń 2026</td>
-                    <td><span class="chip chip-green">Paid</span></td>
-                    <td>{{ formatCurrency(4500.00) }}</td>
-                    <td>{{ formatCurrency(450.00) }}</td>
-                    <td class="text-right">{{ formatCurrency(4950.00) }}</td>
+                  <tr v-for="item in store.confirmationHistory" :key="item.id">
+                    <td>{{ item.createdAt || '—' }}</td>
+                    <td><span class="chip" :class="getHistoryChipClass(item.action)">{{ formatHistoryAction(item.action) }}</span></td>
+                    <td>{{ item.actorRole || '—' }}</td>
+                    <td>{{ item.comment || '—' }}</td>
+                    <td class="text-right">{{ store.rawSalary?.id ? '#' + store.rawSalary.id : '—' }}</td>
                   </tr>
-                  <tr>
-                    <td>Grudzień 2025</td>
-                    <td><span class="chip chip-green">Paid</span></td>
-                    <td>{{ formatCurrency(4200.00) }}</td>
-                    <td>{{ formatCurrency(400.00) }}</td>
-                    <td class="text-right">{{ formatCurrency(4600.00) }}</td>
+                  <tr v-if="!store.confirmationHistory.length">
+                    <td colspan="5" class="dim">No workflow history yet</td>
                   </tr>
                 </tbody>
               </table>
@@ -790,7 +944,7 @@ async function submitDispute() {
 
 /* ── Buttons ── */
 .btn{border:none;border-radius:9px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:700;padding:9px 18px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
-.btn-primary{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--glow-blue)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--purple));color:#fff;box-shadow:var(--app-glow)}
 .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
 .btn-success{background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);color:var(--green)}
 .btn-success:hover{background:rgba(34,197,94,.25)}
@@ -834,7 +988,7 @@ async function submitDispute() {
 /* ── Exceptions / Rekompensata ── */
 .excep-alert{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:14px 18px;margin:16px 16px 0;display:flex;gap:12px;align-items:flex-start}
 .excep-alert-text{font-size:12.5px;line-height:1.6}
-.excep-child-card{background:var(--bg3);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:16px 18px;margin:12px 16px;position:relative;transition:border-color .3s}
+.excep-child-card{background:var(--app-surface);border:1px solid rgba(239,68,68,.2);border-radius:12px;padding:16px 18px;margin:12px 16px;position:relative;transition:border-color .3s}
 .excep-child-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--red),var(--amber));border-radius:12px 0 0 12px;transition:background .3s}
 .excep-child-card.has-comp{border-color:rgba(34,197,94,.3)}
 .excep-child-card.has-comp::before{background:linear-gradient(180deg,var(--green),var(--cyan))}
@@ -950,7 +1104,7 @@ async function submitDispute() {
 
 /* Rezygnacje stat bar */
 .rezygn-stat-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;border:1px solid var(--border);border-radius:12px;overflow:hidden;margin:12px 16px}
-.rezygn-stat-cell{padding:14px 18px;background:var(--bg2);border-right:1px solid var(--border)}
+.rezygn-stat-cell{padding:14px 18px;background:var(--app-surface);border-right:1px solid var(--border)}
 .rezygn-stat-cell:last-child{border-right:none}
 .rezygn-stat-label{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
 .rezygn-stat-val{font-family:'Space Mono',monospace;font-size:20px;font-weight:700}

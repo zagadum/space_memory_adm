@@ -58,7 +58,7 @@ const handleSendDispute = () => {
     <div class="confirmed-stamp" :class="{ show: status !== 'draft' }">
        <div class="stamp-inner">
          <div class="stamp-check">✅</div>
-         <div class="stamp-text">{{ t('teacherSalary.status.confirmed') }}</div>
+          <div class="stamp-text">{{ t('teacherSalary.status.' + (status === 'draft' ? 'confirmed' : status)) }}</div>
          <div class="stamp-date mono" v-if="confirmedAt">{{ confirmedAt }}</div>
        </div>
     </div>

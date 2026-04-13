@@ -27,15 +27,10 @@ const openSections = ref<Record<string, boolean>>({
   'rezygnacje': true
 });
 
-const openTrials = ref<Record<string, boolean>>({});
-
 const toggleSection = (id: string) => {
   openSections.value[id] = !openSections.value[id];
 };
 
-const toggleTrial = (id: string) => {
-  openTrials.value[id] = !openTrials.value[id];
-};
 
 const handleConfirm = async () => {
   if (salaryStore.salaryData?.status === 'draft') {
@@ -57,6 +52,8 @@ onMounted(async () => {
 
 const salaryData = computed(() => salaryStore.salaryData);
 const activeSections = computed(() => salaryStore.activeSections);
+const confirmationHistory = computed(() => salaryStore.salaryData?.confirmations ?? []);
+const generatedAt = computed(() => salaryStore.salaryData?.calculatedAt || salaryStore.salaryData?.confirmedAt || '—');
 
 const getStatusClass = (status: string) => {
   if (status === 'confirmed') return 'st-confirmed';
@@ -70,6 +67,19 @@ const getStatusIcon = (status: string) => {
   if (status === 'paid') return '💰';
   if (status === 'disputed') return '⚠️';
   return '⏳';
+};
+
+const getHistoryLabel = (action: string) => {
+  const map: Record<string, string> = {
+    teacher_confirmed: 'Teacher confirmed',
+    accountant_confirmed: 'Accountant confirmed',
+    disputed: 'Disputed',
+    recalculated: 'Recalculated',
+    manual_section_added: 'Manual section added',
+    paid: 'Paid',
+  };
+
+  return map[action] || action;
 };
 </script>
 
@@ -413,9 +423,22 @@ const getStatusIcon = (status: string) => {
         @dispute="handleSendDispute"
       />
 
+      <div v-if="confirmationHistory.length" class="salary-history-card">
+        <div class="history-title">🕐 Workflow history</div>
+        <div class="history-list">
+          <div v-for="item in confirmationHistory" :key="item.id" class="history-row">
+            <div>
+              <div class="history-action">{{ getHistoryLabel(item.action) }}</div>
+              <div class="history-meta">{{ item.actorRole || 'system' }} · {{ item.createdAt || '—' }}</div>
+            </div>
+            <div class="history-comment">{{ item.comment || '—' }}</div>
+          </div>
+        </div>
+      </div>
+
       <!-- TIMESTAMP -->
       <div class="ts-bar">
-        <span>{{ t('teacherSalary.generatedAt') }}: 01.03.2026 · 09:14</span>
+        <span>{{ t('teacherSalary.generatedAt') }}: {{ generatedAt }}</span>
       </div>
       </template>
 
@@ -578,6 +601,15 @@ const getStatusIcon = (status: string) => {
 .final-bd-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--app-text-dim); }
 .final-amount { font-size: 36px; font-weight: 900; color: var(--app-text-main); text-shadow: 0 0 20px rgba(79,110,247,.2); line-height: 1; }
 .final-sublabel { font-size: 12px; font-weight: 700; color: var(--app-text-dim); margin-top: 8px; text-transform: uppercase; }
+
+.salary-history-card { margin-top: 24px; background: var(--app-card); border: 1px solid var(--app-border); border-radius: 20px; box-shadow: var(--app-shadow); overflow: hidden; }
+.history-title { padding: 16px 20px; font-size: 14px; font-weight: 800; border-bottom: 1px solid var(--app-border); color: var(--app-text-main); }
+.history-list { display: flex; flex-direction: column; }
+.history-row { display: flex; justify-content: space-between; gap: 16px; padding: 14px 20px; border-top: 1px solid var(--app-border); }
+.history-row:first-child { border-top: none; }
+.history-action { font-weight: 700; color: var(--app-text-main); }
+.history-meta { font-size: 12px; color: var(--app-text-dim); margin-top: 4px; }
+.history-comment { font-size: 12px; color: var(--app-text-dim); text-align: right; max-width: 40%; }
 
 .ts-bar { margin-top: 32px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.03); text-align: center; font-size: 10.5px; color: var(--app-text-dim); font-family: 'Space Mono', monospace; }
 .hint { font-size: 11.5px; color: #4b5563; margin-top: 12px; font-style: italic; }
