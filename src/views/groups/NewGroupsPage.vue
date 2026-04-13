@@ -17,14 +17,12 @@
         <thead>
           <tr>
             <th @click="sort('name')">{{ t('newGroups.table.name') }} <span class="sort-icon">{{ sortIcon('name') }}</span></th>
-            <th @click="sort('type')">{{ t('newGroups.table.type') }} <span class="sort-icon">{{ sortIcon('type') }}</span></th>
+            <th @click="sort('type')">{{ t('newGroups.table.typeAge') }} <span class="sort-icon">{{ sortIcon('type') }}</span></th>
             <th @click="sort('createdDate')">{{ t('newGroups.table.createdDate') }} <span class="sort-icon">{{ sortIcon('createdDate') }}</span></th>
             <th @click="sort('startDate')">{{ t('newGroups.table.startDate') }} <span class="sort-icon">{{ sortIcon('startDate') }}</span></th>
             <th @click="sort('studentsCount')">{{ t('newGroups.table.count') }} <span class="sort-icon">{{ sortIcon('studentsCount') }}</span></th>
             <th @click="sort('paid')">{{ t('newGroups.table.paidContract') }} <span class="sort-icon">{{ sortIcon('paid') }}</span></th>
-            <th @click="sort('days')">{{ t('newGroups.table.waiting') }} <span class="sort-icon">{{ sortIcon('days') }}</span></th>
             <th @click="sort('manager')">{{ t('newGroups.table.responsible') }} <span class="sort-icon">{{ sortIcon('manager') }}</span></th>
-            <th @click="sort('age')">{{ t('newGroups.table.age') }} <span class="sort-icon">{{ sortIcon('age') }}</span></th>
             <th style="width:110px"></th>
           </tr>
         </thead>
@@ -38,9 +36,7 @@
               <td><div class="skel skel-w40"></div></td>
               <td><div class="skel skel-w20"></div></td>
               <td><div class="skel skel-w40"></div></td>
-              <td><div class="skel skel-w20"></div></td>
               <td><div class="skel skel-w50"></div></td>
-              <td><div class="skel skel-w20"></div></td>
               <td><div class="skel skel-w30"></div></td>
             </tr>
           </template>
@@ -55,23 +51,49 @@
                 </div>
               </td>
               <td>
-                <span :class="['type-badge', (g.type_group ?? g.type) === 'individual' ? 'type-individual' : 'type-group']">
-                  {{ (g.type_group ?? g.type) === 'individual' ? t('newGroups.typeIndividual') : t('newGroups.typeGroup') }}
-                </span>
-              </td>
-              <td><span class="date-mono">{{ fmtDate(g.createdDate) }}</span></td>
-              <td><span class="date-mono">{{ fmtDate(g.startDate) }}</span></td>
-              <td><span class="slots-val">{{ g.studentsCount }}/{{ g.totalSlots }}</span><span class="slots-label"> {{ t('newGroups.persons') }}</span></td>
-              <td>
-                <div class="payment-ratio">
-                  <span class="ratio-text" :style="{ color: ratioColor(g) }">{{ g.paid }}/{{ g.totalSlots }}</span>
-                  <div class="ratio-bar"><div class="ratio-fill" :style="{ width: pct(g) + '%' }"></div></div>
+                <div class="type-age-cell">
+                  <span :class="['type-badge', (g.type_group ?? g.type) === 'individual' ? 'type-individual' : 'type-group']">
+                    {{ (g.type_group ?? g.type) === 'individual' ? t('newGroups.typeIndividual') : t('newGroups.typeGroup') }}
+                  </span>
+                  <div v-if="ageMap[g.age ?? '']" class="age-info">
+                    <span class="age-icon">{{ ageMap[g.age!].icon }}</span>
+                    <span class="age-val">{{ ageMap[g.age!].label }} {{ t('newGroups.detail.years') }}</span>
+                  </div>
                 </div>
               </td>
               <td>
-                <div class="timer-cell">
-                  <span :class="['timer-days', timerCls(daysDiff(g.createdDate))]">{{ daysDiff(g.createdDate) }}</span>
-                  <span class="timer-label">{{ t('newGroups.days') }}</span>
+                <div class="date-cell">
+                  <span class="date-mono">{{ fmtDate(g.createdDate) }}</span>
+                  <span class="date-timer age-old">{{ t('newGroups.daysPassed', { n: daysDiff(g.createdDate) }) }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="date-cell">
+                  <span class="date-mono">{{ fmtDate(g.startDate) }}</span>
+                  <span v-if="g.startDate" :class="['date-timer', daysDiff(g.startDate) < 0 ? 'time-left' : 'time-passed']">
+                    {{ daysDiff(g.startDate) < 0 
+                      ? t('newGroups.daysLeft', { n: Math.abs(daysDiff(g.startDate)) }) 
+                      : t('newGroups.daysPassed', { n: daysDiff(g.startDate) }) 
+                    }}
+                  </span>
+                  <span v-else class="date-timer empty">—</span>
+                </div>
+              </td>
+              <td>
+                <div class="slots-cell">
+                  <span class="slots-val">{{ g.studentsCount }}</span>
+                  <span class="slots-label">{{ t('newGroups.persons') }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="payment-ratio">
+                  <span class="ratio-text" :style="{ color: ratioColor(g) }">{{ g.paid }}</span>
+                  <div class="ratio-bar"><div class="ratio-fill" :style="{ width: pct(g) + '%', background: ratioColor(g) }"></div></div>
+                  
+                  <!-- Бейдж статуса -->
+                  <div :class="['readiness-badge', readinessCls(g)]">
+                    {{ readinessLabel(g) }}
+                  </div>
                 </div>
               </td>
               <td>
@@ -82,13 +104,17 @@
                 <span v-else class="empty-cell">{{ t('newGroups.notAssigned') }}</span>
               </td>
               <td>
-                <span v-if="ageMap[g.age ?? '']" :class="['age-badge', ageMap[g.age!].cls]">
-                  {{ ageMap[g.age!].icon }} {{ ageMap[g.age!].label }}
-                </span>
-                <span v-else class="empty-cell">—</span>
-              </td>
-              <td>
-                <button v-if="g.totalSlots > 0" class="btn-start" @click.stop="openStartModal(g)">{{ t('newGroups.startBtn') }}</button>
+                <div v-if="g.studentsCount > 0" class="start-action-cell">
+                  <button :class="['btn-start', { 'btn-start-ready': g.paid >= 5 && g.paid <= 10 }]" @click.stop="openStartModal(g)">
+                    {{ t('newGroups.startBtn') }}
+                  </button>
+                  <div v-if="g.studentsCount > g.paid" class="unpaid-reminder">
+                    {{ t('newGroups.status.unpaidToRemove', { n: g.studentsCount - g.paid }) }}
+                  </div>
+                  <div v-else-if="g.studentsCount > 0 && g.studentsCount === g.paid" class="all-paid-hint">
+                    {{ t('newGroups.status.allPaid') }}
+                  </div>
+                </div>
               </td>
             </tr>
             <tr v-if="sortedGroups.length === 0">
@@ -133,6 +159,7 @@
       :group="panelGroup"
       :students="panelStudents"
       :master-students="masterStudents"
+      :teachers="teachers"
       :loading-students="loadingStudents"
       @close="closePanel"
       @start="openStartModal(panelGroup!)"
@@ -142,6 +169,7 @@
       @student-archived="onStudentArchived"
       @student-transferred="onStudentTransferred"
       @student-email="onStudentEmail"
+      @teacher-assigned="onTeacherAssigned"
     />
   </div>
 </template>
@@ -151,7 +179,8 @@ import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
-import { getNewGroups, getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, emailStudentFromGroup } from '../../api/newGroupsApi'
+import { useNewGroupsStore } from '../../stores/newGroups.store'
+import { getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup, editGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
 import { getRecruitmentApi } from '../../api/recruitmentApi'
@@ -168,9 +197,10 @@ const { t } = useI18n()
 const route = useRoute()
 const notify = useNotificationStore()
 const searchStore = useGlobalSearchStore()
+const newGroupsStore = useNewGroupsStore()
 const recruitmentBackend = computed<RecruitmentBackend>(() => route.meta.recruitmentBackend === 'indigo' ? 'indigo' : 'default')
 const isLoading = ref(false)
-const groups = ref<NewGroup[]>([])
+const groups = computed(() => newGroupsStore.groups)
 const masterStudents = ref<MasterStudent[]>([])
 const teachers = ref<NewGroupTeacher[]>([])
 const panelGroup = ref<NewGroup | null>(null)
@@ -218,36 +248,60 @@ const transferPickerStudentName = computed(() => {
   return transferStudent.value ? `${t('newStudents.groupPicker.for')}: ${transferStudent.value.name}` : ''
 })
 
-// ── Helpers ──
+// ── Status Helpers ──
 
+// Progress % для полосы (на базе минимального порога 5 чел)
 function pct(g: NewGroup) {
-  if (g.totalSlots <= 0) return 0
-  return Math.round(g.paid / g.totalSlots * 100)
+  if (g.paid >= 5) return 100
+  return Math.round(g.paid / 5 * 100)
 }
 
+// Цвет текста для оплат
 function ratioColor(g: NewGroup) {
-  const p = pct(g)
-  return p === 100 ? 'var(--green)' : p >= 50 ? 'var(--amber)' : 'var(--red)'
+  if (g.paid < 5)   return 'var(--red)'
+  if (g.paid <= 10) return 'var(--green)'
+  return 'var(--blue)'
+}
+
+// Статус готовности (текст)
+function readinessLabel(g: NewGroup) {
+  if (g.paid < 5)   return t('newGroups.status.recruiting')
+  if (g.paid <= 10) return t('newGroups.status.ready')
+  return t('newGroups.status.overfilled')
+}
+
+// Цвет бейджа статуса
+function readinessCls(g: NewGroup) {
+  if (g.paid < 5)   return 'status-recruiting'
+  if (g.paid <= 10) return 'status-ready'
+  return 'status-overfilled'
 }
 
 function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
 
-function syncGroupStudentsCount(groupId: number, studentsCount: number) {
-  const nextCount = Math.max(0, studentsCount)
+function updateGroupCounters(groupId: number, studentList: NewGroupStudent[]) {
   const group = groups.value.find(x => x.id === groupId)
-  if (group) {
-    group.studentsCount = nextCount
-    if (group.totalSlots <= 0) {
-      group.totalSlots = nextCount
-    }
+  if (!group) return
+
+  const count = studentList.length
+  const paid = studentList.filter(s => s.contract === 'signed').length
+
+  group.studentsCount = count
+  group.paid = paid
+  
+  // Если вместимость не задана, ставим её равной текущему количеству (для новых групп)
+  if (group.totalSlots <= 0) {
+    group.totalSlots = count
   }
 
+  // Также обновляем данные в открытой панели, если это та же группа
   if (panelGroup.value?.id === groupId) {
-    panelGroup.value.studentsCount = nextCount
+    panelGroup.value.studentsCount = count
+    panelGroup.value.paid = paid
     if (panelGroup.value.totalSlots <= 0) {
-      panelGroup.value.totalSlots = nextCount
+      panelGroup.value.totalSlots = count
     }
   }
 }
@@ -255,14 +309,12 @@ function syncGroupStudentsCount(groupId: number, studentsCount: number) {
 function getSortVal(g: NewGroup, col: string): string | number {
   switch (col) {
     case 'name':        return g.name.toLowerCase()
-    case 'type':        return g.type_group || g.type
+    case 'type':        return (g.type_group || g.type) + (g.age || '')
     case 'startDate':   return g.startDate || ''
     case 'createdDate': return g.createdDate
     case 'studentsCount': return g.studentsCount
     case 'paid':        return g.paid
-    case 'days':        return daysDiff(g.createdDate)
     case 'manager':     return g.manager ? g.manager.name.toLowerCase() : 'яя'
-    case 'age':         return g.age || 'z'
     default:            return ''
   }
 }
@@ -308,6 +360,7 @@ async function openPanel(id: number) {
   try {
     const res = await getNewGroupStudents(id, recruitmentBackend.value)
     panelStudents.value = res.items
+    updateGroupCounters(id, res.items)
   } finally {
     loadingStudents.value = false
   }
@@ -321,7 +374,7 @@ function closePanel() {
 async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
   try {
     const res = await createNewGroup(payload, recruitmentBackend.value)
-    groups.value.unshift(res.group)
+    newGroupsStore.setGroups([res.group, ...newGroupsStore.groups])
     showCreateModal.value = false
     notify.addToast(t('newGroups.toasts.created'), 'success')
   } catch (err: unknown) {
@@ -332,7 +385,7 @@ async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
 async function onGroupStarted(id: number) {
   try {
     await apiStartGroup(id, recruitmentBackend.value)
-    groups.value = groups.value.filter(g => g.id !== id)
+    newGroupsStore.setGroups(newGroupsStore.groups.filter(g => g.id !== id))
     startGroup.value = null
     if (panelGroup.value?.id === id) closePanel()
     notify.addToast(t('newGroups.toasts.started'), 'success')
@@ -344,7 +397,7 @@ async function onGroupStarted(id: number) {
 async function onDeleteGroup(id: number) {
   try {
     await deleteNewGroup(id, recruitmentBackend.value)
-    groups.value = groups.value.filter(g => g.id !== id)
+    newGroupsStore.setGroups(newGroupsStore.groups.filter(g => g.id !== id))
     closePanel()
     notify.addToast(t('newGroups.toasts.deleted'), 'warning')
   } catch (err: unknown) {
@@ -357,7 +410,7 @@ async function onStudentsAdded(payload: { groupId: number; studentIds: number[] 
     await addStudentsToGroup(payload, recruitmentBackend.value)
     const res = await getNewGroupStudents(payload.groupId, recruitmentBackend.value)
     panelStudents.value = res.items
-    syncGroupStudentsCount(payload.groupId, res.items.length)
+    updateGroupCounters(payload.groupId, res.items)
     notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentsAddError')), 'error')
@@ -368,7 +421,7 @@ async function onStudentRemoved(payload: { groupId: number; studentId: number })
   try {
     await removeStudentFromGroup(payload, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
+    updateGroupCounters(payload.groupId, panelStudents.value)
     notify.addToast(t('newGroups.toasts.studentRemoved'), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('newGroups.toasts.studentRemoveError')), 'error')
@@ -379,7 +432,7 @@ async function onStudentArchived(payload: { groupId: number; studentId: number; 
   try {
     await archiveStudentFromGroup({ groupId: payload.groupId, studentId: payload.studentId }, recruitmentBackend.value)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
+    updateGroupCounters(payload.groupId, panelStudents.value)
     notify.addToast(t('newGroups.toasts.archivedToast', { name: payload.name }), 'warning')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')
@@ -402,7 +455,7 @@ async function onTransferGroupPicked(groupId: number, groupName: string, _teache
     const api = getRecruitmentApi(recruitmentBackend.value)
     await api.setStudentGroup(payload.studentId, groupId)
     panelStudents.value = panelStudents.value.filter(s => Number(s.id) !== payload.studentId)
-    syncGroupStudentsCount(payload.groupId, panelStudents.value.length)
+    updateGroupCounters(payload.groupId, panelStudents.value)
     notify.addToast(`✅ ${payload.name} -> ${groupName}`, 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')
@@ -418,6 +471,28 @@ async function onStudentEmail(payload: { groupId: number; studentId: number; nam
   }
 }
 
+async function onTeacherAssigned(payload: { groupId: number; teacherId: number | null }) {
+  try {
+    const res = await editGroup({ 
+      group_id: payload.groupId, 
+      teacher_id: payload.teacherId 
+    }, recruitmentBackend.value)
+    
+    // Update local state
+    const index = groups.value.findIndex(g => g.id === payload.groupId)
+    if (index !== -1) {
+      groups.value[index] = { ...groups.value[index], teacher: res.data.teacher }
+      if (panelGroup.value?.id === payload.groupId) {
+        panelGroup.value = { ...panelGroup.value, teacher: res.data.teacher }
+      }
+    }
+    
+    notify.addToast(t('common.success'), 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
 // ── Init ──
 watch(recruitmentBackend, async () => {
   showCreateModal.value = false
@@ -425,12 +500,11 @@ watch(recruitmentBackend, async () => {
   closePanel()
   isLoading.value = true
   try {
-    const [gRes, sRes, tRes] = await Promise.all([
-      getNewGroups(recruitmentBackend.value),
+    const [_, sRes, tRes] = await Promise.all([
+      newGroupsStore.fetchGroups(recruitmentBackend.value),
       getMasterStudents(recruitmentBackend.value),
       getTeachers(recruitmentBackend.value),
     ])
-    groups.value = gRes.items
     masterStudents.value = sRes.items
     teachers.value = tRes.items
   } catch (err: unknown) {
@@ -532,6 +606,11 @@ td { padding: 12px 13px; font-size: 13.5px; vertical-align: middle; }
 
 .group-schedule { font-size: 11px; color: var(--app-text-dim); margin-top: 2px; }
 
+.type-age-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.age-info { display: flex; align-items: center; gap: 4px; }
+.age-icon { font-size: 10px; }
+.age-val { font-size: 11px; color: var(--app-text-dim); font-weight: 500; }
+
 .type-badge {
   display: inline-flex;
   align-items: center;
@@ -561,21 +640,46 @@ td { padding: 12px 13px; font-size: 13.5px; vertical-align: middle; }
 .age-senior { background: var(--status-danger-bg);   color: #ef4444;   border: 1px solid rgba(239,68,68,0.3); }
 .age-adult  { background: var(--status-info-bg);  color: #8b5cf6; border: 1px solid rgba(139,92,246,0.3); }
 
-.date-mono { font-family: 'Space Mono', monospace; font-size: 12.5px; color: var(--app-text-main); }
+.age-adult  { background: var(--status-info-bg);  color: #8b5cf6; border: 1px solid rgba(139,92,246,0.3); }
 
-.slots-val   { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
-.slots-label { color: var(--app-text-dim); font-size: 11px; }
+.date-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+.date-mono { font-family: 'Space Mono', monospace; font-size: 13px; color: var(--app-text-main); font-weight: 500; }
+.date-timer { font-size: 10px; font-weight: 600; white-space: nowrap; }
+.date-timer.age-old { color: var(--app-text-dim); }
+.date-timer.time-left { color: #10b981; }
+.date-timer.time-passed { color: #8b5cf6; }
+.date-timer.empty { color: rgba(136,146,176,0.25); }
 
-.payment-ratio { display: inline-flex; align-items: center; gap: 6px; }
-.ratio-text    { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
-.ratio-bar     { width: 42px; height: 4px; background: var(--app-border-faint); border-radius: 2px; overflow: hidden; }
-.ratio-fill    { height: 100%; background: linear-gradient(90deg, #10b981, #06b6d2); border-radius: 2px; }
+.slots-cell { display: flex; flex-direction: column; align-items: flex-start; }
+.slots-val   { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; color: var(--app-text-main); }
+.slots-label { color: var(--app-text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 
-.timer-cell  { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.timer-days  { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; }
-.timer-label { font-size: 10px; color: var(--app-text-dim); text-transform: uppercase; letter-spacing: 0.06em; }
-.timer-days.low  { color: #10b981; }
-.timer-days.mid  { color: #f59e0b; }
+.payment-ratio { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.ratio-text    { font-family: 'Space Mono', monospace; font-size: 14px; font-weight: 700; }
+.ratio-bar     { width: 100%; max-width: 100px; height: 4px; background: var(--app-border-faint); border-radius: 2px; overflow: hidden; }
+.ratio-fill    { height: 100%; transition: width 0.3s ease, background 0.3s ease; }
+
+.readiness-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.status-recruiting { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+.status-ready      { 
+  background: rgba(16,185,129,0.1); color: #10b981; border: 1px solid rgba(16,185,129,0.3);
+  box-shadow: 0 0 10px rgba(16,185,129,0.15);
+  animation: pulse-ready 2s infinite;
+}
+.status-overfilled { background: rgba(79,110,247,0.1);  color: #4f6ef7;   border: 1px solid rgba(79,110,247,0.2); }
+
+@keyframes pulse-ready {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.02); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 .timer-days.high { color: #ef4444; }
 
 .person-cell { display: flex; align-items: center; gap: 8px; }
@@ -590,24 +694,36 @@ td { padding: 12px 13px; font-size: 13.5px; vertical-align: middle; }
 .person-name { font-size: 13px; font-weight: 500; }
 .empty-cell  { color: rgba(136,146,176,0.35); font-size: 12px; font-style: italic; }
 
+.start-action-cell { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.unpaid-reminder { font-size: 10px; color: var(--amber); white-space: nowrap; font-weight: 500; }
+.all-paid-hint   { font-size: 10px; color: var(--green); white-space: nowrap; font-weight: 500; }
+
 .btn-start {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
-  padding: 5px 12px;
+  padding: 6px 14px;
   border-radius: 8px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   font-family: 'Outfit', sans-serif;
   cursor: pointer;
   transition: all 0.2s;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text-dim);
+  white-space: nowrap;
+  width: 100%;
+}
+
+.btn-start-ready {
   border: 1px solid rgba(16,185,129,0.35);
   background: var(--status-success-bg);
   color: #10b981;
-  white-space: nowrap;
 }
 
-.btn-start:hover {
+.btn-start-ready:hover {
   background: rgba(16,185,129,0.35);
   box-shadow: 0 0 12px rgba(16,185,129,0.25);
   transform: translateY(-1px);

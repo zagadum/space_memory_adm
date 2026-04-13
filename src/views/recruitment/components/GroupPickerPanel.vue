@@ -39,15 +39,15 @@
           @click="pick(g)"
         >
           <div class="gpp-item-left">
-            <div class="gpp-color-dot" :style="{ background: ageColor(g.age), boxShadow: `0 0 6px ${ageColor(g.age)}66` }" />
+            <div class="gpp-color-dot" :style="{ background: ageMap[g.age ?? '']?.icon === '🟢' ? 'var(--green)' : (ageMap[g.age ?? '']?.icon === '🟡' ? 'var(--amber)' : (ageMap[g.age ?? '']?.icon === '🔴' ? 'var(--red)' : 'var(--blue)')), boxShadow: `0 0 6px rgba(0,0,0,0.2)` }" />
             <div class="gpp-item-info">
               <div class="gpp-item-name">{{ g.name }}</div>
               <div class="gpp-item-meta">{{ g.day }}<template v-if="g.time">, {{ g.time }}</template> · {{ g.teacher?.name ?? '—' }}</div>
             </div>
           </div>
           <div class="gpp-item-right">
-            <span v-if="g.age" class="gpp-age-badge" :class="`gpp-age-${ageClass(g.age)}`">
-              {{ ageEmoji(g.age) }} {{ g.age }}
+            <span v-if="ageMap[g.age ?? '']" class="gpp-age-badge" :class="`gpp-${ageMap[g.age!].cls}`">
+              {{ ageMap[g.age!].icon }} {{ ageMap[g.age!].label }}
             </span>
           </div>
         </div>
@@ -66,6 +66,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ageMap } from '../../../utils/newGroupsUtils'
 
 interface ApiGroup {
   id: number
@@ -91,15 +92,15 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const searchQ = ref('')
-const activeAge = ref<'all' | '5-7' | '8-10' | '11-14'>('all')
+const activeAge = ref<'all' | 'junior' | 'middle' | 'senior' | 'adult'>('all')
 const groups = ref<ApiGroup[]>([])
 const loading = ref(false)
 
 const ageChips = [
-  { key: 'all' as const,    cls: 'j', label: 'Все' },
-  { key: '5-7' as const,   cls: 'j', label: '🟢 5–7' },
-  { key: '8-10' as const,  cls: 'm', label: '🟡 8–10' },
-  { key: '11-14' as const, cls: 's', label: '🔴 11–14' },
+  { key: 'all' as const,      cls: 'all',    label: 'Все' },
+  { key: 'junior' as const,   cls: 'junior', label: '🟢 5–7' },
+  { key: 'middle' as const,   cls: 'middle', label: '🟡 8–10' },
+  { key: 'senior' as const,   cls: 'senior', label: '🔴 11–14' },
 ]
 
 async function loadGroups() {
@@ -131,23 +132,6 @@ const filteredGroups = computed(() => {
     return true
   })
 })
-
-function ageColor(age: string | null) {
-  if (!age) return '#4f6ef7'
-  if (age === '5-7')   return '#10b981'
-  if (age === '8-10')  return '#f59e0b'
-  return '#ef4444'
-}
-function ageClass(age: string | null) {
-  if (age === '5-7')  return 'j'
-  if (age === '8-10') return 'm'
-  return 's'
-}
-function ageEmoji(age: string | null) {
-  if (age === '5-7')  return '🟢'
-  if (age === '8-10') return '🟡'
-  return '🔴'
-}
 
 function pick(g: ApiGroup) {
   emit('pick', g.id, g.name, g.teacher?.id ?? null)
@@ -204,9 +188,11 @@ function pick(g: ApiGroup) {
   border: 1px solid var(--app-border); background: var(--app-card); color: var(--app-text-dim);
 }
 .gpp-age-chip:hover { border-color: var(--app-border-hi); color: var(--app-text-main); }
-.gpp-age-chip.active-j { background: rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.5); color: #10b981; }
-.gpp-age-chip.active-m { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #f59e0b; }
-.gpp-age-chip.active-s { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.5); color: #ef4444; }
+.gpp-age-chip.active-junior { background: rgba(16,185,129,0.18); border-color: rgba(16,185,129,0.5); color: #10b981; }
+.gpp-age-chip.active-middle { background: rgba(245,158,11,0.18); border-color: rgba(245,158,11,0.5); color: #f59e0b; }
+.gpp-age-chip.active-senior { background: rgba(239,68,68,0.18); border-color: rgba(239,68,68,0.5); color: #ef4444; }
+.gpp-age-chip.active-adult  { background: rgba(139,92,246,0.18); border-color: rgba(139,92,246,0.5); color: #8b5cf6; }
+.gpp-age-chip.active-all { background: rgba(79,110,247,0.12); border-color: rgba(79,110,247,0.4); color: var(--blue); }
 
 .gpp-list { flex: 1; overflow-y: auto; padding: 10px 22px; }
 .gpp-empty { text-align: center; padding: 40px 20px; color: var(--app-text-dim); font-size: 13px; }
@@ -224,10 +210,11 @@ function pick(g: ApiGroup) {
 .gpp-item-meta { font-size: 11.5px; color: var(--app-text-dim); margin-top: 2px; }
 .gpp-item-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
-.gpp-age-badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 20px; font-size: 10.5px; font-weight: 600; white-space: nowrap; }
-.gpp-age-j { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
-.gpp-age-m { background: rgba(245,158,11,0.12); color: #f59e0b; border: 1px solid rgba(245,158,11,0.3); }
-.gpp-age-s { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+.gpp-age-badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 20px; font-size: 10.5px; font-weight: 600; white-space: nowrap; border: 1px solid rgba(255,255,255,0.08); }
+.gpp-age-junior { background: rgba(16,185,129,0.12); color: #10b981; border-color: rgba(16,185,129,0.3); }
+.gpp-age-middle { background: rgba(245,158,11,0.12); color: #f59e0b; border-color: rgba(245,158,11,0.3); }
+.gpp-age-senior { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.3); }
+.gpp-age-adult  { background: rgba(139,92,246,0.12); color: #8b5cf6; border-color: rgba(139,92,246,0.3); }
 
 .gpp-slots { font-family: 'Space Mono', monospace; font-size: 11px; font-weight: 700; }
 .gpp-slots.full { color: #ef4444; }

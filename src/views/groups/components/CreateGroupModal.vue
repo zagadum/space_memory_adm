@@ -135,6 +135,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { NewGroupTeacher, MasterStudent } from '../../../api/newGroupsApi'
+import { ageMap } from '../../../utils/newGroupsUtils'
 
 const { t } = useI18n()
 
@@ -173,13 +174,6 @@ const days = [
   t('newGroups.weekdays.sat'),
   t('newGroups.weekdays.sun'),
 ]
-
-const ageMap: Record<string, { label: string; icon: string }> = {
-  junior: { label: '5–7',   icon: '🟢' },
-  middle: { label: '8–10',  icon: '🟡' },
-  senior: { label: '11–14', icon: '🔴' },
-  adult:  { label: '15+',   icon: '🟣' },
-}
 
 const filteredTeachers = computed(() => {
   const q = teacherQuery.value.toLowerCase()

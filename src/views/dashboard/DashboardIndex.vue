@@ -21,7 +21,7 @@
           <div class="stat-value">{{ store.stats.totalStudents }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.totalStudents') }}</div>
         </div>
-        <div class="stat-trend">{{ $t('dashboard.stats.studentsTrend', { n: 0 }) }}</div>
+        <div class="stat-trend">{{ $t('dashboard.stats.studentsTrend', { n: store.stats.studentsWeeklyTrend }) }}</div>
       </div>
       
       <div class="stat-card green">
@@ -30,7 +30,7 @@
           <div class="stat-value">{{ store.stats.activeGroups }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.activeGroups') }}</div>
         </div>
-        <div class="stat-trend">{{ $t('dashboard.stats.groupsTrend', { n: 0 }) }}</div>
+        <div class="stat-trend">{{ $t('dashboard.stats.groupsTrend', { n: store.stats.groupsFillRate }) }}</div>
       </div>
       
       <div class="stat-card amber">
@@ -39,7 +39,10 @@
           <div class="stat-value">{{ store.stats.pendingInvoices }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.pendingInvoices') }}</div>
         </div>
-        <div class="stat-trend warning">{{ $t('dashboard.stats.invoicesTrend') }}</div>
+        <div class="stat-trend warning">
+          <span v-if="store.stats.overdueInvoices > 0">🔴 {{ store.stats.overdueInvoices }} {{ $t('finance.overdueCount') }}</span>
+          <span v-else>{{ $t('dashboard.stats.invoicesTrend') }}</span>
+        </div>
       </div>
       
       <div class="stat-card purple">
@@ -48,7 +51,10 @@
           <div class="stat-value">{{ store.stats.newLeads }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.newLeads') }}</div>
         </div>
-        <div class="stat-trend info">{{ $t('dashboard.stats.leadsTrend') }}</div>
+        <div class="stat-trend info">
+          <span v-if="store.stats.criticalLeads > 0">🔴 {{ store.stats.criticalLeads }} {{ $t('dashboard.stats.leadsTrend') }}</span>
+          <span v-else>{{ store.stats.newLeads }} {{ $t('dashboard.stats.leadsTrend') }}</span>
+        </div>
       </div>
 
       <div class="stat-card teal">
@@ -57,7 +63,10 @@
           <div class="stat-value">{{ store.stats.newStudents }}</div>
           <div class="stat-label">{{ $t('dashboard.stats.newStudents') }}</div>
         </div>
-        <div class="stat-trend info">{{ $t('dashboard.stats.newStudentsTrend') }}</div>
+        <div class="stat-trend info">
+          <span v-if="store.stats.studentsWithoutGroup > 0">⏳ {{ store.stats.studentsWithoutGroup }} {{ $t('dashboard.stats.newStudentsTrend') }}</span>
+          <span v-else>{{ $t('dashboard.stats.newStudentsTrend') }}</span>
+        </div>
       </div>
     </section>
 
@@ -68,18 +77,28 @@
         <div class="scard">
           <div class="scard-hdr">
             <h2 class="scard-title">{{ $t('dashboard.activity.title') }}</h2>
-            <button class="btn btn-ghost btn-xs">{{ $t('dashboard.activity.viewAll') }}</button>
+            <button class="btn btn-ghost btn-xs" @click="router.push('/activity')">
+              {{ $t('dashboard.activity.viewAll') }} →
+            </button>
           </div>
           <div class="scard-body no-padding">
-            <div class="activity-list">
+            <div v-if="store.isLoadingActivity" class="activity-list">
+              <div v-for="n in 4" :key="n" class="activity-item activity-skeleton"></div>
+            </div>
+            <div v-else-if="!store.recentActivity.length" class="activity-empty">
+              <span>📋</span> {{ $t('activity.historyEmpty') }}
+            </div>
+            <div v-else class="activity-list">
               <div v-for="event in store.recentActivity" :key="event.id" class="activity-item">
-                <div class="activity-marker" :class="event.status"></div>
+                <div class="activity-icon-dot" :style="{ background: getActivityMeta(event.action_type).color }">
+                  {{ getActivityMeta(event.action_type).icon }}
+                </div>
                 <div class="activity-content">
                   <div class="activity-header">
-                    <span class="activity-title">{{ event.title }}</span>
-                    <span class="activity-time">{{ event.timestamp }}</span>
+                    <span class="activity-title">{{ event.description }}</span>
+                    <span class="activity-time">{{ formatRelativeTime(event.created_at) }}</span>
                   </div>
-                  <p class="activity-desc">{{ event.description }}</p>
+                  <p class="activity-desc">{{ event.actor_name }}</p>
                 </div>
               </div>
             </div>
@@ -128,14 +147,16 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDashboardStore } from '../../stores/dashboard.store'
 import { useAuthStore } from '../../stores/auth.store'
+import { getActivityMeta, formatRelativeTime } from '../../stores/activity.store'
 
-const { t, locale } = useI18n()
+const { locale } = useI18n()
 const store = useDashboardStore()
 const authStore = useAuthStore()
 const router = useRouter()
 
 onMounted(() => {
   store.fetchStats()
+  store.fetchRecentActivity(5)
 })
 
 const currentDate = computed(() => {
@@ -294,17 +315,34 @@ const navigate = (path: string) => {
 .activity-item:last-child {
   border-bottom: none;
 }
-.activity-marker {
-  width: 4px;
-  height: 40px;
-  border-radius: 2px;
+.activity-icon-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
   flex-shrink: 0;
-  background: rgba(100,120,255,0.1);
+  opacity: 0.85;
 }
-.activity-marker.success { background: #10b981; box-shadow: 0 0 10px rgba(16,185,129,0.3); }
-.activity-marker.info { background: #4f6ef7; box-shadow: 0 0 10px rgba(79,110,247,0.3); }
-.activity-marker.warning { background: #f59e0b; box-shadow: 0 0 10px rgba(245,158,11,0.3); }
-.activity-marker.error { background: #ef4444; box-shadow: 0 0 10px rgba(239,68,68,0.3); }
+.activity-skeleton {
+  height: 48px;
+  background: linear-gradient(90deg, var(--app-surface) 25%, var(--app-border) 50%, var(--app-surface) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+.activity-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 32px 20px;
+  color: var(--app-text-dim);
+  font-size: 13px;
+  justify-content: center;
+}
 
 .activity-content {
   flex: 1;

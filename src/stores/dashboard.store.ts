@@ -1,22 +1,23 @@
 import { defineStore } from 'pinia'
 import { getDashboardStats } from '../api/dashboardApi'
+import { useActivityStore } from './activity.store'
+import type { ActivityLog } from './activity.store'
 
 export interface DashboardStats {
     totalStudents: number
+    studentsWeeklyTrend: number
     activeGroups: number
+    groupsFillRate: number
     pendingInvoices: number
+    unpaidSum: number
+    overdueInvoices: number
     newLeads: number
+    criticalLeads: number
     newStudents: number
+    studentsWithoutGroup: number
 }
 
-export interface ActivityEvent {
-    id: string
-    type: 'payment' | 'student' | 'group' | 'lead'
-    title: string
-    description: string
-    timestamp: string
-    status?: 'success' | 'warning' | 'info' | 'error'
-}
+export type { ActivityLog as ActivityEvent }
 
 export interface QuickAction {
     id: string
@@ -31,54 +32,17 @@ export const useDashboardStore = defineStore('dashboard', {
         isLoadingStats: false,
         stats: {
             totalStudents: 0,
+            studentsWeeklyTrend: 0,
             activeGroups: 0,
+            groupsFillRate: 0,
             pendingInvoices: 0,
+            unpaidSum: 0,
+            overdueInvoices: 0,
             newLeads: 0,
-            newStudents: 0
+            criticalLeads: 0,
+            newStudents: 0,
+            studentsWithoutGroup: 0
         } as DashboardStats,
-
-        recentActivity: [
-            {
-                id: '1',
-                type: 'payment',
-                title: 'Anna Kowalska opłaciła fakturę',
-                description: 'Faktura FA/2026/03/001 na kwotę 350 PLN',
-                timestamp: '10 minut temu',
-                status: 'success'
-            },
-            {
-                id: '2',
-                type: 'student',
-                title: 'Nowy uczeń w grupie Space Memory',
-                description: 'Marek Nowak został przypisany do grupy SM-12',
-                timestamp: '1 godzina temu',
-                status: 'info'
-            },
-            {
-                id: '3',
-                type: 'lead',
-                title: 'Nowy lead: Janusz Biznes',
-                description: 'Zapytanie o kurs programowania dla dzieci',
-                timestamp: '2 godziny temu',
-                status: 'warning'
-            },
-            {
-                id: '4',
-                type: 'payment',
-                title: 'Nieudało się pobrać płatności',
-                description: 'Uczeń: Zofia Błąd, powód: brak środków',
-                timestamp: '3 godziny temu',
-                status: 'error'
-            },
-            {
-                id: '5',
-                type: 'group',
-                title: 'Uruchomiono nową grupę',
-                description: 'Grupą INDIGO-04 rozpoczęła zajęcia',
-                timestamp: '5 godzin temu',
-                status: 'success'
-            }
-        ] as ActivityEvent[],
 
         quickActions: [
             { id: '1', label: 'dashboard.quickActions.issueInvoice', icon: '📝', path: '/finance/invoices/new', color: 'blue' },
@@ -88,6 +52,17 @@ export const useDashboardStore = defineStore('dashboard', {
         ] as QuickAction[]
     }),
 
+    getters: {
+        recentActivity(): ActivityLog[] {
+            const activityStore = useActivityStore()
+            return activityStore.recentLogs
+        },
+        isLoadingActivity(): boolean {
+            const activityStore = useActivityStore()
+            return activityStore.isLoadingRecent
+        }
+    },
+
     actions: {
         async fetchStats() {
             this.isLoadingStats = true
@@ -96,17 +71,27 @@ export const useDashboardStore = defineStore('dashboard', {
                 this.stats = data
             } catch (err) {
                 console.warn('Dashboard stats endpoint not ready or failed. Using defaults.', err)
-                // Keep initial zeros or previous values
                 this.stats = {
                     totalStudents: 0,
+                    studentsWeeklyTrend: 0,
                     activeGroups: 0,
+                    groupsFillRate: 0,
                     pendingInvoices: 0,
+                    unpaidSum: 0,
+                    overdueInvoices: 0,
                     newLeads: 0,
-                    newStudents: 0
+                    criticalLeads: 0,
+                    newStudents: 0,
+                    studentsWithoutGroup: 0
                 }
             } finally {
                 this.isLoadingStats = false
             }
+        },
+
+        async fetchRecentActivity(limit = 5) {
+            const activityStore = useActivityStore()
+            await activityStore.fetchRecent(limit)
         }
     }
 })

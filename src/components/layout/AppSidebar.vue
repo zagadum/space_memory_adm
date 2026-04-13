@@ -61,6 +61,15 @@
         <span class="nav-icon">📊</span> {{ t('sidebar.dashboard') }}
       </div>
 
+      <!-- ИСТОРИЯ АКТИВНОСТИ -->
+      <div
+        class="nav-standalone"
+        :class="{ active: activeItem === 'activity-log' }"
+        @click="navigateTo('activity-log', '/activity')"
+      >
+        <span class="nav-icon">📋</span> {{ t('sidebar.activityLog') }}
+      </div>
+
       <div 
         v-if="isSectionAllowed('secretariat')"
         class="nav-section"
@@ -202,24 +211,27 @@
       <div v-if="isSectionAllowed('recruitment') && projectStore.usesDefaultRecruitment" class="nav-children" :class="{ open: openSections.recruitment }">
         <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students' }, accessClass('new-students')]" @click="navigateTo('new-students', '/recruitment/space/new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
+          <span class="nav-badge red" v-if="newStudentsStore.totalCount > 0">{{ newStudentsStore.totalCount }}</span>
+        </div>
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/space/new-groups')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+          <span class="nav-badge blue" v-if="newGroupsStore.totalCount > 0">{{ newGroupsStore.totalCount }}</span>
         </div>
         <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads' }, accessClass('leads')]" @click="navigateTo('leads', '/recruitment/space/leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db' }, accessClass('import-db')]" @click="navigateTo('import-db', '/recruitment/space/import-db')">
+          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
         <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail' }, accessClass('target-mail')]" @click="navigateTo('target-mail', '/recruitment/space/target-mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
         </div>
         <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled' }, accessClass('expelled')]" @click="navigateTo('expelled', '/recruitment/space/expelled-students')">
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
-        </div>
-        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups' }, accessClass('new-groups')]" @click="navigateTo('new-groups', '/recruitment/space/new-groups')">
-          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+          <span class="nav-badge" v-if="expelledStudentsStore.pagination.total > 0">{{ expelledStudentsStore.pagination.total }}</span>
         </div>
         <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived' }, accessClass('archived')]" @click="navigateTo('archived', '/recruitment/space/archived-students')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
-        </div>
-        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db' }, accessClass('import-db')]" @click="navigateTo('import-db', '/recruitment/space/import-db')">
-          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
       </div>
 
@@ -237,24 +249,27 @@
       <div v-if="isSectionAllowed('recruitment') && projectStore.isIndigo" class="nav-children" :class="{ open: openSections.recruitmentIndigo }">
         <div v-if="isVisible('new-students')" class="nav-item" :class="[{ active: activeItem === 'new-students-indigo' }, accessClass('new-students')]" @click="navigateTo('new-students-indigo', '/recruitment/indigo/new-students', 'new-students')">
           <span class="nav-icon">🌟</span> {{ t('sidebar.newStudents') }}
+          <span class="nav-badge red" v-if="newStudentsStore.totalCount > 0">{{ newStudentsStore.totalCount }}</span>
+        </div>
+        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups-indigo' }, accessClass('new-groups')]" @click="navigateTo('new-groups-indigo', '/recruitment/indigo/new-groups', 'new-groups')">
+          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+          <span class="nav-badge blue" v-if="newGroupsStore.totalCount > 0">{{ newGroupsStore.totalCount }}</span>
         </div>
         <div v-if="isVisible('leads')" class="nav-item" :class="[{ active: activeItem === 'leads-indigo' }, accessClass('leads')]" @click="navigateTo('leads-indigo', '/recruitment/indigo/leads', 'leads')">
           <span class="nav-icon">📋</span> {{ t('sidebar.leads') }}
+        </div>
+        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db-indigo' }, accessClass('import-db')]" @click="navigateTo('import-db-indigo', '/recruitment/indigo/import-db', 'import-db')">
+          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
         <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail-indigo' }, accessClass('target-mail')]" @click="navigateTo('target-mail-indigo', '/recruitment/indigo/target-mail', 'target-mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
         </div>
         <div v-if="isVisible('expelled')" class="nav-item" :class="[{ active: activeItem === 'expelled-indigo' }, accessClass('expelled')]" @click="navigateTo('expelled-indigo', '/recruitment/indigo/expelled-students', 'expelled')">
           <span class="nav-icon">📤</span> {{ t('sidebar.expelled') }}
-        </div>
-        <div v-if="isVisible('new-groups')" class="nav-item" :class="[{ active: activeItem === 'new-groups-indigo' }, accessClass('new-groups')]" @click="navigateTo('new-groups-indigo', '/recruitment/indigo/new-groups', 'new-groups')">
-          <span class="nav-icon">🚀</span> {{ t('sidebar.newGroups') }}
+          <span class="nav-badge" v-if="expelledStudentsStore.pagination.total > 0">{{ expelledStudentsStore.pagination.total }}</span>
         </div>
         <div v-if="isVisible('archived')" class="nav-item" :class="[{ active: activeItem === 'archived-indigo' }, accessClass('archived')]" @click="navigateTo('archived-indigo', '/recruitment/indigo/archived-students', 'archived')">
           <span class="nav-icon">📁</span> {{ t('sidebar.archive') }}
-        </div>
-        <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db-indigo' }, accessClass('import-db')]" @click="navigateTo('import-db-indigo', '/recruitment/indigo/import-db', 'import-db')">
-          <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
       </div>
 
@@ -275,11 +290,11 @@
         </div>
         <div v-if="isVisible('debtors')" class="nav-item" :class="{ active: activeItem === 'debtors' }" @click="navigateTo('debtors', '/finance/debtors')">
           <span class="nav-icon">🔴</span> {{ t('sidebar.debtors') }}
-          <span class="nav-badge" v-if="debtors > 0">{{ debtors }}</span>
+          <span class="nav-badge" v-if="debtorsStore.pagination.total > 0">{{ debtorsStore.pagination.total }}</span>
         </div>
         <div v-if="isVisible('nadplaty')" class="nav-item" :class="{ active: activeItem === 'nadplaty' }" @click="navigateTo('nadplaty', '/finance/nadplaty')">
           <span class="nav-icon">💙</span> {{ t('sidebar.nadplaty') }}
-          <span class="nav-badge cyan">3</span>
+          <span class="nav-badge cyan" v-if="debtorsStore.pagination.total > 0">{{ debtorsStore.pagination.total }}</span>
         </div>
         <div v-if="isVisible('contractors')" class="nav-item" :class="{ active: activeItem === 'contractors' }" @click="navigateTo('contractors', '/finance/contractors')">
           <span class="nav-icon">🏢</span> {{ t('sidebar.contractors') }}
@@ -301,7 +316,7 @@
       <div v-if="isSectionAllowed('accounting')" class="nav-section" :class="{ open: openSections.accounting }" @click="toggleSection('accounting')">
         <span class="nav-section-icon">🧾</span>
         <span class="nav-section-label">{{ t('sidebar.accounting') }}</span>
-        <span class="nav-section-badge nb-cyan" v-if="pendingReturns > 0">{{ pendingReturns }}</span>
+        <span class="nav-section-badge nb-cyan" v-if="refundsStore.stats.pending_count > 0">{{ refundsStore.stats.pending_count }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('accounting')" class="nav-children" :class="{ open: openSections.accounting }">
@@ -310,7 +325,7 @@
         </div>
         <div v-if="isVisible('returns')" class="nav-item" :class="[{ active: activeItem === 'returns' }, accessClass('returns')]" @click="navigateTo('returns', '/finance/returns')">
           <span class="nav-icon">↩️</span> {{ t('sidebar.returns') }}
-          <span class="nav-badge cyan" v-if="pendingReturns > 0">{{ pendingReturns }}</span>
+          <span class="nav-badge cyan" v-if="refundsStore.stats.pending_count > 0">{{ refundsStore.stats.pending_count }}</span>
         </div>
         <div v-if="isVisible('projects')" class="nav-item" :class="[{ active: activeItem === 'projects' }, accessClass('projects')]" @click="navigateTo('projects', '/projects')">
           <span class="nav-icon">📁</span> {{ t('sidebar.projects') }}
@@ -453,6 +468,12 @@ import { useAuthStore } from '../../stores/auth.store'
 import { useAppStore } from '../../stores/app.store'
 import { useProjectStore } from '../../stores/project.store'
 import { useAccessStore } from '../../stores/access.store'
+import { useNewStudentsStore } from '../../stores/newStudents.store'
+import { useExpelledStudentsStore } from '../../stores/expelledStudents.store'
+import { useNewGroupsStore } from '../../stores/newGroups.store'
+import { useDebtorsStore } from '../../stores/debtors.store'
+import { useRefundsStore } from '../../stores/refunds.store'
+import { onMounted } from 'vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -467,6 +488,13 @@ const notificationStore = useNotificationStore()
 const appStore = useAppStore()
 const projectStore = useProjectStore()
 const accessStore = useAccessStore()
+
+// Новые сторы для счетчиков
+const newStudentsStore = useNewStudentsStore()
+const expelledStudentsStore = useExpelledStudentsStore()
+const newGroupsStore = useNewGroupsStore()
+const debtorsStore = useDebtorsStore()
+const refundsStore = useRefundsStore()
 
 // Показываем только те проекты, которые доступны пользователю по роли
 // admin / super-admin видят все проекты; остальные — только текущий
@@ -517,9 +545,6 @@ const handleLogout = () => {
 // Заглушки счетчиков
 const hrCandidates   = ref(8)
 const trainerTasks   = ref(4)
-const debtors        = ref(7)
-const pendingReturns = ref(2)
-const rezygnajeCount = ref(11)
 const unreadNews     = ref(3)
 
 const openSections = ref<Record<string, boolean>>({
@@ -648,6 +673,17 @@ watch(() => route.path, (path) => {
   else if (path.startsWith('/trainer/mail'))     { activeItem.value = 'trainer-mail';      openSections.value.trainer = true }
   // Мой кабинет
 }, { immediate: true })
+
+onMounted(async () => {
+  const backend = projectStore.activeProject === 'indigo' ? 'indigo' : 'default'
+  void Promise.allSettled([
+    newStudentsStore.fetchStudents(1, backend),
+    newGroupsStore.fetchGroups(backend),
+    expelledStudentsStore.fetchExpelled(1, backend),
+    debtorsStore.fetchDebtors(),
+    refundsStore.fetchStats()
+  ])
+})
 
 // Автоматически раскрываем раздел настроек для админов, когда данные пользователя загружены
 watch(() => authStore.user?.role, (newRole) => {

@@ -162,7 +162,12 @@
             <div v-else class="sp-data-list">
               <div v-for="group in listStore.teacherGroups" :key="group.id" class="sp-data-item">
                 <div class="sp-item-info">
-                  <div class="sp-item-title">{{ group.name }}</div>
+                  <div class="sp-item-title-row">
+                    <div class="sp-item-title">{{ group.name }}</div>
+                    <span v-if="ageMap[group.age ?? '']" :class="['age-badge', ageMap[group.age!].cls]">
+                      {{ ageMap[group.age!].icon }} {{ ageMap[group.age!].label }}
+                    </span>
+                  </div>
                   <div class="sp-item-sub">{{ group.schedule }}</div>
                 </div>
                 <div class="sp-item-badge">
@@ -255,6 +260,7 @@ import { ref, watch, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { TeacherDetails } from '../../../api/teachersApi'
 import { useTeachersListStore } from '../../../stores/teachersList.store'
+import { ageMap } from '../../../utils/newGroupsUtils'
 
 const listStore = useTeachersListStore()
 const activeTab = ref('profile')
@@ -582,6 +588,13 @@ function onSave() {
 }
 .sp-note-btn-primary { border-color: rgba(79,110,247,0.5); color: var(--blue); }
 .sp-note-btn-danger { border-color: rgba(239,68,68,0.35); color: #ef4444; }
+
+.sp-item-title-row { display: flex; align-items: center; gap: 8px; }
+.age-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 700; white-space: nowrap; font-family: 'Outfit', sans-serif; border: 1px solid rgba(255,255,255,0.08); }
+.age-junior { background: rgba(16,185,129,0.12); color: #10b981; border-color: rgba(16,185,129,0.25); }
+.age-middle { background: rgba(245,158,11,0.12); color: #f59e0b; border-color: rgba(245,158,11,0.25); }
+.age-senior { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.25); }
+.age-adult  { background: rgba(139,92,246,0.12); color: #8b5cf6; border-color: rgba(139,92,246,0.25); }
 
 /* Languages selection in panel */
 .sp-languages-grid {

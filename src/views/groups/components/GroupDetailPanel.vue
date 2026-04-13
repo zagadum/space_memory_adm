@@ -17,13 +17,25 @@
               <span>{{ group.time }}</span>
               <template v-if="group.teacher">
                 <span class="sep">·</span>
-                <span>{{ group.teacher.name }}</span>
+                <span class="teacher-link" @click="teacherPanelOpen = true">
+                  {{ group.teacher.name }}
+                  <span class="edit-icon">✎</span>
+                </span>
+              </template>
+              <template v-else>
+                <span class="sep">·</span>
+                <span class="assign-teacher-link" @click="teacherPanelOpen = true">
+                  {{ t('newGroups.detail.assignTeacher') }}
+                </span>
               </template>
               <span class="sep">·</span>
               <span>{{ t('newGroups.detail.start') }} {{ fmtDate(group.startDate) }}</span>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
+            <button class="gp-btn-history" @click="historyPanelOpen = true">
+              📋 {{ t('activity.groupHistory') }}
+            </button>
             <button class="gp-btn-delete" @click="confirmDelete">{{ t('newGroups.detail.deleteGroup') }}</button>
             <div class="gp-close" @click="$emit('close')">✕</div>
           </div>
@@ -86,6 +98,7 @@
             <thead>
               <tr>
                 <th>{{ t('newGroups.detail.thName') }}</th>
+                <th>{{ t('newGroups.detail.thEmail') }}</th>
                 <th>{{ t('newGroups.detail.thAge') }}</th>
                 <th>{{ t('newGroups.detail.thContract') }}</th>
                 <th>{{ t('newGroups.detail.thPayment') }}</th>
@@ -110,14 +123,23 @@
                 :class="s.contract !== 'signed' ? 'row-not-ready' : ''"
               >
                 <td>
-                  <div style="display:flex;align-items:center;gap:8px">
+                  <div style="display:flex;align-items:center;gap:10px">
                     <div class="status-dot" :style="{ background: s.contract === 'signed' ? 'var(--green)' : 'var(--amber)', boxShadow: '0 0 4px ' + (s.contract === 'signed' ? 'var(--green)' : 'var(--amber)') }"></div>
-                    <span style="font-weight:500">{{ s.name }}</span>
+                    <div>
+                      <div class="student-name">{{ s.name }}</div>
+                      <div class="student-info-sub">
+                        <span class="sub-id">#{{ s.id }}</span>
+                        <span v-if="s.phone" class="sub-phone">{{ s.phone }}</span>
+                      </div>
+                    </div>
                   </div>
                 </td>
                 <td>
+                  <div class="student-email" :title="s.email || ''">{{ s.email || '—' }}</div>
+                </td>
+                <td>
                   <span class="age-mono">{{ s.age }}</span>
-                  <span style="color:var(--dim);font-size:11px"> {{ t('newGroups.detail.years') }}</span>
+                  <span class="age-label"> {{ pluralizeYears(s.age) }}</span>
                 </td>
                 <td>
                   <span :class="['contract-badge', s.contract === 'signed' ? 'contract-signed' : 'contract-pending']">
@@ -125,12 +147,25 @@
                   </span>
                 </td>
                 <td>
-                  <span :class="['payment-mono', s.paymentStr === '0 zł' ? 'payment-zero' : '']">{{ s.paymentStr }}</span>
+                  <span 
+                    v-if="s.paymentStr !== '0 zł'"
+                    :class="['payment-mono', s.isPaid ? 'payment-paid' : 'payment-expected']"
+                  >
+                    {{ s.paymentStr }}
+                    <template v-if="s.isPaid"> · {{ t('newStudents.table.paid') }}</template>
+                    <template v-else> · {{ t('newStudents.table.pending') }}</template>
+                  </span>
+                  <span v-else class="payment-mono payment-zero">{{ s.paymentStr }}</span>
                 </td>
-                <td><span class="date-mono">{{ fmtDate(s.createdDate) }}</span></td>
                 <td>
                   <div class="timer-cell">
-                    <span :class="['timer-days', timerCls(daysDiff(s.createdDate))]">{{ daysDiff(s.createdDate) }}</span>
+                    <span :class="['timer-days', timerCls(daysDiff(s.enrollDate || s.createdDate))]">{{ daysDiff(s.enrollDate || s.createdDate) }}</span>
+                    <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
+                  </div>
+                </td>
+                <td>
+                  <div class="timer-cell">
+                    <span :class="['timer-days', timerCls(daysDiff(s.registeredAt || s.createdDate))]">{{ daysDiff(s.registeredAt || s.createdDate) }}</span>
                     <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
                   </div>
                 </td>
@@ -211,23 +246,89 @@
     </div>
 
     <!-- TOAST REMOVED -->
+
+    <!-- GROUP HISTORY PANEL -->
+    <GroupHistoryPanel
+      v-if="historyPanelOpen"
+      :group-id="group.id"
+      :group-name="group.name"
+      @close="historyPanelOpen = false"
+    />
+
+    <!-- TEACHER SELECTION SUB-PANEL -->
+    <div v-if="teacherPanelOpen" :class="['asp-panel', 'open']">
+      <div class="asp-header">
+        <div>
+          <div class="asp-title">{{ t('newGroups.detail.selectTeacherTitle') }}</div>
+          <div class="asp-sub">{{ t('newGroups.detail.selectTeacherSub') }}</div>
+        </div>
+        <div class="gp-close" @click="teacherPanelOpen = false">✕</div>
+      </div>
+      <div class="asp-search-wrap">
+        <div class="asp-search-box">
+          <span style="color:var(--dim);font-size:14px">🔍</span>
+          <input v-model="teacherQuery" type="text" :placeholder="t('newGroups.detail.searchTeacherPlaceholder')" style="flex:1;background:none;border:none;outline:none;color:var(--text-main);font-family:'Outfit',sans-serif;font-size:13px" />
+        </div>
+      </div>
+      <div class="asp-list">
+        <!-- Option to remove teacher -->
+        <div 
+          v-if="group.teacher" 
+          class="asp-item remove-teacher" 
+          @click="selectTeacher(null)"
+        >
+          <div class="asp-avatar" style="background:var(--red);opacity:0.8">✕</div>
+          <div class="asp-info">
+            <div class="asp-name" style="color:var(--red)">Убрать преподавателя</div>
+          </div>
+        </div>
+
+        <div
+          v-for="tr in filteredTeachers"
+          :key="tr.id"
+          :class="['asp-item', group.teacher?.id === tr.id ? 'selected' : '']"
+          @click="selectTeacher(tr.id)"
+        >
+          <div class="asp-avatar" :style="{ background: tr.color }">{{ tr.initials }}</div>
+          <div class="asp-info">
+            <div class="asp-name">{{ tr.name }}</div>
+          </div>
+          <span v-if="group.teacher?.id === tr.id" class="asp-status already">{{ t('newGroups.detail.selected') }}</span>
+        </div>
+      </div>
+      <div class="asp-footer">
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" @click="teacherPanelOpen = false">{{ t('newGroups.detail.cancel') }}</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { NewGroup, NewGroupStudent, MasterStudent } from '../../../api/newGroupsApi'
+import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../../api/newGroupsApi'
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
+import GroupHistoryPanel from './GroupHistoryPanel.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+
+function pluralizeYears(n: number): string {
+  if (locale.value !== 'ru' && locale.value !== 'uk') return t('newGroups.detail.years')
+  
+  const m10 = n % 10
+  const m100 = n % 100
+  if (m10 === 1 && m100 !== 11) return locale.value === 'ru' ? 'год' : 'рік'
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return locale.value === 'ru' ? 'года' : 'роки'
+  return locale.value === 'ru' ? 'лет' : 'років'
+}
 const notify = useNotificationStore()
 
 const props = defineProps<{
   group: NewGroup
   students: NewGroupStudent[]
   masterStudents: MasterStudent[]
+  teachers: NewGroupTeacher[]
   loadingStudents: boolean
 }>()
 
@@ -240,18 +341,25 @@ const emit = defineEmits<{
   'student-archived': [payload: { groupId: number; studentId: number; name: string }]
   'student-transferred': [payload: { groupId: number; studentId: number; name: string }]
   'student-email': [payload: { groupId: number; studentId: number; name: string }]
+  'teacher-assigned': [payload: { groupId: number; teacherId: number | null }]
 }>()
 
 const addPanelOpen = ref(false)
 const aspQuery = ref('')
 const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
+const historyPanelOpen = ref(false)
+
+const teacherPanelOpen = ref(false)
+const teacherQuery = ref('')
 
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
-// Когда студенты загружены — считаем из них. Иначе fallback на group.paid
-const actualTotal = computed(() =>
-  props.students.length > 0 ? props.students.length : props.group.totalSlots
-)
+// Когда студенты загружены — считаем оплативших из них.
+// Знаменатель всегда totalSlots (вместимость), если только она не 0 (тогда используем кол-во студентов)
+const actualTotal = computed(() => {
+  if (props.group.totalSlots > 0) return props.group.totalSlots
+  return props.students.length
+})
 const actualPaid = computed(() =>
   props.students.length > 0
     ? props.students.filter(s => s.contract === 'signed').length
@@ -274,6 +382,11 @@ const filteredMaster = computed(() => {
   return q ? props.masterStudents.filter(s => s.name.toLowerCase().includes(q)) : props.masterStudents
 })
 
+const filteredTeachers = computed(() => {
+  const q = teacherQuery.value.toLowerCase().trim()
+  return q ? props.teachers.filter(t => t.name.toLowerCase().includes(q)) : props.teachers
+})
+
 function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
@@ -282,6 +395,11 @@ function toggleAsp(id: number) {
   const s = new Set(aspSelected.value)
   s.has(id) ? s.delete(id) : s.add(id)
   aspSelected.value = s
+}
+
+function selectTeacher(teacherId: number | null) {
+  emit('teacher-assigned', { groupId: props.group.id, teacherId })
+  teacherPanelOpen.value = false
 }
 
 async function confirmAdd() {
@@ -366,6 +484,23 @@ function doDelete() {
   font-size: 12.5px; color: var(--dim);
   margin-top: 4px; display: flex; align-items: center; gap: 8px;
 }
+.teacher-link {
+  color: var(--blue);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.teacher-link:hover { text-decoration: underline; }
+.edit-icon { font-size: 10px; opacity: 0.6; }
+
+.assign-teacher-link {
+  color: var(--amber);
+  cursor: pointer;
+  font-weight: 500;
+}
+.assign-teacher-link:hover { text-decoration: underline; }
+
 .sep { opacity: 0.4; }
 
 .gp-close {
@@ -458,8 +593,10 @@ function doDelete() {
 .contract-signed  { background: rgba(16,185,129,0.13); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
 .contract-pending { background: rgba(245,158,11,0.12);  color: var(--amber); border: 1px solid rgba(245,158,11,0.3); }
 
-.payment-mono { font-family: 'Space Mono', monospace; font-size: 12.5px; font-weight: 700; color: var(--green); }
-.payment-zero { color: var(--dim); }
+.payment-mono { font-family: 'Space Mono', monospace; font-size: 12.5px; font-weight: 700; color: var(--app-text-main); }
+.payment-paid { color: #10b981 !important; }
+.payment-expected { color: #f59e0b !important; }
+.payment-zero { color: var(--dim); font-style: italic; opacity: 0.6; }
 
 .date-mono { font-family: 'Space Mono', monospace; font-size: 12px; }
 .timer-cell { display: flex; flex-direction: column; align-items: flex-start; }
@@ -469,6 +606,13 @@ function doDelete() {
 .timer-days.mid { color: var(--amber); }
 .timer-days.high { color: var(--red); }
 .empty-cell { color: rgba(136,146,176,0.35); font-size: 12px; font-style: italic; }
+
+.student-name { font-weight: 600; font-size: 13.5px; color: var(--app-text-main); }
+.student-info-sub { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.sub-id { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--dim); background: rgba(255,255,255,0.05); padding: 1px 4px; border-radius: 4px; }
+.sub-phone { font-size: 11px; color: var(--dim); font-weight: 500; }
+.student-email { font-size: 12.5px; color: var(--dim); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.age-label { font-size: 11px; color: var(--dim); }
 
 .row-actions { display: flex; align-items: center; gap: 4px; opacity: 0; transition: opacity 0.15s; }
 .gp-table tbody tr:hover .row-actions { opacity: 1; }
@@ -497,6 +641,15 @@ function doDelete() {
 }
 
 /* PANEL ACTION BTNS */
+.gp-btn-history {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 13px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
+  font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s;
+  background: rgba(79,110,247,0.08); color: #4f6ef7;
+  border: 1px solid rgba(79,110,247,0.25);
+}
+.gp-btn-history:hover { background: rgba(79,110,247,0.16); border-color: rgba(79,110,247,0.5); }
+
 .gp-btn-delete {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 6px 13px; border-radius: 8px; font-size: 12.5px; font-weight: 600;
