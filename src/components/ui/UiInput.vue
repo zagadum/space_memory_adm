@@ -7,6 +7,7 @@
         :type="inputType"
         :placeholder="placeholder"
         :value="modelValue"
+        :readonly="readonly"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
       <button
@@ -34,8 +35,9 @@ const props = withDefaults(
     placeholder?: string;
     type?: string;
     error?: string;
+    readonly?: boolean;
   }>(),
-  { modelValue: "", placeholder: "", type: "text", error: "" }
+  { modelValue: "", placeholder: "", type: "text", error: "", readonly: false }
 );
 
 defineEmits<{
@@ -101,6 +103,13 @@ function togglePassword() {
 .ui-input:focus {
   border-color: var(--blue, #4f6ef7);
   box-shadow: 0 0 0 2px rgba(79, 110, 247, 0.12);
+}
+
+.ui-input[readonly] {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(100, 120, 255, 0.1);
+  color: var(--dim, #8892b0);
+  cursor: default;
 }
 
 .ui-input-toggle {

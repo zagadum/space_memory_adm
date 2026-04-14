@@ -1675,6 +1675,7 @@
       "lessonTime": "Lesson Time",
       "timezoneHint": "(Warsaw)",
       "namePlaceholder": "e.g. Mon 18 senior ELa",
+      "selectDateFirst": " Select start date first",
       "notFound": "Not found",
       "optional": "(optional)",
       "plannedStart": "Planned Start Date",
@@ -1685,7 +1686,37 @@
       "submit": "✦ Create Group",
       "subtitle": "Fill in the details for a new study group",
       "teacher": "Teacher",
-      "title": "✦ Create New Group"
+      "title": "✦ Create New Group",
+      "timezoneLabel": "Timezone",
+      "shortWeekdays": {
+        "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri", "sat": "Sat", "sun": "Sun"
+      },
+      "ageAdjectives": {
+        "junior": "junior",
+        "middle": "middle",
+        "senior": "senior",
+        "adult": "adult"
+      },
+      "sections": {
+        "general": "General Information",
+        "schedule": "Schedule & Timing",
+        "team": "Team & Students"
+      },
+      "preview": {
+        "title": "Group Preview",
+        "subtitle": "Review data before creation",
+        "selected": "{n} students selected",
+        "noTeacher": "No teacher selected",
+        "noStudents": "No students selected"
+      },
+      "timezones": {
+        "warsaw": "Warsaw (UTC+1/2)",
+        "kyiv": "Kyiv (UTC+2/3)",
+        "london": "London (UTC+0/1)",
+        "new_york": "New York (UTC-4/5)",
+        "chicago": "Chicago (UTC-5/6)",
+        "los_angeles": "Los Angeles (UTC-7/8)"
+      }
     },
     "createBtn": "✦ Create New Group",
     "days": "days",

@@ -66,7 +66,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ageMap } from '../../../utils/newGroupsUtils'
+import { ageMap, CANONICAL_AGE_GROUPS } from '../../../utils/newGroupsUtils'
 
 interface ApiGroup {
   id: number
@@ -98,9 +98,11 @@ const loading = ref(false)
 
 const ageChips = [
   { key: 'all' as const,      cls: 'all',    label: 'Все' },
-  { key: 'junior' as const,   cls: 'junior', label: '🟢 5–7' },
-  { key: 'middle' as const,   cls: 'middle', label: '🟡 8–10' },
-  { key: 'senior' as const,   cls: 'senior', label: '🔴 11–14' },
+  ...CANONICAL_AGE_GROUPS.map(a => ({
+    key: a.key as 'junior' | 'middle' | 'senior' | 'adult',
+    cls: a.key,
+    label: `${a.icon} ${a.label}`
+  }))
 ]
 
 async function loadGroups() {
@@ -124,7 +126,10 @@ watch(() => props.modelValue, (open) => {
 const filteredGroups = computed(() => {
   const q = searchQ.value.toLowerCase().trim()
   return groups.value.filter(g => {
-    if (activeAge.value !== 'all' && g.age !== activeAge.value) return false
+    if (activeAge.value !== 'all') {
+      const normalizedAge = ageMap[g.age ?? '']?.key ?? g.age
+      if (normalizedAge !== activeAge.value) return false
+    }
     if (q) {
       const haystack = [g.name, g.teacher?.name ?? '', g.day].join(' ').toLowerCase()
       if (!haystack.includes(q)) return false

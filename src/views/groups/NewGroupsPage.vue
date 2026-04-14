@@ -381,9 +381,10 @@ function closePanel() {
   panelStudents.value = []
 }
 
-async function onGroupCreated(payload: Parameters<typeof createNewGroup>[0]) {
+async function onGroupCreated(payload: any) {
   try {
-    const res = await createNewGroup(payload, recruitmentBackend.value)
+    const { timezone, ...apiPayload } = payload
+    const res = await createNewGroup(apiPayload, recruitmentBackend.value)
     newGroupsStore.setGroups([res.group, ...newGroupsStore.groups])
     showCreateModal.value = false
     notify.addToast(t('newGroups.toasts.created'), 'success')

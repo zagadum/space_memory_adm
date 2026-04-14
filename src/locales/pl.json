@@ -1628,6 +1628,7 @@
       "lessonTime": "Czas lekcji",
       "timezoneHint": "(Warszawa)",
       "namePlaceholder": "np. Pon 18 starsza ELa",
+      "selectDateFirst": "Najpierw wybierz datę startu",
       "notFound": "Nie znaleziono",
       "optional": "(opcjonalnie)",
       "plannedStart": "Planowana data startu",
@@ -1638,7 +1639,37 @@
       "submit": "✦ Utwórz grupę",
       "subtitle": "Wypełnij dane dla nowej grupy zajęciowej",
       "teacher": "Nauczyciel",
-      "title": "✦ Utwórz nową grupę"
+      "title": "✦ Utwórz nową grupę",
+      "timezoneLabel": "Strefa czasowa",
+      "shortWeekdays": {
+        "mon": "Pn", "tue": "Wt", "wed": "Śr", "thu": "Cz", "fri": "Pt", "sat": "So", "sun": "Nd"
+      },
+      "ageAdjectives": {
+        "junior": "młodsza",
+        "middle": "średnia",
+        "senior": "starsza",
+        "adult": "dorosła"
+      },
+      "sections": {
+        "general": "Informacje podstawowe",
+        "schedule": "Harmonogram i czas",
+        "team": "Zespół i uczniowie"
+      },
+      "preview": {
+        "title": "Podgląd grupy",
+        "subtitle": "Sprawdź dane przed utworzeniem",
+        "selected": "Wybrano: {n} os.",
+        "noTeacher": "Nie wybrano nauczyciela",
+        "noStudents": "Nie wybrano uczniów"
+      },
+      "timezones": {
+        "warsaw": "Warszawa (UTC+1/2)",
+        "kyiv": "Kijów (UTC+2/3)",
+        "london": "Londyn (UTC+0/1)",
+        "new_york": "Nowy Jork (UTC-4/5)",
+        "chicago": "Chicago (UTC-5/6)",
+        "los_angeles": "Los Angeles (UTC-7/8)"
+      }
     },
     "createBtn": "✦ Utwórz nową grupę",
     "days": "dni",

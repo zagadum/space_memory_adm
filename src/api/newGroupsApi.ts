@@ -1,5 +1,6 @@
 import { http, httpRecruitmentIndigo, type RecruitmentBackend } from "./http";
 import { NEW_GROUPS } from "./endpoints";
+import { ageMap } from "../utils/newGroupsUtils";
 
 export interface NewGroupTeacher {
     id: number;
@@ -175,7 +176,7 @@ export async function createNewGroup(payload: {
         time: payload.time,
         start_date: payload.startDate,
         age: payload.age,
-        age_name: payload.age,
+        age_name: payload.age ? (ageMap[payload.age]?.label ?? payload.age) : null,
         teacher_id: payload.teacherId,
         student_ids: payload.studentIds,
         ...workdays,
