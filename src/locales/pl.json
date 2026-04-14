@@ -2698,6 +2698,15 @@
         "empty": "Brak aktywnych grup",
         "name": "Nazwa",
         "schedule": "Harmonogram",
+        "startDate": "Start",
+        "status": "Status",
+        "statusValues": {
+          "active": "Aktywna",
+          "archived": "Archiwum",
+          "closed": "Zamknięta",
+          "new": "Nowa",
+          "paused": "Pauza"
+        },
         "students": "Uczniowie"
       },
       "history": {

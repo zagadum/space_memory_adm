@@ -168,7 +168,16 @@
                       {{ ageMap[group.age!].icon }} {{ ageMap[group.age!].label }}
                     </span>
                   </div>
-                  <div class="sp-item-sub">{{ group.schedule }}</div>
+                  <div class="sp-item-sub" v-if="group.startDate || group.status">
+                    <span v-if="group.startDate">
+                      {{ t('teachersList.panel.groups.startDate') || 'Старт' }}: {{ formatGroupStartDate(group.startDate) }}
+                    </span>
+                    <span v-if="group.startDate && group.status"> • </span>
+                    <span v-if="group.status">
+                      {{ t('teachersList.panel.groups.status') || 'Статус' }}: {{ formatGroupStatus(group.status) }}
+                    </span>
+                  </div>
+                  <div class="sp-item-sub" v-else>{{ group.schedule }}</div>
                 </div>
                 <div class="sp-item-badge">
                   {{ group.studentsCount }} {{ t('teachersList.panel.groups.students') || 'учеников' }}
@@ -433,7 +442,31 @@ function initials(name: string) {
   return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 }
 
-function onSave() { 
+function formatGroupStatus(status?: string | null): string {
+  const value = String(status ?? '').trim().toLowerCase()
+  if (!value) return '—'
+
+  const labels: Record<string, string> = {
+    active: t('teachersList.panel.groups.statusValues.active') || 'Активная',
+    new: t('teachersList.panel.groups.statusValues.new') || 'Новая',
+    paused: t('teachersList.panel.groups.statusValues.paused') || 'Пауза',
+    archived: t('teachersList.panel.groups.statusValues.archived') || 'Архив',
+    closed: t('teachersList.panel.groups.statusValues.closed') || 'Закрыта',
+  }
+
+  return labels[value] ?? value
+}
+
+function formatGroupStartDate(value?: string | null): string {
+  if (!value) return '—'
+
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return value
+
+  return new Intl.DateTimeFormat('ru-RU').format(parsed)
+}
+
+function onSave() {
   emit('save', { ...form.value }) 
 }
 </script>

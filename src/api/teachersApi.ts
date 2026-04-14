@@ -108,6 +108,8 @@ export interface TeacherGroupItem {
   id: number
   name: string
   schedule: string
+  status: string
+  startDate: string | null
   studentsCount: number
   school: string
   age?: string | null
@@ -134,10 +136,14 @@ function normalizeTeacherNote(raw: any): TeacherNote {
 }
 
 function normalizeTeacherGroup(raw: any): TeacherGroupItem {
+  const status = String(raw?.status ?? raw?.status_group ?? '')
+
   return {
     id: Number(raw?.id ?? 0),
     name: String(raw?.name ?? raw?.group_name ?? raw?.title ?? 'Unknown Group'),
     schedule: String(raw?.schedule ?? raw?.description ?? ''),
+    status,
+    startDate: raw?.startDate ?? raw?.start_date ?? null,
     studentsCount: Number(raw?.studentsCount ?? raw?.students_count ?? raw?.count ?? 0),
     school: String(raw?.school ?? raw?.branch ?? 'Space Memory'),
     age: raw?.age_name ?? raw?.age ?? null

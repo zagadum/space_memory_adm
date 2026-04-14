@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { getTeachers, getTeacher, createTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails, type TeacherNote } from '../api/teachersApi'
+import { getTeachers, getTeacher, createTeacher, updateTeacher, changeTeacherPassword, type TeacherListParams, type TeacherListItem, type TeacherDetails, type TeacherNote, type TeacherGroupItem } from '../api/teachersApi'
 
 export const useTeachersListStore = defineStore('teachersList', () => {
   const teachers = ref<TeacherListItem[]>([])
@@ -30,7 +30,7 @@ export const useTeachersListStore = defineStore('teachersList', () => {
 
   // Profile data
   const teacherHistory = ref<any[]>([])
-  const teacherGroups = ref<any[]>([])
+  const teacherGroups = ref<TeacherGroupItem[]>([])
   const teacherNotes = ref<TeacherNote[]>([])
 
   const totalTeachers = computed(() => pagination.value.total || teachers.value.length)

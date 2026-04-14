@@ -2736,6 +2736,15 @@
         "empty": "Немає активних груп",
         "name": "Назва",
         "schedule": "Розклад",
+        "startDate": "Старт",
+        "status": "Статус",
+        "statusValues": {
+          "active": "Активна",
+          "archived": "Архів",
+          "closed": "Закрита",
+          "new": "Нова",
+          "paused": "Пауза"
+        },
         "students": "Учні"
       },
       "history": {

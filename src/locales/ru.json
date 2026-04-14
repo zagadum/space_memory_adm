@@ -2736,6 +2736,15 @@
         "empty": "Нет активных групп",
         "name": "Название",
         "schedule": "Расписание",
+        "startDate": "Старт",
+        "status": "Статус",
+        "statusValues": {
+          "active": "Активная",
+          "archived": "Архив",
+          "closed": "Закрыта",
+          "new": "Новая",
+          "paused": "Пауза"
+        },
         "students": "Ученики"
       },
       "history": {

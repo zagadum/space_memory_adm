@@ -2805,6 +2805,15 @@
         "empty": "No active groups",
         "name": "Name",
         "schedule": "Schedule",
+        "startDate": "Start",
+        "status": "Status",
+        "statusValues": {
+          "active": "Active",
+          "archived": "Archived",
+          "closed": "Closed",
+          "new": "New",
+          "paused": "Paused"
+        },
         "students": "Students"
       },
       "history": {
