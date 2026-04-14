@@ -50,11 +50,15 @@
               <div class="modal-label">{{ t('newGroups.create.ageGroup') }}</div>
               <div class="age-toggle">
                 <div
-                  v-for="age in displayAgeGroups"
-                  :key="age.key"
-                  :class="['age-option', selAge === age.key ? 'sel-' + age.key : '']"
-                  @click="selAge = age.key"
-                >{{ age.icon }} {{ age.label }}</div>
+                  v-for="key in (['junior', 'middle', 'senior', 'adult'] as const)"
+                  :key="key"
+                  :class="['age-option', selAge === key ? 'sel-' + key : '']"
+                  @click="selAge = key"
+                >
+                  <span class="age-icon">{{ ageMap[key].icon }}</span>
+                  <span class="age-range">{{ ageMap[key].label }}</span>
+                  <span class="age-type">({{ t('newGroups.create.ageAdjectives.' + key) }})</span>
+                </div>
               </div>
             </div>
           </div>
@@ -200,6 +204,17 @@
                 <div class="p-value" v-else style="opacity:0.4">{{ t('newGroups.create.selectDateFirst') }}</div>
               </div>
 
+              <!-- Age Preview -->
+              <div class="preview-item">
+                <div class="p-label">{{ t('newGroups.create.ageGroup') }}</div>
+                <div class="p-value" v-if="selAge">
+                  <UiBadge :variant="ageVariant(selAge)">
+                    {{ ageMap[selAge].icon }} {{ ageMap[selAge].label }} ({{ t('newGroups.create.ageAdjectives.' + selAge) }})
+                  </UiBadge>
+                </div>
+                <div class="p-value" v-else style="opacity:0.4">—</div>
+              </div>
+
               <!-- Teacher Preview -->
               <div class="preview-item">
                 <div class="p-label">{{ t('newGroups.create.teacher') }}</div>
@@ -303,12 +318,8 @@ const weekdays = [
 const hrs = Array.from({ length: 15 }, (_, i) => String(i + 7).padStart(2, '0'))
 const mins = ['00', '15', '30', '45']
 
-const displayAgeGroups = computed(() => [
-  { key: 'junior', label: ageMap.junior.label, icon: ageMap.junior.icon },
-  { key: 'middle', label: ageMap.middle.label, icon: ageMap.middle.icon },
-  { key: 'senior', label: ageMap.senior.label, icon: ageMap.senior.icon },
-  { key: 'adult',  label: ageMap.adult.label,  icon: ageMap.adult.icon },
-])
+// ── Constants ──
+const ageKeys = ['junior', 'middle', 'senior', 'adult'] as const
 
 // ── Computed ──
 const time = computed(() => `${selHour.value}:${selMinute.value}`)
@@ -333,6 +344,14 @@ const selectedTeacherName = computed(() => {
 const isReady = computed(() => {
   return name.value.trim().length > 0 && day.value.length > 0 && startDate.value.length > 0
 })
+
+function ageVariant(key: string): "success" | "warning" | "danger" | "info" | "default" {
+  if (key === 'junior') return 'success'
+  if (key === 'middle') return 'warning'
+  if (key === 'senior') return 'danger'
+  if (key === 'adult')  return 'info'
+  return 'default'
+}
 
 // ── Logic ──
 const shortWeekdays = {
@@ -585,6 +604,10 @@ onUnmounted(() => document.removeEventListener('click', handleOutside))
 .age-option.sel-middle { background: rgba(245,158,11,0.1); border-color: var(--amber); color: var(--amber); }
 .age-option.sel-senior { background: rgba(239,68,68,0.1); border-color: var(--red); color: var(--red); }
 .age-option.sel-adult  { background: rgba(139,92,246,0.1); border-color: var(--purple); color: var(--purple); }
+
+.age-range { font-weight: 700; margin-right: 4px; }
+.age-type { opacity: 0.8; font-weight: 400; font-size: 11px; }
+.age-icon { margin-right: 6px; }
 
 /* Time */
 .time-select-group { display: flex; align-items: center; gap: 8px; }

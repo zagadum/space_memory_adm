@@ -57,7 +57,10 @@
                   </span>
                   <div v-if="ageMap[g.age ?? '']" class="age-info">
                     <span class="age-icon">{{ ageMap[g.age!].icon }}</span>
-                    <span class="age-val">{{ ageMap[g.age!].label }} {{ t('newGroups.detail.years') }}</span>
+                    <span class="age-val">
+                      {{ ageMap[g.age!].label }}
+                      <span class="age-adj">{{ t('newGroups.create.ageAdjectives.' + ageMap[g.age!].key) }}</span>
+                    </span>
                   </div>
                 </div>
               </td>
@@ -663,6 +666,8 @@ td { padding: 12px 13px; font-size: 13.5px; vertical-align: middle; }
 
 .slots-cell { display: flex; flex-direction: column; align-items: flex-start; }
 .slots-val   { font-family: 'Space Mono', monospace; font-size: 15px; font-weight: 700; color: var(--app-text-main); }
+.age-val { font-size: 13px; font-weight: 600; color: var(--white); }
+.age-adj { font-size: 11px; color: var(--dim); margin-left: 4px; font-weight: 400; text-transform: lowercase; }
 .slots-label { color: var(--app-text-dim); font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
 
 .payment-ratio { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
