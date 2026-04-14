@@ -183,7 +183,7 @@
                 </td>
                 <td>
                   <span 
-                    v-if="s.paymentStr !== '0 zł'"
+                    v-if="s.paymentStr !== '0 zł' || s.isPaid"
                     :class="['payment-mono', s.isPaid ? 'payment-paid' : 'payment-expected']"
                   >
                     {{ s.paymentStr }}

@@ -139,6 +139,33 @@ function normalizeNewGroup(raw: any): NewGroup {
     }
 }
 
+function normalizeNewGroupStudent(raw: any): NewGroupStudent {
+    const paymentStr = String(raw?.paymentStr ?? raw?.payment_str ?? '0 zł')
+    const isPaidInStr = paymentStr.toLowerCase().includes('оплачено')
+    
+    // Clean string: remove "оплачено" and extra dots/spaces
+    const cleanedPayment = paymentStr
+        .replace(/·?\s*оплачено/gi, '')
+        .replace(/^\s*·\s*/, '')
+        .trim() || '0 zł'
+
+    return {
+        id: raw?.id ?? 0,
+        name: String(raw?.name ?? ''),
+        age: Number(raw?.age ?? 0),
+        phone: raw?.phone,
+        email: raw?.email,
+        meta: raw?.meta,
+        contract: raw?.contract ?? "pending",
+        isPaid: raw?.isPaid === true || isPaidInStr,
+        paymentStr: cleanedPayment,
+        enrollDate: String(raw?.enrollDate ?? raw?.enroll_date ?? ''),
+        registeredAt: String(raw?.registeredAt ?? raw?.registered_at ?? ''),
+        createdDate: String(raw?.createdDate ?? raw?.created_at ?? ''),
+        manager: raw?.manager ?? null,
+    }
+}
+
 export async function getNewGroups(backend: RecruitmentBackend = "default") {
     const res = await getClient(backend).get(NEW_GROUPS.LIST);
     const items = Array.isArray(res.data?.items) ? res.data.items.map((item: any) => normalizeNewGroup(item)) : []
@@ -147,7 +174,8 @@ export async function getNewGroups(backend: RecruitmentBackend = "default") {
 
 export async function getNewGroupStudents(groupId: number, backend: RecruitmentBackend = "default") {
     const res = await getClient(backend).get(NEW_GROUPS.STUDENTS, { params: { groupId } });
-    return res.data as { items: NewGroupStudent[] };
+    const items = Array.isArray(res.data?.items) ? res.data.items.map((s: any) => normalizeNewGroupStudent(s)) : []
+    return { items };
 }
 
 export async function getMasterStudents(backend: RecruitmentBackend = "default") {
@@ -248,13 +276,16 @@ export async function editGroup(payload: {
 
 export async function getGroupFullInfo(group_id: number, backend: RecruitmentBackend = "default") {
     const res = await getClient(backend).post(NEW_GROUPS.FULL_INFO, { group_id });
-    return res.data as {
-        success: true;
+    const students = Array.isArray(res.data?.data?.students) 
+        ? res.data.data.students.map((s: any) => normalizeNewGroupStudent(s)) 
+        : []
+        
+    return {
+        success: true,
         data: {
-            group: NewGroup;
-            students: NewGroupStudent[];
-            counters: { students_count: number; paid_count: number; contract_signed_count: number; age_name: string | null };
-        };
+            ...res.data.data,
+            students
+        }
     };
 }
 
