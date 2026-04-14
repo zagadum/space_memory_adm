@@ -165,6 +165,7 @@
       :master-students="masterStudents"
       :teachers="teachers"
       :loading-students="loadingStudents"
+      :backend="recruitmentBackend"
       @close="closePanel"
       @start="openStartModal(panelGroup!)"
       @delete="onDeleteGroup"
@@ -174,6 +175,7 @@
       @student-transferred="onStudentTransferred"
       @student-email="onStudentEmail"
       @teacher-assigned="onTeacherAssigned"
+      @group-saved="onGroupSaved"
     />
   </div>
 </template>
@@ -480,25 +482,38 @@ async function onStudentEmail(payload: { groupId: number; studentId: number; nam
   }
 }
 
-async function onTeacherAssigned(payload: { groupId: number; teacherId: number | null }) {
+async function onTeacherAssigned(payload: { groupId: number; teacherId: number | null; name?: string }) {
   try {
-    const res = await editGroup({ 
-      group_id: payload.groupId, 
-      teacher_id: payload.teacherId 
+    const res = await editGroup({
+      group_id: payload.groupId,
+      teacher_id: payload.teacherId,
+      ...(payload.name ? { name: payload.name } : {}),
     }, recruitmentBackend.value)
-    
-    // Update local state
+
+    const updates: Partial<NewGroup> = { teacher: res.data.teacher }
+    if (payload.name) updates.name = payload.name
+
     const index = groups.value.findIndex(g => g.id === payload.groupId)
     if (index !== -1) {
-      groups.value[index] = { ...groups.value[index], teacher: res.data.teacher }
-      if (panelGroup.value?.id === payload.groupId) {
-        panelGroup.value = { ...panelGroup.value, teacher: res.data.teacher }
-      }
+      groups.value[index] = { ...groups.value[index], ...updates }
     }
-    
+    if (panelGroup.value?.id === payload.groupId) {
+      panelGroup.value = { ...panelGroup.value, ...updates }
+    }
+
     notify.addToast(t('common.success'), 'success')
   } catch (err: unknown) {
     notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
+function onGroupSaved(payload: { groupId: number; updates: Partial<NewGroup> }) {
+  const index = groups.value.findIndex(g => g.id === payload.groupId)
+  if (index !== -1) {
+    groups.value[index] = { ...groups.value[index], ...payload.updates }
+  }
+  if (panelGroup.value?.id === payload.groupId) {
+    panelGroup.value = { ...panelGroup.value, ...payload.updates }
   }
 }
 

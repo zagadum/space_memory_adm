@@ -12,9 +12,31 @@
           <div>
             <div class="gp-title">{{ group.name }}</div>
             <div class="gp-subtitle">
+              <!-- День (readonly — производное от даты) -->
               <span>{{ group.day }}</span>
               <span class="sep">·</span>
-              <span>{{ group.time }}</span>
+
+              <!-- Время — кликабельное inline-редактирование -->
+              <template v-if="!editingTime">
+                <span class="edit-field-link" @click="openEditTime">
+                  {{ group.time }}<span class="edit-icon">✎</span>
+                </span>
+              </template>
+              <template v-else>
+                <span class="inline-edit-wrap">
+                  <select v-model="editTimeH" class="inline-select">
+                    <option v-for="h in timeHours" :key="h" :value="h">{{ h }}</option>
+                  </select>
+                  <span style="opacity:0.5">:</span>
+                  <select v-model="editTimeM" class="inline-select">
+                    <option v-for="m in timeMinutes" :key="m" :value="m">{{ m }}</option>
+                  </select>
+                  <span class="inline-save" @click="saveTime">✓</span>
+                  <span class="inline-cancel" @click="editingTime = false">✕</span>
+                </span>
+              </template>
+
+              <!-- Учитель -->
               <template v-if="group.teacher">
                 <span class="sep">·</span>
                 <span class="teacher-link" @click="teacherPanelOpen = true">
@@ -28,8 +50,21 @@
                   {{ t('newGroups.detail.assignTeacher') }}
                 </span>
               </template>
+
+              <!-- Дата старта — кликабельное inline-редактирование -->
               <span class="sep">·</span>
-              <span>{{ t('newGroups.detail.start') }} {{ fmtDate(group.startDate) }}</span>
+              <template v-if="!editingDate">
+                <span class="edit-field-link" @click="openEditDate">
+                  {{ t('newGroups.detail.start') }} {{ fmtDate(group.startDate) }}<span class="edit-icon">✎</span>
+                </span>
+              </template>
+              <template v-else>
+                <span class="inline-edit-wrap">
+                  <input type="date" v-model="editDateVal" class="inline-date-input" />
+                  <span class="inline-save" @click="saveDate">✓</span>
+                  <span class="inline-cancel" @click="editingDate = false">✕</span>
+                </span>
+              </template>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px">
@@ -307,21 +342,24 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../../api/newGroupsApi'
+import { editGroup } from '../../../api/newGroupsApi'
+import type { RecruitmentBackend } from '../../../api/http'
 import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
+import { parseApiError } from '../../../api/errorHelper'
 import GroupHistoryPanel from './GroupHistoryPanel.vue'
 
 const { t, locale } = useI18n()
 
 function pluralizeYears(n: number): string {
   if (locale.value !== 'ru' && locale.value !== 'uk') return t('newGroups.detail.years')
-  
   const m10 = n % 10
   const m100 = n % 100
   if (m10 === 1 && m100 !== 11) return locale.value === 'ru' ? 'год' : 'рік'
   if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return locale.value === 'ru' ? 'года' : 'роки'
   return locale.value === 'ru' ? 'лет' : 'років'
 }
+
 const notify = useNotificationStore()
 
 const props = defineProps<{
@@ -330,6 +368,7 @@ const props = defineProps<{
   masterStudents: MasterStudent[]
   teachers: NewGroupTeacher[]
   loadingStudents: boolean
+  backend?: RecruitmentBackend
 }>()
 
 const emit = defineEmits<{
@@ -341,21 +380,95 @@ const emit = defineEmits<{
   'student-archived': [payload: { groupId: number; studentId: number; name: string }]
   'student-transferred': [payload: { groupId: number; studentId: number; name: string }]
   'student-email': [payload: { groupId: number; studentId: number; name: string }]
-  'teacher-assigned': [payload: { groupId: number; teacherId: number | null }]
+  'teacher-assigned': [payload: { groupId: number; teacherId: number | null; name?: string }]
+  'group-saved': [payload: { groupId: number; updates: Partial<NewGroup> }]
 }>()
 
+// ── Panel state ──
 const addPanelOpen = ref(false)
 const aspQuery = ref('')
 const aspSelected = ref<Set<number>>(new Set())
 const deleteConfirm = ref(false)
 const historyPanelOpen = ref(false)
-
 const teacherPanelOpen = ref(false)
 const teacherQuery = ref('')
 
+// ── Inline edit: time ──
+const editingTime = ref(false)
+const editTimeH = ref('17')
+const editTimeM = ref('00')
+const timeHours = Array.from({ length: 15 }, (_, i) => String(i + 7).padStart(2, '0'))
+const timeMinutes = ['00', '15', '30', '45']
+
+// ── Inline edit: date ──
+const editingDate = ref(false)
+const editDateVal = ref('')
+
+// ── Auto-name helpers (same logic as CreateGroupModal) ──
+const shortWeekdays: Record<number, string> = {
+  0: t('newGroups.create.shortWeekdays.sun'),
+  1: t('newGroups.create.shortWeekdays.mon'),
+  2: t('newGroups.create.shortWeekdays.tue'),
+  3: t('newGroups.create.shortWeekdays.wed'),
+  4: t('newGroups.create.shortWeekdays.thu'),
+  5: t('newGroups.create.shortWeekdays.fri'),
+  6: t('newGroups.create.shortWeekdays.sat'),
+}
+
+// Full weekday names for the `day` field sent to API
+const fullWeekdays: Record<number, string> = {
+  0: t('newGroups.weekdays.sun'),
+  1: t('newGroups.weekdays.mon'),
+  2: t('newGroups.weekdays.tue'),
+  3: t('newGroups.weekdays.wed'),
+  4: t('newGroups.weekdays.thu'),
+  5: t('newGroups.weekdays.fri'),
+  6: t('newGroups.weekdays.sat'),
+}
+
+function deriveTeacherShort(fullName: string): string {
+  if (!fullName) return ''
+  const parts = fullName.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return ''
+  if (parts.length > 1) {
+    return parts[0][0].toUpperCase() + parts[1][0].toUpperCase() + (parts[1][1] || '').toLowerCase()
+  }
+  return parts[0].slice(0, 3).toUpperCase()
+}
+
+function buildAutoName(opts: {
+  dateStr?: string
+  timeStr?: string
+  teacher?: NewGroupTeacher | null
+}): string {
+  const dateStr = opts.dateStr ?? props.group.startDate
+  const timeStr = opts.timeStr ?? props.group.time
+  const teacher = opts.teacher !== undefined ? opts.teacher : props.group.teacher
+
+  let res = ''
+
+  if (dateStr) {
+    const d = new Date(dateStr + 'T00:00:00Z')
+    if (!isNaN(d.getTime())) res += shortWeekdays[d.getUTCDay()] || ''
+  }
+
+  const hour = timeStr ? timeStr.split(':')[0] : ''
+  if (hour) res += (res ? ' ' : '') + hour
+
+  if (props.group.age) {
+    res += (res ? ' ' : '') + t(`newGroups.create.ageAdjectives.${props.group.age}`)
+  }
+
+  if (teacher) {
+    res += (res ? ' ' : '') + deriveTeacherShort(teacher.name)
+  }
+
+  return res
+}
+
+// ── Computed ──
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
-// Когда студенты загружены — считаем оплативших из них.
-// Знаменатель всегда totalSlots (вместимость), если только она не 0 (тогда используем кол-во студентов)
+
 const actualTotal = computed(() => {
   if (props.group.totalSlots > 0) return props.group.totalSlots
   return props.students.length
@@ -374,19 +487,59 @@ const contractCount = computed(() => props.students.filter(s => s.contract === '
 const contractPct = computed(() =>
   actualTotal.value > 0 ? Math.round(contractCount.value / actualTotal.value * 100) : 0
 )
-
 const alreadyInGroup = computed(() => new Set(props.students.map(s => Number(s.id))))
-
 const filteredMaster = computed(() => {
   const q = aspQuery.value.toLowerCase().trim()
   return q ? props.masterStudents.filter(s => s.name.toLowerCase().includes(q)) : props.masterStudents
 })
-
 const filteredTeachers = computed(() => {
   const q = teacherQuery.value.toLowerCase().trim()
-  return q ? props.teachers.filter(t => t.name.toLowerCase().includes(q)) : props.teachers
+  return q ? props.teachers.filter(tr => tr.name.toLowerCase().includes(q)) : props.teachers
 })
 
+// ── Time edit ──
+function openEditTime() {
+  const parts = props.group.time.split(':')
+  editTimeH.value = parts[0] ?? '17'
+  editTimeM.value = parts[1] ?? '00'
+  editingTime.value = true
+}
+
+async function saveTime() {
+  const newTime = `${editTimeH.value}:${editTimeM.value}`
+  try {
+    const newName = buildAutoName({ timeStr: newTime })
+    await editGroup({ group_id: props.group.id, time: newTime, name: newName }, props.backend)
+    emit('group-saved', { groupId: props.group.id, updates: { time: newTime, name: newName } })
+    editingTime.value = false
+    notify.addToast(t('common.success'), 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
+// ── Date edit ──
+function openEditDate() {
+  editDateVal.value = props.group.startDate
+  editingDate.value = true
+}
+
+async function saveDate() {
+  if (!editDateVal.value) { editingDate.value = false; return }
+  try {
+    const d = new Date(editDateVal.value + 'T00:00:00Z')
+    const newDay = !isNaN(d.getTime()) ? (fullWeekdays[d.getUTCDay()] ?? props.group.day) : props.group.day
+    const newName = buildAutoName({ dateStr: editDateVal.value })
+    await editGroup({ group_id: props.group.id, start_date: editDateVal.value, day: newDay, name: newName }, props.backend)
+    emit('group-saved', { groupId: props.group.id, updates: { startDate: editDateVal.value, day: newDay, name: newName } })
+    editingDate.value = false
+    notify.addToast(t('common.success'), 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
+}
+
+// ── Helpers ──
 function timerCls(days: number) {
   return days <= 7 ? 'low' : days <= 21 ? 'mid' : 'high'
 }
@@ -398,7 +551,9 @@ function toggleAsp(id: number) {
 }
 
 function selectTeacher(teacherId: number | null) {
-  emit('teacher-assigned', { groupId: props.group.id, teacherId })
+  const teacher = teacherId ? (props.teachers.find(tr => tr.id === teacherId) ?? null) : null
+  const newName = buildAutoName({ teacher })
+  emit('teacher-assigned', { groupId: props.group.id, teacherId, name: newName || undefined })
   teacherPanelOpen.value = false
 }
 
@@ -501,6 +656,73 @@ function doDelete() {
 .assign-teacher-link:hover { text-decoration: underline; }
 
 .sep { opacity: 0.4; }
+
+/* Inline edit fields */
+.edit-field-link {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  border-radius: 4px;
+  padding: 1px 4px;
+  transition: background 0.15s, color 0.15s;
+}
+.edit-field-link:hover {
+  background: rgba(79,110,247,0.12);
+  color: var(--blue);
+}
+.edit-field-link:hover .edit-icon { opacity: 1; }
+
+.inline-edit-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.inline-date-input {
+  background: var(--app-surface);
+  border: 1px solid var(--bh);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-family: 'Space Mono', monospace;
+  font-size: 11.5px;
+  padding: 2px 6px;
+  outline: none;
+}
+.inline-date-input:focus { border-color: var(--blue); }
+
+.inline-select {
+  background: var(--app-surface);
+  border: 1px solid var(--bh);
+  border-radius: 6px;
+  color: var(--text-main);
+  font-family: 'Space Mono', monospace;
+  font-size: 11.5px;
+  padding: 2px 4px;
+  outline: none;
+  cursor: pointer;
+}
+.inline-select:focus { border-color: var(--blue); }
+
+.inline-save {
+  cursor: pointer;
+  color: var(--green);
+  font-size: 13px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.inline-save:hover { background: rgba(16,185,129,0.15); }
+
+.inline-cancel {
+  cursor: pointer;
+  color: var(--dim);
+  font-size: 12px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+.inline-cancel:hover { background: rgba(239,68,68,0.1); color: var(--red); }
 
 .gp-close {
   width: 32px; height: 32px; flex-shrink: 0;
