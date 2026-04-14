@@ -160,8 +160,8 @@ function normalizeNewGroupStudent(raw: any): NewGroupStudent {
         isPaid: raw?.isPaid === true || isPaidInStr,
         paymentStr: cleanedPayment,
         enrollDate: String(raw?.enrollDate ?? raw?.enroll_date ?? ''),
-        registeredAt: String(raw?.registeredAt ?? raw?.registered_at ?? ''),
-        createdDate: String(raw?.createdDate ?? raw?.created_at ?? ''),
+        registeredAt: String(raw?.registeredAt ?? raw?.registered_at ?? raw?.created_at ?? raw?.createdAt ?? row?.date_create ?? ''),
+        createdDate: String(raw?.createdDate ?? raw?.created_at ?? raw?.createdAt ?? raw?.date_create ?? ''),
         manager: raw?.manager ?? null,
     }
 }

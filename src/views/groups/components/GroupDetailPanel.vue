@@ -193,15 +193,19 @@
                   <span v-else class="payment-mono payment-zero">{{ s.paymentStr }}</span>
                 </td>
                 <td>
-                  <div class="timer-cell">
-                    <span :class="['timer-days', timerCls(daysDiff(s.enrollDate || s.createdDate))]">{{ daysDiff(s.enrollDate || s.createdDate) }}</span>
-                    <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
+                  <div class="date-cell">
+                    <span class="date-mono">{{ s.enrollDate ? fmtDate(s.enrollDate) : '—' }}</span>
+                    <span v-if="s.enrollDate" :class="['date-timer', timerCls(daysDiff(s.enrollDate))]">
+                      {{ t('newGroups.daysPassed', { n: daysDiff(s.enrollDate) }) }}
+                    </span>
                   </div>
                 </td>
                 <td>
-                  <div class="timer-cell">
-                    <span :class="['timer-days', timerCls(daysDiff(s.registeredAt || s.createdDate))]">{{ daysDiff(s.registeredAt || s.createdDate) }}</span>
-                    <span class="timer-label">{{ t('newGroups.detail.daysShort') }}</span>
+                  <div class="date-cell">
+                    <span class="date-mono">{{ fmtDate(s.createdDate) }}</span>
+                    <span :class="['date-timer', timerCls(daysDiff(s.createdDate))]">
+                      {{ t('newGroups.daysPassed', { n: daysDiff(s.createdDate) }) }}
+                    </span>
                   </div>
                 </td>
                 <td>
@@ -819,13 +823,12 @@ function doDelete() {
 .payment-expected { color: #f59e0b !important; }
 .payment-zero { color: var(--dim); font-style: italic; opacity: 0.6; }
 
-.date-mono { font-family: 'Space Mono', monospace; font-size: 12px; }
-.timer-cell { display: flex; flex-direction: column; align-items: flex-start; }
-.timer-days { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; }
-.timer-label { font-size: 10px; color: var(--dim); text-transform: uppercase; }
-.timer-days.low { color: var(--green); }
-.timer-days.mid { color: var(--amber); }
-.timer-days.high { color: var(--red); }
+.date-mono { font-family: 'Space Mono', monospace; font-size: 12.5px; font-weight: 600; color: var(--app-text-main); }
+.date-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.date-timer { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+.date-timer.low { color: var(--green); }
+.date-timer.mid { color: var(--amber); }
+.date-timer.high { color: var(--red); }
 .empty-cell { color: rgba(136,146,176,0.35); font-size: 12px; font-style: italic; }
 
 .student-name { font-weight: 600; font-size: 13.5px; color: var(--app-text-main); }
