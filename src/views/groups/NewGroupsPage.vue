@@ -136,6 +136,7 @@
       v-if="showCreateModal"
       :teachers="teachers"
       :all-students="masterStudents"
+      :backend="recruitmentBackend"
       @close="showCreateModal = false"
       @created="onGroupCreated"
     />
@@ -183,7 +184,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGlobalSearchStore } from '../../stores/globalSearch.store'
 import { useNewGroupsStore } from '../../stores/newGroups.store'
-import { getNewGroupStudents, getMasterStudents, getTeachers, createNewGroup, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, transferStudentFromGroup, emailStudentFromGroup, editGroup } from '../../api/newGroupsApi'
+import { getNewGroupStudents, getMasterStudents, getTeachers, startGroup as apiStartGroup, deleteNewGroup, addStudentsToGroup, removeStudentFromGroup, archiveStudentFromGroup, emailStudentFromGroup, editGroup } from '../../api/newGroupsApi'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../api/http'
 import { getRecruitmentApi } from '../../api/recruitmentApi'
@@ -384,16 +385,10 @@ function closePanel() {
   panelStudents.value = []
 }
 
-async function onGroupCreated(payload: any) {
-  try {
-    const { timezone, ...apiPayload } = payload
-    const res = await createNewGroup(apiPayload, recruitmentBackend.value)
-    newGroupsStore.setGroups([res.group, ...newGroupsStore.groups])
-    showCreateModal.value = false
-    notify.addToast(t('newGroups.toasts.created'), 'success')
-  } catch (err: unknown) {
-    notify.addToast(parseApiError(err, t('newGroups.toasts.createError')), 'error')
-  }
+function onGroupCreated(group: NewGroup) {
+  newGroupsStore.setGroups([group, ...newGroupsStore.groups])
+  showCreateModal.value = false
+  notify.addToast(t('newGroups.toasts.created'), 'success')
 }
 
 async function onGroupStarted(id: number) {

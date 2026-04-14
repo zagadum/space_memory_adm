@@ -207,9 +207,9 @@
         <div
           v-for="s in filteredMaster"
           :key="s.id"
-          :class="['asp-item', aspSelected.has(s.id) ? 'selected' : '', alreadyInGroup.has(s.name) ? 'in-group' : '']"
-          :style="alreadyInGroup.has(s.name) ? 'opacity:0.5;cursor:default' : ''"
-          @click="!alreadyInGroup.has(s.name) && toggleAsp(s.id)"
+          :class="['asp-item', aspSelected.has(s.id) ? 'selected' : '', alreadyInGroup.has(s.id) ? 'in-group' : '']"
+          :style="alreadyInGroup.has(s.id) ? 'opacity:0.5;cursor:default' : ''"
+          @click="!alreadyInGroup.has(s.id) && toggleAsp(s.id)"
         >
           <div :class="['asp-checkbox', aspSelected.has(s.id) ? 'checked' : '']"></div>
           <div class="asp-avatar" :style="{ background: s.color }">{{ s.initials }}</div>
@@ -217,7 +217,7 @@
             <div class="asp-name">{{ s.name }}</div>
             <div class="asp-meta">{{ s.meta }}</div>
           </div>
-          <span v-if="alreadyInGroup.has(s.name)" class="asp-status already">{{ t('newGroups.detail.alreadyInGroup') }}</span>
+          <span v-if="alreadyInGroup.has(s.id)" class="asp-status already">{{ t('newGroups.detail.alreadyInGroup') }}</span>
           <span v-else-if="aspSelected.has(s.id)" class="asp-status new">{{ t('newGroups.detail.selected') }}</span>
         </div>
       </div>
@@ -375,7 +375,7 @@ const contractPct = computed(() =>
   actualTotal.value > 0 ? Math.round(contractCount.value / actualTotal.value * 100) : 0
 )
 
-const alreadyInGroup = computed(() => new Set(props.students.map(s => s.name)))
+const alreadyInGroup = computed(() => new Set(props.students.map(s => Number(s.id))))
 
 const filteredMaster = computed(() => {
   const q = aspQuery.value.toLowerCase().trim()
@@ -411,7 +411,6 @@ async function confirmAdd() {
   addPanelOpen.value = false
   aspSelected.value = new Set()
   aspQuery.value = ''
-  notify.addToast(t('newGroups.toasts.studentsAdded'), 'success')
 }
 
 function removeStudent(studentId: number | string) {

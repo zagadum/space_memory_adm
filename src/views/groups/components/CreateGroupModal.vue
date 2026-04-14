@@ -249,8 +249,12 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { NewGroupTeacher, MasterStudent } from '../../../api/newGroupsApi'
+import type { NewGroupTeacher, MasterStudent, NewGroup } from '../../../api/newGroupsApi'
+import { createNewGroup } from '../../../api/newGroupsApi'
+import type { RecruitmentBackend } from '../../../api/http'
 import { ageMap } from '../../../utils/newGroupsUtils'
+import { useNotificationStore } from '../../../stores/notification.store'
+import { parseApiError } from '../../../api/errorHelper'
 import UiInput from '../../../components/ui/UiInput.vue'
 import UiButton from '../../../components/ui/UiButton.vue'
 import UiBadge from '../../../components/ui/UiBadge.vue'
@@ -258,24 +262,16 @@ import UiBadge from '../../../components/ui/UiBadge.vue'
 const props = defineProps<{
   teachers: NewGroupTeacher[]
   allStudents: MasterStudent[]
+  backend?: RecruitmentBackend
 }>()
 
 const emit = defineEmits<{
   close: []
-  created: [payload: {
-    name: string
-    type: 'group' | 'individual'
-    day: string
-    time: string
-    startDate: string
-    timezone: string
-    age: string | null
-    teacherId: number | null
-    studentIds: number[]
-  }]
+  created: [group: NewGroup]
 }>()
 
 const { t } = useI18n()
+const notify = useNotificationStore()
 
 // ── State ──
 const isLoading = ref(false)
@@ -368,12 +364,6 @@ function deriveTeacherShort(fullName: string): string {
   if (!fullName) return ''
   const parts = fullName.trim().split(/\s+/).filter(Boolean)
   if (parts.length === 0) return ''
-  const first = parts[0][0]
-  const last = parts.length > 1 ? parts[1].slice(0, 2) : ''
-  return (first + last).toUpperCase() // or as is? Example was "ЕЛа". I'll try to preserve case if possible.
-  // Actually, let's do: First initial (Upper) + next chars (Lower if they were lower)
-  // Example: Elena Lazareva -> E + La -> ELa.
-  // parts[0][0] + parts[1].slice(0, 2)
   if (parts.length > 1) {
     return parts[0][0].toUpperCase() + parts[1][0].toUpperCase() + (parts[1][1] || '').toLowerCase()
   }
@@ -447,23 +437,29 @@ function selectTeacher(t: NewGroupTeacher) {
   teacherOpen.value = false
 }
 
-function submit() {
+async function submit() {
   nameError.value = name.value.trim() ? '' : 'required'
   dayError.value = day.value ? '' : 'required'
   if (!name.value.trim() || !day.value) return
 
   isLoading.value = true
-  emit('created', {
-    name: name.value,
-    type: selType.value,
-    day: day.value,
-    time: time.value,
-    startDate: startDate.value,
-    timezone: selTimezone.value,
-    age: selAge.value,
-    teacherId: teacherId.value,
-    studentIds: Array.from(selStudents.value)
-  })
+  try {
+    const res = await createNewGroup({
+      name: name.value,
+      type: selType.value,
+      day: day.value,
+      time: time.value,
+      startDate: startDate.value,
+      timezone: selTimezone.value,
+      age: selAge.value,
+      teacherId: teacherId.value,
+      studentIds: Array.from(selStudents.value),
+    }, props.backend ?? 'default')
+    emit('created', res.group)
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('newGroups.toasts.createError')), 'error')
+    isLoading.value = false
+  }
 }
 
 // ── Outside Click for Search ──

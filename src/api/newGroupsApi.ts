@@ -45,6 +45,7 @@ export interface NewGroup {
     teacher: NewGroupTeacher | null;
     day: string;
     time: string;
+    timezone: string | null;
     age: string | null;
     students: (number | string)[];
 }
@@ -132,6 +133,7 @@ function normalizeNewGroup(raw: any): NewGroup {
         teacher: raw?.teacher ?? null,
         day: String(raw?.day ?? ''),
         time: String(raw?.time ?? ''),
+        timezone: raw?.timezone ?? null,
         age: raw?.age ?? raw?.age_name ?? null,
         students,
     }
@@ -164,6 +166,7 @@ export async function createNewGroup(payload: {
     day: string;
     time: string;
     startDate: string;
+    timezone: string;
     age: string | null;
     teacherId: number | null;
     studentIds: number[];
@@ -175,6 +178,7 @@ export async function createNewGroup(payload: {
         type: payload.type,
         time: payload.time,
         start_date: payload.startDate,
+        timezone: payload.timezone,
         age: payload.age,
         age_name: payload.age ? (ageMap[payload.age]?.label ?? payload.age) : null,
         teacher_id: payload.teacherId,

@@ -8,10 +8,10 @@
       <!-- Readiness -->
       <div class="start-readiness">
         <div class="start-ratio-big" :style="{ color: ratioColor, textShadow: '0 0 30px ' + ratioColor + '66' }">
-          {{ group.paid }}/{{ group.totalSlots }}
+          {{ group.paid }}/{{ effectiveTotal }}
         </div>
         <div class="start-ratio-label">
-          {{ group.paid }} {{ plural(group.paid, t('newGroups.start.student1'), t('newGroups.start.student2'), t('newGroups.start.student5')) }} {{ t('newGroups.start.readyLabel', { paid: '', total: group.totalSlots }).replace(/ $/, '') }}
+          {{ group.paid }} {{ plural(group.paid, t('newGroups.start.student1'), t('newGroups.start.student2'), t('newGroups.start.student5')) }} {{ t('newGroups.start.readyLabel', { paid: '', total: effectiveTotal }).replace(/ $/, '') }}
         </div>
         <div class="start-progress-bar">
           <div class="start-progress-fill" :style="{ width: pct + '%' }"></div>
@@ -30,7 +30,7 @@
         </div>
         <div class="start-info-item">
           <div class="start-info-label">{{ t('newGroups.start.paidSigned') }}</div>
-          <div class="start-info-value" :style="{ color: ratioColor }">{{ t('newGroups.start.ofTotal', { paid: group.paid, total: group.totalSlots }) }}</div>
+          <div class="start-info-value" :style="{ color: ratioColor }">{{ t('newGroups.start.ofTotal', { paid: group.paid, total: effectiveTotal }) }}</div>
         </div>
         <div class="start-info-item">
           <div class="start-info-label">{{ t('newGroups.start.ageGroup') }}</div>
@@ -132,8 +132,9 @@ defineEmits<{
 const showReady = ref(true)
 const showWaiting = ref(true)
 
-const pct = computed(() => Math.round(props.group.paid / props.group.totalSlots * 100))
-const notPaid = computed(() => props.group.totalSlots - props.group.paid)
+const effectiveTotal = computed(() => props.group.totalSlots > 0 ? props.group.totalSlots : props.group.studentsCount)
+const pct = computed(() => effectiveTotal.value > 0 ? Math.round(props.group.paid / effectiveTotal.value * 100) : 0)
+const notPaid = computed(() => Math.max(0, effectiveTotal.value - props.group.paid))
 const ageLabel = computed(() => {
   const ai = ageMap[props.group.age ?? '']
   return ai ? ai.icon + ' ' + ai.label : '—'
