@@ -87,33 +87,59 @@
 
       <!-- START BAR -->
       <div class="gp-start-bar">
-        <div class="gp-start-info">
-          <div>
-            <div class="gp-ratio-big" :style="{ color: ratioColor, textShadow: '0 0 20px ' + ratioColor + '55' }">
-              {{ actualPaid }}/{{ actualTotal }}
+        <!-- Loading state while students are being fetched -->
+        <template v-if="loadingStudents">
+          <div class="gp-start-info">
+            <div>
+              <div class="gp-ratio-big" style="color: var(--dim); opacity: 0.4">…/…</div>
+              <div class="gp-ratio-sub" style="opacity: 0.4">{{ t('newGroups.detail.loading') }}</div>
             </div>
-            <div class="gp-ratio-sub">
-              <span :style="{ color: 'var(--green)' }">{{ t('newGroups.detail.willActivate', { n: actualPaid }) }}</span>
-              <template v-if="notPaid > 0"> · <span :style="{ color: 'var(--amber)' }">{{ t('newGroups.detail.willWait', { n: notPaid }) }}</span></template>
+            <div class="gp-mini-bars">
+              <div class="gp-bar-row">
+                <span class="gp-bar-label">{{ t('newGroups.detail.signedContract') }}</span>
+                <div class="gp-bar-track"><div class="gp-bar-fill" style="width:0%"></div></div>
+                <span class="gp-bar-val" style="color:var(--dim)">—</span>
+              </div>
+              <div class="gp-bar-row">
+                <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
+                <div class="gp-bar-track"><div class="gp-bar-fill" style="width:0%"></div></div>
+                <span class="gp-bar-val" style="color:var(--dim)">—</span>
+              </div>
             </div>
           </div>
-          <div class="gp-mini-bars">
-            <div class="gp-bar-row">
-              <span class="gp-bar-label">{{ t('newGroups.detail.signedContract') }}</span>
-              <div class="gp-bar-track"><div class="gp-bar-fill green" :style="{ width: contractPct + '%' }"></div></div>
-              <span class="gp-bar-val" style="color:var(--green)">{{ contractCount }}</span>
+          <button class="gp-start-btn" disabled>{{ t('newGroups.detail.startGroup') }}</button>
+        </template>
+
+        <!-- Loaded state -->
+        <template v-else>
+          <div class="gp-start-info">
+            <div>
+              <div class="gp-ratio-big" :style="{ color: ratioColor, textShadow: '0 0 20px ' + ratioColor + '55' }">
+                {{ actualPaid }}/{{ actualTotal }}
+              </div>
+              <div class="gp-ratio-sub">
+                <span :style="{ color: 'var(--green)' }">{{ t('newGroups.detail.willActivate', { n: actualPaid }) }}</span>
+                <template v-if="notPaid > 0"> · <span :style="{ color: 'var(--amber)' }">{{ t('newGroups.detail.willWait', { n: notPaid }) }}</span></template>
+              </div>
             </div>
-             <div class="gp-bar-row">
-               <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
-               <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
-               <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">
-                 <template v-if="actualPaid === actualTotal && actualTotal > 0">{{ t('newGroups.detail.paidStatus') }}</template>
-                 <template v-else>{{ notPaid }}</template>
-               </span>
-             </div>
+            <div class="gp-mini-bars">
+              <div class="gp-bar-row">
+                <span class="gp-bar-label">{{ t('newGroups.detail.signedContract') }}</span>
+                <div class="gp-bar-track"><div class="gp-bar-fill green" :style="{ width: contractPct + '%' }"></div></div>
+                <span class="gp-bar-val" style="color:var(--green)">{{ contractCount }}</span>
+              </div>
+               <div class="gp-bar-row">
+                 <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
+                 <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
+                 <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">
+                   <template v-if="actualPaid === actualTotal && actualTotal > 0">{{ t('newGroups.detail.paidStatus') }}</template>
+                   <template v-else>{{ notPaid }}</template>
+                 </span>
+               </div>
+            </div>
           </div>
-        </div>
-        <button class="gp-start-btn" :disabled="actualTotal === 0" @click="$emit('start')">{{ t('newGroups.detail.startGroup') }}</button>
+          <button class="gp-start-btn" :disabled="actualTotal === 0" @click="$emit('start')">{{ t('newGroups.detail.startGroup') }}</button>
+        </template>
       </div>
 
       <!-- BODY -->
@@ -145,7 +171,7 @@
             </thead>
             <tbody>
               <tr v-if="students.length === 0">
-                <td colspan="8">
+                <td colspan="9">
                   <div class="gp-empty">
                     <div class="gp-empty-icon">👤</div>
                     {{ t('newGroups.detail.noStudents') }}
@@ -474,18 +500,33 @@ function buildAutoName(opts: {
 const ageInfo = computed(() => ageMap[props.group.age ?? ''] ?? null)
 
 const actualTotal = computed(() => {
+  // When students are loaded, use real count from the loaded array
+  if (props.students.length > 0) return props.students.length
+  // Fallback: use studentsCount from the group object (from API list response)
+  if (props.group.studentsCount > 0) return props.group.studentsCount
+  // Last resort: totalSlots (capacity)
   if (props.group.totalSlots > 0) return props.group.totalSlots
-  return props.students.length
+  return 0
 })
-const actualPaid = computed(() =>
-  props.students.length > 0
-    ? props.students.filter(s => s.isPaid === true).length
-    : props.group.paid
-)
+const actualPaid = computed(() => {
+  // When students are loaded, count isPaid from the loaded array
+  if (props.students.length > 0) {
+    return props.students.filter(s => s.isPaid === true).length
+  }
+  // Fallback: use pre-calculated paid from the group object
+  return props.group.paid
+})
 const pct = computed(() =>
   actualTotal.value > 0 ? Math.round(actualPaid.value / actualTotal.value * 100) : 0
 )
-const notPaid = computed(() => actualTotal.value - actualPaid.value)
+const notPaid = computed(() => {
+  // When students are loaded, notPaid = total - paid
+  if (props.students.length > 0) {
+    return actualTotal.value - actualPaid.value
+  }
+  // When no students loaded yet, use group-level data
+  return Math.max(0, props.group.studentsCount - props.group.paid)
+})
 const ratioColor = computed(() => pct.value === 100 ? 'var(--green)' : pct.value >= 50 ? 'var(--amber)' : 'var(--red)')
 const contractCount = computed(() => props.students.filter(s => s.contract === 'signed').length)
 const contractPct = computed(() =>

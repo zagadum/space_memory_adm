@@ -118,17 +118,26 @@ function normalizeTypeGroup(raw: any): "group" | "individual" {
 function normalizeNewGroup(raw: any): NewGroup {
     const typeGroup = normalizeTypeGroup(raw?.type_group ?? raw?.type)
     const students = Array.isArray(raw?.students) ? raw.students : []
-    const studentsCount = Number(raw?.studentsCount ?? raw?.students_count ?? students.length ?? 0)
+    const paid = Number(raw?.paid ?? 0)
+    // studentsCount: try explicit fields first, then students[].length, then at-least-paid fallback
+    let studentsCount = Number(raw?.studentsCount ?? raw?.students_count ?? 0)
+    if (studentsCount === 0 && students.length > 0) {
+        studentsCount = students.length
+    }
+    // If API returns paid > 0 but no studentsCount/students[], trust paid as minimum count
+    if (studentsCount === 0 && paid > 0) {
+        studentsCount = paid
+    }
     return {
         id: Number(raw?.id ?? 0),
         name: String(raw?.name ?? ''),
         type: typeGroup,
         type_group: typeGroup,
-        startDate: String(raw?.startDate ?? ''),
-        createdDate: String(raw?.createdDate ?? ''),
+        startDate: String(raw?.startDate ?? raw?.start_date ?? ''),
+        createdDate: String(raw?.createdDate ?? raw?.created_date ?? raw?.created_at ?? ''),
         studentsCount,
         totalSlots: Number(raw?.totalSlots ?? raw?.total_slot ?? 0),
-        paid: Number(raw?.paid ?? 0),
+        paid,
         manager: raw?.manager ?? null,
         teacher: raw?.teacher ?? null,
         day: String(raw?.day ?? ''),
@@ -149,6 +158,14 @@ function normalizeNewGroupStudent(raw: any): NewGroupStudent {
         .replace(/^\s*·\s*/, '')
         .trim() || '0 zł'
 
+    // Normalize isPaid: support boolean true, numeric 1, string 'true', is_paid, payment_status
+    const isPaid = raw?.isPaid === true
+        || raw?.isPaid === 1
+        || raw?.is_paid === true
+        || raw?.is_paid === 1
+        || String(raw?.payment_status ?? '').toLowerCase() === 'paid'
+        || isPaidInStr
+
     return {
         id: raw?.id ?? 0,
         name: String(raw?.name ?? ''),
@@ -157,10 +174,10 @@ function normalizeNewGroupStudent(raw: any): NewGroupStudent {
         email: raw?.email,
         meta: raw?.meta,
         contract: raw?.contract ?? "pending",
-        isPaid: raw?.isPaid === true || isPaidInStr,
+        isPaid,
         paymentStr: cleanedPayment,
         enrollDate: String(raw?.enrollDate ?? raw?.enroll_date ?? ''),
-        registeredAt: String(raw?.registeredAt ?? raw?.registered_at ?? raw?.created_at ?? raw?.createdAt ?? row?.date_create ?? ''),
+        registeredAt: String(raw?.registeredAt ?? raw?.registered_at ?? raw?.created_at ?? raw?.createdAt ?? raw?.date_create ?? ''),
         createdDate: String(raw?.createdDate ?? raw?.created_at ?? raw?.createdAt ?? raw?.date_create ?? ''),
         manager: raw?.manager ?? null,
     }

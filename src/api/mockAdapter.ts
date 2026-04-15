@@ -725,6 +725,7 @@ export const mockAdapter: AxiosAdapter = async (config) => {
       startDate: body.startDate || (() => { const d = new Date(); d.setDate(d.getDate() + 14); return d.toISOString().slice(0, 10); })(),
       createdDate: today,
       totalSlots: body.type === "individual" ? 1 : 10,
+      studentsCount: (body.studentIds ?? []).length,
       paid: 0,
       manager: mockManagers[0],
       teacher: body.teacherId ? mockTeachers.find(t => t.id === body.teacherId) ?? null : null,
