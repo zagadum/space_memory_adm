@@ -255,6 +255,7 @@ import type { RecruitmentBackend } from '../../../api/http'
 import { ageMap } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
 import { parseApiError } from '../../../api/errorHelper'
+import { parseDate } from '../../../utils/dateConfig'
 import UiInput from '../../../components/ui/UiInput.vue'
 import UiButton from '../../../components/ui/UiButton.vue'
 import UiBadge from '../../../components/ui/UiBadge.vue'
@@ -375,9 +376,9 @@ const autoName = computed(() => {
   
   // 1. Day
   if (startDate.value) {
-    const d = new Date(startDate.value + 'T00:00:00Z')
-    if (!isNaN(d.getTime())) {
-      res += shortWeekdays[d.getUTCDay() as keyof typeof shortWeekdays] || ''
+    const d = parseDate(startDate.value)
+    if (d.isValid()) {
+      res += shortWeekdays[d.day() as keyof typeof shortWeekdays] || ''
     }
   }
 
@@ -412,10 +413,10 @@ watch(startDate, (newVal) => {
     day.value = ''
     return
   }
-  // Force UTC parsing to avoid locale shifts
-  const d = new Date(newVal + 'T00:00:00Z')
-  if (isNaN(d.getTime())) return
-  const jsDay = d.getUTCDay() // 0=Sun, 1=Mon...
+  // Force standardized parsing to avoid locale shifts
+  const d = parseDate(newVal)
+  if (!d.isValid()) return
+  const jsDay = d.day() // 0=Sun, 1=Mon...
   const idx = (jsDay + 6) % 7
   day.value = weekdays[idx]
   dayError.value = ''
