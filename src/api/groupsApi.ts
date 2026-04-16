@@ -26,13 +26,14 @@ export interface GroupListItem {
   id: number
   name: string
   type?: 'group' | 'individual' | 'mini' | string | null
-
+  studentsCount?: number
   students_count?: number
   teacherId?: number
   teacher_id?: number
   teacherName?: string
   teacher?: GroupListTeacher | null
   startDate?: string
+  start_day?: string | null
   startTime?: string | null
   start_time?: string | null
   age?: string | null
