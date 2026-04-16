@@ -74,7 +74,7 @@ export const useTeachersListStore = defineStore('teachersList', () => {
       sorting.value.orderDirection = sorting.value.orderDirection === 'asc' ? 'desc' : 'asc'
     } else {
       sorting.value.orderBy = orderBy
-      sorting.value.orderDirection = orderBy === 'groupsCount' || orderBy === 'students_count' ? 'desc' : 'asc'
+      sorting.value.orderDirection = orderBy === 'groupsCount' || orderBy === 'studentsCount' ? 'desc' : 'asc'
     }
     applyFilters()
   }
