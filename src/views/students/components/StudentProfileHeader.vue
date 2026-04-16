@@ -11,12 +11,7 @@
           <span v-if="student" style="font-family:'Space Mono',monospace">{{ student.phone }}</span><div class="sep" v-if="student"></div>
           <span v-if="student" :style="{ color: student.statusColor || 'var(--green)' }">{{ student.status }}</span>
         </div>
-        <div class="s-family" style="margin-top:8px; gap:10px">
-          <div class="badge badge-blue">JWT</div>
-          <div class="badge badge-purple">REST</div>
-          <div class="badge badge-amber">Dialog Modals</div>
-          <div class="badge badge-green">i18n (RU/UA/PL/EN)</div>
-        </div>
+
       </div>
 
       <div style="text-align:right;flex-shrink:0; display:flex; flex-direction:column; gap:8px; align-items:flex-end">
