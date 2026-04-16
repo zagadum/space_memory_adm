@@ -83,7 +83,7 @@
 
         <!-- Студенты -->
         <div class="students-count">
-          <span class="count-num">{{ group.studentsCount }}</span>
+          <span class="count-num">{{ group.students_count }}</span>
           <span class="count-label">{{ t('trainerGroups.pupils') }}</span>
         </div>
       </div>
@@ -106,7 +106,7 @@ interface Group {
   id: number
   name: string
   type: 'group' | 'mini' | 'individual'
-  studentsCount: number
+  students_count: number
   teacherName: string
   lastCommentDate: string | null
   lastComment: string | null
@@ -148,7 +148,7 @@ const filteredGroups = computed(() => {
 })
 
 const totalStudents = computed(() =>
-  groups.value.reduce((sum, g) => sum + (g.studentsCount || 0), 0)
+  groups.value.reduce((sum, g) => sum + (g.students_count || 0), 0)
 )
 
 function typeEmoji(type: string) {
