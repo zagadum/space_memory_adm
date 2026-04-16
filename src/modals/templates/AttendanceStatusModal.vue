@@ -11,7 +11,7 @@
         type="button"
         class="status-btn"
         :class="{ active: mark === option.value }"
-        @click="mark = option.value"
+        @click="selectMark(option.value)"
       >
         <span>{{ option.icon }}</span>
         <span>{{ option.label }}</span>
@@ -20,6 +20,8 @@
 
     <div class="popup-label">{{ t('modals.attendance.note') }}</div>
     <textarea class="popup-input popup-textarea" v-model="note" :placeholder="t('modals.attendance.notePh')"></textarea>
+
+    <div v-if="errorMessage" class="popup-error">{{ errorMessage }}</div>
 
     <div class="popup-actions">
       <button class="btn btn-ghost" @click="close">{{ t('common.cancel') }}</button>
@@ -37,6 +39,7 @@ import { useModalStore } from "../../stores/modal.store";
 import { setAttendanceMark } from "../../api/studentApi";
 import { useStudentTabsStore } from "../../stores/studentTabs.store";
 import { usePaymentsStore } from "../../stores/payments.store";
+import { parseApiError } from "../../api/errorHelper";
 
 const { t } = useI18n();
 const route = useRoute();
@@ -48,7 +51,7 @@ const row = computed(() => (modal.payload as any)?.row);
 const studentId = computed(() => (modal.payload as any)?.studentId || (route.params.id as string) || "");
 const rowLabel = computed(() => (row.value ? `#${row.value.num} · ${row.value.date} · ${row.value.trainer || row.value.teacher || ''}` : ""));
 
-const statusOptions = computed(() => ([
+const statusOptions = computed<Array<{ value: AttendanceMark; icon: string; label: string }>>(() => ([
   { value: "present", icon: "✓", label: t('attendance.present') },
   { value: "absent", icon: "✕", label: t('attendance.absent') },
   { value: "late", icon: "⏱", label: t('attendance.late') },
@@ -56,15 +59,26 @@ const statusOptions = computed(() => ([
   { value: "empty", icon: "—", label: t('modals.attendance.empty') },
 ]));
 
-const mark = ref("empty");
+type AttendanceMark = "present" | "absent" | "late" | "makeup" | "empty";
+
+const allowedMarks: AttendanceMark[] = ["present", "absent", "late", "makeup", "empty"];
+
+function normalizeMark(value: unknown): AttendanceMark {
+  const next = String(value || "").trim() as AttendanceMark;
+  return allowedMarks.includes(next) ? next : "present";
+}
+
+const mark = ref<AttendanceMark>("present");
 const note = ref("");
 const saving = ref(false);
+const errorMessage = ref("");
 
 watch(
   row,
   (nextRow) => {
-    mark.value = nextRow?.mark ?? "empty";
+    mark.value = normalizeMark(nextRow?.mark);
     note.value = nextRow?.note ?? "";
+    errorMessage.value = "";
   },
   { immediate: true }
 );
@@ -73,19 +87,34 @@ function close() {
   modal.close();
 }
 
+function selectMark(value: AttendanceMark) {
+  mark.value = value;
+  errorMessage.value = "";
+}
+
 async function save() {
   if (!row.value?.id || !studentId.value) return close();
   saving.value = true;
+  errorMessage.value = "";
   try {
     const finalStudentId = paymentsStore.currentStudentId || studentId.value || "s_1";
-    await setAttendanceMark({
+    const selectedMark = normalizeMark(mark.value);
+    const res: { ok: true; row?: any } = await setAttendanceMark({
       studentId: finalStudentId,
       attendanceId: row.value.id,
-      mark: mark.value,
+      mark: selectedMark,
       note: note.value,
     });
-    await tabs.loadAttendance(finalStudentId);
+
+    (tabs as any).updateAttendanceRow(res.row ?? {
+      ...row.value,
+      mark: selectedMark,
+      note: note.value,
+    });
+
     modal.close();
+  } catch (e: unknown) {
+    errorMessage.value = parseApiError(e, t('common.error'));
   } finally {
     saving.value = false;
   }
@@ -131,6 +160,12 @@ async function save() {
 .popup-textarea {
   min-height: 88px;
   resize: vertical;
+}
+
+.popup-error {
+  margin: 8px 0 12px;
+  color: var(--red);
+  font-size: 12px;
 }
 </style>
 

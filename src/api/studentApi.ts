@@ -1,4 +1,5 @@
 import { http } from "./http";
+import { STUDENT } from "./endpoints";
 
 function isNotFoundError(error: any): boolean {
   return Number(error?.response?.status) === 404;
@@ -97,7 +98,7 @@ export async function updateStudentInfo(payload: { studentId: string; patch: any
 }
 
 export async function getStudentAttendance(studentId: string) {
-  const res = await http.get("student/attendance", { params: { studentId } });
+  const res = await http.get(STUDENT.ATTENDANCE, { params: { studentId } });
   return res.data as { attendance: any };
 }
 
@@ -107,8 +108,8 @@ export async function setAttendanceMark(payload: {
   mark: string;
   note?: string;
 }) {
-  const res = await http.post("student/attendance", payload);
-  return res.data as { ok: true };
+  const res = await http.post(STUDENT.ATTENDANCE, payload);
+  return res.data as { ok: true; row?: any };
 }
 
 export async function getStudentProgress(studentId: string) {

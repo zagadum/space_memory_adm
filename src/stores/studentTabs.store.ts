@@ -66,6 +66,37 @@ export const useStudentTabsStore = defineStore("studentTabs", () => {
     }
   }
 
+  function updateAttendanceRow(updatedRow: any) {
+    if (!updatedRow?.id || !attendance.value || !Array.isArray(attendance.value.items)) return;
+
+    const items = [...attendance.value.items];
+    const index = items.findIndex((item) => String(item?.id) === String(updatedRow.id));
+    if (index === -1) return;
+
+    items[index] = { ...items[index], ...updatedRow };
+
+    const present = items.filter((item) => item?.mark === "present").length;
+    const absent = items.filter((item) => item?.mark === "absent").length;
+    const makeup = items.filter((item) => item?.mark === "makeup").length;
+    const late = items.filter((item) => item?.mark === "late").length;
+    const total = items.length;
+    const rate = total > 0 ? Number((((present + late) / total) * 100).toFixed(1)) : 0;
+
+    attendance.value = {
+      ...attendance.value,
+      items,
+      summary: {
+        ...(attendance.value.summary || {}),
+        total,
+        present,
+        absent,
+        makeup,
+        late,
+        rate,
+      },
+    };
+  }
+
   async function loadProgress(studentId: string) {
     loading.progress = true;
     try {
@@ -109,6 +140,7 @@ export const useStudentTabsStore = defineStore("studentTabs", () => {
     loadGroups,
     loadInfo,
     loadAttendance,
+    updateAttendanceRow,
     loadProgress,
     loadNotes,
     resetAll,
