@@ -86,7 +86,7 @@ export const useAccessStore = defineStore("access", () => {
     try {
       const data = prefetched ?? await accessControlApi.getMyAccessControl();
       applyMyAccessControl(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error('[AccessStore] Failed to init:', err);
     } finally {
       loading.value = false;

@@ -226,6 +226,13 @@ export const ACTIVITY = {
 } as const;
 
 // ═══════════════════════════════════════════════════════════════════════════
+// FINANCE — Аналитика и когорты
+// ═══════════════════════════════════════════════════════════════════════════
+export const FINANCE = {
+  COHORTS: 'finance/cohorts',
+} as const;
+
+// ═══════════════════════════════════════════════════════════════════════════
 // Backwards compatible export (для существующих импортов)
 // ═══════════════════════════════════════════════════════════════════════════
 export const endpoints = {
@@ -242,6 +249,7 @@ export const endpoints = {
   SETTINGS,
   TEACHERS,
   INVOICES,
+  FINANCE,
   ACTIVITY,
 } as const;
 

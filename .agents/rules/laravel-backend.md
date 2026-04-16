@@ -6,6 +6,12 @@ globs: app/**/*.php
 # Laravel — Правило для Backend кода
 **Activation: Glob — `app/**/*.php`, `routes/*.php`, `database/**/*.php`**
 
+> Этот проект имеет ДВА Laravel-бэкенда:
+> - **Space Memory** (`:8000`) — основная CRM, финансы, студенты
+> - **Indigo** (`:8001`) — отдельный сервер со своей базой данных
+>
+> Правила ниже применяются к обоим проектам одинаково.
+
 ## Архитектура эндпоинта (обязательный порядок)
 
 Для каждого нового API-эндпоинта создавать в таком порядке:
@@ -110,9 +116,11 @@ $stats = Cache::remember('dashboard:stats', 900, function () {
 Cache::forget('dashboard:stats');
 ```
 
-## Webhook от Drupal — идемпотентность
+## Webhook-обработчики — идемпотентность
+
+> Применяется к любым входящим webhook'ам: от Drupal (LMS/платёжная система) или от Indigo.
 ```php
-// Всегда проверять transaction_id — Drupal может прислать дубль
+// Всегда проверять transaction_id — внешняя система может прислать дубль
 public function handlePayment(Request $request): JsonResponse {
     $existing = WebhookLog::where('transaction_id', $request->transaction_id)->first();
     if ($existing) {

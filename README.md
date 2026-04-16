@@ -1,105 +1,119 @@
-# 📊 GLS Admin — Space Memory Platform
+# GLS Admin — Space Memory & Indigo CRM
 
-![Project Status](https://img.shields.io/badge/Status-Active-brightgreen)
-![Tech Stack](https://img.shields.io/badge/Stack-Vue%203%20|%20Laravel%2011%20|%20PostgreSQL-blue)
-![Localization](https://img.shields.io/badge/Localization-PL%20|%20EN%20|%20RU%20|%20UK-orange)
-
-**GLS Admin (Space Memory)** is a modern CRM and ERP system for a language school in Warsaw. It automates financial workflows, student management, and recruitment pipelines with a high-performance, developer-friendly architecture.
+**GLS Admin** — CRM-панель для языковой школы Global Leaders Skills (Варшава).
+Управляет финансами, студентами, расписанием и рекрутацией для двух продуктов:
+**Space Memory** (Польша + Украина) и **Indigo** (отдельный бэкенд).
 
 ---
 
-## 🚀 Key Modules & Features
+## Архитектура (локальная разработка)
 
-### 💰 Finance & Salary Engine
-- **Salary Calculator**: Advanced piecework calculation for teachers with retention bonuses and trial conversion tracking.
-- **Returns & Refunds**: Automated management of student refunds and balance corrections.
-- **Financial Status Tracking**: Pipeline for payroll (Draft → Confirmed → Paid).
+| Сервис | URL | Проект |
+|---|---|---|
+| **Frontend (этот проект)** | http://localhost:5173 | `space_memory_adm` |
+| **Space Memory Backend** | http://localhost:8000 | `space_memory-recrut` |
+| **Indigo Backend** | http://localhost:8001 | `Indigo` |
 
-### 👩‍🚀 Student Management
-- **Lifecycle Engine**: End-to-end management of subscriptions, pauses, transfers, and resignations.
-- **Student Profile**: 6-tab comprehensive view including Payments, Groups, Attendance, Progress, and Notes.
-- **Side Panel & History**: Real-time access to student event history and quick actions.
+Фронтенд общается с ДВУМЯ независимыми бэкендами через три Axios-клиента:
 
-### 🌟 Recruitment Hub
-- **Leads & Pipeline**: Management of potential students through a structured recruitment funnel.
-- **New Groups Engine**: Advanced tool for assembling and launching new classes.
-- **Expelled Students**: Tracking and recovery logic for former students.
+```
+src/api/http.ts
+├── http                  — основной клиент (переключается с проектом в UI)
+├── httpRecruitment       — рекрутация Space Memory → :8000
+└── httpRecruitmentIndigo — рекрутация Indigo       → :8001
+```
 
-### 🏗️ Advanced UI/UX
-- **Dynamic Themes**: Intelligent Dark/Light mode with persistence and CSS Design Tokens.
-- **Flexible Views**: Calendar Grid ↔ Table view toggle for payments and schedules.
-- **Pixel-Perfect Design**: Custom UI library (`UiButton`, `UiInput`, `UiBadge`) with "Glassmorphism" effects.
+Функция `getRecruitmentHttpClient('indigo')` возвращает нужный клиент по имени бэкенда.
 
 ---
 
-## 🛠 Tech Stack
-
-### Frontend
-- **Framework**: [Vue 3](https://vuejs.org/) (Composition API + `<script setup lang="ts">`)
-- **State**: [Pinia](https://pinia.vuejs.org/) (Setup focus)
-- **Tooling**: [Vite](https://vitejs.dev/), [TypeScript](https://www.typescriptlang.org/)
-- **i18n**: Full support for PL, EN, RU, UK locales.
-
-### Backend
-- **Core**: [Laravel 11](https://laravel.com/)
-- **Database**: PostgreSQL (Primary) + Redis (Queue/Cache)
-- **Auth**: Laravel Sanctum
-
----
-
-## 📂 Project Structure (`src/`)
+## Быстрый старт
 
 ```bash
-src/
-  api/          # Axios functions, centralized endpoints.ts, mock adapters
-  app/          # Core: Main entry, Router, i18n initialization
-  components/   # reusable design system: /layout and /ui components
-  layouts/      # AppLayout.vue, AuthLayout.vue
-  stores/       # Pinia stores (business logic and state)
-  views/        # Page components (Finance, Students, Teacher, etc.)
-  modals/       # Centralized ModalHost.vue and modal windows
-  locales/      # Multi-language JSON dictionaries
-  styles/       # Global CSS (base.css, layout.css) with Design Tokens
-  types/        # Shared TypeScript interfaces
-  utils/        # Business logic helpers (date, formatters, etc.)
+# 1. Установить зависимости
+npm install
+
+# 2. Создать локальный конфиг (не коммитить)
+cp .env.example .env.local
+# .env.local уже настроен под localhost:8000 / localhost:8001
+
+# 3. Запустить дев-сервер
+npm run dev
+# → http://localhost:5173
+```
+
+> Перед запуском убедитесь что оба бэкенда запущены: `:8000` и `:8001`.
+
+---
+
+## Тестовые данные
+
+Файл `indigo_recruting.sql` в корне проекта — дамп базы с тестовыми данными для Indigo.
+
+```bash
+# Залить в локальную БД Indigo
+psql -U postgres -d indigo_db < indigo_recruting.sql
 ```
 
 ---
 
-## 🏁 Getting Started
+## Стек
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
+### Frontend
+- **Vue 3** — Composition API + `<script setup lang="ts">`
+- **Pinia** — Setup Store (загрузка данных в store, не в компоненте)
+- **Vite** — сборщик и дев-сервер
+- **Axios** — три клиента с перехватчиками токена и глобальным loading
 
-2. **Environment Setup**:
-   Copy `.env.example` to `.env` and configure your API URLs.
-   ```bash
-   VITE_API_BASE_URL=https://api.gls-admin.com/v1
-   ```
-
-3. **Development Mode**:
-   ```bash
-   npm run dev
-   ```
-
-4. **Production Build**:
-   ```bash
-   npm run build
-   ```
+### Backend (оба проекта)
+- **Laravel 11** — API, очереди, Jobs
+- **PostgreSQL** — основная БД
+- **Redis** — кеш и очереди
+- **Laravel Sanctum** — аутентификация
 
 ---
 
-## 📜 Core Development Rules
+## Структура `src/`
 
-- **Strict TypeScript**: Always use interfaces for props, emits, and API responses.
-- **i18n Mandatory**: Hardcoded strings are forbidden. Add translations to all 4 locale files.
-- **API Versioning**: All endpoints must use the `/v1/` prefix via `src/api/http.ts`.
-- **Component Style**: Use `<script setup lang="ts">` and `<style scoped>`.
+```
+src/
+  api/          # Axios-клиенты, endpoints.ts, mockAdapter.ts
+  app/          # main.ts, router.ts, i18n.ts
+  components/   # ui/ — UiButton, UiInput, UiBadge и др.
+  config/       # projectApi.ts, env.ts — настройки окружения
+  layouts/      # AppLayout.vue, AuthLayout.vue
+  stores/       # Pinia stores (вся бизнес-логика)
+  views/        # Страницы по роутам
+  modals/       # ModalHost.vue и модальные окна
+  locales/      # ru.json, uk.json, pl.json, en.json
+  styles/       # base.css, layout.css (CSS-переменные, дизайн-токены)
+  types/        # Общие TypeScript интерфейсы
+  utils/        # Хелперы: даты (dayjs), форматирование, строки
+```
 
-> [!IMPORTANT]
-> Detailed coding standards are maintained in the project-wide `gls-main.md` rulebook.
+---
+
+## Mock-режим
+
+По умолчанию `VITE_USE_MOCK=false` (реальный API).
+Для работы без бэкенда:
+
+```bash
+# .env.local
+VITE_USE_MOCK=true
+```
+
+Можно миксовать: `VITE_MOCK_ONLY=salary` / `VITE_REAL_ONLY=auth,students`.
+
+---
+
+## Ключевые правила (для агентов)
+
+- Правила кода: `.agents/rules/gls-main.md` (всегда активен)
+- Правила Vue-компонентов: `.agents/rules/vue-components.md`
+- Правила Laravel: `.agents/rules/laravel-backend.md`
+- Воркфлоу нового компонента: `.agents/workflows/new-vue-component.md`
+- Воркфлоу нового API: `.agents/workflows/new-laravel-api.md`
 
 ---
 

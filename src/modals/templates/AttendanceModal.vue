@@ -8,11 +8,11 @@
       <div class="p-att-subtitle">{{ modalData?.date }} · {{ modalData?.schoolName }}</div>
       
       <div class="p-att-options">
-        <div class="p-att-opt" :class="{ active: tempAttendance === 'Присутствовал' }" @click="tempAttendance = t('attendance.present')">
+        <div class="p-att-opt" :class="{ active: tempAttendance === 'present' }" @click="tempAttendance = 'present'">
           <div class="p-att-icon att-ok">✓</div>
           <div class="p-att-label">{{ t('attendance.present') }}</div>
         </div>
-        <div class="p-att-opt" :class="{ active: tempAttendance === 'Отсутствовал' }" @click="tempAttendance = t('attendance.absent')">
+        <div class="p-att-opt" :class="{ active: tempAttendance === 'absent' }" @click="tempAttendance = 'absent'">
           <div class="p-att-icon att-no">✕</div>
           <div class="p-att-label">{{ t('attendance.absent') }}</div>
         </div>
@@ -45,10 +45,22 @@ const studentTabsStore = useStudentTabsStore();
 const { modalData } = storeToRefs(modalStore);
 const tempAttendance = ref('');
 
+function normalizeAttendance(val: string | undefined): string {
+  if (!val) return '';
+  // Canonical codes (new format)
+  if (val === 'present' || val === 'absent') return val;
+  // All locale variants that could have been saved as translated strings
+  const presentVariants = ['Присутствовал', '✅ Присутствовал', 'Присутній', '✅ Присутній', 'Obecny', '✅ Obecny', 'Present', '✅ Present'];
+  const absentVariants  = ['Отсутствовал', '❌ Отсутствовал', 'Відсутній', '❌ Відсутній', 'Nieobecny', '❌ Nieobecny', 'Absent', '❌ Absent'];
+  if (presentVariants.includes(val)) return 'present';
+  if (absentVariants.includes(val))  return 'absent';
+  return val;
+}
+
 // Следим за открытием, чтобы подставить текущее значение
 watch(() => modalStore.activeModal, (newVal) => {
   if (newVal === 'attendance') {
-    tempAttendance.value = modalData.value?.currentAttendance || '';
+    tempAttendance.value = normalizeAttendance(modalData.value?.currentAttendance);
   }
 });
 

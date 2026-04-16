@@ -239,7 +239,7 @@ export const invoicesApi = {
   },
 
   async sendBulkToKsef(ids: number[]): Promise<{ message: string }> {
-    const { data } = await http.post('/v1/invoices/bulk-ksef', { ids });
+    const { data } = await http.post(endpoints.INVOICES.BULK_KSEF, { ids });
     return data;
   },
 

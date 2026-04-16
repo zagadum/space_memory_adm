@@ -9,10 +9,14 @@ description:
 
 ### Step 1 — Определить эндпоинт
 Уточнить у пользователя:
+- **В каком бэкенде?** Space Memory (`:8000`, проект `space_memory-recrut`) или Indigo (`:8001`)?
 - Что за ресурс? (students, groups, payments, reports...)
 - Какие HTTP методы нужны? (GET list, GET detail, POST, PUT, DELETE)
 - Нужна ли связь с другими таблицами?
 - Это быстрая операция (<1 сек) или тяжёлая (расчёты, синхронизация)?
+
+> Если эндпоинт для рекрутации Indigo — фронтенд будет использовать `httpRecruitmentIndigo`,
+> если для Space Memory — `httpRecruitment`. Основная CRM → `http`.
 
 ### Step 2 — Создать Migration
 ```

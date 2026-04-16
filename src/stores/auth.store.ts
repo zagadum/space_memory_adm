@@ -75,7 +75,7 @@ export const useAuthStore = defineStore("auth", () => {
       const bootstrap = await authApi.getSessionBootstrap();
       user.value = bootstrap.user;
       useAccessStore().applyMyAccessControl(bootstrap.access);
-    } catch {
+    } catch (e: any) {
       logout();
     }
   }

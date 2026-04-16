@@ -47,7 +47,10 @@ export const authApi = {
       return sessionBootstrapPromise;
     }
 
-    sessionBootstrapPromise = Promise.all([authApi.me(), accessControlApi.getMyAccessControl()])
+    const userPromise = authApi.me();
+    const accessPromise = accessControlApi.getMyAccessControl();
+
+    sessionBootstrapPromise = Promise.all([userPromise, accessPromise])
       .then(([user, access]) => {
         const value = { user, access };
         sessionBootstrapCache = { at: Date.now(), value };

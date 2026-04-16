@@ -1,4 +1,5 @@
 import { http } from './http';
+import { FINANCE } from './endpoints';
 
 export interface CohortHeatmapItem {
   month_index: number;
@@ -20,6 +21,6 @@ export interface CohortStatsResponse {
 
 export const cohortsApi = {
   getStats(params: { project_id?: number; year?: number } = {}): Promise<CohortStatsResponse> {
-    return http.get('/v1/finance/cohorts', { params });
+    return http.get(FINANCE.COHORTS, { params });
   }
 };
