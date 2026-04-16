@@ -11,7 +11,7 @@ export interface GroupsListRow {
   id: number
   name: string
   type: string | null
-  studentsCount: number
+  students_count: number
   teacherId: number | null
   teacherName: string
   startDate: string | null
@@ -74,7 +74,7 @@ function normalizeGroup(item: GroupListItem): GroupsListRow {
     id: Number(item.id),
     name: item.name || '—',
     type: item.type ?? null,
-    studentsCount: Number(item.studentsCount ?? item.students_count ?? 0),
+    students_count: Number(item.students_count ?? item.students_count ?? 0),
     teacherId: Number(item.teacherId ?? item.teacher_id ?? item.teacher?.id ?? 0) || null,
     teacherName,
     startDate: normalizedStartDate,
