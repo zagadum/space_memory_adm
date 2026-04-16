@@ -503,9 +503,9 @@ const actualTotal = computed(() => {
   // When students are loaded, use real count from the loaded array
   if (props.students.length > 0) return props.students.length
   // Fallback: use studentsCount from the group object (from API list response)
-  if (props.group.students_count > 0) return props.group.students_count
+  if (props.group.studentsCount > 0) return props.group.studentsCount
   // Last resort: totalSlots (capacity)
-  if (props.group.total_slots > 0) return props.group.total_slots
+  if (props.group.totalSlots > 0) return props.group.totalSlots
   return 0
 })
 const actualPaid = computed(() => {
@@ -525,7 +525,7 @@ const notPaid = computed(() => {
     return actualTotal.value - actualPaid.value
   }
   // When no students loaded yet, use group-level data
-  return Math.max(0, props.group.students_count - props.group.paid)
+  return Math.max(0, props.group.studentsCount - props.group.paid)
 })
 const ratioColor = computed(() => pct.value === 100 ? 'var(--green)' : pct.value >= 50 ? 'var(--amber)' : 'var(--red)')
 const contractCount = computed(() => props.students.filter(s => s.contract === 'signed').length)
