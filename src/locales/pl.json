@@ -399,6 +399,48 @@
       "history": "Historia",
       "transfer": "Przenieś do grupy",
       "transferAny": "Do dowolnej grupy"
+  },
+  "auth": {
+    "title": "Logowanie",
+    "email": "Email",
+    "password": "Hasło",
+    "submit": "Zaloguj się"
+  },
+  "tabs": {
+    "payments": "Płatności",
+    "groups": "Grupy",
+    "info": "Informacje",
+    "attendance": "Obecność",
+    "progress": "Postępy",
+    "notes": "Notatki"
+  },
+  "payments": {
+    "currencyPerMonth": "zł/mies.",
+    "currency": "zł",
+    "balance": "Saldo",
+    "overall": "Saldo całkowite",
+    "nextPay": "Następna płatność",
+    "activePrograms": "Aktywne programy",
+    "actions": "Akcje",
+    "tx": {
+      "title": "Transakcje",
+      "combinedTitle": "Transakcje i faktury KSeF",
+      "count": "brak transakcji | {n} transakcja | {n} transakcje | {n} transakcji",
+      "loading": "Ładowanie transakcji…",
+      "paid": "✓ Opłacone",
+      "pending": "🕐 Oczekuje",
+      "subscription": "Abonament",
+      "invoice": "Faktura",
+      "extra": "Zajęcia dodatkowe",
+      "edit": "Edytuj fakturę",
+      "editInvoice": "Edytuj fakturę",
+      "correction": "Korekta",
+      "korekta": "Korekta",
+      "refund": "Zwrot",
+      "downloadPdf": "Pobierz PDF",
+      "pdfDownloading": "Pobieranie...",
+      "pdfError": "Błąd pobierania PDF",
+      "empty": "Brak transakcji dla tego programu"
     },
     "archive": {
       "cancel": "Anuluj",

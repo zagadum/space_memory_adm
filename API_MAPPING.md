@@ -30,35 +30,23 @@
 
 ## 👤 StudentProfile - Профиль студента
 
-| MockDB Field | API Field | Тип | Источник БД | Примечания |
+| Frontend Field | Backend (Laravel) | Тип | Источник БД | Примечания |
 |--------------|-----------|-----|-------------|------------|
 | `id` | `id` | string | `student.id` | ✅ Совпадает |
-| `initials` | `initials` | string | Вычисляется | `surname[0] + lastname[0]` |
-| `name` | `name` | string | Вычисляется | `surname + ' ' + lastname` |
-| `firstName` | `firstName` | string | `student.lastname` | ⚠️ В БД это `lastname` |
-| `lastName` | `lastName` | string | `student.surname` | ⚠️ В БД это `surname` |
+| `initials` | — | string | Вычисляется | `surname[0] + lastname[0]` |
+| `firstName` | `lastname` | string | `student.lastname` | ⚠️ В БД это `lastname` |
+| `lastName` | `surname` | string | `student.surname` | ⚠️ В БД это `surname` |
 | `email` | `email` | string | `student.email` | ✅ Совпадает |
-| `birthDate` | `birthDate` | string (YYYY-MM-DD) | `student.dob` | Формат: ISO 8601 |
-| `age` | `age` | number | Вычисляется | `now().diffInYears(dob)` |
+| `birthDate` | `dob` | string (YYYY-MM-DD) | `student.dob` | Формат: ISO 8601 |
+| `age` | — | number | Вычисляется | `now().diffInYears(dob)` |
 | `phone` | `phone` | string | `student.phone` | ✅ Совпадает |
-| `country` | `country` | string | `student.parent1_phone_country` | Код страны (UA/PL) |
-| `city` | `city` | string | ❌ Отсутствует | Пустая строка |
-| `street` | `street` | string | ❌ Отсутствует | Пустая строка |
-| `apartment` | `apartment` | string | ❌ Отсутствует | Пустая строка |
-| `postalCode` | `postalCode` | string | ❌ Отсутствует | Пустая строка |
-| `parentName` | `parentName` | string | Вычисляется | `parent1_surname + ' ' + parent1_lastname` |
-| `parentFirstName` | `parentFirstName` | string | `student.parent1_lastname` | ⚠️ В БД это `lastname` |
-| `parentLastName` | `parentLastName` | string | `student.parent1_surname` | ⚠️ В БД это `surname` |
-| `parentPhone` | `parentPhone` | string | `student.parent1_phone` | ✅ Совпадает |
-| `parentRole` | `parentRole` | string | Константа | Всегда "родитель" |
-| `parentPassport` | `parentPassport` | string | ❌ Отсутствует | Пустая строка |
-| `status` | `status` | string | Вычисляется | `enabled ? 'active' : 'inactive'` |
-| `statusColor` | `statusColor` | string | Вычисляется | `enabled ? 'green' : 'gray'` |
-| `photoConsent` | `photoConsent` | boolean | ❌ Отсутствует | Всегда `false` |
-| `regComment` | `regComment` | string | ❌ Отсутствует | Пустая строка |
-| `totalBalance` | `totalBalance` | object | Вычисляется | См. ниже ⬇️ |
-| `nextPay` | `nextPay` | object | Вычисляется | См. ниже ⬇️ |
-| `enrollments` | `enrollments` | array | ❌ Отсутствует | Пустой массив |
+| `country` | `phone_country` | string | `student.parent1_phone_country` | Код страны (UA/PL) |
+| `city` | ❌ | string | ❌ Отсутствует | Пустая строка |
+| `parentFirstName` | `parent1_lastname` | string | `student.parent1_lastname` | ⚠️ В БД это `lastname` |
+| `parentLastName` | `parent1_surname` | string | `student.parent1_surname` | ⚠️ В БД это `surname` |
+| `parentPhone` | `parent1_phone` | string | `student.parent1_phone` | ✅ Совпадает |
+| `status` | `enabled` / `blocked` | string | Вычисляется | `enabled ? 'active' : 'inactive'` |
+
 
 ### totalBalance Object
 
@@ -148,7 +136,23 @@ API теперь автоматически определяет тип прог
 
 ---
 
+## 🏟️ Groups - Группы (Recruitment & List)
+
+| Frontend (Store) | Backend (API Raw) | Тип | Описание |
+|------------------|-------------------|-----|----------|
+| `id` | `id` | number | ID группы |
+| `name` | `name` | string | Название группы |
+| `studentsCount` | `students_count` | number | Количество учеников (набор) |
+| `teacherId` | `teacher_id` | number | ID учителя |
+| `startDate` | `start_day` / `start_date` | string | Дата начала |
+| `startTime` | `start_time` | string | Время начала |
+| `lastComment` | `last_comment` | string | Последний комментарий |
+| `lastCommentDate` | `last_comment_date` | string | Дата комментария |
+
+---
+
 ## 🔄 Алгоритм формирования years
+
 
 ### Логика backend (PaymentController.php):
 
@@ -323,6 +327,7 @@ type MonthStatus = 'paid' | 'pending' | 'overdue' | 'future' | 'pause' | 'summer
 - Frontend: `src/api/mockDb.ts`
 - Types: `src/api/mockDb.ts` (interfaces)
 - Store: `src/stores/payments.store.ts`
+- Access Control: `app/Http/Controllers/Api/Gls/MeAccessControlController.php`
 
 ---
 
@@ -336,34 +341,35 @@ type MonthStatus = 'paid' | 'pending' | 'overdue' | 'future' | 'pause' | 'summer
 | 2026-03-07 | 1.3 | Создан файл соответствий |
 | 2026-03-07 | 1.4 | ✨ Добавлена имитация программ как в mockDB |
 
-### Версия 1.4 - Детали
+| 2026-04-16 | 1.5 | Добавлено описание Access Control Matrix и маппинг ролей |
+
+### Версия 1.5 - Детали
 
 **Добавлено:**
-- Автоопределение типа программы по названию группы
-- 5 типов программ с иконками и градиентами:
-  - 🌌 Space Memory (память)
-  - ⚡ Speedy Mind (ментальная арифметика)
-  - 📖 Speed Reading (скорочтение)
-  - ♟️ Logic & Chess (логика и шахматы)
-  - 📚 Основная программа (по умолчанию)
-- Подробный подзаголовок программы:
-  - Название группы из `teacher_groups`
-  - Расписание (день недели + время)
-  - Имя учителя из `teacher`
-  - Тариф с валютой
-  - Информация о скидке
-
-**Новые методы в PaymentController:**
-- `detectProgramType()` - определяет тип программы
-- `buildProgramSubtitle()` - формирует подзаголовок
-- `getWeekDayFromGroup()` - получает день недели из расписания
-
-**Используемые связи:**
-- `Student::group()` → `TeacherGroup`
-- `Student::teacher()` → `Teacher`
+- Маппинг системы прав доступа (Access Control Matrix)
+- Перевод ролей: `admin` → `super-admin`, `manager` → `franchisee-manager`
+- Структура ответа для `/me/access-control`
 
 ---
 
-**Автор:** GitHub Copilot  
-**Последнее обновление:** 2026-03-07
+## 🔐 Access Control Matrix
+
+| Frontend Role | Backend (DB) | Role Code (API) | Описание |
+|---------------|--------------|-----------------|----------|
+| `Super Admin` | `admin` | `super-admin` | Полный доступ ко всем ресурсам |
+| `Manager` | `manager` | `franchisee-manager`| Доступ ограничен филиалом |
+
+### Matrix Structure
+Ответ содержит объект `matrix`, где ключи — это `resource_key`, а значения — `access_mode`.
+
+| Mode | Описание в UI |
+|------|---------------|
+| `active` | Полный доступ (чтение/запись) |
+| `read-only` | Только чтение |
+| `hidden` | Элемент/раздел скрыт |
+
+---
+
+**Автор:** Antigravity (AI Assistant)
+**Последнее обновление:** 2026-04-16
 
