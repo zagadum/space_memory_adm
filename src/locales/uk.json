@@ -383,7 +383,7 @@
     "selected": "вибрано",
     "sending": "Надсилання…",
     "settings": "Налаштування",
-    "students_count": "{n} учень | {n} учні | {n} учнів",
+    "studentsCount": "{n} учень | {n} учні | {n} учнів",
     "submit": "Надіслати",
     "success": "Успішно",
     "themeDark": "Темна",
@@ -1136,10 +1136,10 @@
       "lastComment": "Останній коментар",
       "lastCommentDate": "Дата ком.",
       "name": "Назва групи",
-      "start_date": "Дата старту",
+      "startDate": "Дата старту",
       "startTime": "Час старту",
       "studentDetails": "Дані учня",
-      "students_count": "Учнів",
+      "studentsCount": "Учнів",
       "teacher": "Вчитель",
       "workdays": "Дні занять"
     },
@@ -1810,7 +1810,7 @@
       "name": "Назва групи",
       "paidContract": "Сплатили",
       "responsible": "Відповідальний",
-      "start_date": "Дата старту",
+      "startDate": "Дата старту",
       "type": "Тип",
       "waiting": "Очікування"
     },
@@ -1903,7 +1903,7 @@
       "phone": "Телефон батьків",
       "phonePh": "+48 000 000 000",
       "price": "Вартість абонемента",
-      "start_date": "Дата старту",
+      "startDate": "Дата старту",
       "submit": "Додати учня",
       "submitInvite": "Надіслати запрошення",
       "subtitle": "Заповніть дані для додавання нового учня",
@@ -2039,7 +2039,7 @@
       "pending": "Очікує",
       "signed": "Підписано",
       "signedStatus": "Підписано {n} з {total}",
-      "start_date": "Старт",
+      "startDate": "Старт",
       "studentDetails": "Дані учня",
       "waitDays": "Очікування",
       "years": "років"
@@ -2519,7 +2519,7 @@
       "lastContact": "ОСТАННІЙ КОНТАКТ",
       "name": "ІМ'Я ПРІЗВИЩЕ",
       "school": "ШКОЛА",
-      "start_date": "ДАТА СТАРТУ",
+      "startDate": "ДАТА СТАРТУ",
       "studentDetails": "Дані учня",
       "teacher": "ВЧИТЕЛЬ",
       "trainingTerm": "ТЕРМІН НАВЧАННЯ",
@@ -2736,7 +2736,7 @@
         "empty": "Немає активних груп",
         "name": "Назва",
         "schedule": "Розклад",
-        "start_date": "Старт",
+        "startDate": "Старт",
         "status": "Статус",
         "statusValues": {
           "active": "Активна",
@@ -2779,7 +2779,7 @@
       "name": "Ім'я Прізвище",
       "phone": "Телефон",
       "studentDetails": "Дані учня",
-      "students_count": "Всього учнів"
+      "studentsCount": "Всього учнів"
     },
     "toolbar": {
       "addBtn": "Додати вчителя",
