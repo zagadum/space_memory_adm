@@ -15,8 +15,8 @@
         <div class="cg-card">
           <div class="cg-stats">
             <div class="cg-stat"><div class="cg-stat-val">{{ enr.lessons?.length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statTotal') }}</div></div>
-            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--green)">{{ enr.lessons?.filter(l => l.attendance === 'Присутствовал' || l.attendance === 'present').length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statPresent') }}</div></div>
-            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--red)">{{ enr.lessons?.filter(l => l.attendance === 'Отсутствовал' || l.attendance === 'absent').length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statAbsent') }}</div></div>
+            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--green)">{{ enr.lessons?.filter(l => normalizeAttendance(l.attendance) === 'present').length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statPresent') }}</div></div>
+            <div class="cg-stat"><div class="cg-stat-val" style="color:var(--red)">{{ enr.lessons?.filter(l => normalizeAttendance(l.attendance) === 'absent').length || 0 }}</div><div class="cg-stat-label">{{ t('groups.statAbsent') }}</div></div>
           </div>
         </div>
 
@@ -63,10 +63,10 @@
                 <td><div class="trainer-main">{{ lesson.teacher }}</div></td>
                 <td style="text-align:center">
                   <span class="att-dot" @click="openAttendanceModal(enr, lesson, enr.lessons.length - lIdx)" :class="{
-                    'att-ok': lesson.attendance === 'Присутствовал' || lesson.attendance === 'present',
-                    'att-no': lesson.attendance === 'Отсутствовал' || lesson.attendance === 'absent',
-                    'att-future': lesson.attendance === 'Будет' || lesson.attendance === 'future'
-                  }">{{ (lesson.attendance === 'Присутствовал' || lesson.attendance === 'present') ? '✓' : (lesson.attendance === 'Отсутствовал' || lesson.attendance === 'absent') ? '✕' : '–' }}</span>
+                    'att-ok':     normalizeAttendance(lesson.attendance) === 'present',
+                    'att-no':     normalizeAttendance(lesson.attendance) === 'absent',
+                    'att-future': normalizeAttendance(lesson.attendance) === 'future'
+                  }">{{ normalizeAttendance(lesson.attendance) === 'present' ? '✓' : normalizeAttendance(lesson.attendance) === 'absent' ? '✕' : '–' }}</span>
                 </td>
                 <td>
                   <span class="sc" :class="{
@@ -108,6 +108,7 @@ import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { usePaymentsStore } from "../../../../stores/payments.store";
 import { useModalStore } from "../../../../stores/modal.store";
+import { normalizeAttendance } from "../../../../utils/attendance";
 
 const { t } = useI18n();
 const paymentsStore = usePaymentsStore();

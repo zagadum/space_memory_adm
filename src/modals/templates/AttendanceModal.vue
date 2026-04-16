@@ -37,6 +37,7 @@ import { useI18n } from 'vue-i18n';
 import { useModalStore } from '../../stores/modal.store';
 import { useStudentTabsStore } from '../../stores/studentTabs.store';
 import { storeToRefs } from 'pinia';
+import { normalizeAttendance } from '../../utils/attendance';
 
 const { t } = useI18n();
 
@@ -44,18 +45,6 @@ const modalStore = useModalStore();
 const studentTabsStore = useStudentTabsStore();
 const { modalData } = storeToRefs(modalStore);
 const tempAttendance = ref('');
-
-function normalizeAttendance(val: string | undefined): string {
-  if (!val) return '';
-  // Canonical codes (new format)
-  if (val === 'present' || val === 'absent') return val;
-  // All locale variants that could have been saved as translated strings
-  const presentVariants = ['Присутствовал', '✅ Присутствовал', 'Присутній', '✅ Присутній', 'Obecny', '✅ Obecny', 'Present', '✅ Present'];
-  const absentVariants  = ['Отсутствовал', '❌ Отсутствовал', 'Відсутній', '❌ Відсутній', 'Nieobecny', '❌ Nieobecny', 'Absent', '❌ Absent'];
-  if (presentVariants.includes(val)) return 'present';
-  if (absentVariants.includes(val))  return 'absent';
-  return val;
-}
 
 // Следим за открытием, чтобы подставить текущее значение
 watch(() => modalStore.activeModal, (newVal) => {
