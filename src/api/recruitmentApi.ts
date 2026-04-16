@@ -358,10 +358,20 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
     return data;
   },
   // New: paginated groups picker — returns items + pagination
-  async getGroupsForPickerPaged(page: number = 1, perPage: number = 20) {
-    const { data } = await client.get('groups/new-groups', { params: { page, per_page: perPage } });
+  async getGroupsForPickerPaged(
+    page: number = 1,
+    perPage: number = 20,
+    search?: string,
+    ageName?: string,
+  ) {
+    const params: Record<string, any> = { page, per_page: perPage }
+    if (search && search.trim()) params.search = search.trim()
+    if (ageName && ageName !== 'all') params.age_name = ageName
+    const { data } = await client.get('groups/new-groups', { params });
     const items: any[] = Array.isArray(data?.items) ? data.items : (Array.isArray(data?.data) ? data.data : []);
-    const pagination = pickPagination(data, items.length);
+    // backend returns pagination under data.meta; fall back to root level for other backends
+    const paginationSource = data?.meta ?? data;
+    const pagination = pickPagination(paginationSource, items.length);
     const mapped = items.map((g: any) => ({
       id: Number(g.id),
       name: String(g.name ?? ''),

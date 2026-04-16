@@ -1885,6 +1885,7 @@
     "groupPicker": {
       "createGroup": "Utwórz nową grupę",
       "for": "Uczeń",
+      "loading": "Ładowanie grup...",
       "noResults": "Nie znaleziono grup. Spróbuj zmienić filtry.",
       "noSlots": "Brak miejsc",
       "searchPlaceholder": "Szukaj po nazwie, nauczycielu, dniu...",
