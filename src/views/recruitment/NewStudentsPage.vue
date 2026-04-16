@@ -301,6 +301,23 @@
       :student-name="groupPickerForName"
       :backend="recruitmentBackend"
       @pick="onGroupPicked"
+      @create-group="onCreateGroup"
+    />
+
+    <!-- CREATE GROUP MODAL -->
+    <div v-if="createModalLoading" class="modal-backdrop" style="z-index:600">
+      <div style="color:#fff;font-size:18px;display:flex;align-items:center;gap:12px">
+        <span style="animation:spin 1s linear infinite;display:inline-block">⏳</span>
+        Загрузка данных...
+      </div>
+    </div>
+    <CreateGroupModal
+      v-if="showCreateModal"
+      :teachers="createModalTeachers"
+      :all-students="createModalStudents"
+      :backend="recruitmentBackend"
+      @close="showCreateModal = false"
+      @created="onGroupCreated"
     />
 
     <!-- STUDENT SIDE PANEL -->
@@ -341,6 +358,9 @@ import GroupPickerPanel from './components/GroupPickerPanel.vue'
 import StudentSidePanel from './components/StudentSidePanel.vue'
 import { useLoginAsStudent } from '../../composables/useLoginAsStudent'
 import { getRecruitmentApi } from '../../api/recruitmentApi'
+import { getMasterStudents, getTeachers } from '../../api/newGroupsApi'
+import type { MasterStudent, NewGroup, NewGroupTeacher } from '../../api/newGroupsApi'
+import CreateGroupModal from '../groups/components/CreateGroupModal.vue'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -552,6 +572,12 @@ const groupPickerForName = computed(() => {
   return s ? `${t('newStudents.groupPicker.for')}: ${s.name}` : ''
 })
 
+// ─── CREATE GROUP MODAL ───
+const showCreateModal       = ref(false)
+const createModalTeachers   = ref<NewGroupTeacher[]>([])
+const createModalStudents   = ref<MasterStudent[]>([])
+const createModalLoading    = ref(false)
+
 function openGroupPicker(id: number) {
   groupPickerForId.value = id
   groupPickerOpen.value = true
@@ -572,6 +598,33 @@ async function onGroupPicked(groupId: number, groupName: string, _teacherId: num
     await store.fetchStudentsFromApi(store.pagination.currentPage, recruitmentBackend.value)
   } catch (err: any) {
     notif.addToast(`❌ Ошибка назначения группы: ${err?.response?.data?.message ?? err.message}`, 'error')
+  }
+}
+
+async function onCreateGroup() {
+  if (createModalLoading.value) return
+  createModalLoading.value = true
+  try {
+    const [teachersRes, studentsRes] = await Promise.all([
+      getTeachers(recruitmentBackend.value),
+      getMasterStudents(recruitmentBackend.value),
+    ])
+    createModalTeachers.value = teachersRes.items
+    createModalStudents.value = studentsRes.items
+    showCreateModal.value = true
+  } catch (err: any) {
+    notif.addToast(`❌ Ошибка загрузки данных: ${err?.response?.data?.message ?? err.message}`, 'error')
+  } finally {
+    createModalLoading.value = false
+  }
+}
+
+function onGroupCreated(group: NewGroup) {
+  showCreateModal.value = false
+  notif.addToast(`✅ Группа «${group.name}» создана`, 'success')
+  // Если перед этим был выбран ученик — сразу предложить назначить его в новую группу
+  if (groupPickerForId.value) {
+    onGroupPicked(group.id, group.name, group.teacher?.id ?? null)
   }
 }
 
@@ -1163,6 +1216,8 @@ td { padding: 12px 14px; font-size: 13.5px; vertical-align: middle; white-space:
 
 /* ADD MODAL */
 .modal-backdrop { position: fixed; inset: 0; background: rgba(4,4,15,0.82); backdrop-filter: blur(8px); z-index: 500; display: flex; align-items: center; justify-content: center; }
+
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 .modal { background: var(--app-surface); border: 1px solid var(--app-border-hi); border-radius: 16px; padding: 28px; width: 500px; max-width: calc(100vw - 40px); max-height: calc(100vh - 40px); overflow-y: auto; position: relative; box-shadow: 0 24px 80px rgba(0,0,0,0.3); }
 
 .modal-enter-active, .modal-leave-active { transition: opacity 0.25s ease; }

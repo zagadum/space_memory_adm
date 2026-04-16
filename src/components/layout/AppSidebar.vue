@@ -342,13 +342,11 @@
       <div v-if="isSectionAllowed('quality')" class="nav-section" :class="{ open: openSections.quality }" @click="toggleSection('quality')">
         <span class="nav-section-icon">🎯</span>
         <span class="nav-section-label">{{ t('sidebar.quality') }}</span>
-        <span class="nav-section-badge nb-red" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
         <span class="nav-section-arrow">›</span>
       </div>
       <div v-if="isSectionAllowed('quality')" class="nav-children" :class="{ open: openSections.quality }">
         <div v-if="isVisible('rezygnacje')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'rezygnacje' }" @click="navigateTo('rezygnacje', '/quality/rezygnacje')">
           <span class="nav-icon">🚪</span> {{ t('sidebar.rezygnacje') }}
-          <span class="nav-badge" v-if="rezygnajeCount > 0">{{ rezygnajeCount }}</span>
         </div>
         <div v-if="isVisible('holidays-return')" class="nav-item nav-item--stub" :class="{ active: activeItem === 'holidays-return' }" @click="navigateTo('holidays-return', '/quality/holidays-return')">
           <span class="nav-icon">🌙</span> {{ t('sidebar.holidaysReturn') }}
@@ -510,7 +508,7 @@ const visibleProjectOptions = computed(() => {
 const isProjectDropdownOpen = ref(false)
 
 function toggleProjectDropdown() {
-  isProjectDropdownOpen.value = !isProjectDropdownOpen.value
+  isProjectDropdownOpen.value = !isProjectDropdown.value
 }
 
 function selectProject(project: ProjectCode) {
@@ -674,36 +672,49 @@ watch(() => route.path, (path) => {
   // Мой кабинет
 }, { immediate: true })
 
-onMounted(async () => {
-  const backend = projectStore.activeProject === 'indigo' ? 'indigo' : 'default'
-  void Promise.allSettled([
-    newStudentsStore.fetchStudents(1, backend),
-    newGroupsStore.fetchGroups(backend),
-    expelledStudentsStore.fetchExpelled(1, backend),
-    debtorsStore.fetchDebtors(),
-    refundsStore.fetchStats()
-  ])
+// ─── ACCESS CACHE ────────────────────────────────────────────────────────────
+// Без кэша isVisible/isSectionAllowed вызывают useAuthStore() + useAccessStore()
+// 117 раз за один рендер. computed пересчитывается только при изменении store.
+const _ALL_MENU_KEYS = [
+  'access-control','all-tasks','archived','cohorts','contractors','course-endings',
+  'dashboard','debtors','expelled','faktury','finance-ustawienia','groups',
+  'holidays-return','hr-active','hr-analytics','hr-personal','hr-pipeline','hr-training',
+  'import-db','indigo-techniques','inpost','integrations','leads','lesson-tracker',
+  'my-cabinet','nadplaty','new-groups','new-students','projects','quality-analytics',
+  'quality-materials','quality-monitoring','quality-olimpiad','quality-stats',
+  'quality-zaliczenia','reports','returns','rezygnacje','salary-calculator','salary-demo',
+  'school-settings','sciezka','settings','spotkania','student-finance','students',
+  'target-mail','teachers','trainer-dashboard','trainer-exam','trainer-groups',
+  'trainer-mail','trainer-materials','trainer-students','trial-lessons-qd','zaliczenia-calendar',
+]
+
+const _ALL_SECTION_KEYS = [
+  'accounting','finance','hr','quality','recruitment','secretariat','settings-section','trainer',
+]
+
+const _menuVisCache = computed<Record<string, boolean>>(() => {
+  const result: Record<string, boolean> = {}
+  for (const k of _ALL_MENU_KEYS) result[k] = isMenuVisible(k)
+  return result
 })
 
-// Автоматически раскрываем раздел настроек для админов, когда данные пользователя загружены
-watch(() => authStore.user?.role, (newRole) => {
-  if (newRole === 'super-admin' || newRole === 'admin') {
-    openSections.value.settings = true
-  }
-}, { immediate: true })
+const _sectionVisCache = computed<Record<string, boolean>>(() => {
+  const result: Record<string, boolean> = {}
+  for (const k of _ALL_SECTION_KEYS) result[k] = isSectionVisible(k)
+  return result
+})
 
-function isVisible(menuKey: string) {
-  return isMenuVisible(menuKey)
+function isVisible(menuKey: string): boolean {
+  return _menuVisCache.value[menuKey] ?? true
 }
 
-function isSectionAllowed(sectionKey: string) {
-  return isSectionVisible(sectionKey)
+function isSectionAllowed(sectionKey: string): boolean {
+  return _sectionVisCache.value[sectionKey] ?? true
 }
 
-function accessClass(menuKey: string) {
-  return {
-    'nav-item--blocked': isMenuBlocked(menuKey),
-  }
+// isMenuBlocked всегда возвращает false — возвращаем пустой объект
+function accessClass(_menuKey: string) {
+  return {}
 }
 
 function notifyBlocked(menuKey: string) {

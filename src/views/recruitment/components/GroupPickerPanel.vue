@@ -54,7 +54,7 @@
       </div>
 
       <div class="gpp-footer">
-        <button class="btn btn-ghost" style="width:100%;justify-content:center" @click="$emit('update:modelValue', false)">
+        <button class="btn btn-primary" style="width:100%;justify-content:center" @click="$emit('create-group'); $emit('update:modelValue', false)">
           ✦ {{ t('newStudents.groupPicker.createGroup') }}
         </button>
       </div>
@@ -64,7 +64,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ageMap, CANONICAL_AGE_GROUPS } from '../../../utils/newGroupsUtils'
 
@@ -87,6 +87,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [val: boolean]
   pick: [groupId: number, groupName: string, teacherId: number | null]
+  'create-group': []
 }>()
 
 const { t } = useI18n()
@@ -95,6 +96,8 @@ const searchQ = ref('')
 const activeAge = ref<'all' | 'junior' | 'middle' | 'senior' | 'adult'>('all')
 const groups = ref<ApiGroup[]>([])
 const loading = ref(false)
+const hasLoaded = ref(false)
+let loadedBackend: 'default' | 'indigo' = props.backend ?? 'default'
 
 // Pagination
 const currentPage = ref(1)
@@ -121,6 +124,7 @@ async function loadGroups(page = 1) {
     groups.value = res.items
     currentPage.value = res.pagination.currentPage
     lastPage.value = res.pagination.lastPage
+    hasLoaded.value = true
   } catch (e) {
     console.error('GroupPickerPanel: failed to load groups', e)
   } finally {
@@ -128,8 +132,19 @@ async function loadGroups(page = 1) {
   }
 }
 
+watch(() => props.backend, (backend) => {
+  const nextBackend = backend ?? 'default'
+  if (nextBackend === loadedBackend) return
+  loadedBackend = nextBackend
+  hasLoaded.value = false
+  groups.value = []
+  currentPage.value = 1
+  lastPage.value = 1
+})
+
 watch(() => props.modelValue, (open) => {
-  if (open) loadGroups()
+  if (!open || hasLoaded.value) return
+  nextTick(() => loadGroups())
 })
 
 function goToPage(page: number) {

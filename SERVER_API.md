@@ -17,6 +17,7 @@ GET|HEAD   api/v1/new-groups/master-students .......................... v1.new-g
 POST       api/v1/new-groups/remove-student ................................ v1.new-groups.remove-student › pp\Http\Controllers\Api\NewGroupsController@removeStudent  
 POST       api/v1/new-groups/start .......................................................... v1.new-groups.start › pp\Http\Controllers\Api\NewGroupsController@start  
 GET|HEAD   api/v1/new-groups/students .............................................. v1.new-groups.students › pp\Http\Controllers\Api\NewGroupsController@getStudents  
+  ↳ response item fields include: `amount_paymant` (decimal string with 2 digits, e.g. `"125.40"`), `amout_paymant` (legacy alias), `paymentStr` (`"125.40 zł"`).
 GET|HEAD   api/v1/new-groups/teachers .............................................. v1.new-groups.teachers › pp\Http\Controllers\Api\NewGroupsController@getTeachers  
 POST       api/v1/payments/archive ................................................. v1.payments.archive › pp\Http\Controllers\Api\Payments\PaymentController@archive  
 POST       api/v1/payments/change-group ...................................... v1.payments.change-group › pp\Http\Controllers\Api\Student\GroupController@changeGroup  
@@ -54,4 +55,3 @@ GET|HEAD   api/v1/students/groups-filter .............................. v1.stude
 GET|HEAD   api/v1/students/list ................................................. v1.students.list-legacy › pp\Http\Controllers\Api\Student\StudentController@getList  
 GET|HEAD   api/v1/students/teacher-filter ........................... v1.students.teacher-filter › pp\Http\Controllers\Api\Student\StudentController@getTeacherFilter  
 GET|HEAD   api/v1/students/{id}/payments ............................... v1.students.payments › pp\Http\Controllers\Api\Payments\PaymentController@getStudentPayments  
-

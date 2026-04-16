@@ -24,6 +24,7 @@ export interface NewGroupStudent {
     meta?: string;
     contract: "signed" | "pending";
     isPaid: boolean;
+    amountPaymant: number;
     paymentStr: string;
     enrollDate: string;
     registeredAt: string;
@@ -149,14 +150,14 @@ function normalizeNewGroup(raw: any): NewGroup {
 }
 
 function normalizeNewGroupStudent(raw: any): NewGroupStudent {
-    const paymentStr = String(raw?.paymentStr ?? raw?.payment_str ?? '0 zł')
+    const rawAmountPaymant = raw?.amount_paymant ?? raw?.amout_paymant ?? raw?.paid_amount ?? 0
+    const parsedAmountPaymant = Number(rawAmountPaymant)
+    const amountPaymant = Number.isFinite(parsedAmountPaymant)
+        ? Number(parsedAmountPaymant.toFixed(2))
+        : 0
+
+    const paymentStr = String(raw?.paymentStr ?? raw?.payment_str ?? '')
     const isPaidInStr = paymentStr.toLowerCase().includes('оплачено')
-    
-    // Clean string: remove "оплачено" and extra dots/spaces
-    const cleanedPayment = paymentStr
-        .replace(/·?\s*оплачено/gi, '')
-        .replace(/^\s*·\s*/, '')
-        .trim() || '0 zł'
 
     // Normalize isPaid: support boolean true, numeric 1, string 'true', is_paid, payment_status
     const isPaid = raw?.isPaid === true
@@ -165,6 +166,7 @@ function normalizeNewGroupStudent(raw: any): NewGroupStudent {
         || raw?.is_paid === 1
         || String(raw?.payment_status ?? '').toLowerCase() === 'paid'
         || isPaidInStr
+        || amountPaymant > 0
 
     return {
         id: raw?.id ?? 0,
@@ -175,7 +177,8 @@ function normalizeNewGroupStudent(raw: any): NewGroupStudent {
         meta: raw?.meta,
         contract: raw?.contract ?? "pending",
         isPaid,
-        paymentStr: cleanedPayment,
+        amountPaymant,
+        paymentStr: amountPaymant.toFixed(2) + ' zł',
         enrollDate: String(raw?.enrollDate ?? raw?.enroll_date ?? ''),
         registeredAt: String(raw?.registeredAt ?? raw?.registered_at ?? raw?.created_at ?? raw?.createdAt ?? raw?.date_create ?? ''),
         createdDate: String(raw?.createdDate ?? raw?.created_at ?? raw?.createdAt ?? raw?.date_create ?? ''),
@@ -310,4 +313,3 @@ export async function updateGroupStatus(group_id: number, status_group: 'new' | 
     const res = await getClient(backend).post(NEW_GROUPS.UPDATE_STATUS, { group_id, status_group });
     return res.data as { success: true; data: { group_id: number; old_status: string; new_status: string } };
 }
-

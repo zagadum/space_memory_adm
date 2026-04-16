@@ -208,15 +208,15 @@
                   </span>
                 </td>
                 <td>
-                  <span 
-                    v-if="s.paymentStr !== '0 zł' || s.isPaid"
+                  <span
+                    v-if="s.amountPaymant > 0 || s.isPaid"
                     :class="['payment-mono', s.isPaid ? 'payment-paid' : 'payment-expected']"
                   >
-                    {{ s.paymentStr }}
+                    {{ s.amountPaymant.toFixed(2) }} zł
                     <template v-if="s.isPaid"> · {{ t('newStudents.table.paid') }}</template>
                     <template v-else> · {{ t('newStudents.table.pending') }}</template>
                   </span>
-                  <span v-else class="payment-mono payment-zero">{{ s.paymentStr }}</span>
+                  <span v-else class="payment-mono payment-zero">{{ s.amountPaymant.toFixed(2) }} zł</span>
                 </td>
                 <td>
                   <div class="date-cell">
