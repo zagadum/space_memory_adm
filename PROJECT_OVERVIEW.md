@@ -1,7 +1,7 @@
 # GLS CRM — Project Overview
 
-**Version:** 1.0
-**Last Updated:** 2026-03-11
+**Version:** 1.1
+**Last Updated:** 2026-04-16
 **Status:** Active Development
 
 ---
@@ -442,7 +442,24 @@ Component (reactive UI update)
 **Authentication**: JWT Bearer token in `Authorization` header
 **Laravel Backend**: `space_memory-php8` (separate repository)
 
-### 6.2 API Endpoints (43+ methods across 8 modules)
+### 6.2 Data Naming Conventions
+
+The project maintains a strict separation between Backend and Frontend naming styles:
+
+| Layer | Style | Source of Truth |
+|-------|-------|-----------------|
+| **Backend (DB/API)** | `snake_case` | PostgreSQL fields, Raw JSON responses |
+| **Frontend (Store/UI)** | `camelCase` | Pinia models, Props, Local state |
+
+**Mapping Strategy**:
+- Data from API is normalized in Pinia stores using ternary checks:
+  `studentsCount: item.students_count ?? item.studentsCount ?? 0`
+- API Parameters for POST/PATCH usually follow the backend `snake_case` (e.g., `per_page`, `group_id`).
+- See [AGENTS.md](file:///Users/artsiomhrableuski/GLS_SPACE_ADMIN/space_memory_adm/AGENTS.md) for detailed rules.
+
+
+### 6.3 API Endpoints (43+ methods across 8 modules)
+
 
 #### Authentication
 ```
@@ -534,6 +551,12 @@ PATCH /api/v1/recruitment/leads/{id}       # Update lead
 GET  /api/v1/settings/users                # User list
 PATCH /api/v1/settings/users/{id}          # Update user
 DELETE /api/v1/settings/users/{id}         # Delete user
+
+#### Access Control (NEW)
+```
+GET   /api/v1/gls/me/access-control        # Get current user permission matrix
+GET   /api/v1/gls/settings/access-control  # Manage role-resource matrix
+```
 ```
 
 ### 6.3 External Services
@@ -699,6 +722,7 @@ VITE_USE_MOCK=true npm run dev
 - ✅ Token refresh logic
 - ✅ Route guards
 - ✅ User profile display
+- ✅ **Access Control Matrix**: Flexible permission system with roles (super-admin, franchisee-manager) and modes (active, read-only, hidden)
 
 #### UI/UX
 - ✅ Responsive design
@@ -891,5 +915,5 @@ This document provides:
 ---
 
 **Maintained by:** GLS Development Team
-**Documentation Version:** 1.0
-**Last Updated:** 2026-03-11
+**Documentation Version:** 1.1
+**Last Updated:** 2026-04-16
