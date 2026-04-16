@@ -68,14 +68,14 @@
             <div class="card-label">{{ t('newGroups.create.sections.schedule') }}</div>
             
             <!-- Timezone Picker (Locked to Warsaw as per requirement) -->
-            <div class="modal-field">
-              <div class="modal-label">{{ t('newGroups.create.timezoneLabel') }}</div>
-              <select v-model="selTimezone" class="modal-input-raw" disabled>
-                <option v-for="tz in timezones" :key="tz.id" :value="tz.id">
-                  {{ tz.label }}
-                </option>
-              </select>
-            </div>
+<!--            <div class="modal-field">-->
+<!--              <div class="modal-label">{{ t('newGroups.create.timezoneLabel') }}</div>-->
+<!--              <select v-model="selTimezone" class="modal-input-raw" disabled>-->
+<!--                <option v-for="tz in timezones" :key="tz.id" :value="tz.id">-->
+<!--                  {{ tz.label }}-->
+<!--                </option>-->
+<!--              </select>-->
+<!--            </div>-->
 
             <div class="grid-2">
               <!-- Start Date -->
