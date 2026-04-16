@@ -96,6 +96,11 @@ const activeAge = ref<'all' | 'junior' | 'middle' | 'senior' | 'adult'>('all')
 const groups = ref<ApiGroup[]>([])
 const loading = ref(false)
 
+// Pagination
+const currentPage = ref(1)
+const lastPage = ref(1)
+const perPage = ref(20)
+
 const ageChips = [
   { key: 'all' as const,      cls: 'all',    label: 'Все' },
   ...CANONICAL_AGE_GROUPS.map(a => ({
@@ -105,13 +110,17 @@ const ageChips = [
   }))
 ]
 
-async function loadGroups() {
+async function loadGroups(page = 1) {
   if (loading.value) return
   loading.value = true
   try {
     const { getRecruitmentApi } = await import('../../../api/recruitmentApi')
     const api = getRecruitmentApi(props.backend ?? 'default')
-    groups.value = await api.getGroupsForPicker()
+    // use paged API to avoid loading huge lists in one go
+    const res = await api.getGroupsForPickerPaged(page, perPage.value)
+    groups.value = res.items
+    currentPage.value = res.pagination.currentPage
+    lastPage.value = res.pagination.lastPage
   } catch (e) {
     console.error('GroupPickerPanel: failed to load groups', e)
   } finally {
@@ -122,6 +131,11 @@ async function loadGroups() {
 watch(() => props.modelValue, (open) => {
   if (open) loadGroups()
 })
+
+function goToPage(page: number) {
+  if (page < 1 || page > lastPage.value || page === currentPage.value) return
+  loadGroups(page)
+}
 
 const filteredGroups = computed(() => {
   const q = searchQ.value.toLowerCase().trim()

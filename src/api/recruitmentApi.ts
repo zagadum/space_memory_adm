@@ -357,11 +357,12 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
     const { data } = await client.post(`recruitment/new-students/${studentId}/set-group`, { group_id: groupId });
     return data;
   },
-
-  async getGroupsForPicker(): Promise<Array<{ id: number; name: string; teacher: { id: number; name: string } | null; day: string; time: string; age: string | null; status: string }>> {
-    const { data } = await client.get('groups/new-groups', { params: { per_page: 1000 } });
+  // New: paginated groups picker — returns items + pagination
+  async getGroupsForPickerPaged(page: number = 1, perPage: number = 20) {
+    const { data } = await client.get('groups/new-groups', { params: { page, per_page: perPage } });
     const items: any[] = Array.isArray(data?.items) ? data.items : (Array.isArray(data?.data) ? data.data : []);
-    return items.map((g: any) => ({
+    const pagination = pickPagination(data, items.length);
+    const mapped = items.map((g: any) => ({
       id: Number(g.id),
       name: String(g.name ?? ''),
       teacher: g.teacher ? { id: Number(g.teacher.id), name: String(g.teacher.name ?? '') } : null,
@@ -370,6 +371,13 @@ function createRecruitmentApi(backend: RecruitmentBackend = "default") {
       age: g.age_name ?? g.age ?? null,
       status: String(g.status ?? 'new'),
     }));
+    return { items: mapped, pagination };
+  },
+
+  // Backwards-compatible helper: fetch many items (legacy behaviour)
+  async getGroupsForPicker(): Promise<Array<{ id: number; name: string; teacher: { id: number; name: string } | null; day: string; time: string; age: string | null; status: string }>> {
+    const res = await this.getGroupsForPickerPaged(1, 1000 as number);
+    return res.items;
   },
   };
 }
