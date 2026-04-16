@@ -430,6 +430,13 @@
   "expelled": {
     "actions": {
       "apply": "Apply",
+      "archive": "Archive",
+      "archiveAll": "Archive All",
+      "callToday": "Call Today",
+      "history": "History",
+      "transfer": "Move to Group",
+      "transferAny": "To Any Group"
+    }
   },
   "auth": {
     "title": "Sign In",
