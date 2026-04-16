@@ -43,8 +43,8 @@
             <th @click="sortBy('groupsCount')" style="cursor:pointer; user-select:none; width: 90px; text-align: center;">
               {{ t('teachersList.table.groupsCount') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'groupsCount' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'groupsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
-            <th @click="sortBy('students_count')" style="cursor:pointer; user-select:none; width: 100px; text-align: center;">
-              {{ t('teachersList.table.students_count') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'students_count' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'studentsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
+            <th @click="sortBy('studentsCount')" style="cursor:pointer; user-select:none; width: 100px; text-align: center;">
+              {{ t('teachersList.table.studentsCount') }} <span class="sort-icon" :style="{ color: listStore.sorting.orderBy === 'studentsCount' ? 'var(--blue)' : 'inherit' }">{{ listStore.sorting.orderBy === 'studentsCount' ? (listStore.sorting.orderDirection === 'asc' ? '↑' : '↓') : '↕' }}</span>
             </th>
             <th style="width: 250px;">{{ t('teachersList.table.comment') }}</th>
           </tr>
