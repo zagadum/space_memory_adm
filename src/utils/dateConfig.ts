@@ -15,7 +15,7 @@ dayjs.tz.setDefault(APP_TIMEZONE)
  */
 export function parseDate(dateStr: string | Date | undefined | null) {
   if (!dateStr) return dayjs().tz(APP_TIMEZONE)
-  return dayjs(dateStr).tz(APP_TIMEZONE)
+  return dayjs.tz(dateStr, APP_TIMEZONE)
 }
 
 /**

@@ -67,10 +67,10 @@
           <div class="form-card">
             <div class="card-label">{{ t('newGroups.create.sections.schedule') }}</div>
             
-            <!-- Timezone Picker -->
+            <!-- Timezone Picker (Locked to Warsaw as per requirement) -->
             <div class="modal-field">
               <div class="modal-label">{{ t('newGroups.create.timezoneLabel') }}</div>
-              <select v-model="selTimezone" class="modal-input-raw">
+              <select v-model="selTimezone" class="modal-input-raw" disabled>
                 <option v-for="tz in timezones" :key="tz.id" :value="tz.id">
                   {{ tz.label }}
                 </option>
@@ -413,10 +413,12 @@ watch(startDate, (newVal) => {
     day.value = ''
     return
   }
-  // Force standardized parsing to avoid locale shifts
+  // parseDate now uses strict Warsaw timezone parsing to avoid browser shifts
   const d = parseDate(newVal)
   if (!d.isValid()) return
+  
   const jsDay = d.day() // 0=Sun, 1=Mon...
+  // Map Sunday(0) to Index 6, Monday(1) to Index 0, etc. to match weekdays array
   const idx = (jsDay + 6) % 7
   day.value = weekdays[idx]
   dayError.value = ''
