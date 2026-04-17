@@ -9,11 +9,11 @@
 
 ### Три сервиса (локальная разработка)
 
-| Сервис | URL | Репозиторий | Роль |
-|---|---|---|---|
-| **Frontend Admin** | http://localhost:5173 | `space_memory_adm` | Этот проект — CRM для сотрудников |
-| **Space Memory Backend** | http://localhost:8000 | `space_memory-recrut` | Основной бэкенд: финансы, студенты, группы |
-| **Indigo Backend** | http://localhost:8001 | `Indigo` | Отдельный бэкенд LMS-платформы |
+| Сервис | URL | Репозиторий | Роль | Ветка (Development) |
+|---|---|---|---|---|
+| **Frontend Admin** | http://localhost:5173 | `space_memory_adm` | CRM для сотрудников | `artem1` |
+| **Space Memory Backend** | http://localhost:8000 | `space_memory-recrut` | Основной бэкенд | `recrut_indigo2` |
+| **Indigo Backend** | http://localhost:8001 | `Indigo` | Бэкенд LMS | `recrut_indigo2` |
 
 **Кто куда ходит:**
 - Ученик взаимодействует только с `space_memory-recrut` (регистрация, личный кабинет, оплата)
@@ -142,9 +142,10 @@ psql -U postgres -d indigo_db < indigo_recruting.sql
 
 | Событие | Автоматическое действие |
 |---------|------------------------|
-| Регистрация завершена | Аккаунт создан, появляется в "Новых учениках" |
-| Оплата прошла (Imoje) | Фактура + письмо "Ждём старта группы" |
-| Старт группы нажат | Группа и ученики → Секретариат, аккаунты активируются |
+| Регистрация завершена | Аккаунт создан, статус "registered", появляется в "Новых учениках" |
+| Оплата прошла (Imoje) | Запись в `gls_payment_transactions` (direction='in', status='completed') |
+| Договор подписан | Запись в `gls_documents` (doc_status='signed', doc_type='contract') |
+| Старт группы нажат | Группа и ученики → Секретариат, аккаунты активируются (необратимо) |
 | Старт занятий | Письмо клиенту + письмо тренеру |
 
 ### 10 критических бизнес-правил
@@ -359,16 +360,27 @@ Route::prefix('v1')->middleware('auth:sanctum')->group(function () {
 });
 ```
 
-**Счётчики — КРИТИЧНО:**
+**Счётчики и статусы — КРИТИЧНО:**
 ```php
-// ✗ НИКОГДА — убивает БД под нагрузкой
-$count = Student::where('status', 'active')->count();
+// ✗ НИКОГДА — полагаться на RecrutingStudent::status для финансов
+$paid = RecrutingStudent::where('status', 'paid')->count();
 
-// ✓ ВСЕГДА — инкремент в отдельной таблице
+// ✓ ВСЕГДА — использовать JOIN-ы к сырым таблицам транзакций и документов
+// Пример из NewGroupsController:
+$paidStudentsSub = DB::table('gls_payment_transactions')
+    ->select('student_id')
+    ->selectRaw("MAX(CASE WHEN direction = 'in' AND status = 'completed' THEN 1 ELSE 0 END) as has_paid")
+    ->groupBy('student_id');
+
+// Использовать инкремент только для простых счетчиков
 DB::table('counters')->where('key', 'active_students')->increment('value');
-// или денормализация
-$group->increment('students_count');
 ```
+
+**Особенности API нейминга (Legacy Hardcore):**
+Из-за исторических опечаток в базе и API, некоторые поля имеют два варианта. Фронтенд должен поддерживать оба для совместимости:
+- `amount_paymant` / `amout_paymant` (с опечаткой)
+- `isPaid` (boolean) / `payment_status` (string: 'paid'|'pending')
+- `students_count` (из БД) -> `studentsCount` (во Vue)
 
 **Тяжёлые операции (>1 сек) → Jobs:**
 ```php
@@ -618,17 +630,20 @@ POST   /payments/change-group
 
 **New Groups (рекрутинг)**
 ```
-GET    /new-groups                   ← список групп в наборе
-POST   /new-groups/create
-POST   /new-groups/delete
-POST   /new-groups/add-students
-POST   /new-groups/remove-student
+GET    /new-groups                   ← список (per_page=1000 по умолчанию)
+POST   /new-groups/create            ← создать новую группу
+POST   /new-groups/delete            ← удалить группу в наборе
+POST   /new-groups/add-students      ← добавить студентов в группу
+POST   /new-groups/remove-student    ← убрать студента (group_id -> null)
 POST   /new-groups/start             ← СТАРТ ГРУППЫ (необратимо!)
-GET    /new-groups/students
-GET    /new-groups/teachers
-GET    /new-groups/master-students
+GET    /new-groups/students          ← ученики конкретной группы (с деталями оплаты)
+GET    /new-groups/teachers          ← список учителей для создания/пикера
+GET    /new-groups/master-students   ← свободные ученики (без группы)
 GET    /groups/new-groups            ← пагинированный список для пикера
 ```
+
+> [!NOTE]
+> В разделе рекрутинга (`NewStudentsPage`) интегрировано создание группы "на лету" — через `onCreateGroup` вызывается `getTeachers` и `getMasterStudents` для инициализации `CreateGroupModal`.
 
 **Salary**
 ```

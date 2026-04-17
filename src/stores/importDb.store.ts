@@ -63,6 +63,19 @@ export const useImportDbStore = defineStore('importDb', () => {
       isLoading.value = false;
     }
   }
+  async function generateLink(id: number | string) {
+    isLoading.value = true;
+    error.value = null;
+    try {
+      const api = getImportDbApi(currentBackend.value);
+      return await api.generateLink(id);
+    } catch (err: unknown) {
+      error.value = parseApiError(err, 'Ошибка генерации ссылки');
+      throw err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
   async function updateImportDbItem(id: number | string, payload: Partial<ImportDbItem>) {
     isLoading.value = true;
     error.value = null;
@@ -86,6 +99,5 @@ export const useImportDbStore = defineStore('importDb', () => {
     error.value = null;
     isLoading.value = false;
   }
-  return { items, isLoading, error, currentPage, perPage, totalCount, lastPage, currentBackend, sentCount, doneCount, pendingCount, fetchImportDbList, deleteImportDbItem, resendInvitation, updateImportDbItem, resetState };
+  return { items, isLoading, error, currentPage, perPage, totalCount, lastPage, currentBackend, sentCount, doneCount, pendingCount, fetchImportDbList, deleteImportDbItem, resendInvitation, generateLink, updateImportDbItem, resetState };
 });
-

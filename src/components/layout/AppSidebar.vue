@@ -223,6 +223,9 @@
         <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db' }, accessClass('import-db')]" @click="navigateTo('import-db', '/recruitment/space/import-db')">
           <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
         </div>
+        <div v-if="isVisible('link-generator')" class="nav-item" :class="[{ active: activeItem === 'link-generator' }, accessClass('link-generator')]" @click="navigateTo('link-generator', '/recruitment/space/link-generator')">
+          <span class="nav-icon">✦</span> {{ t('sidebar.linkGenerator') }}
+        </div>
         <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail' }, accessClass('target-mail')]" @click="navigateTo('target-mail', '/recruitment/space/target-mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
         </div>
@@ -260,6 +263,9 @@
         </div>
         <div v-if="isVisible('import-db')" class="nav-item" :class="[{ active: activeItem === 'import-db-indigo' }, accessClass('import-db')]" @click="navigateTo('import-db-indigo', '/recruitment/indigo/import-db', 'import-db')">
           <span class="nav-icon">📥</span> {{ t('sidebar.importDb') }}
+        </div>
+        <div v-if="isVisible('link-generator')" class="nav-item" :class="[{ active: activeItem === 'link-generator-indigo' }, accessClass('link-generator')]" @click="navigateTo('link-generator-indigo', '/recruitment/indigo/link-generator', 'link-generator')">
+          <span class="nav-icon">✦</span> {{ t('sidebar.linkGenerator') }}
         </div>
         <div v-if="isVisible('target-mail')" class="nav-item" :class="[{ active: activeItem === 'target-mail-indigo' }, accessClass('target-mail')]" @click="navigateTo('target-mail-indigo', '/recruitment/indigo/target-mail', 'target-mail')">
           <span class="nav-icon">✉️</span> {{ t('sidebar.targetMail') }}
@@ -602,6 +608,12 @@ watch(() => route.path, (path) => {
   } else if (path.startsWith('/recruitment/space/import-db')) {
     activeItem.value = 'import-db'
     openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/space/link-generator')) {
+    activeItem.value = 'link-generator'
+    openSections.value.recruitment = true
+  } else if (path.startsWith('/recruitment/indigo/link-generator')) {
+    activeItem.value = 'link-generator-indigo'
+    openSections.value.recruitmentIndigo = true
   } else if (path.startsWith('/finance/returns')) {
     activeItem.value = 'returns'
     openSections.value.accounting = true
@@ -679,7 +691,7 @@ const _ALL_MENU_KEYS = [
   'access-control','all-tasks','archived','cohorts','contractors','course-endings',
   'dashboard','debtors','expelled','faktury','finance-ustawienia','groups',
   'holidays-return','hr-active','hr-analytics','hr-personal','hr-pipeline','hr-training',
-  'import-db','indigo-techniques','inpost','integrations','leads','lesson-tracker',
+  'import-db','link-generator','indigo-techniques','inpost','integrations','leads','lesson-tracker',
   'my-cabinet','nadplaty','new-groups','new-students','projects','quality-analytics',
   'quality-materials','quality-monitoring','quality-olimpiad','quality-stats',
   'quality-zaliczenia','reports','returns','rezygnacje','salary-calculator','salary-demo',

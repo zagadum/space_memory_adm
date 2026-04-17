@@ -142,12 +142,13 @@ API теперь автоматически определяет тип прог
 |------------------|-------------------|-----|----------|
 | `id` | `id` | number | ID группы |
 | `name` | `name` | string | Название группы |
-| `studentsCount` | `students_count` | number | Количество учеников (набор) |
+| `studentsCount` | `students_count` | number | Всего учеников в группе |
+| `paidCount` | `paid_count` | number | Учеников с оплатой (`gls_payment_transactions`) |
+| `contractSignedCount`| `contract_signed_count`| number | Учеников с подписью (`gls_documents`) |
 | `teacherId` | `teacher_id` | number | ID учителя |
-| `startDate` | `start_day` / `start_date` | string | Дата начала |
+| `teacherName` | `teacher_name` | string | ФИО учителя |
+| `startDate` | `start_day` | string | Дата начала |
 | `startTime` | `start_time` | string | Время начала |
-| `lastComment` | `last_comment` | string | Последний комментарий |
-| `lastCommentDate` | `last_comment_date` | string | Дата комментария |
 
 ---
 
@@ -342,6 +343,7 @@ type MonthStatus = 'paid' | 'pending' | 'overdue' | 'future' | 'pause' | 'summer
 | 2026-03-07 | 1.4 | ✨ Добавлена имитация программ как в mockDB |
 
 | 2026-04-16 | 1.5 | Добавлено описание Access Control Matrix и маппинг ролей |
+| 2026-04-16 | 1.6 | Обновлены статы групп (paid_count, contract_signed_count) |
 
 ### Версия 1.5 - Детали
 

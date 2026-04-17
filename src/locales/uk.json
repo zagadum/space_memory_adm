@@ -280,13 +280,10 @@
     "trainer": "Тренер"
   },
   "auth": {
-    "description": "CRM-платформа для управління школами Space Memory та Indigo Mental у рамках Global Leaders Skills. Забезпечує комплексне управління освітніми процесами, спілкування зі студентами та управління філіями.",
+    "title": "Вхід",
     "email": "Email",
     "password": "Пароль",
-    "project": "Проєкт",
-    "schools": "Сайти шкіл:",
-    "submit": "Увійти",
-    "title": "Вхід до системи"
+    "submit": "Увійти"
   },
   "changePassword": {
     "confirmPassword": "Підтвердіть пароль",
@@ -438,137 +435,164 @@
       "transferAny": "В будь-яку групу"
     }
   },
-  "auth": {
-    "title": "Вхід",
-    "email": "Email",
-    "password": "Пароль",
-    "submit": "Увійти"
-  },
   "tabs": {
-    "payments": "Платежі",
+    "attendance": "Відвідуваність",
     "groups": "Групи",
     "info": "Інформація",
-    "attendance": "Відвідуваність",
-    "progress": "Успішність",
-    "notes": "Нотатки"
+    "notes": "Нотатки",
+    "payments": "Платежі",
+    "progress": "Успішність"
   },
   "payments": {
-    "currencyPerMonth": "зл/міс.",
-    "currency": "zł",
-    "balance": "Баланс",
-    "overall": "Загальний баланс",
-    "nextPay": "Наступний платіж",
-    "activePrograms": "Активні програми",
     "actions": "Дії",
+    "activePrograms": "Активні програми",
+    "balance": "Баланс",
+    "btn": {
+      "addExtra": "Додати дод. заняття",
+      "archive": "Архів",
+      "changeGroup": "Змінити групу",
+      "discount": "Знижка",
+      "extra": "Додаткові",
+      "invoice": "Рахунок",
+      "korekta": "Корекція",
+      "pause": "Пауза",
+      "refund": "Повернення",
+      "resume": "Відновити",
+      "split": "Розділити",
+      "tariff": "Тариф",
+      "unlock": "Розблокувати"
+    },
+    "child2badge": "👧 2-а дитина · −10% сімʼя",
+    "currency": "zł",
+    "currencyPerMonth": "зл/міс.",
+    "detail": {
+      "activePause": "🌙 Активна пауза",
+      "amount": "💵 Сума до сплати",
+      "bonus": "⭐ Бонусне заняття",
+      "discount": "🏷️ Знижка",
+      "distribution": "🔄 Розподіл",
+      "ksefLabel": "📄 KSeF",
+      "lessons": "📊 Заняття",
+      "partialPause": "◐ Часткова пауза",
+      "payStatus": "💰 Статус оплати",
+      "teacher": "👩‍🏫 Вчитель",
+      "txHint": "💡 Транзакції та рахунки — нижче в блоці «Транзакції»"
+    },
+    "disc": {
+      "complaint": "Компенсація",
+      "family": "Сімейна",
+      "loyalty": "Лояльність",
+      "promo": "Промо",
+      "referral": "Реферальна"
+    },
+    "extras": {
+      "afterPayment": "після оплати",
+      "awaitingPayment": "очікує оплати",
+      "infoText": "Разові послуги — немає абонемементу, пауз та зміни тарифу.",
+      "items": "позиції",
+      "paid": "оплачено",
+      "subtitle": "Разові послуги та товари",
+      "title": "Дод. матеріали та програми"
+    },
+    "ksef": {
+      "conflict": "! Конфлікт",
+      "error": "✕ Помилка",
+      "loading": "Завантаження KSeF…",
+      "manual": "✎ Ручне",
+      "ok": "✓ Відправлено",
+      "pending": "⏳ Очікує",
+      "title": "Рахунки KSeF"
+    },
+    "labels": {
+      "discountShort": "знижка",
+      "free": "Безкоштовно",
+      "from": "з",
+      "lessonsCount": "занять",
+      "lessonsSuffix": "зан.",
+      "return": "повернення",
+      "until": "до"
+    },
+    "legend": {
+      "extra": "Дод. заняття",
+      "overdue": "Прострочено",
+      "paid": "Оплачено",
+      "partial": "Частково",
+      "pause": "Пауза",
+      "pending": "Очікує",
+      "summer": "Канікули",
+      "title": "Легенда:"
+    },
+    "month": {
+      "amount": "Сума",
+      "lessons": "Заняття",
+      "status": "Статус"
+    },
+    "monthsFull": [
+      "Січень",
+      "Лютий",
+      "Березень",
+      "Квітень",
+      "Травень",
+      "Червень",
+      "Липень",
+      "Серпень",
+      "Вересень",
+      "Жовтень",
+      "Листопад",
+      "Грудень"
+    ],
+    "nextPay": "Наступний платіж",
+    "overall": "Загальний баланс",
+    "refund": {
+      "forInvoice": "Повернення по рахунку"
+    },
+    "status": {
+      "approved": "Схвалено",
+      "completed": "Завершено",
+      "extra": "Дод. заняття",
+      "future": "Майбутнє",
+      "manual_pending": "Ручний (очікує)",
+      "overdue": "Прострочено",
+      "paid": "Оплачено",
+      "partial": "Частково",
+      "pause": "Пауза",
+      "pending": "Очікує",
+      "processing": "В обробці",
+      "rejected": "Відхилено",
+      "summer": "Канікули"
+    },
+    "table": {
+      "amount": "Сума",
+      "date": "Дата",
+      "ksef": "KSeF",
+      "lessons": "Заняття",
+      "month": "Місяць",
+      "status": "Статус",
+      "studentDetails": "Дані учня"
+    },
     "tx": {
-      "title": "Транзакції",
       "combinedTitle": "Транзакції та рахунки KSeF",
+      "correction": "Корекція",
       "count": "{n} транзакція | {n} транзакції | {n} транзакцій",
+      "downloadPdf": "Завантажити PDF",
+      "edit": "Редагувати рахунок",
+      "editInvoice": "Редагувати рахунок",
+      "empty": "Немає транзакцій для цієї програми",
+      "extra": "Дод. заняття",
+      "invoice": "Рахунок",
+      "korekta": "Коректура",
       "loading": "Завантаження транзакцій…",
       "paid": "✓ Оплачено",
       "pending": "🕐 Очікує",
-      "subscription": "Абонемент",
-      "invoice": "Рахунок",
-      "extra": "Дод. заняття",
-      "edit": "Редагувати рахунок",
-      "editInvoice": "Редагувати рахунок",
-      "correction": "Корекція",
-      "korekta": "Коректура",
       "refund": "Повернення",
-      "downloadPdf": "Завантажити PDF",
-      "pdfDownloading": "Завантаження...",
-      "pdfError": "Помилка завантаження PDF",
-      "empty": "Немає транзакцій для цієї програми"
+      "subscription": "Абонемент",
+      "title": "Транзакції"
     },
-    "archive": {
-      "cancel": "Відміна",
-      "confirm": "Підтвердити архівацію",
-      "moved": "Переїхав",
-      "noAnswer": "Не додзвонилися 3 рази",
-      "notRelevant": "Не актуально",
-      "other": "Інше",
-      "otherPlaceholder": "Напишіть причину...",
-      "otherSchool": "Вибрав іншу школу",
-      "reason": "Причина архівації",
-      "specify": "Вкажіть причину",
-      "sub": "Учень буде переміщений у загальний архів системи",
-      "title": "Архівувати учня"
+    "view": {
+      "grid": "⬛ Сітка",
+      "table": "☰ Таблиця"
     },
-    "archived": "🗃️ Учня архівовано",
-    "bulk": {
-      "archive": "Архівувати вибраних",
-      "assign": "Призначити відповідального",
-      "deselect": "Зняти виділення",
-      "forStudents": "Для {count} учнів",
-      "selected": "0 вибраних | {n} вибраний | {n} вибраних | {n} вибраних"
-    },
-    "callMarked": "📞 Контакт відмічено сьогодні",
-    "contact": {
-      "daysAgo": "{days} дн. тому",
-      "none": "Немає контакту",
-      "today": "Сьогодні"
-    },
-    "empty": {
-      "sub": "Виписаних учнів за заданими фільтрами не знайдено",
-      "title": "Список порожній"
-    },
-    "filter": {
-      "allGroups": "Всі групи",
-      "allManagers": "Всі співробітники",
-      "contactAny": "Будь-який",
-      "contactHot": "Більше 7 днів",
-      "contactNone": "Без контакту",
-      "contactToday": "Сьогодні",
-      "contactWeek": "Останні 7 днів",
-      "noManager": "Без відповідального",
-      "search": "Пошук за ім'ям..."
-    },
-    "info": {
-      "rule1": "Тут тільки учні, <strong>записані в групу, але які не почали навчання</strong>. З ними працює відділ продажу.",
-      "rule2": "<strong>Червона смуга зліва</strong> — не було контакту більше 7 днів. Потребує термінового дзвінка.",
-      "rule3": "Дату контакту, відповідального та коментар можна <strong>редагувати прямо в рядку</strong> — зміни зберігаються одразу.",
-      "rule4": "Після <strong>архівуції з причиною</strong> учень зникає з вкладки та переходить у розділ <strong>«Архів»</strong>.",
-      "rule5": "Роль <strong>Manager</strong> — повний доступ. <strong>Quality</strong> — перегляд та відновлення. <strong>Sales</strong> — редагування та перенесення.",
-      "title": "Логика роботи · правила дозакриття"
-    },
-    "loading": "Завантаження...",
-    "pageSubTitle": "інструмент повторних продажів · дозакриття",
-    "pageTitle": "Виписані учні",
-    "saved": "💾 Збережено",
-    "showing": "Показано {shown} з {total} учнів",
-    "sort": {
-      "conAsc": "Старі контакти ↑",
-      "conDesc": "Нові контакти ↓",
-      "expAsc": "За датою виписки ↑",
-      "expDesc": "За датою виписки ↓"
-    },
-    "stats": {
-      "hot": "Давно без контакту",
-      "hotSub": "більше 7 днів тому",
-      "none": "Не дзвонили ніколи",
-      "noneSub": "пріоритет 1",
-      "total": "Всього в роботі",
-      "totalSub": "активних контактів",
-      "unpaid": "Не оплачено",
-      "unpaidSub": "можливі борги"
-    },
-    "table": {
-      "comment": "Коментар",
-      "expelled": "Дата виписки",
-      "group": "Попередня група",
-      "lastContact": "Останній контакт",
-      "manager": "Відповідальний",
-      "name": "Ім'я учня",
-      "paid": "Оплата",
-      "studentDetails": "Дані учня",
-      "type": "Тип",
-      "typeGroup": "Груп.",
-      "typeIndividual": "Інд."
-    },
-    "tableToolbar": {
-      "title": "СПИСОК УЧНІВ"
-    },
-    "transferred": "✅ Учня перенесено в групу"
+    "year": "Рік:"
   },
   "export": {
     "amount": "Сума",
@@ -1718,7 +1742,13 @@
       "title": "✦ Створити нову групу",
       "timezoneLabel": "Часовий пояс",
       "shortWeekdays": {
-        "mon": "Пн", "tue": "Вт", "wed": "Ср", "thu": "Чт", "fri": "Пт", "sat": "Сб", "sun": "Нд"
+        "mon": "Пн",
+        "tue": "Вт",
+        "wed": "Ср",
+        "thu": "Чт",
+        "fri": "Пт",
+        "sat": "Сб",
+        "sun": "Нд"
       },
       "ageAdjectives": {
         "junior": "молодша",
@@ -2116,157 +2146,6 @@
     "typeMeet": "Зустріч",
     "typeNote": "Нотатка"
   },
-  "payments": {
-    "actions": "Дії",
-    "activePrograms": "Активні програми",
-    "balance": "Баланс",
-    "btn": {
-      "addExtra": "Додати дод. заняття",
-      "archive": "Архів",
-      "changeGroup": "Змінити групу",
-      "discount": "Знижка",
-      "extra": "Додаткові",
-      "invoice": "Рахунок",
-      "korekta": "Корекція",
-      "pause": "Пауза",
-      "refund": "Повернення",
-      "resume": "Відновити",
-      "split": "Розділити",
-      "tariff": "Тариф",
-      "unlock": "Розблокувати"
-    },
-    "child2badge": "👧 2-а дитина · −10% сімʼя",
-    "currency": "zł",
-    "currencyPerMonth": "зл/міс.",
-    "detail": {
-      "activePause": "🌙 Активна пауза",
-      "amount": "💵 Сума до сплати",
-      "bonus": "⭐ Бонусне заняття",
-      "discount": "🏷️ Знижка",
-      "distribution": "🔄 Розподіл",
-      "ksefLabel": "📄 KSeF",
-      "lessons": "📊 Заняття",
-      "partialPause": "◐ Часткова пауза",
-      "payStatus": "💰 Статус оплати",
-      "teacher": "👩‍🏫 Вчитель",
-      "txHint": "💡 Транзакції та рахунки — нижче в блоці «Транзакції»"
-    },
-    "disc": {
-      "complaint": "Компенсація",
-      "family": "Сімейна",
-      "loyalty": "Лояльність",
-      "promo": "Промо",
-      "referral": "Реферальна"
-    },
-    "extras": {
-      "afterPayment": "після оплати",
-      "awaitingPayment": "очікує оплати",
-      "infoText": "Разові послуги — немає абонемементу, пауз та зміни тарифу.",
-      "items": "позиції",
-      "paid": "оплачено",
-      "subtitle": "Разові послуги та товари",
-      "title": "Дод. матеріали та програми"
-    },
-    "ksef": {
-      "conflict": "! Конфлікт",
-      "error": "✕ Помилка",
-      "loading": "Завантаження KSeF…",
-      "manual": "✎ Ручне",
-      "ok": "✓ Відправлено",
-      "pending": "⏳ Очікує",
-      "title": "Рахунки KSeF"
-    },
-    "labels": {
-      "discountShort": "знижка",
-      "free": "Безкоштовно",
-      "from": "з",
-      "lessonsCount": "занять",
-      "lessonsSuffix": "зан.",
-      "return": "повернення",
-      "until": "до"
-    },
-    "legend": {
-      "extra": "Дод. заняття",
-      "overdue": "Прострочено",
-      "paid": "Оплачено",
-      "partial": "Частково",
-      "pause": "Пауза",
-      "pending": "Очікує",
-      "summer": "Канікули",
-      "title": "Легенда:"
-    },
-    "month": {
-      "amount": "Сума",
-      "lessons": "Заняття",
-      "status": "Статус"
-    },
-    "monthsFull": [
-      "Січень",
-      "Лютий",
-      "Березень",
-      "Квітень",
-      "Травень",
-      "Червень",
-      "Липень",
-      "Серпень",
-      "Вересень",
-      "Жовтень",
-      "Листопад",
-      "Грудень"
-    ],
-    "nextPay": "Наступний платіж",
-    "overall": "Загальний баланс",
-    "refund": {
-      "forInvoice": "Повернення по рахунку"
-    },
-    "status": {
-      "approved": "Схвалено",
-      "completed": "Завершено",
-      "extra": "Дод. заняття",
-      "future": "Майбутнє",
-      "manual_pending": "Ручний (очікує)",
-      "overdue": "Прострочено",
-      "paid": "Оплачено",
-      "partial": "Частково",
-      "pause": "Пауза",
-      "pending": "Очікує",
-      "processing": "В обробці",
-      "rejected": "Відхилено",
-      "summer": "Канікули"
-    },
-    "table": {
-      "amount": "Сума",
-      "date": "Дата",
-      "ksef": "KSeF",
-      "lessons": "Заняття",
-      "month": "Місяць",
-      "status": "Статус",
-      "studentDetails": "Дані учня"
-    },
-    "tx": {
-      "combinedTitle": "Транзакції та рахунки KSeF",
-      "correction": "Корекція",
-      "count": "{n} транзакція | {n} транзакції | {n} транзакцій",
-      "downloadPdf": "Завантажити PDF",
-      "edit": "Редагувати рахунок",
-      "editInvoice": "Редагувати рахунок",
-      "empty": "Немає транзакцій для цієї програми",
-      "extra": "Дод. заняття",
-      "invoice": "Рахунок",
-      "korekta": "Коректура",
-      "loading": "Завантаження транзакцій…",
-      "paid": "✓ Оплачено",
-      "pending": "🕐 Очікує",
-      "refund": "Повернення",
-      "subscription": "Абонемент",
-      "title": "Транзакції"
-    },
-    "view": {
-      "grid": "⬛ Сітка",
-      "table": "☰ Таблиця"
-    },
-    "year": "Рік:"
-  },
   "progress": {
     "achievements": "Досягнення",
     "kpi": {
@@ -2528,7 +2407,8 @@
     "trialMonth": "Пробний місяць",
     "ustawienia": "Налаштування (Ustawienia)",
     "zaliczenia": "Заліки",
-    "zaliczeniaCalendar": "Календар заліків"
+    "zaliczeniaCalendar": "Календар заліків",
+    "linkGenerator": "Генератор посилань"
   },
   "studentList": {
     "actions": {
@@ -2605,14 +2485,6 @@
       "title": "Транзакції",
       "total": "Разом до сплати"
     }
-  },
-  "tabs": {
-    "attendance": "Відвідуваність",
-    "groups": "Групи",
-    "info": "Інформація",
-    "notes": "Нотатки",
-    "payments": "Платежі",
-    "progress": "Успішність"
   },
   "targetMail": {
     "emptyFiltered": "За поточним пошуком нічого не знайдено.",
@@ -2865,5 +2737,100 @@
     "responsible": "Відповідальний",
     "subtitle": "Тимчасовий доступ при відсутності платежу.",
     "title": "🔓 Розблокувати платформу"
+  },
+  "linkGenerator": {
+    "tabPersonal": "Personal",
+    "tabMarketing": "Marketing",
+    "personalTitle": "Персональні інвайти",
+    "personalDesc": "Зручний інтерфейс над поточним flow invite + resend-invitation для конкретного з батьків.",
+    "personalFlowHint": "Спочатку створюється чернетка в Import DB, а потім можна згенерувати посилання або одразу надіслати email.",
+    "personalNicknameHint": "Nickname обов'язковий: backend використовує його для перевірки унікальності та створення чернетки.",
+    "personalCreateDraft": "Створити чернетку",
+    "personalGenerateLink": "Згенерувати посилання",
+    "personalCreateAndSend": "Створити та надіслати",
+    "personalLinkBox": "Персональне посилання",
+    "personalLinkPlaceholder": "Спочатку створіть чернетку або згенеруйте посилання.",
+    "personalCopyCurrent": "Скопіювати поточне посилання",
+    "personalDraftId": "Draft ID",
+    "personalHistoryTitle": "Чернетки та інвайти з Import DB",
+    "personalHistorySubtitle": "Ця таблиця використовує поточний recruitment flow, а не окрему історію посилань.",
+    "personalHistoryEmpty": "У Import DB поки немає відповідних записів",
+    "personalHistoryStatus": "Статус",
+    "personalStatusDraft": "Чернетка",
+    "personalStatusSent": "Надіслано",
+    "personalStatusDone": "Завершено",
+    "personalSendAgain": "Надіслати email",
+    "marketingTitle": "Маркетингові посилання",
+    "marketingDesc": "Окремий сценарій для багаторазових посилань кампаній і знижкових оферів.",
+    "marketingFlowHint": "Ця вкладка залишається окремим інструментом для генерації marketing-посилань.",
+    "marketingLinkPlaceholder": "Згенеруйте marketing-посилання, щоб побачити фінальний URL.",
+    "marketingHistoryTitle": "Історія marketing-посилань",
+    "marketingHistorySubtitle": "Окремий реєстр marketing-генерації для поточного проєкту.",
+    "notifDraftCreated": "Чернетку створено в Import DB",
+    "notifInviteSent": "Email із запрошенням надіслано",
+    "notifPersonalLinkGenerated": "Персональне посилання згенеровано!",
+    "pageSubtitle": "для клієнтів",
+    "pageDesc": "Посилання відкриває особистий кабінет з зашитим тарифом та знижками. Клієнт сам обирає кількість місяців.",
+    "step1Label": "Крок 1 — Дані учня",
+    "fieldFirstName": "Ім'я дитини",
+    "fieldFirstNamePlaceholder": "Ім'я...",
+    "fieldSurname": "Прізвище дитини",
+    "fieldSurnamePlaceholder": "Прізвище...",
+    "fieldParentEmail": "Email батька/матері",
+    "step2Label": "Крок 2 — Тариф (zł / місяць)",
+    "tariffCustomPlaceholder": "Інший...",
+    "tariffLockTip": "🔒 Тариф 399 zł та довільна ціна доступні лише супер-адміністратору",
+    "step3Label": "Крок 3 — Знижки (можна комбінувати дозволені)",
+    "discFastName": "Швидка заявка",
+    "discFastMeta": "Одноразова · лише 1-й платіж",
+    "discTrialName": "Пробний місяць",
+    "discTrialMeta": "Перші 4 заняття від старту",
+    "discSecondName": "Друга дитина",
+    "discSecondMeta": "Постійна · кожен місяць",
+    "discReferralName": "Рекомендація",
+    "discReferralMeta": "Одноразова · наст. місяць",
+    "conflictSecond": "Другою дитиною",
+    "conflictReferral": "Рекомендацією",
+    "conflictMsg": "⛔ Не можна використовувати разом з «{name}»",
+    "subfieldSecondLabel": "Ім'я першої дитини (обов'язково)",
+    "subfieldSecondPlaceholder": "Ім'я та прізвище 1-ї дитини...",
+    "subfieldReferralWho": "Хто отримує знижку?",
+    "referrerOption": "Той хто рекомендував",
+    "referredOption": "Тому кого рекомендували",
+    "subfieldReferrerLabel": "Ім'я учня, який прийшов за рекомендацією (обов'язково)",
+    "subfieldReferredLabel": "Ім'я учня, який дав рекомендацію (обов'язково)",
+    "subfieldStudentPlaceholder": "Ім'я та прізвище учня...",
+    "calcTitle": "💡 Розрахунок для клієнта (1 місяць)",
+    "calcBaseTariff": "Базовий тариф",
+    "calcTotal": "Разом / місяць",
+    "calcSaving": "Економія клієнта",
+    "step4Label": "Крок 4 — Готове посилання",
+    "urlBoxTitle": "Посилання для клієнта",
+    "urlFill": "⚠️ Заповніть дані",
+    "urlConflict": "⛔ Конфлікт знижок",
+    "btnCopy": "📋 Копіювати",
+    "btnGenerate": "✦ Створити та зберегти",
+    "validationConflict": "Знижки «Друга дитина» та «Рекомендація» не можна використовувати одночасно.",
+    "validationPartnerRequired": "Для {discounts} необхідно заповнити поле прив'язки до учня.",
+    "historyTitle": "Згенеровані посилання",
+    "historyClear": "Очистити",
+    "historyEmpty": "Ще немає згенерованих посилань",
+    "compatTitle": "Таблиця сумісності знижок",
+    "compatColDiscount": "Знижка",
+    "compatNote": "⚠️ Друга дитина + Рекомендація — взаємовиключні підстави знижки. Клієнт не може отримати обидві одночасно.",
+    "notifGenerated": "Посилання згенеровано та збережено!",
+    "notifCopied": "Скопійовано!",
+    "notifError": "Помилка при генерації",
+    "confirmDelete": "Видалити цей запис?",
+    "confirmClear": "Очистити історію для поточного проєкту?",
+    "roleSuperadmin": "Супер-адмін",
+    "roleManager": "Менеджер",
+    "roleDemo": "/ демо",
+    "perMonth": "/міс",
+    "statusGenerated": "Створено",
+    "statusSent": "Надіслано",
+    "statusConverted": "Зареєстровано",
+    "historyManager": "Менеджер",
+    "historyConverted": "Зарєєстр."
   }
 }

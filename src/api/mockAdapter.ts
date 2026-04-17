@@ -3,6 +3,7 @@ import { mockNewGroups, mockGroupStudents, mockMasterStudents, mockTeachers, moc
 import { mockDb, mockTransactions, mockKsefInvoices, mockGroups, mockInfo, mockAttendance, mockProgress, mockNotes, StudentProfile, Program, MonthStatus, PayStatus, KsefStatus, MOCK_INVOICES, MOCK_DEBTORS, MOCK_KONTRAHENCI, MOCK_REFUNDS } from "./mockDb";
 import { MENU_ROUTE_KEY_MAP, MENU_SECTION_ITEMS } from "../config/menuAccess.config";
 import { ROLE_MENU_ACCESS, normalizeRole, type AppRole } from "../config/roleMenuAccess.config";
+import { APP_ENV } from "../config/env";
 
 type Json = any;
 type AccessMode = "active" | "read-only" | "hidden";
@@ -39,6 +40,10 @@ function readBody(config: InternalAxiosRequestConfig): any {
     try { return JSON.parse(d); } catch { return d; }
   }
   return d;
+}
+
+function normalizeBaseUrl(url: string): string {
+  return String(url || '').replace(/\/+$/, '')
 }
 
 const ACCESS_ROLES: RoleCode[] = ["super-admin", "admin", "teacher", "sales", "quality", "finance", "secretariat", "hr"];
@@ -1895,202 +1900,225 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     });
   }
 
-  if (method === 'get' && (
-    url === 'target-mail' ||
-    url === 'recruitment/target-mail' ||
-    url === 'targetmail' ||
-    url === 'recruitment/targetmail'
-  )) {
-    console.log(`[MOCK] GET ${url}`);
+  // ── IMPORT DB ──────────────────────────────────────────────────────────────
+
+  // Detect which backend this request targets so we can use correct domain
+  const isIndigoBk = String((config as any).baseURL || '').includes('indigo') ||
+                     String((config as any).baseURL || '').includes('8001')
+  const regBaseUrl = isIndigoBk
+    ? normalizeBaseUrl(APP_ENV.platformLoginUrlIndigo)
+    : normalizeBaseUrl(APP_ENV.platformLoginUrlSpace)
+
+  // Generate a token matching real backend: Str::random(48) — alphanumeric, 48 chars
+  function mockToken(): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    return Array.from({ length: 48 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  }
+
+  const g_import_db: any[] = (globalThis as any).__mock_import_db ??
+    ((globalThis as any).__mock_import_db = [
+      { id: 1,  first_name: 'Anna',      surname: 'Kowalska',   parent_email: 'mama.kowalska@gmail.com',  phone: '+48 600 111 222', nickname: 'anna.kowalska@student.pl',  subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 1, is_done: 0, group_external_id: 'GRP-01', teacher_external_id: 'TCH-03' },
+      { id: 2,  first_name: 'Mikołaj',   surname: 'Wróbel',     parent_email: 'tata.wrobel@o2.pl',        phone: '+48 501 333 444', nickname: 'mikolaj.wrobel@student.pl', subscription_amount: 549, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 10,  paid_months: 1, paid: true,  is_send: 1, is_done: 1, group_external_id: 'GRP-02', teacher_external_id: 'TCH-01' },
+      { id: 3,  first_name: 'Zofia',     surname: 'Nowak',      parent_email: 'nowak.rodzic@wp.pl',       phone: '+48 512 555 666', nickname: 'zofia.nowak@student.pl',    subscription_amount: 489, subscription_end_date: '2025-09-01', contract_old_new: 'old', balance_overpayment: 50,  discount: 20,  paid_months: 3, paid: true,  is_send: 1, is_done: 1, group_external_id: 'GRP-01', teacher_external_id: 'TCH-02' },
+      { id: 4,  first_name: 'Bartosz',   surname: 'Kaczmarek',  parent_email: 'kaczmarek.m@gmail.com',    phone: '+48 796 777 888', nickname: null,                        subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 0, is_done: 0, group_external_id: null,     teacher_external_id: null     },
+      { id: 5,  first_name: 'Natalia',   surname: 'Wiśniewska', parent_email: 'wisn.rodzic@interia.pl',   phone: '+48 604 999 000', nickname: 'natalia.wisn@student.pl',   subscription_amount: 549, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 1, is_done: 0, group_external_id: 'GRP-03', teacher_external_id: 'TCH-01' },
+      { id: 6,  first_name: 'Kamil',     surname: 'Lewandowski', parent_email: 'lewandowski@gmail.com',  phone: '+48 531 101 202', nickname: 'kamil.lew@student.pl',      subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 2, paid: true,  is_send: 1, is_done: 1, group_external_id: 'GRP-02', teacher_external_id: 'TCH-03' },
+      { id: 7,  first_name: 'Maja',      surname: 'Zielińska',  parent_email: 'zielinska.r@wp.pl',        phone: '+48 693 303 404', nickname: null,                        subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 0, is_done: 0, group_external_id: null,     teacher_external_id: null     },
+      { id: 8,  first_name: 'Paweł',     surname: 'Szymański',  parent_email: 'szymanski.t@gmail.com',    phone: '+48 575 505 606', nickname: 'pawel.szym@student.pl',     subscription_amount: 549, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 10,  paid_months: 1, paid: true,  is_send: 1, is_done: 0, group_external_id: 'GRP-01', teacher_external_id: 'TCH-02' },
+      { id: 9,  first_name: 'Iga',       surname: 'Dąbrowska',  parent_email: 'dabrowska@o2.pl',          phone: '+48 668 707 808', nickname: 'iga.dabrowska@student.pl',  subscription_amount: 489, subscription_end_date: null, contract_old_new: 'old', balance_overpayment: 20,  discount: 0,   paid_months: 5, paid: true,  is_send: 1, is_done: 1, group_external_id: 'GRP-03', teacher_external_id: 'TCH-01' },
+      { id: 10, first_name: 'Tomasz',    surname: 'Piotrowska', parent_email: 'piotr.t@gmail.com',        phone: '+48 887 909 010', nickname: null,                        subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 0, is_done: 0, group_external_id: null,     teacher_external_id: null     },
+      { id: 11, first_name: 'Weronika',  surname: 'Mazur',      parent_email: 'mazur.rodzic@interia.pl',  phone: '+48 504 121 232', nickname: 'weronika.mazur@student.pl', subscription_amount: 549, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 1, is_done: 0, group_external_id: 'GRP-02', teacher_external_id: 'TCH-03' },
+      { id: 12, first_name: 'Szymon',    surname: 'Wojciechowski', parent_email: 'wojciech@wp.pl',       phone: '+48 602 343 454', nickname: 'szymon.wojc@student.pl',    subscription_amount: 489, subscription_end_date: '2024-12-01', contract_old_new: 'old', balance_overpayment: 100, discount: 20,  paid_months: 8, paid: true,  is_send: 1, is_done: 1, group_external_id: 'GRP-01', teacher_external_id: 'TCH-02' },
+      { id: 13, first_name: 'Julia',     surname: 'Kwiatkowska', parent_email: 'kwiat.m@gmail.com',      phone: '+48 791 565 676', nickname: null,                        subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 0, is_done: 0, group_external_id: null,     teacher_external_id: null     },
+      { id: 14, first_name: 'Radosław',  surname: 'Malinowski',  parent_email: 'malinowski@o2.pl',       phone: '+48 519 787 898', nickname: 'radek.malin@student.pl',    subscription_amount: 549, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 2, paid: true,  is_send: 1, is_done: 0, group_external_id: 'GRP-03', teacher_external_id: 'TCH-01' },
+      { id: 15, first_name: 'Aleksandra', surname: 'Jabłońska',  parent_email: 'jablonska@gmail.com',    phone: '+48 576 909 012', nickname: 'ola.jablon@student.pl',     subscription_amount: 489, subscription_end_date: null, contract_old_new: 'new', balance_overpayment: 0,   discount: 0,   paid_months: 0, paid: false, is_send: 1, is_done: 0, group_external_id: 'GRP-02', teacher_external_id: 'TCH-03' },
+    ]);
+
+  // GET recruitment/import-db  (paginated)
+  if (method === 'get' && url === 'recruitment/import-db') {
+    const qs     = (config.url || '').split('?')[1] || ''
+    const params = Object.fromEntries(new URLSearchParams(qs))
+    const page   = Math.max(1, Number(params.page || 1))
+    const per    = Math.max(1, Number(params.per_page || 10))
+    const total  = g_import_db.length
+    const last   = Math.ceil(total / per) || 1
+    const from   = (page - 1) * per
+    const slice  = g_import_db.slice(from, from + per)
     return ok(config, {
-      data: [
-        {
-          id: 1,
-          surname: 'Kowalska',
-          name: 'Anna',
-          parent_email: 'anna.kowalska@example.com',
-          status: 'sent',
-          error_message: null,
-          link_clicked_at: '2026-03-20T09:30:00Z',
-          converted_at: null,
-        },
-        {
-          id: 2,
-          surname: 'Nowak',
-          name: 'Piotr',
-          parent_email: 'piotr.nowak@example.com',
-          status: 'clicked',
-          error_message: null,
-          link_clicked_at: '2026-03-21T14:12:00Z',
-          converted_at: null,
-        },
-        {
-          id: 3,
-          surname: 'Wiśniewska',
-          name: 'Maja',
-          parent_email: 'maja.parent@example.com',
-          status: 'converted',
-          error_message: null,
-          link_clicked_at: '2026-03-18T08:05:00Z',
-          converted_at: '2026-03-18T12:40:00Z',
-        },
-        {
-          id: 4,
-          surname: 'Lewandowski',
-          name: 'Jan',
-          parent_email: 'jan.parent@example.com',
-          status: 'error',
-          error_message: 'SMTP mailbox unavailable',
-          link_clicked_at: null,
-          converted_at: null,
-        },
-        {
-          id: 5,
-          surname: 'Dąbrowska',
-          name: 'Zofia',
-          parent_email: 'zofia.parent@example.com',
-          status: 'opened',
-          error_message: null,
-          link_clicked_at: '2026-03-24T17:55:00Z',
-          converted_at: null,
-        },
-      ]
-    });
+      data: slice,
+      current_page: page,
+      last_page: last,
+      per_page: per,
+      total,
+      from: from + 1,
+      to: from + slice.length,
+    })
   }
 
-  // POST leads/move (or PATCH leads/:id based on API)
-  if ((method === 'post' || method === 'patch') && (url === 'leads/move' || url.startsWith('recruitment/leads/'))) {
-    console.log(`[MOCK] ${method.toUpperCase()} ${url}`);
-    return ok(config, { ok: true });
+  // PATCH recruitment/import-db/:id
+  if (method === 'patch' && /^recruitment\/import-db\/[\w-]+$/.test(url)) {
+    const id   = url.split('/').pop()
+    const body = readBody(config)
+    const idx  = g_import_db.findIndex((i: any) => String(i.id) === String(id))
+    if (idx === -1) return err(config, 404, 'Import DB record not found')
+    g_import_db[idx] = { ...g_import_db[idx], ...body }
+    return ok(config, { success: true, data: g_import_db[idx] })
   }
 
-  // POST leads/add (or POST recruitment/leads)
-  if (method === 'post' && (url === 'leads/add' || url === 'recruitment/leads')) {
-    const body = JSON.parse(config.data || '{}');
-    console.log(`[MOCK] POST ${url}, body: ${JSON.stringify(body)}`);
-    return ok(config, { id: Date.now().toString(), ...body });
+  // DELETE recruitment/import-db/:id
+  if (method === 'delete' && /^recruitment\/import-db\/[\w-]+$/.test(url)) {
+    const id  = url.split('/').pop()
+    const idx = g_import_db.findIndex((i: any) => String(i.id) === String(id))
+    if (idx !== -1) g_import_db.splice(idx, 1)
+    return ok(config, { success: true })
   }
 
+  // POST recruitment/import-db/:id/resend-invitation
+  // Real backend: creates token in recruiting_email_sender, dispatches SendRecruitingEmailJob.
+  // Does NOT return a link — the link goes to the parent via email only.
+  if (method === 'post' && /^recruitment\/import-db\/[\w-]+\/generate-link$/.test(url)) {
+    const parts = url.split('/')
+    const id    = parts[parts.length - 2]
+    const idx   = g_import_db.findIndex((i: any) => String(i.id) === String(id))
+    if (idx === -1) return err(config, 404, 'Import DB record not found')
+    const token = mockToken()
+    const link = `${regBaseUrl}/register/invite/${token}`
+    return ok(config, { success: true, data: { token, link, status: 'generated', import_id: g_import_db[idx].id } })
+  }
 
-  // ── INVOICES & FINANCE ─────────────────────────────────────────────────────
+  if (method === 'post' && /^recruitment\/import-db\/[\w-]+\/resend-invitation$/.test(url)) {
+    const parts = url.split('/')
+    const id    = parts[parts.length - 2]
+    const idx   = g_import_db.findIndex((i: any) => String(i.id) === String(id))
+    if (idx === -1) return err(config, 404, 'Import DB record not found')
+    g_import_db[idx].is_send = 1
+    // Token is generated and stored on backend; email is dispatched. Frontend only gets confirmation.
+    return ok(config, { success: true, message: 'Invitation sent successfully' })
+  }
 
-  if (method === 'get' && url.endsWith('invoices')) {
-    let items = [...MOCK_INVOICES];
-    const p = config.params as any || {};
-
-    const searchQuery = p.q || p.search;
-    if (searchQuery) {
-      const s = String(searchQuery).toLowerCase();
-      items = items.filter(i => 
-        i.number.toLowerCase().includes(s) || 
-        i.buyer_name.toLowerCase().includes(s)
-      );
+  // POST recruitment/invite  (InviteLeadModal — creates new import-db record)
+  if (method === 'post' && url === 'recruitment/invite') {
+    const body = readBody(config)
+    // Check uniqueness of nickname
+    if (body?.nickname) {
+      const exists = g_import_db.some((i: any) =>
+        i.nickname && String(i.nickname).toLowerCase() === String(body.nickname).toLowerCase()
+      )
+      if (exists) return err(config, 409, `Ученик с email "${body.nickname}" уже существует в базе`)
     }
-    if (p.project_id) {
-      items = items.filter(i => i.project_id === Number(p.project_id));
+    const newRecord = {
+      id: Date.now(),
+      first_name:           body.first_name   || '',
+      surname:              body.surname       || '',
+      parent_email:         body.parent_email  || body.email || '',
+      phone:                body.phone         || '',
+      nickname:             body.nickname      || null,
+      subscription_amount:  body.subscription_amount ?? 489,
+      subscription_end_date: null,
+      contract_old_new:     body.contract_old_new || 'new',
+      balance_overpayment:  body.balance_overpayment ?? 0,
+      discount:             body.discount ?? 0,
+      paid_months:          0,
+      paid:                 false,
+      is_send:              0,
+      is_done:              0,
+      group_external_id:    null,
+      teacher_external_id:  null,
     }
-    if (p.status) {
-      items = items.filter(i => i.ksef_status === p.status);
+    g_import_db.unshift(newRecord)
+    return ok(config, { success: true, data: newRecord }, 201)
+  }
+
+  // ── LINK GENERATOR ─────────────────────────────────────────────────────────
+
+  const g_links = (globalThis as any).__mock_link_history ?? ((globalThis as any).__mock_link_history = [
+    {
+      id: 1,
+      created_at: new Date(Date.now() - 3600000 * 24 * 2).toISOString(),
+      manager: 'Demo Admin',
+      parent_email: 'parent@example.com',
+      student_name: 'Ivan Ivanov',
+      tariff: 489,
+      total_price: 365,
+      discounts: [{ id: 'fast', value: 89, type: 'fixed', name: 'Fast payment' }, { id: 'sibling', value: 10, type: 'percent', name: 'Sibling' }],
+      link: `${regBaseUrl}/register/invite/mock_token_1`,
+      status: 'sent',
+      converted_at: null
+    },
+    {
+      id: 2,
+      created_at: new Date(Date.now() - 3600000 * 5).toISOString(),
+      manager: 'Super Admin',
+      parent_email: 'mama@test.pl',
+      student_name: 'Zofia Nowak',
+      tariff: 549,
+      total_price: 494.1,
+      discounts: [{ id: 'second_child', value: 10, type: 'percent', name: 'Second child' }],
+      link: `${regBaseUrl}/register/invite/mock_token_2`,
+      status: 'converted',
+      converted_at: new Date(Date.now() - 3600000 * 2).toISOString()
     }
+  ]);
 
-    const page = Number(p.page) || 1;
-    const perPage = Number(p.per_page) || 25;
-    const total = items.length;
-    const from = (page - 1) * perPage;
-    const sliced = items.slice(from, from + perPage);
-
-    return ok(config, {
-      data: sliced,
-      meta: {
-        current_page: page,
-        last_page: Math.ceil(total / perPage) || 1,
-        per_page: perPage,
-        total,
-      }
-    });
+  if (method === 'get' && url === 'recruitment/link-history') {
+    return ok(config, { success: true, data: g_links });
   }
 
-  if (method === 'get' && url.endsWith('invoices/stats')) {
-    return ok(config, {
-      issued_count: MOCK_INVOICES.filter(i => i.document_type === 'FA').length,
-      gross_total: MOCK_INVOICES.reduce((acc, i) => acc + i.amount_gross, 0),
-      corrections_count: MOCK_INVOICES.filter(i => i.document_type === 'FK').length,
-      refunds_total: 450.00, // This might need a separate mock if it's not from invoices
-      proforma_count: MOCK_INVOICES.filter(i => i.document_type === 'PROFORMA').length
-    });
+  if (method === 'post' && url === 'recruitment/generate-link') {
+    const body = readBody(config);
+    const token = mockToken();
+    const link  = `${regBaseUrl}/register/invite/${token}`;
+    const newLink = {
+      id: Date.now(),
+      created_at: new Date().toISOString(),
+      manager: body.manager_name || 'Demo Admin',
+      parent_email: body.parent_email,
+      student_name: `${body.first_name} ${body.surname}`,
+      tariff: body.tariff,
+      total_price: body.total_price,
+      discounts: body.discounts || [],
+      link,
+      status: 'generated',
+      converted_at: null
+    };
+    g_links.unshift(newLink);
+    // Real backend also creates an import_students_full record (same table as import-db)
+    const importRecord = {
+      id: newLink.id + 1,
+      first_name:            body.first_name,
+      surname:               body.surname,
+      parent_email:          body.parent_email,
+      phone:                 null,
+      nickname:              body.partner_child_name || null,
+      subscription_amount:   body.total_price,
+      subscription_end_date: null,
+      contract_old_new:      'new',
+      balance_overpayment:   0,
+      discount:              0,
+      paid_months:           0,
+      paid:                  false,
+      is_send:               1,
+      is_done:               0,
+      group_external_id:     null,
+      teacher_external_id:   null,
+    };
+    g_import_db.unshift(importRecord);
+    return ok(config, { success: true, data: { link, token } });
   }
 
-  if (method === 'get' && (url.endsWith('invoices/debtors') || url.endsWith('finance/debtors'))) {
-    return ok(config, {
-      debtors: MOCK_DEBTORS,
-      summary: {
-        total_debtors_count: MOCK_DEBTORS.length,
-        total_debt_amount: 1090,
-        invoice_debt: 640,
-        proforma_debt: 450
-      }
-    });
+  if (method === 'delete' && url.startsWith('recruitment/link-history/')) {
+    const linkId = Number(url.split('/').pop());
+    const lIdx = g_links.findIndex((l: any) => l.id === linkId);
+    if (lIdx !== -1) g_links.splice(lIdx, 1);
+    return ok(config, { success: true });
   }
 
-  if (method === 'get' && url.endsWith('finance/debtors/stats')) {
-    return ok(config, {
-      total_debtors_count: MOCK_DEBTORS.length,
-      total_debt_amount: 1090,
-      invoice_debt: 640,
-      proforma_debt: 450
-    });
-  }
-
-  if (method === 'get' && url.endsWith('finance/kontrahenci')) {
-    return ok(config, {
-      data: MOCK_KONTRAHENCI,
-      meta: {
-        total: MOCK_KONTRAHENCI.length,
-        current_page: 1,
-        last_page: 1,
-        per_page: 25
-      }
-    });
-  }
-
-  if (method === 'get' && url.endsWith('finance/overpayments')) {
-    return ok(config, {
-      data: [
-        { id: 101, full_name: 'Анна Новак', email: 'anna@test.pl', phone: '+48 000 000', balance: 100, balance_overpayment: 100, total_credit: 100 }
-      ],
-      meta: { total: 1, current_page: 1, last_page: 1, per_page: 25 }
-    });
-  }
-
-  if (method === 'get' && url.endsWith('finance/overpayments/stats')) {
-    return ok(config, {
-      total_count: 1,
-      total_amount: 100
-    });
-  }
-
-  if (method === 'get' && url.endsWith('finance/refunds')) {
-    return ok(config, {
-      data: MOCK_REFUNDS,
-      total: MOCK_REFUNDS.length,
-      current_page: 1,
-      last_page: 1,
-      per_page: 25
-    });
-  }
-
-  if (method === 'get' && url.endsWith('finance/refunds/stats')) {
-    return ok(config, {
-      pending_count: MOCK_REFUNDS.filter(r => r.status === 'pending').length,
-      pending_amount: MOCK_REFUNDS.filter(r => r.status === 'pending').reduce((acc, r) => acc + r.amount, 0),
-      processing_count: MOCK_REFUNDS.filter(r => r.status === 'processing').length,
-      completed_month: MOCK_REFUNDS.filter(r => r.status === 'completed').length,
-      rejected_month: MOCK_REFUNDS.filter(r => r.status === 'rejected').length
-    });
+  if (method === 'delete' && url === 'recruitment/link-history') {
+    g_links.length = 0;
+    return ok(config, { success: true });
   }
 
   // ── END RECRUITMENT MOCKS ──────────────────────────────────────────────────
 
   return err(config, 404, `No mock route for ${method.toUpperCase()} /${url}`);
 };
-

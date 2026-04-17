@@ -108,7 +108,7 @@ const SECRETARIAT: string[] = [
 
 const RECRUITMENT: string[] = [
   "recruitment", "new-students", "leads", "target-mail",
-  "expelled", "new-groups", "archived", "import-db",
+  "expelled", "new-groups", "archived", "import-db", "link-generator",
 ];
 
 const IMPORT_DB_ACTIONS: string[] = [
@@ -192,13 +192,13 @@ export const ROLE_MENU_ACCESS: Record<AppRole, MenuAccessMap> = {
 
   // Teacher — only import-db page (recruitment section)
   "teacher": allow(
-    ["recruitment", "import-db"],
+    ["recruitment", "import-db", "link-generator"],
   ),
 
   // Sales / Recruitment department — only recruitment pages
   "sales": allow(
     ["recruitment", "new-students", "leads", "target-mail",
-     "expelled", "new-groups", "archived", "import-db"],
+     "expelled", "new-groups", "archived", "import-db", "link-generator"],
   ),
 
   // Quality department — secretariat + recruitment + quality + import-db actions

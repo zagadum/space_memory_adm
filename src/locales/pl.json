@@ -243,13 +243,10 @@
     "trainer": "Trener"
   },
   "auth": {
-    "description": "Platforma CRM do zarządzania szkołami Space Memory & Indigo Mental w ramach Global Leaders Skills. Umożliwia kompleksową obsługę procesów edukacyjnych, komunikację z uczniami oraz zarządzanie placówkami.",
+    "title": "Logowanie",
     "email": "Email",
     "password": "Hasło",
-    "project": "Projekt",
-    "schools": "Strony szkół:",
-    "submit": "Zaloguj się",
-    "title": "Logowanie"
+    "submit": "Zaloguj się"
   },
   "changePassword": {
     "confirmPassword": "Potwierdź hasło",
@@ -401,137 +398,163 @@
       "transferAny": "Do dowolnej grupy"
     }
   },
-  "auth": {
-    "title": "Logowanie",
-    "email": "Email",
-    "password": "Hasło",
-    "submit": "Zaloguj się"
-  },
   "tabs": {
-    "payments": "Płatności",
+    "attendance": "Obecność",
     "groups": "Grupy",
     "info": "Informacje",
-    "attendance": "Obecność",
-    "progress": "Postępy",
-    "notes": "Notatki"
+    "notes": "Notatki",
+    "payments": "Płatności",
+    "progress": "Postępy"
   },
   "payments": {
-    "currencyPerMonth": "zł/mies.",
-    "currency": "zł",
-    "balance": "Saldo",
-    "overall": "Saldo całkowite",
-    "nextPay": "Następna płatność",
-    "activePrograms": "Aktywne programy",
     "actions": "Akcje",
+    "activePrograms": "Aktywne programy",
+    "balance": "Saldo",
+    "btn": {
+      "addExtra": "Dodaj dodatковą lekcję",
+      "archive": "Archiwum",
+      "changeGroup": "Zmień grupę",
+      "discount": "Zniżka",
+      "extra": "Dodatkowe",
+      "invoice": "Faktura",
+      "korekta": "Korekta",
+      "pause": "Pauza",
+      "refund": "Zwrot",
+      "resume": "Wznów",
+      "split": "Podziel",
+      "tariff": "Taryfa",
+      "unlock": "Odblokuj"
+    },
+    "child2badge": "👧 2. dziecko · −10% rodzina",
+    "currency": "zł",
+    "currencyPerMonth": "zł/mies.",
+    "detail": {
+      "activePause": "🌙 Aktywna pauza",
+      "amount": "💵 Kwota do zapłaty",
+      "bonus": "⭐ 5. zajęcia gratis",
+      "discount": "🏷️ Zniżka",
+      "distribution": "🔄 Rozkład",
+      "ksefLabel": "📄 KSeF",
+      "lessons": "📊 Zajęcia",
+      "partialPause": "◐ Częściowa pauza",
+      "payStatus": "💰 Status płatności",
+      "teacher": "👩‍🏫 Nauczyciel",
+      "txHint": "💡 Transakcje i faktury — patrz poniżej w sekcji «Transakcje»"
+    },
+    "disc": {
+      "complaint": "Rekompensata",
+      "family": "Rodzinna",
+      "loyalty": "Lojalnościowa",
+      "promo": "Promo",
+      "referral": "Z polecenia"
+    },
+    "extras": {
+      "afterPayment": "po opłaceniu",
+      "awaitingPayment": "oczekuje na płatność",
+      "infoText": "Usługi jednorazowe — brak abonamentu, pauz i zmiany taryfy.",
+      "items": "pozycje",
+      "paid": "opłacone",
+      "subtitle": "Jednorazowe usługi i produkty",
+      "title": "Dodatkowe materiały i programy"
+    },
+    "ksef": {
+      "conflict": "! Konflikt",
+      "error": "✕ Błąd",
+      "loading": "Ładowanie KSeF…",
+      "manual": "✎ Ręcznie",
+      "ok": "✓ Wysłano",
+      "pending": "⏳ Oczekuje",
+      "title": "Faktury KSeF"
+    },
+    "labels": {
+      "discountShort": "zniżka",
+      "free": "Za darmo",
+      "from": "od",
+      "lessonsCount": "zajęć",
+      "lessonsSuffix": "zaj.",
+      "return": "powrót",
+      "until": "do"
+    },
+    "legend": {
+      "extra": "Zaj. dodatkowe",
+      "overdue": "Zaległe",
+      "paid": "Opłacone",
+      "partial": "Częściowo",
+      "pause": "Pauza",
+      "pending": "Oczekuje",
+      "summer": "Wakacje",
+      "title": "Legenda:"
+    },
+    "month": {
+      "amount": "Kwota",
+      "lessons": "Zajęcia",
+      "status": "Status"
+    },
+    "monthsFull": [
+      "Styczeń",
+      "Luty",
+      "Marzec",
+      "Kwiecień",
+      "Maj",
+      "Czerwiec",
+      "Lipiec",
+      "Sierpień",
+      "Wrzesień",
+      "Październik",
+      "Listopad",
+      "Grudzień"
+    ],
+    "nextPay": "Następna płatność",
+    "overall": "Saldo całkowite",
+    "refund": {
+      "forInvoice": "Zwrot do faktury"
+    },
+    "status": {
+      "approved": "Zatwierdzone",
+      "completed": "Zakończono",
+      "extra": "Dodatkowa lekcja",
+      "future": "Przyszłość",
+      "manual_pending": "Ręczny (oczekuje)",
+      "overdue": "Zaległe",
+      "paid": "Opłacone",
+      "partial": "Częściowo",
+      "pause": "Pauza",
+      "pending": "Oczekuje",
+      "processing": "W trakcie",
+      "rejected": "Odrzucone",
+      "summer": "Wakacje"
+    },
+    "table": {
+      "amount": "Kwota",
+      "ksef": "KSeF",
+      "lessons": "Zajęcia",
+      "month": "Miesiąc",
+      "status": "Status",
+      "studentDetails": "Dane ucznia"
+    },
     "tx": {
-      "title": "Transakcje",
       "combinedTitle": "Transakcje i faktury KSeF",
+      "correction": "Korekta",
       "count": "brak transakcji | {n} transakcja | {n} transakcje | {n} transakcji",
+      "downloadPdf": "Pobierz PDF",
+      "edit": "Edytuj fakturę",
+      "editInvoice": "Edytuj fakturę",
+      "empty": "Brak transakcji dla tego programu",
+      "extra": "Zajęcia dodatkowe",
+      "invoice": "Faktura",
+      "korekta": "Korekta",
       "loading": "Ładowanie transakcji…",
       "paid": "✓ Opłacone",
       "pending": "🕐 Oczekuje",
-      "subscription": "Abonament",
-      "invoice": "Faktura",
-      "extra": "Zajęcia dodatkowe",
-      "edit": "Edytuj fakturę",
-      "editInvoice": "Edytuj fakturę",
-      "correction": "Korekta",
-      "korekta": "Korekta",
       "refund": "Zwrot",
-      "downloadPdf": "Pobierz PDF",
-      "pdfDownloading": "Pobieranie...",
-      "pdfError": "Błąd pobierania PDF",
-      "empty": "Brak transakcji dla tego programu"
+      "subscription": "Abonament",
+      "title": "Transakcje"
     },
-    "archive": {
-      "cancel": "Anuluj",
-      "confirm": "Potwierdź archiwizację",
-      "moved": "Przeprowadzka",
-      "noAnswer": "Nie odebrano 3 razy",
-      "notRelevant": "Nieaktualne",
-      "other": "Inne",
-      "otherPlaceholder": "Wpisz powód...",
-      "otherSchool": "Wybrano inną szkołę",
-      "reason": "Powód archiwizacji",
-      "specify": "Określ powód",
-      "sub": "Uczeń zostanie przeniesiony do ogólnego archiwum systemu",
-      "title": "Archiwizuj ucznia"
+    "view": {
+      "grid": "⬛ Siatka",
+      "table": "☰ Tabela"
     },
-    "archived": "🗃️ Uczeń zarchiwizowany",
-    "bulk": {
-      "archive": "Archiwizuj wybranych",
-      "assign": "Przypisz opiekuna",
-      "deselect": "Odznacz",
-      "forStudents": "Dla {count} uczniów",
-      "selected": "0 wybranych | {n} wybrany | {n} wybranych | {n} wybranych"
-    },
-    "callMarked": "📞 Kontakt zaznaczony dzisiaj",
-    "contact": {
-      "daysAgo": "{days} dni temu",
-      "none": "Brak kontaktu",
-      "today": "Dzisiaj"
-    },
-    "empty": {
-      "sub": "Nie znaleziono wypisanych uczniów dla wybranych filtrów",
-      "title": "Lista jest pusta"
-    },
-    "filter": {
-      "allGroups": "Wszystkie grupy",
-      "allManagers": "Wszyscy pracownicy",
-      "contactAny": "Dowolny",
-      "contactHot": "Ponad 7 dni",
-      "contactNone": "Brak kontaktu",
-      "contactToday": "Dzisiaj",
-      "contactWeek": "Ostatnie 7 dni",
-      "noManager": "Bez opiekuna",
-      "search": "Szukaj po imieniu..."
-    },
-    "info": {
-      "rule1": "Tutaj są tylko uczniowie <strong>zapisani do grupy, którzy nie rozpoczęli nauki</strong>. Z nimi pracuje dział sprzedaży.",
-      "rule2": "<strong>Czerwony pasek po lewej</strong> — brak kontaktu od ponad 7 dni. Wymaga pilnego telefonu.",
-      "rule3": "Datę kontaktu, opiekuna i komentarz można <strong>edytować bezpośrednio w wierszu</strong> — zmiany są zapisywane od razu.",
-      "rule4": "Po <strong>archiwizacji z powodem</strong> uczeń znika z zakładki i trafia do sekcji <strong>«Archiwum»</strong>.",
-      "rule5": "Rola <strong>Manager</strong> — pełny dostęp. <strong>Quality</strong> — podgląd i przywracanie. <strong>Sales</strong> — edycja i przenoszenie.",
-      "title": "Logika pracy · zasady domykania"
-    },
-    "loading": "Ładowanie...",
-    "pageSubTitle": "narzędzie ponownej sprzedaży · domykanie",
-    "pageTitle": "Wypisani uczniowie",
-    "saved": "💾 Zapisano",
-    "showing": "Pokazano {shown} z {total} uczniów",
-    "sort": {
-      "conAsc": "Stare kontakty ↑",
-      "conDesc": "Nowe kontakty ↓",
-      "expAsc": "Po dacie wypisu ↑",
-      "expDesc": "Po dacie wypisu ↓"
-    },
-    "stats": {
-      "hot": "Dawno bez kontaktu",
-      "hotSub": "ponad 7 dni temu",
-      "none": "Nigdy nie dzwoniono",
-      "noneSub": "priorytet 1",
-      "total": "Razem w pracy",
-      "totalSub": "aktywnych kontaktów",
-      "unpaid": "Nieopłacone",
-      "unpaidSub": "możliwe długi"
-    },
-    "table": {
-      "comment": "Komentarz",
-      "expelled": "Data wypisu",
-      "group": "Poprzednia grupa",
-      "lastContact": "Ostatni kontakt",
-      "manager": "Opiekun",
-      "name": "Imię ucznia",
-      "paid": "Płatność",
-      "studentDetails": "Dane ucznia",
-      "type": "Typ",
-      "typeGroup": "Grup.",
-      "typeIndividual": "Ind."
-    },
-    "tableToolbar": {
-      "title": "LISTA UCZNIÓW"
-    },
-    "transferred": "✅ Uczeń przeniesiony do grupy"
+    "year": "Rok:"
   },
   "export": {
     "amount": "Kwota",
@@ -1685,7 +1708,13 @@
       "title": "✦ Utwórz nową grupę",
       "timezoneLabel": "Strefa czasowa",
       "shortWeekdays": {
-        "mon": "Pn", "tue": "Wt", "wed": "Śr", "thu": "Cz", "fri": "Pt", "sat": "So", "sun": "Nd"
+        "mon": "Pn",
+        "tue": "Wt",
+        "wed": "Śr",
+        "thu": "Cz",
+        "fri": "Pt",
+        "sat": "So",
+        "sun": "Nd"
       },
       "ageAdjectives": {
         "junior": "młodsza",
@@ -2083,156 +2112,6 @@
     "typeMeet": "Spotkanie",
     "typeNote": "Notatka"
   },
-  "payments": {
-    "actions": "Akcje",
-    "activePrograms": "Aktywne programy",
-    "balance": "Saldo",
-    "btn": {
-      "addExtra": "Dodaj dodatковą lekcję",
-      "archive": "Archiwum",
-      "changeGroup": "Zmień grupę",
-      "discount": "Zniżka",
-      "extra": "Dodatkowe",
-      "invoice": "Faktura",
-      "korekta": "Korekta",
-      "pause": "Pauza",
-      "refund": "Zwrot",
-      "resume": "Wznów",
-      "split": "Podziel",
-      "tariff": "Taryfa",
-      "unlock": "Odblokuj"
-    },
-    "child2badge": "👧 2. dziecko · −10% rodzina",
-    "currency": "zł",
-    "currencyPerMonth": "zł/mies.",
-    "detail": {
-      "activePause": "🌙 Aktywna pauza",
-      "amount": "💵 Kwota do zapłaty",
-      "bonus": "⭐ 5. zajęcia gratis",
-      "discount": "🏷️ Zniżka",
-      "distribution": "🔄 Rozkład",
-      "ksefLabel": "📄 KSeF",
-      "lessons": "📊 Zajęcia",
-      "partialPause": "◐ Częściowa pauza",
-      "payStatus": "💰 Status płatności",
-      "teacher": "👩‍🏫 Nauczyciel",
-      "txHint": "💡 Transakcje i faktury — patrz poniżej w sekcji «Transakcje»"
-    },
-    "disc": {
-      "complaint": "Rekompensata",
-      "family": "Rodzinna",
-      "loyalty": "Lojalnościowa",
-      "promo": "Promo",
-      "referral": "Z polecenia"
-    },
-    "extras": {
-      "afterPayment": "po opłaceniu",
-      "awaitingPayment": "oczekuje na płatność",
-      "infoText": "Usługi jednorazowe — brak abonamentu, pauz i zmiany taryfy.",
-      "items": "pozycje",
-      "paid": "opłacone",
-      "subtitle": "Jednorazowe usługi i produkty",
-      "title": "Dodatkowe materiały i programy"
-    },
-    "ksef": {
-      "conflict": "! Konflikt",
-      "error": "✕ Błąd",
-      "loading": "Ładowanie KSeF…",
-      "manual": "✎ Ręcznie",
-      "ok": "✓ Wysłano",
-      "pending": "⏳ Oczekuje",
-      "title": "Faktury KSeF"
-    },
-    "labels": {
-      "discountShort": "zniżka",
-      "free": "Za darmo",
-      "from": "od",
-      "lessonsCount": "zajęć",
-      "lessonsSuffix": "zaj.",
-      "return": "powrót",
-      "until": "do"
-    },
-    "legend": {
-      "extra": "Zaj. dodatkowe",
-      "overdue": "Zaległe",
-      "paid": "Opłacone",
-      "partial": "Częściowo",
-      "pause": "Pauza",
-      "pending": "Oczekuje",
-      "summer": "Wakacje",
-      "title": "Legenda:"
-    },
-    "month": {
-      "amount": "Kwota",
-      "lessons": "Zajęcia",
-      "status": "Status"
-    },
-    "monthsFull": [
-      "Styczeń",
-      "Luty",
-      "Marzec",
-      "Kwiecień",
-      "Maj",
-      "Czerwiec",
-      "Lipiec",
-      "Sierpień",
-      "Wrzesień",
-      "Październik",
-      "Listopad",
-      "Grudzień"
-    ],
-    "nextPay": "Następna płatność",
-    "overall": "Saldo całkowite",
-    "refund": {
-      "forInvoice": "Zwrot do faktury"
-    },
-    "status": {
-      "approved": "Zatwierdzone",
-      "completed": "Zakończono",
-      "extra": "Dodatkowa lekcja",
-      "future": "Przyszłość",
-      "manual_pending": "Ręczny (oczekuje)",
-      "overdue": "Zaległe",
-      "paid": "Opłacone",
-      "partial": "Częściowo",
-      "pause": "Pauza",
-      "pending": "Oczekuje",
-      "processing": "W trakcie",
-      "rejected": "Odrzucone",
-      "summer": "Wakacje"
-    },
-    "table": {
-      "amount": "Kwota",
-      "ksef": "KSeF",
-      "lessons": "Zajęcia",
-      "month": "Miesiąc",
-      "status": "Status",
-      "studentDetails": "Dane ucznia"
-    },
-    "tx": {
-      "combinedTitle": "Transakcje i faktury KSeF",
-      "correction": "Korekta",
-      "count": "brak transakcji | {n} transakcja | {n} transakcje | {n} transakcji",
-      "downloadPdf": "Pobierz PDF",
-      "edit": "Edytuj fakturę",
-      "editInvoice": "Edytuj fakturę",
-      "empty": "Brak transakcji dla tego programu",
-      "extra": "Zajęcia dodatkowe",
-      "invoice": "Faktura",
-      "korekta": "Korekta",
-      "loading": "Ładowanie transakcji…",
-      "paid": "✓ Opłacone",
-      "pending": "🕐 Oczekuje",
-      "refund": "Zwrot",
-      "subscription": "Abonament",
-      "title": "Transakcje"
-    },
-    "view": {
-      "grid": "⬛ Siatka",
-      "table": "☰ Tabela"
-    },
-    "year": "Rok:"
-  },
   "progress": {
     "achievements": "Osiągnięcia",
     "kpi": {
@@ -2494,7 +2373,8 @@
     "trialMonth": "Miesiąc próbny",
     "ustawienia": "Ustawienia (Ustawienia)",
     "zaliczenia": "Zaliczenia",
-    "zaliczeniaCalendar": "Kalendarz zaliczeń"
+    "zaliczeniaCalendar": "Kalendarz zaliczeń",
+    "linkGenerator": "Generator linków"
   },
   "studentList": {
     "actions": {
@@ -2571,14 +2451,6 @@
       "title": "Transakcje",
       "total": "Razem do zapłaty"
     }
-  },
-  "tabs": {
-    "attendance": "Obecność",
-    "groups": "Grupy",
-    "info": "Informacje",
-    "notes": "Notatki",
-    "payments": "Płatności",
-    "progress": "Postępy"
   },
   "targetMail": {
     "emptyFiltered": "Brak wyników dla bieżącego wyszukiwania.",
@@ -2827,5 +2699,100 @@
     "responsible": "Odpowiedzialny",
     "subtitle": "Tymczasowy dostęp przy braku płatności.",
     "title": "🔓 Odblokuj platformę"
+  },
+  "linkGenerator": {
+    "tabPersonal": "Personal",
+    "tabMarketing": "Marketing",
+    "personalTitle": "Zaproszenia personalne",
+    "personalDesc": "Wygodny interfejs nad obecnym flow invite + resend-invitation dla konkretnego rodzica.",
+    "personalFlowHint": "Najpierw tworzony jest draft w Import DB, a potem można wygenerować link lub od razu wysłać email.",
+    "personalNicknameHint": "Nickname jest wymagany: backend używa go do sprawdzenia unikalności i utworzenia draftu.",
+    "personalCreateDraft": "Utwórz draft",
+    "personalGenerateLink": "Generuj link",
+    "personalCreateAndSend": "Utwórz i wyślij",
+    "personalLinkBox": "Link personalny",
+    "personalLinkPlaceholder": "Najpierw utwórz draft lub wygeneruj link.",
+    "personalCopyCurrent": "Kopiuj bieżący link",
+    "personalDraftId": "Draft ID",
+    "personalHistoryTitle": "Drafty i zaproszenia z Import DB",
+    "personalHistorySubtitle": "Ta tabela korzysta z aktualnego recruitment flow, a nie z osobnej historii linków.",
+    "personalHistoryEmpty": "Brak pasujących rekordów w Import DB",
+    "personalHistoryStatus": "Status",
+    "personalStatusDraft": "Draft",
+    "personalStatusSent": "Wysłano",
+    "personalStatusDone": "Zakończono",
+    "personalSendAgain": "Wyślij email",
+    "marketingTitle": "Linki marketingowe",
+    "marketingDesc": "Oddzielny scenariusz dla wielorazowych linków kampanii i ofert rabatowych.",
+    "marketingFlowHint": "Ta zakładka pozostaje osobnym narzędziem do generowania linków marketingowych.",
+    "marketingLinkPlaceholder": "Wygeneruj link marketingowy, aby zobaczyć końcowy URL.",
+    "marketingHistoryTitle": "Historia linków marketingowych",
+    "marketingHistorySubtitle": "Osobny rejestr generacji marketingowej dla bieżącego projektu.",
+    "notifDraftCreated": "Draft został utworzony w Import DB",
+    "notifInviteSent": "Email z zaproszeniem został wysłany",
+    "notifPersonalLinkGenerated": "Link personalny został wygenerowany!",
+    "pageSubtitle": "dla klientów",
+    "pageDesc": "Link otwiera panel klienta z wbudowanym planem i rabatami. Klient sam wybiera liczbę miesięcy.",
+    "step1Label": "Krok 1 — Dane ucznia",
+    "fieldFirstName": "Imię dziecka",
+    "fieldFirstNamePlaceholder": "Imię...",
+    "fieldSurname": "Nazwisko dziecka",
+    "fieldSurnamePlaceholder": "Nazwisko...",
+    "fieldParentEmail": "Email rodzica",
+    "step2Label": "Krok 2 — Taryfa (zł / miesiąc)",
+    "tariffCustomPlaceholder": "Inna...",
+    "tariffLockTip": "🔒 Taryfa 399 zł i cena dowolna dostępna tylko dla super-administratora",
+    "step3Label": "Krok 3 — Zniżki (można łączyć dozwolone)",
+    "discFastName": "Szybka rejestracja",
+    "discFastMeta": "Jednorazowa · tylko 1. płatność",
+    "discTrialName": "Miesiąc próbny",
+    "discTrialMeta": "Pierwsze 4 zajęcia od startu",
+    "discSecondName": "Drugie dziecko",
+    "discSecondMeta": "Stała · co miesiąc",
+    "discReferralName": "Polecenie",
+    "discReferralMeta": "Jednorazowa · nast. miesiąc",
+    "conflictSecond": "Drugie dziecko",
+    "conflictReferral": "Polecenie",
+    "conflictMsg": "⛔ Nie można używać razem z «{name}»",
+    "subfieldSecondLabel": "Imię pierwszego dziecka (wymagane)",
+    "subfieldSecondPlaceholder": "Imię i nazwisko 1. dziecka...",
+    "subfieldReferralWho": "Kto otrzymuje zniżkę?",
+    "referrerOption": "Ten, kto polecił",
+    "referredOption": "Temu, kogo polecono",
+    "subfieldReferrerLabel": "Imię ucznia, który przyszedł z polecenia (wymagane)",
+    "subfieldReferredLabel": "Imię ucznia, który polecił (wymagane)",
+    "subfieldStudentPlaceholder": "Imię i nazwisko ucznia...",
+    "calcTitle": "💡 Kalkulacja dla klienta (1 miesiąc)",
+    "calcBaseTariff": "Taryfa bazowa",
+    "calcTotal": "Razem / miesiąc",
+    "calcSaving": "Oszczędność klienta",
+    "step4Label": "Krok 4 — Gotowy link",
+    "urlBoxTitle": "Link dla klienta",
+    "urlFill": "⚠️ Wypełnij dane",
+    "urlConflict": "⛔ Konflikt zniżek",
+    "btnCopy": "📋 Kopiuj",
+    "btnGenerate": "✦ Utwórz i zapisz",
+    "validationConflict": "Zniżki «Drugie dziecko» i «Polecenie» nie mogą być używane jednocześnie.",
+    "validationPartnerRequired": "Dla {discounts} należy wypełnić pole powiązania z uczniem.",
+    "historyTitle": "Wygenerowane linki",
+    "historyClear": "Wyczyść",
+    "historyEmpty": "Brak wygenerowanych linków",
+    "compatTitle": "Tabela zgodności zniżek",
+    "compatColDiscount": "Zniżka",
+    "compatNote": "⚠️ Drugie dziecko + Polecenie — wzajemnie wykluczające się podstawy zniżki. Klient nie może otrzymać obu jednocześnie.",
+    "notifGenerated": "Link wygenerowany i zapisany!",
+    "notifCopied": "Skopiowano!",
+    "notifError": "Błąd podczas generowania",
+    "confirmDelete": "Usunąć ten wpis?",
+    "confirmClear": "Wyczyścić historię dla bieżącego projektu?",
+    "roleSuperadmin": "Super-admin",
+    "roleManager": "Menedżer",
+    "roleDemo": "/ demo",
+    "perMonth": "/mies.",
+    "statusGenerated": "Utworzono",
+    "statusSent": "Wysłano",
+    "statusConverted": "Zarejestrowano",
+    "historyManager": "Menedżer",
+    "historyConverted": "Zarej."
   }
 }

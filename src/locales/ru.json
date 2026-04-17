@@ -280,13 +280,10 @@
     "trainer": "Тренер"
   },
   "auth": {
-    "description": "CRM-платформа для управления школами Space Memory и Indigo Mental в рамках Global Leaders Skills. Обеспечивает комплексное управление образовательными процессами, общение со студентами и управление филиалами.",
+    "title": "Вход",
     "email": "Email",
     "password": "Пароль",
-    "project": "Проект",
-    "schools": "Сайты школ:",
-    "submit": "Войти",
-    "title": "Вход в систему"
+    "submit": "Войти"
   },
   "changePassword": {
     "confirmPassword": "Подтвердите пароль",
@@ -309,99 +306,166 @@
       "history": "История",
       "transfer": "Перенести в группу",
       "transferAny": "В любую группу"
-    },
-    "archive": {
-      "cancel": "Отмена",
-      "confirm": "Подтвердить архивацию",
-      "moved": "Переехал",
-      "noAnswer": "Не дозвонились 3 раза",
-      "notRelevant": "Не актуально",
-      "other": "Другое",
-      "otherPlaceholder": "Напишите причину...",
-      "otherSchool": "Выбрал другую школу",
-      "reason": "Причина архивации",
-      "specify": "Укажите причину",
-      "sub": "Ученик будет перемещён в общий архив системы",
-      "title": "Архивировать ученика"
-    },
-    "archived": "🗃️ Ученик архивирован",
-    "bulk": {
-      "archive": "Архивировать выбранных",
-      "assign": "Назначить ответственного",
-      "deselect": "Снять выделение",
-      "forStudents": "Для {count} учеников",
-      "selected": "0 выбранных | {n} выбран | {n} выбранных | {n} выбранных"
-    },
-    "callMarked": "📞 Контакт отмечен сегодня",
-    "contact": {
-      "daysAgo": "{days} дн. назад",
-      "none": "Нет контакта",
-      "today": "Сегодня"
-    },
-    "empty": {
-      "sub": "Выписанных учеников по заданным фильтрам не найдено",
-      "title": "Список пуст"
-    },
-    "filter": {
-      "allGroups": "Все группы",
-      "allManagers": "Все сотрудники",
-      "contactAny": "Любой",
-      "contactHot": "Более 7 дней",
-      "contactNone": "Без контакта",
-      "contactToday": "Сегодня",
-      "contactWeek": "Последние 7 дней",
-      "noManager": "Без ответственного",
-      "search": "Поиск по имени..."
-    },
-    "info": {
-      "rule1": "Здесь только ученики, <strong>записанные в группу, но не начавшие обучение</strong>. С ними работает отдел продаж.",
-      "rule2": "<strong>Красная полоса слева</strong> — не было контакта более 7 дней. Требует срочного звонка.",
-      "rule3": "Дату контакта, ответственного и комментарий можно <strong>редактировать прямо в строке</strong> — изменения сохраняются сразу.",
-      "rule4": "После <strong>архивации с причиной</strong> ученик исчезает из вкладки и переходит в раздел <strong>«Архив»</strong>."
     }
   },
-  "auth": {
-    "title": "Вход",
-    "email": "Email",
-    "password": "Пароль",
-    "submit": "Войти"
-  },
   "tabs": {
-    "payments": "Оплаты",
+    "attendance": "Посещаемость",
     "groups": "Группы",
     "info": "Информация",
-    "attendance": "Посещаемость",
-    "progress": "Успеваемость",
-    "notes": "Заметки"
+    "notes": "Заметки",
+    "payments": "Оплаты",
+    "progress": "Успеваемость"
   },
   "payments": {
-    "currencyPerMonth": "зл/мес",
-    "currency": "zł",
-    "balance": "Баланс",
-    "overall": "Общий баланс",
-    "nextPay": "Следующий платеж",
-    "activePrograms": "Активные программы",
     "actions": "Действия",
+    "activePrograms": "Активные программы",
+    "balance": "Баланс",
+    "btn": {
+      "addExtra": "Добавить доп. занятие",
+      "archive": "Архив",
+      "changeGroup": "Сменить группу",
+      "discount": "Скидка",
+      "extra": "Дополнительно",
+      "invoice": "Счет",
+      "korekta": "Коррекция",
+      "pause": "Пауза",
+      "refund": "Возврат",
+      "resume": "Возобновить",
+      "split": "Разделить",
+      "tariff": "Тариф",
+      "unlock": "Разблокировать"
+    },
+    "child2badge": "👧 2-й ребёнок · −10% семья",
+    "currency": "zł",
+    "currencyPerMonth": "зл/мес",
+    "detail": {
+      "activePause": "🌙 Активная пауза",
+      "amount": "💵 Сумма к оплате",
+      "bonus": "⭐ 5-е занятие бесплатно",
+      "discount": "🏷️ Скидка",
+      "distribution": "🔄 Распределение",
+      "ksefLabel": "📄 KSeF",
+      "lessons": "📊 Занятия",
+      "partialPause": "◐ Частичная пауза",
+      "payStatus": "💰 Статус оплаты",
+      "teacher": "👩‍🏫 Учитель",
+      "txHint": "💡 Транзакции и счета — смотрите ниже в разделе «Транзакции»"
+    },
+    "disc": {
+      "complaint": "Компенсация",
+      "family": "Семейная",
+      "loyalty": "Лояльность",
+      "promo": "Промо",
+      "referral": "Реферальная"
+    },
+    "extras": {
+      "afterPayment": "после оплаты",
+      "awaitingPayment": "ожидает оплаты",
+      "infoText": "Разовые услуги — нет абонемента, пауз и изменения тарифа.",
+      "items": "позиции",
+      "paid": "оплачено",
+      "subtitle": "Разовые услуги и товары",
+      "title": "Доп. материалы и программы"
+    },
+    "ksef": {
+      "conflict": "! Конфликт",
+      "error": "✕ Ошибка",
+      "loading": "Загрузка KSeF…",
+      "manual": "✎ Вручную",
+      "ok": "✓ Отправлено",
+      "pending": "⏳ Ожидает",
+      "title": "Счета KSeF"
+    },
+    "labels": {
+      "discountShort": "скидка",
+      "free": "Бесплатно",
+      "from": "с",
+      "lessonsCount": "занятий",
+      "lessonsSuffix": "зан.",
+      "return": "возврат",
+      "until": "до"
+    },
+    "legend": {
+      "extra": "Доп. занятия",
+      "overdue": "Просрочено",
+      "paid": "Оплачено",
+      "partial": "Частично",
+      "pause": "Пауза",
+      "pending": "Ожидает",
+      "summer": "Каникулы",
+      "title": "Легенда:"
+    },
+    "month": {
+      "amount": "Сумма",
+      "lessons": "Занятия",
+      "status": "Статус"
+    },
+    "monthsFull": [
+      "Январь",
+      "Февраль",
+      "Март",
+      "Апрель",
+      "Май",
+      "Июнь",
+      "Июль",
+      "Август",
+      "Сентябрь",
+      "Октябрь",
+      "Ноябрь",
+      "Декабрь"
+    ],
+    "nextPay": "Следующий платеж",
+    "overall": "Общий баланс",
+    "refund": {
+      "forInvoice": "Возврат по счету"
+    },
+    "status": {
+      "approved": "Одобрено",
+      "completed": "Завершено",
+      "extra": "Доп. занятие",
+      "future": "Будущее",
+      "manual_pending": "Ручной (ожидает)",
+      "overdue": "Просрочено",
+      "paid": "Оплачено",
+      "partial": "Частично",
+      "pause": "Пауза",
+      "pending": "Ожидает",
+      "processing": "В обработке",
+      "rejected": "Отклонено",
+      "summer": "Каникулы"
+    },
+    "table": {
+      "amount": "Сумма",
+      "date": "Дата",
+      "ksef": "KSeF",
+      "lessons": "Занятия",
+      "month": "Месяц",
+      "status": "Статус",
+      "studentDetails": "Данные ученика"
+    },
     "tx": {
-      "title": "Транзакции",
       "combinedTitle": "Транзакции и счета KSeF",
+      "correction": "Коррекция",
       "count": "{n} транзакция | {n} транзакции | {n} транзакций",
+      "downloadPdf": "Скачать PDF",
+      "edit": "Редактировать счёт",
+      "editInvoice": "Редактировать счёт",
+      "empty": "Нет транзакций для этой программы",
+      "extra": "Доп. занятие",
+      "invoice": "Счет",
+      "korekta": "Корректypa",
       "loading": "Загрузка транзакций…",
       "paid": "✓ Оплачен",
       "pending": "🕐 Ожидает",
-      "subscription": "Абонемент",
-      "invoice": "Счет",
-      "extra": "Доп. занятие",
-      "edit": "Редактировать счёт",
-      "editInvoice": "Редактировать счёт",
-      "correction": "Коррекция",
-      "korekta": "Корректypa",
       "refund": "Возврат",
-      "downloadPdf": "Скачать PDF",
-      "pdfDownloading": "Загрузка...",
-      "pdfError": "Ошибка загрузки PDF",
-      "empty": "Нет транзакций для этой программы"
-    }
+      "subscription": "Абонемент",
+      "title": "Транзакции"
+    },
+    "view": {
+      "grid": "⬛ Сетка",
+      "table": "☰ Таблица"
+    },
+    "year": "Год:"
   },
   "cohorts": {
     "avgRetention": "Среднее удержание",
@@ -529,149 +593,6 @@
       "online": "Система онлайн",
       "version": "v2.4.0"
     }
-  },
-  "expelled": {
-    "actions": {
-      "apply": "Применить",
-      "archive": "Архивировать",
-      "archiveAll": "Архивировать всех",
-      "callToday": "Звонок сегодня",
-      "history": "История",
-      "transfer": "Перенести в группу",
-      "transferAny": "В любую группу"
-    }
-  },
-  "auth": {
-    "title": "Вход",
-    "email": "Email",
-    "password": "Пароль",
-    "submit": "Войти"
-  },
-  "tabs": {
-    "payments": "Оплаты",
-    "groups": "Группы",
-    "info": "Информация",
-    "attendance": "Посещаемость",
-    "progress": "Успеваемость",
-    "notes": "Заметки"
-  },
-  "payments": {
-    "currencyPerMonth": "зл/мес",
-    "currency": "zł",
-    "balance": "Баланс",
-    "overall": "Общий баланс",
-    "nextPay": "Следующий платеж",
-    "activePrograms": "Активные программы",
-    "actions": "Действия",
-    "tx": {
-      "title": "Транзакции",
-      "combinedTitle": "Транзакции и счета KSeF",
-      "count": "{n} транзакция | {n} транзакции | {n} транзакций",
-      "loading": "Загрузка транзакций…",
-      "paid": "✓ Оплачен",
-      "pending": "🕐 Ожидает",
-      "subscription": "Абонемент",
-      "invoice": "Счет",
-      "extra": "Доп. занятие",
-      "edit": "Редактировать счёт",
-      "editInvoice": "Редактировать счёт",
-      "correction": "Коррекция",
-      "korekta": "Корректypa",
-      "refund": "Возврат",
-      "downloadPdf": "Скачать PDF",
-      "pdfDownloading": "Загрузка...",
-      "pdfError": "Ошибка загрузки PDF",
-      "empty": "Нет транзакций для этой программы"
-    },
-    "archive": {
-      "cancel": "Отмена",
-      "confirm": "Подтвердить архивацию",
-      "moved": "Переехал",
-      "noAnswer": "Не дозвонились 3 раза",
-      "notRelevant": "Не актуально",
-      "other": "Другое",
-      "otherPlaceholder": "Напишите причину...",
-      "otherSchool": "Выбрал другую школу",
-      "reason": "Причина архивации",
-      "specify": "Укажите причину",
-      "sub": "Ученик будет перемещён в общий архив системы",
-      "title": "Архивировать ученика"
-    },
-    "archived": "🗃️ Ученик архивирован",
-    "bulk": {
-      "archive": "Архивировать выбранных",
-      "assign": "Назначить ответственного",
-      "deselect": "Снять выделение",
-      "forStudents": "Для {count} учеников",
-      "selected": "0 выбранных | {n} выбран | {n} выбранных | {n} выбранных"
-    },
-    "callMarked": "📞 Контакт отмечен сегодня",
-    "contact": {
-      "daysAgo": "{days} дн. назад",
-      "none": "Нет контакта",
-      "today": "Сегодня"
-    },
-    "empty": {
-      "sub": "Выписанных учеников по заданным фильтрам не найдено",
-      "title": "Список пуст"
-    },
-    "filter": {
-      "allGroups": "Все группы",
-      "allManagers": "Все сотрудники",
-      "contactAny": "Любой",
-      "contactHot": "Более 7 дней",
-      "contactNone": "Без контакта",
-      "contactToday": "Сегодня",
-      "contactWeek": "Последние 7 дней",
-      "noManager": "Без ответственного",
-      "search": "Поиск по имени..."
-    },
-    "info": {
-      "rule1": "Здесь только ученики, <strong>записанные в группу, но не начавшие обучение</strong>. С ними работает отдел продаж.",
-      "rule2": "<strong>Красная полоса слева</strong> — не было контакта более 7 дней. Требует срочного звонка.",
-      "rule3": "Дату контакта, ответственного и комментарий можно <strong>редактировать прямо в строке</strong> — изменения сохраняются сразу.",
-      "rule4": "После <strong>архивации с причиной</strong> ученик исчезает из вкладки и переходит в раздел <strong>«Архив»</strong>.",
-      "rule5": "Роль <strong>Manager</strong> — полный доступ. <strong>Quality</strong> — просмотр и восстановление. <strong>Sales</strong> — редактирование и перенос.",
-      "title": "Логика работы · правила дозакрытия"
-    },
-    "loading": "Загрузка...",
-    "pageSubTitle": "инструмент повторных продаж · дозакрытие",
-    "pageTitle": "Выписанные ученики",
-    "saved": "💾 Сохранено",
-    "showing": "Показано {shown} из {total} учеников",
-    "sort": {
-      "conAsc": "Старые контакты ↑",
-      "conDesc": "Новые контакты ↓",
-      "expAsc": "По дате выписки ↑",
-      "expDesc": "По дате выписки ↓"
-    },
-    "stats": {
-      "hot": "Давно без контакта",
-      "hotSub": "более 7 дней назад",
-      "none": "Не звонили никогда",
-      "noneSub": "приоритет 1",
-      "total": "Всего в работе",
-      "totalSub": "активных контактов",
-      "unpaid": "Не оплачено",
-      "unpaidSub": "возможны долги"
-    },
-    "table": {
-      "comment": "Комментарий",
-      "expelled": "Дата выписки",
-      "group": "Предыдущая группа",
-      "lastContact": "Последний контакт",
-      "manager": "Ответственный",
-      "name": "Имя ученика",
-      "paid": "Оплата",
-      "studentDetails": "Данные ученика",
-      "type": "Тип",
-      "typeGroup": "Групп.",
-      "typeIndividual": "Инд."
-    },
-    "tableToolbar": {
-      "title": "СПИСОК УЧЕНИКОВ"
-    },
-    "transferred": "✅ Ученик перенесён в группу"
   },
   "export": {
     "amount": "Сумма",
@@ -1825,7 +1746,13 @@
       "title": "✦ Создать новую группу",
       "timezoneLabel": "Часовой пояс",
       "shortWeekdays": {
-        "mon": "Пн", "tue": "Вт", "wed": "Ср", "thu": "Чт", "fri": "Пт", "sat": "Сб", "sun": "Вс"
+        "mon": "Пн",
+        "tue": "Вт",
+        "wed": "Ср",
+        "thu": "Чт",
+        "fri": "Пт",
+        "sat": "Сб",
+        "sun": "Вс"
       },
       "ageAdjectives": {
         "junior": "младшая",
@@ -2223,157 +2150,6 @@
     "typeMeet": "Встреча",
     "typeNote": "Заметка"
   },
-  "payments": {
-    "actions": "Действия",
-    "activePrograms": "Активные программы",
-    "balance": "Баланс",
-    "btn": {
-      "addExtra": "Добавить доп. занятие",
-      "archive": "Архив",
-      "changeGroup": "Сменить группу",
-      "discount": "Скидка",
-      "extra": "Дополнительно",
-      "invoice": "Счет",
-      "korekta": "Коррекция",
-      "pause": "Пауза",
-      "refund": "Возврат",
-      "resume": "Возобновить",
-      "split": "Разделить",
-      "tariff": "Тариф",
-      "unlock": "Разблокировать"
-    },
-    "child2badge": "👧 2-й ребёнок · −10% семья",
-    "currency": "zł",
-    "currencyPerMonth": "зл/мес",
-    "detail": {
-      "activePause": "🌙 Активная пауза",
-      "amount": "💵 Сумма к оплате",
-      "bonus": "⭐ 5-е занятие бесплатно",
-      "discount": "🏷️ Скидка",
-      "distribution": "🔄 Распределение",
-      "ksefLabel": "📄 KSeF",
-      "lessons": "📊 Занятия",
-      "partialPause": "◐ Частичная пауза",
-      "payStatus": "💰 Статус оплаты",
-      "teacher": "👩‍🏫 Учитель",
-      "txHint": "💡 Транзакции и счета — смотрите ниже в разделе «Транзакции»"
-    },
-    "disc": {
-      "complaint": "Компенсация",
-      "family": "Семейная",
-      "loyalty": "Лояльность",
-      "promo": "Промо",
-      "referral": "Реферальная"
-    },
-    "extras": {
-      "afterPayment": "после оплаты",
-      "awaitingPayment": "ожидает оплаты",
-      "infoText": "Разовые услуги — нет абонемента, пауз и изменения тарифа.",
-      "items": "позиции",
-      "paid": "оплачено",
-      "subtitle": "Разовые услуги и товары",
-      "title": "Доп. материалы и программы"
-    },
-    "ksef": {
-      "conflict": "! Конфликт",
-      "error": "✕ Ошибка",
-      "loading": "Загрузка KSeF…",
-      "manual": "✎ Вручную",
-      "ok": "✓ Отправлено",
-      "pending": "⏳ Ожидает",
-      "title": "Счета KSeF"
-    },
-    "labels": {
-      "discountShort": "скидка",
-      "free": "Бесплатно",
-      "from": "с",
-      "lessonsCount": "занятий",
-      "lessonsSuffix": "зан.",
-      "return": "возврат",
-      "until": "до"
-    },
-    "legend": {
-      "extra": "Доп. занятия",
-      "overdue": "Просрочено",
-      "paid": "Оплачено",
-      "partial": "Частично",
-      "pause": "Пауза",
-      "pending": "Ожидает",
-      "summer": "Каникулы",
-      "title": "Легенда:"
-    },
-    "month": {
-      "amount": "Сумма",
-      "lessons": "Занятия",
-      "status": "Статус"
-    },
-    "monthsFull": [
-      "Январь",
-      "Февраль",
-      "Март",
-      "Апрель",
-      "Май",
-      "Июнь",
-      "Июль",
-      "Август",
-      "Сентябрь",
-      "Октябрь",
-      "Ноябрь",
-      "Декабрь"
-    ],
-    "nextPay": "Следующий платеж",
-    "overall": "Общий баланс",
-    "refund": {
-      "forInvoice": "Возврат по счету"
-    },
-    "status": {
-      "approved": "Одобрено",
-      "completed": "Завершено",
-      "extra": "Доп. занятие",
-      "future": "Будущее",
-      "manual_pending": "Ручной (ожидает)",
-      "overdue": "Просрочено",
-      "paid": "Оплачено",
-      "partial": "Частично",
-      "pause": "Пауза",
-      "pending": "Ожидает",
-      "processing": "В обработке",
-      "rejected": "Отклонено",
-      "summer": "Каникулы"
-    },
-    "table": {
-      "amount": "Сумма",
-      "date": "Дата",
-      "ksef": "KSeF",
-      "lessons": "Занятия",
-      "month": "Месяц",
-      "status": "Статус",
-      "studentDetails": "Данные ученика"
-    },
-    "tx": {
-      "combinedTitle": "Транзакции и счета KSeF",
-      "correction": "Коррекция",
-      "count": "{n} транзакция | {n} транзакции | {n} транзакций",
-      "downloadPdf": "Скачать PDF",
-      "edit": "Редактировать счёт",
-      "editInvoice": "Редактировать счёт",
-      "empty": "Нет транзакций для этой программы",
-      "extra": "Доп. занятие",
-      "invoice": "Счет",
-      "korekta": "Корректypa",
-      "loading": "Загрузка транзакций…",
-      "paid": "✓ Оплачен",
-      "pending": "🕐 Ожидает",
-      "refund": "Возврат",
-      "subscription": "Абонемент",
-      "title": "Транзакции"
-    },
-    "view": {
-      "grid": "⬛ Сетка",
-      "table": "☰ Таблица"
-    },
-    "year": "Год:"
-  },
   "progress": {
     "achievements": "Достижения",
     "kpi": {
@@ -2578,6 +2354,7 @@
     "hrPipeline": "Новые / Pipeline",
     "hrTraining": "Обучение",
     "importDb": "Импорт регистраций",
+    "linkGenerator": "Генератор ссылок",
     "indigoTechniques": "Techniki INDIGO",
     "inpost": "Заказы InPost",
     "integrations": "Интеграции",
@@ -2712,14 +2489,6 @@
       "title": "Транзакции",
       "total": "Итого к оплате"
     }
-  },
-  "tabs": {
-    "attendance": "Посещаемость",
-    "groups": "Группы",
-    "info": "Информация",
-    "notes": "Заметки",
-    "payments": "Оплаты",
-    "progress": "Успеваемость"
   },
   "targetMail": {
     "emptyFiltered": "По текущему поиску ничего не найдено.",
@@ -2968,5 +2737,100 @@
     "responsible": "Ответственный",
     "subtitle": "Временный доступ при отсутствии платежа.",
     "title": "🔓 Разблокировать платформу"
+  },
+  "linkGenerator": {
+    "tabPersonal": "Personal",
+    "tabMarketing": "Marketing",
+    "personalTitle": "Персональные инвайты",
+    "personalDesc": "Удобный интерфейс над текущим invite + resend-invitation flow для конкретного родителя.",
+    "personalFlowHint": "Сначала создаётся черновик в Import DB, затем по нему можно сгенерировать ссылку или сразу отправить письмо.",
+    "personalNicknameHint": "Nickname обязателен: backend использует его для проверки уникальности и создания draft-записи.",
+    "personalCreateDraft": "Создать черновик",
+    "personalGenerateLink": "Сгенерировать ссылку",
+    "personalCreateAndSend": "Создать и отправить",
+    "personalLinkBox": "Персональная ссылка",
+    "personalLinkPlaceholder": "Сначала создайте черновик или сгенерируйте ссылку.",
+    "personalCopyCurrent": "Скопировать текущую ссылку",
+    "personalDraftId": "Draft ID",
+    "personalHistoryTitle": "Черновики и инвайты из Import DB",
+    "personalHistorySubtitle": "Эта таблица использует текущий recruitment flow, а не отдельную историю ссылок.",
+    "personalHistoryEmpty": "В Import DB пока нет подходящих записей",
+    "personalHistoryStatus": "Статус",
+    "personalStatusDraft": "Черновик",
+    "personalStatusSent": "Отправлено",
+    "personalStatusDone": "Завершено",
+    "personalSendAgain": "Отправить письмо",
+    "marketingTitle": "Маркетинговые ссылки",
+    "marketingDesc": "Отдельный сценарий для многоразовых ссылок кампаний и скидочных офферов.",
+    "marketingFlowHint": "Эта вкладка остаётся отдельным инструментом генерации marketing-ссылок.",
+    "marketingLinkPlaceholder": "Сгенерируйте marketing-ссылку, чтобы увидеть итоговый URL.",
+    "marketingHistoryTitle": "История marketing-ссылок",
+    "marketingHistorySubtitle": "Отдельный реестр marketing-генерации для текущего проекта.",
+    "notifDraftCreated": "Черновик создан в Import DB",
+    "notifInviteSent": "Письмо с приглашением отправлено",
+    "notifPersonalLinkGenerated": "Персональная ссылка сгенерирована!",
+    "pageSubtitle": "для клиентов",
+    "pageDesc": "Ссылка открывает личный кабинет с зашитым тарифом и скидками. Клиент сам выбирает количество месяцев.",
+    "step1Label": "Шаг 1 — Данные ученика",
+    "fieldFirstName": "Имя ребёнка",
+    "fieldFirstNamePlaceholder": "Имя...",
+    "fieldSurname": "Фамилия ребёнка",
+    "fieldSurnamePlaceholder": "Фамилия...",
+    "fieldParentEmail": "Email родителя",
+    "step2Label": "Шаг 2 — Тариф (zł / месяц)",
+    "tariffCustomPlaceholder": "Другая...",
+    "tariffLockTip": "🔒 Тариф 399 zł и произвольная цена доступны только супер-администратору",
+    "step3Label": "Шаг 3 — Скидки (можно комбинировать разрешённые)",
+    "discFastName": "Быстрая заявка",
+    "discFastMeta": "Одноразовая · только 1-й платёж",
+    "discTrialName": "Пробный месяц",
+    "discTrialMeta": "Первые 4 занятия от старта",
+    "discSecondName": "Второй ребёнок",
+    "discSecondMeta": "Постоянная · каждый месяц",
+    "discReferralName": "Рекомендация",
+    "discReferralMeta": "Одноразовая · след. месяц",
+    "conflictSecond": "Вторым ребёнком",
+    "conflictReferral": "Рекомендацией",
+    "conflictMsg": "⛔ Нельзя использовать вместе с «{name}»",
+    "subfieldSecondLabel": "Имя первого ребёнка (обязательно)",
+    "subfieldSecondPlaceholder": "Имя и фамилия 1-го ребёнка...",
+    "subfieldReferralWho": "Кто получает скидку?",
+    "referrerOption": "Тот кто рекомендовал",
+    "referredOption": "Тому кого рекомендовали",
+    "subfieldReferrerLabel": "Имя ученика который пришёл по рекомендации (обязательно)",
+    "subfieldReferredLabel": "Имя ученика который дал рекомендацию (обязательно)",
+    "subfieldStudentPlaceholder": "Имя и фамилия ученика...",
+    "calcTitle": "💡 Расчёт для клиента (1 месяц)",
+    "calcBaseTariff": "Базовый тариф",
+    "calcTotal": "Итого / месяц",
+    "calcSaving": "Экономия клиента",
+    "step4Label": "Шаг 4 — Готовая ссылка",
+    "urlBoxTitle": "Ссылка для клиента",
+    "urlFill": "⚠️ Заполните данные",
+    "urlConflict": "⛔ Конфликт скидок",
+    "btnCopy": "📋 Скопировать",
+    "btnGenerate": "✦ Создать и сохранить",
+    "validationConflict": "Скидки «Второй ребёнок» и «Рекомендация» нельзя использовать одновременно.",
+    "validationPartnerRequired": "Для {discounts} необходимо заполнить поле привязки к ученику.",
+    "historyTitle": "Сгенерированные ссылки",
+    "historyClear": "Очистить",
+    "historyEmpty": "Ещё нет сгенерированных ссылок",
+    "compatTitle": "Таблица совместимости скидок",
+    "compatColDiscount": "Скидка",
+    "compatNote": "⚠️ Второй ребёнок + Рекомендация — взаимоисключающие основания скидки. Клиент не может получить оба одновременно.",
+    "notifGenerated": "Ссылка сгенерирована и сохранена!",
+    "notifCopied": "Скопировано!",
+    "notifError": "Ошибка при генерации",
+    "confirmDelete": "Удалить эту запись?",
+    "confirmClear": "Очистить историю для текущего проекта?",
+    "roleSuperadmin": "Супер-админ",
+    "roleManager": "Менеджер",
+    "roleDemo": "/ демо",
+    "perMonth": "/мес",
+    "statusGenerated": "Создана",
+    "statusSent": "Отправлена",
+    "statusConverted": "Зарегистрирован",
+    "historyManager": "Менеджер",
+    "historyConverted": "Зарег."
   }
 }

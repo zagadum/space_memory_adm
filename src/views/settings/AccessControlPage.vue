@@ -275,6 +275,7 @@ const SECTIONS = [
       { key: 'new-groups' },
       { key: 'archived' },
       { key: 'import-db' },
+      { key: 'link-generator' },
       { key: 'import-db-update' },
       { key: 'import-db-delete' },
       { key: 'import-db-resend-invitation' },

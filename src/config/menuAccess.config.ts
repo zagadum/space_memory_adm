@@ -31,6 +31,7 @@ export const MENU_ACCESS_CONFIG: MenuAccessMap = {
       "new-groups": { mode: "active" },
       "archived": { mode: "active" },
       "import-db": { mode: "active" },
+      "link-generator": { mode: "active" },
 
   // Finance / accounting
   finance: { mode: "active" },
@@ -52,7 +53,7 @@ export const MENU_SECTION_ITEMS: Record<string, string[]> = {
   secretariat: ["students", "groups", "teachers", "course-endings"],
   hr: ["hr-active", "hr-training", "hr-pipeline", "hr-personal", "hr-analytics"],
   trainer: ["trainer-dashboard", "trainer-students", "trainer-groups", "lesson-tracker", "salary-demo", "trainer-materials", "trainer-exam", "trainer-mail"],
-  recruitment: ["new-students", "leads", "target-mail", "expelled", "new-groups", "archived", "import-db"],
+  recruitment: ["new-students", "leads", "target-mail", "expelled", "new-groups", "archived", "import-db", "link-generator"],
   finance: ["student-finance", "debtors", "nadplaty", "settings"],
   accounting: ["faktury", "returns", "projects", "salary-calculator", "finance-ustawienia"],
   quality: ["rezygnacje", "holidays-return", "quality-monitoring", "quality-analytics", "trial-lessons-qd", "quality-zaliczenia", "quality-olimpiad", "spotkania", "sciezka", "quality-materials", "zaliczenia-calendar", "all-tasks", "quality-stats"],
@@ -84,6 +85,8 @@ export const MENU_ROUTE_KEY_MAP: Record<string, string> = {
    "archived-students-indigo": "archived",
    "import-db": "import-db",
    "import-db-indigo": "import-db",
+   "link-generator": "link-generator",
+   "link-generator-indigo": "link-generator",
 
    // ── Finance ──
    "finance-students": "student-finance",
@@ -148,4 +151,3 @@ export const MENU_ROUTE_KEY_MAP: Record<string, string> = {
    "settings-root": "settings-section",
    "access-control": "access-control",
 };
-

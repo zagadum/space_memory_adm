@@ -438,9 +438,15 @@ Component (reactive UI update)
 
 ### 6.1 Backend API Integration
 
-**Base URL**: `https://memory.firm.kiev.ua/api/v1/`
+**Base URL (Production)**: `https://memory.firm.kiev.ua/api/v1/`
+**Base URL (Local)**:
+- Space Memory: `http://localhost:8000/api/v1/`
+- Indigo: `http://localhost:8001/api/v1/`
+
 **Authentication**: JWT Bearer token in `Authorization` header
-**Laravel Backend**: `space_memory-php8` (separate repository)
+**Backends**:
+- `space_memory-recrut` (Laravel 11, Branch: `recrut_indigo2`)
+- `Indigo` (Laravel 11, Branch: `recrut_indigo2`)
 
 ### 6.2 Data Naming Conventions
 

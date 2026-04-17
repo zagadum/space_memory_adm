@@ -93,6 +93,11 @@ function createImportDbApi(backend: RecruitmentBackend = "default") {
       return data;
     },
 
+    async generateLink(id: number | string) {
+      const { data } = await client.post(`recruitment/import-db/${id}/generate-link`);
+      return data;
+    },
+
     async updateImportDbItem(id: number | string, payload: Partial<ImportDbItem>) {
       const { data } = await client.patch(`recruitment/import-db/${id}`, payload);
       return data;
@@ -105,4 +110,3 @@ export const importDbApi = createImportDbApi();
 export function getImportDbApi(backend: RecruitmentBackend = "default") {
   return createImportDbApi(backend);
 }
-

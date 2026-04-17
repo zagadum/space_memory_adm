@@ -280,13 +280,10 @@
     "trainer": "Trainer"
   },
   "auth": {
-    "description": "CRM platform for managing Space Memory & Indigo Mental schools within Global Leaders Skills. Enables comprehensive management of educational processes, communication with students, and facility management.",
+    "title": "Sign In",
     "email": "Email",
     "password": "Password",
-    "project": "Project",
-    "schools": "School websites:",
-    "submit": "Log In",
-    "title": "Sign In"
+    "submit": "Log In"
   },
   "changePassword": {
     "confirmPassword": "Confirm Password",
@@ -438,182 +435,164 @@
       "transferAny": "To Any Group"
     }
   },
-  "auth": {
-    "title": "Sign In",
-    "email": "Email",
-    "password": "Password",
-    "submit": "Log In"
-  },
   "tabs": {
-    "payments": "Payments",
+    "attendance": "Attendance",
     "groups": "Groups",
     "info": "Info",
-    "attendance": "Attendance",
-    "progress": "Progress",
-    "notes": "Notes"
+    "notes": "Notes",
+    "payments": "Payments",
+    "progress": "Progress"
   },
   "payments": {
-    "currencyPerMonth": "PLN/mo",
-    "currency": "PLN",
-    "balance": "Balance",
-    "overall": "Overall Balance",
-    "nextPay": "Next Payment",
-    "activePrograms": "Active Programs",
     "actions": "Actions",
+    "activePrograms": "Active Programs",
+    "balance": "Balance",
+    "btn": {
+      "addExtra": "Add extra class",
+      "archive": "Archive",
+      "changeGroup": "Change group",
+      "discount": "Discount",
+      "extra": "Extra",
+      "invoice": "Invoice",
+      "korekta": "Correction",
+      "pause": "Pause",
+      "refund": "Refund",
+      "resume": "Resume",
+      "split": "Split",
+      "tariff": "Tariff",
+      "unlock": "Unlock"
+    },
+    "child2badge": "👧 2nd child · −10% family",
+    "currency": "PLN",
+    "currencyPerMonth": "PLN/mo",
+    "detail": {
+      "activePause": "🌙 Active Pause",
+      "amount": "💵 Amount Due",
+      "bonus": "⭐ 5th lesson free",
+      "discount": "🏷️ Discount",
+      "distribution": "🔄 Distribution",
+      "ksefLabel": "📄 KSeF",
+      "lessons": "📊 Lessons",
+      "partialPause": "◐ Partial Pause",
+      "payStatus": "💰 Payment Status",
+      "teacher": "👩‍🏫 Teacher",
+      "txHint": "💡 Transactions and invoices — see below in the «Transactions» section"
+    },
+    "disc": {
+      "complaint": "Compensation",
+      "family": "Family",
+      "loyalty": "Loyalty",
+      "promo": "Promo",
+      "referral": "Referral"
+    },
+    "extras": {
+      "afterPayment": "after payment",
+      "awaitingPayment": "awaiting payment",
+      "infoText": "One-time services — no subscription, no pauses, no tariff changes.",
+      "items": "items",
+      "paid": "paid",
+      "subtitle": "One-time services and products",
+      "title": "Extra Materials and Programs"
+    },
+    "ksef": {
+      "conflict": "! Conflict",
+      "error": "✕ Error",
+      "loading": "Loading KSeF…",
+      "manual": "✎ Manual",
+      "ok": "✓ Sent",
+      "pending": "⏳ Pending",
+      "title": "KSeF Invoices"
+    },
+    "labels": {
+      "discountShort": "discount",
+      "free": "Free",
+      "from": "from",
+      "lessonsCount": "lessons",
+      "lessonsSuffix": "lsn.",
+      "return": "return",
+      "until": "until"
+    },
+    "legend": {
+      "extra": "Extra Classes",
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "partial": "Partial",
+      "pause": "Pause",
+      "pending": "Pending",
+      "summer": "Summer Break",
+      "title": "Legend:"
+    },
+    "month": {
+      "amount": "Amount",
+      "lessons": "Lessons",
+      "status": "Status"
+    },
+    "monthsFull": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "nextPay": "Next Payment",
+    "overall": "Overall Balance",
+    "refund": {
+      "forInvoice": "Invoice Refund"
+    },
+    "status": {
+      "approved": "Approved",
+      "completed": "Completed",
+      "extra": "Extra Class",
+      "future": "Future",
+      "manual_pending": "Manual (pending)",
+      "overdue": "Overdue",
+      "paid": "Paid",
+      "partial": "Partial",
+      "pause": "Pause",
+      "pending": "Pending",
+      "processing": "Processing",
+      "rejected": "Rejected",
+      "summer": "Summer Break"
+    },
+    "table": {
+      "amount": "Amount",
+      "date": "Date",
+      "ksef": "KSeF",
+      "lessons": "Lessons",
+      "month": "Month",
+      "status": "Status",
+      "studentDetails": "Student details"
+    },
     "tx": {
-      "title": "Transactions",
       "combinedTitle": "Transactions & KSeF Invoices",
+      "correction": "Correction",
       "count": "no transactions | {n} transaction | {n} transactions",
+      "downloadPdf": "Download PDF",
+      "edit": "Edit invoice",
+      "editInvoice": "Edit Invoice",
+      "empty": "No transactions for this program",
+      "extra": "Extra class",
+      "invoice": "Invoice",
+      "korekta": "Correction",
       "loading": "Loading transactions…",
       "paid": "✓ Paid",
       "pending": "🕐 Pending",
-      "subscription": "Subscription",
-      "invoice": "Invoice",
-      "extra": "Extra class",
-      "edit": "Edit invoice",
-      "editInvoice": "Edit Invoice",
-      "correction": "Correction",
-      "korekta": "Correction",
       "refund": "Refund",
-      "downloadPdf": "Download PDF",
-      "pdfDownloading": "Downloading...",
-      "pdfError": "Failed to download PDF",
-      "empty": "No transactions for this program"
+      "subscription": "Subscription",
+      "title": "Transactions"
     },
-    "extras": {
-      "title": "Extra Materials and Programs",
-      "subtitle": "One-time services and products",
-      "items": "items",
-      "paid": "paid",
-      "awaitingPayment": "awaiting payment",
-      "afterPayment": "after payment",
-      "infoText": "One-time services — no subscription, no pauses, no tariff changes."
-    },
-    "legend": {
-      "title": "Legend:",
-      "paid": "Paid",
-      "pending": "Pending",
-      "overdue": "Overdue",
-      "pause": "Pause",
-      "summer": "Summer Break",
-      "partial": "Partial",
-      "extra": "Extra Classes"
-    },
-    "year": "Year:",
     "view": {
       "grid": "⬛ Grid",
       "table": "☰ Table"
     },
-    "month": {
-      "status": "Status",
-      "amount": "Amount",
-      "lessons": "Lessons"
-    },
-    "btn": {
-      "invoice": "Invoice",
-      "refund": "Refund",
-      "korekta": "Correction",
-      "tariff": "Tariff",
-      "discount": "Discount",
-      "pause": "Pause",
-      "extra": "Extra",
-      "unlock": "Unlock",
-      "archive": "Archive",
-      "archiveAll": "Archive all",
-      "callToday": "Call today",
-      "history": "History",
-      "transfer": "Transfer to group",
-      "transferAny": "To any group"
-    },
-    "archive": {
-      "cancel": "Cancel",
-      "confirm": "Confirm archiving",
-      "moved": "Relocated",
-      "noAnswer": "No answer 3 times",
-      "notRelevant": "Not relevant",
-      "other": "Other",
-      "otherPlaceholder": "Write a reason...",
-      "otherSchool": "Chose another school",
-      "reason": "Archiving reason",
-      "specify": "Specify reason",
-      "sub": "The student will be moved to the system's general archive",
-      "title": "Archive Student"
-    },
-    "archived": "🗃️ Student archived",
-    "bulk": {
-      "archive": "Archive selected",
-      "assign": "Assign manager",
-      "deselect": "Deselect",
-      "forStudents": "For {count} students",
-      "selected": "0 selected | {n} selected | {n} selected"
-    },
-    "callMarked": "📞 Contact marked today",
-    "contact": {
-      "daysAgo": "{days} days ago",
-      "none": "No contact",
-      "today": "Today"
-    },
-    "empty": {
-      "sub": "No expelled students found for the selected filters",
-      "title": "List is empty"
-    },
-    "filter": {
-      "allGroups": "All groups",
-      "allManagers": "All staff",
-      "contactAny": "Any",
-      "contactHot": "More than 7 days",
-      "contactNone": "No contact",
-      "contactToday": "Today",
-      "contactWeek": "Last 7 days",
-      "noManager": "No manager",
-      "search": "Search by name..."
-    },
-    "info": {
-      "rule1": "Only students <strong>enrolled in a group but who haven't started classes</strong> are listed here. The sales department works with them.",
-      "rule2": "<strong>Red strip on the left</strong> — no contact for more than 7 days. Requires an urgent call.",
-      "rule3": "Contact date, manager, and comment can be <strong>edited directly in the row</strong> — changes are saved immediately.",
-      "rule4": "After <strong>archiving with a reason</strong>, the student disappears from the tab and moves to the <strong>«Archive»</strong> section.",
-      "rule5": "Role <strong>Manager</strong> — full access. <strong>Quality</strong> — view and restore. <strong>Sales</strong> — edit and move.",
-      "title": "Business Logic · Closing Rules"
-    },
-    "loading": "Loading...",
-    "pageSubTitle": "resale tool · closing",
-    "pageTitle": "Expelled Students",
-    "saved": "💾 Saved",
-    "showing": "Showing {shown} of {total} students",
-    "sort": {
-      "conAsc": "Oldest contacts ↑",
-      "conDesc": "Newest contacts ↓",
-      "expAsc": "By expulsion date ↑",
-      "expDesc": "By expulsion date ↓"
-    },
-    "stats": {
-      "hot": "No contact for long",
-      "hotSub": "more than 7 days ago",
-      "none": "Never called",
-      "noneSub": "priority 1",
-      "total": "Total in work",
-      "totalSub": "active contacts",
-      "unpaid": "Unpaid",
-      "unpaidSub": "possible debts"
-    },
-    "table": {
-      "comment": "Comment",
-      "expelled": "Expulsion date",
-      "group": "Previous group",
-      "lastContact": "Last contact",
-      "manager": "Manager",
-      "name": "Student name",
-      "paid": "Payment",
-      "studentDetails": "Student details",
-      "type": "Type",
-      "typeGroup": "Grp.",
-      "typeIndividual": "Ind."
-    },
-    "tableToolbar": {
-      "title": "STUDENT LIST"
-    },
-    "transferred": "✅ Student transferred to group"
+    "year": "Year:"
   },
   "export": {
     "amount": "Amount",
@@ -1777,7 +1756,13 @@
       "title": "✦ Create New Group",
       "timezoneLabel": "Timezone",
       "shortWeekdays": {
-        "mon": "Mon", "tue": "Tue", "wed": "Wed", "thu": "Thu", "fri": "Fri", "sat": "Sat", "sun": "Sun"
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
       },
       "ageAdjectives": {
         "junior": "junior",
@@ -2174,157 +2159,6 @@
     "typeMeet": "Meeting",
     "typeNote": "Note"
   },
-  "payments": {
-    "actions": "Actions",
-    "activePrograms": "Active Programs",
-    "balance": "Balance",
-    "btn": {
-      "addExtra": "Add extra class",
-      "archive": "Archive",
-      "changeGroup": "Change group",
-      "discount": "Discount",
-      "extra": "Extra",
-      "invoice": "Invoice",
-      "korekta": "Correction",
-      "pause": "Pause",
-      "refund": "Refund",
-      "resume": "Resume",
-      "split": "Split",
-      "tariff": "Tariff",
-      "unlock": "Unlock"
-    },
-    "child2badge": "👧 2nd child · −10% family",
-    "currency": "PLN",
-    "currencyPerMonth": "PLN/mo",
-    "detail": {
-      "activePause": "🌙 Active Pause",
-      "amount": "💵 Amount Due",
-      "bonus": "⭐ 5th lesson free",
-      "discount": "🏷️ Discount",
-      "distribution": "🔄 Distribution",
-      "ksefLabel": "📄 KSeF",
-      "lessons": "📊 Lessons",
-      "partialPause": "◐ Partial Pause",
-      "payStatus": "💰 Payment Status",
-      "teacher": "👩‍🏫 Teacher",
-      "txHint": "💡 Transactions and invoices — see below in the «Transactions» section"
-    },
-    "disc": {
-      "complaint": "Compensation",
-      "family": "Family",
-      "loyalty": "Loyalty",
-      "promo": "Promo",
-      "referral": "Referral"
-    },
-    "extras": {
-      "afterPayment": "after payment",
-      "awaitingPayment": "awaiting payment",
-      "infoText": "One-time services — no subscription, no pauses, no tariff changes.",
-      "items": "items",
-      "paid": "paid",
-      "subtitle": "One-time services and products",
-      "title": "Extra Materials and Programs"
-    },
-    "ksef": {
-      "conflict": "! Conflict",
-      "error": "✕ Error",
-      "loading": "Loading KSeF…",
-      "manual": "✎ Manual",
-      "ok": "✓ Sent",
-      "pending": "⏳ Pending",
-      "title": "KSeF Invoices"
-    },
-    "labels": {
-      "discountShort": "discount",
-      "free": "Free",
-      "from": "from",
-      "lessonsCount": "lessons",
-      "lessonsSuffix": "lsn.",
-      "return": "return",
-      "until": "until"
-    },
-    "legend": {
-      "extra": "Extra Classes",
-      "overdue": "Overdue",
-      "paid": "Paid",
-      "partial": "Partial",
-      "pause": "Pause",
-      "pending": "Pending",
-      "summer": "Summer Break",
-      "title": "Legend:"
-    },
-    "month": {
-      "amount": "Amount",
-      "lessons": "Lessons",
-      "status": "Status"
-    },
-    "monthsFull": [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ],
-    "nextPay": "Next Payment",
-    "overall": "Overall Balance",
-    "refund": {
-      "forInvoice": "Invoice Refund"
-    },
-    "status": {
-      "approved": "Approved",
-      "completed": "Completed",
-      "extra": "Extra Class",
-      "future": "Future",
-      "manual_pending": "Manual (pending)",
-      "overdue": "Overdue",
-      "paid": "Paid",
-      "partial": "Partial",
-      "pause": "Pause",
-      "pending": "Pending",
-      "processing": "Processing",
-      "rejected": "Rejected",
-      "summer": "Summer Break"
-    },
-    "table": {
-      "amount": "Amount",
-      "date": "Date",
-      "ksef": "KSeF",
-      "lessons": "Lessons",
-      "month": "Month",
-      "status": "Status",
-      "studentDetails": "Student details"
-    },
-    "tx": {
-      "combinedTitle": "Transactions & KSeF Invoices",
-      "correction": "Correction",
-      "count": "no transactions | {n} transaction | {n} transactions",
-      "downloadPdf": "Download PDF",
-      "edit": "Edit invoice",
-      "editInvoice": "Edit Invoice",
-      "empty": "No transactions for this program",
-      "extra": "Extra class",
-      "invoice": "Invoice",
-      "korekta": "Correction",
-      "loading": "Loading transactions…",
-      "paid": "✓ Paid",
-      "pending": "🕐 Pending",
-      "refund": "Refund",
-      "subscription": "Subscription",
-      "title": "Transactions"
-    },
-    "view": {
-      "grid": "⬛ Grid",
-      "table": "☰ Table"
-    },
-    "year": "Year:"
-  },
   "progress": {
     "achievements": "Achievements",
     "kpi": {
@@ -2586,7 +2420,8 @@
     "trialMonth": "Trial Month",
     "ustawienia": "Settings (Ustawienia)",
     "zaliczenia": "Assessments",
-    "zaliczeniaCalendar": "Assessment Calendar"
+    "zaliczeniaCalendar": "Assessment Calendar",
+    "linkGenerator": "Link Generator"
   },
   "studentList": {
     "actions": {
@@ -2722,14 +2557,6 @@
       "title": "Transactions",
       "total": "Total to Pay"
     }
-  },
-  "tabs": {
-    "attendance": "Attendance",
-    "groups": "Groups",
-    "info": "Info",
-    "notes": "Notes",
-    "payments": "Payments",
-    "progress": "Progress"
   },
   "targetMail": {
     "emptyFiltered": "Nothing matched the current search.",
@@ -2978,5 +2805,100 @@
     "responsible": "Responsible person",
     "subtitle": "Temporary access when payment is missing.",
     "title": "🔓 Unlock Platform"
+  },
+  "linkGenerator": {
+    "tabPersonal": "Personal",
+    "tabMarketing": "Marketing",
+    "personalTitle": "Personal invites",
+    "personalDesc": "A convenient UI on top of the current invite + resend-invitation flow for a specific parent.",
+    "personalFlowHint": "A draft is created in Import DB first, then you can generate a link or send the email immediately.",
+    "personalNicknameHint": "Nickname is required: the backend uses it for uniqueness checks and draft creation.",
+    "personalCreateDraft": "Create draft",
+    "personalGenerateLink": "Generate link",
+    "personalCreateAndSend": "Create and send",
+    "personalLinkBox": "Personal link",
+    "personalLinkPlaceholder": "Create a draft or generate a link first.",
+    "personalCopyCurrent": "Copy current link",
+    "personalDraftId": "Draft ID",
+    "personalHistoryTitle": "Import DB drafts and invites",
+    "personalHistorySubtitle": "This table uses the current recruitment flow, not a separate link history.",
+    "personalHistoryEmpty": "No matching records in Import DB yet",
+    "personalHistoryStatus": "Status",
+    "personalStatusDraft": "Draft",
+    "personalStatusSent": "Sent",
+    "personalStatusDone": "Completed",
+    "personalSendAgain": "Send email",
+    "marketingTitle": "Marketing links",
+    "marketingDesc": "A separate scenario for reusable campaign links and discount offers.",
+    "marketingFlowHint": "This tab remains a dedicated tool for marketing-link generation.",
+    "marketingLinkPlaceholder": "Generate a marketing link to see the final URL.",
+    "marketingHistoryTitle": "Marketing link history",
+    "marketingHistorySubtitle": "Separate marketing generation registry for the current project.",
+    "notifDraftCreated": "Draft created in Import DB",
+    "notifInviteSent": "Invitation email sent",
+    "notifPersonalLinkGenerated": "Personal link generated!",
+    "pageSubtitle": "for clients",
+    "pageDesc": "The link opens the client panel with a preset plan and discounts. The client chooses the number of months.",
+    "step1Label": "Step 1 — Student data",
+    "fieldFirstName": "Child's first name",
+    "fieldFirstNamePlaceholder": "First name...",
+    "fieldSurname": "Child's last name",
+    "fieldSurnamePlaceholder": "Last name...",
+    "fieldParentEmail": "Parent's email",
+    "step2Label": "Step 2 — Plan (zł / month)",
+    "tariffCustomPlaceholder": "Other...",
+    "tariffLockTip": "🔒 399 zł plan and custom price available for super-admins only",
+    "step3Label": "Step 3 — Discounts (combinable where allowed)",
+    "discFastName": "Fast registration",
+    "discFastMeta": "One-time · 1st payment only",
+    "discTrialName": "Trial month",
+    "discTrialMeta": "First 4 lessons from start",
+    "discSecondName": "Second child",
+    "discSecondMeta": "Ongoing · every month",
+    "discReferralName": "Referral",
+    "discReferralMeta": "One-time · next month",
+    "conflictSecond": "Second child",
+    "conflictReferral": "Referral",
+    "conflictMsg": "⛔ Cannot be used together with «{name}»",
+    "subfieldSecondLabel": "First child's name (required)",
+    "subfieldSecondPlaceholder": "First and last name of 1st child...",
+    "subfieldReferralWho": "Who receives the discount?",
+    "referrerOption": "The one who referred",
+    "referredOption": "The one who was referred",
+    "subfieldReferrerLabel": "Name of student who came via referral (required)",
+    "subfieldReferredLabel": "Name of student who made the referral (required)",
+    "subfieldStudentPlaceholder": "Student's first and last name...",
+    "calcTitle": "💡 Calculation for client (1 month)",
+    "calcBaseTariff": "Base plan",
+    "calcTotal": "Total / month",
+    "calcSaving": "Client savings",
+    "step4Label": "Step 4 — Generated link",
+    "urlBoxTitle": "Link for client",
+    "urlFill": "⚠️ Fill in the data",
+    "urlConflict": "⛔ Discount conflict",
+    "btnCopy": "📋 Copy",
+    "btnGenerate": "✦ Create and save",
+    "validationConflict": "«Second child» and «Referral» discounts cannot be used at the same time.",
+    "validationPartnerRequired": "For {discounts} you must fill in the student link field.",
+    "historyTitle": "Generated links",
+    "historyClear": "Clear",
+    "historyEmpty": "No generated links yet",
+    "compatTitle": "Discount compatibility table",
+    "compatColDiscount": "Discount",
+    "compatNote": "⚠️ Second child + Referral — mutually exclusive discount bases. A client cannot receive both at the same time.",
+    "notifGenerated": "Link generated and saved!",
+    "notifCopied": "Copied!",
+    "notifError": "Generation error",
+    "confirmDelete": "Delete this entry?",
+    "confirmClear": "Clear history for current project?",
+    "roleSuperadmin": "Super-admin",
+    "roleManager": "Manager",
+    "roleDemo": "/ demo",
+    "perMonth": "/mo",
+    "statusGenerated": "Created",
+    "statusSent": "Sent",
+    "statusConverted": "Registered",
+    "historyManager": "Manager",
+    "historyConverted": "Reg."
   }
 }

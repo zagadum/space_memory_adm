@@ -130,10 +130,22 @@ export const router = createRouter({
           meta: { title: 'importDb.pageTitle', icon: '📥', recruitmentBackend: 'default' }
         },
         {
+          path: "recruitment/space/link-generator",
+          name: "link-generator",
+          component: () => import("../views/recruitment/LinkGeneratorPage.vue"),
+          meta: { title: 'sidebar.linkGenerator', icon: '✦', recruitmentBackend: 'default' }
+        },
+        {
           path: "recruitment/indigo/import-db",
           name: "import-db-indigo",
           component: () => import("../views/recruitment/ImportDbPage.vue"),
           meta: { title: 'importDb.pageTitle', icon: '📥', recruitmentBackend: 'indigo' }
+        },
+        {
+          path: "recruitment/indigo/link-generator",
+          name: "link-generator-indigo",
+          component: () => import("../views/recruitment/LinkGeneratorPage.vue"),
+          meta: { title: 'sidebar.linkGenerator', icon: '✦', recruitmentBackend: 'indigo' }
         },
         { path: 'recruitment/import-db', redirect: { name: 'import-db' } },
         { path: 'recruitment/indigo', redirect: { name: 'new-students-indigo' } },
