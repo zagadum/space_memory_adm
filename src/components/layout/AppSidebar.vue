@@ -514,7 +514,7 @@ const visibleProjectOptions = computed(() => {
 const isProjectDropdownOpen = ref(false)
 
 function toggleProjectDropdown() {
-  isProjectDropdownOpen.value = !isProjectDropdown.value
+  isProjectDropdownOpen.value = !isProjectDropdownOpen.value
 }
 
 function selectProject(project: ProjectCode) {

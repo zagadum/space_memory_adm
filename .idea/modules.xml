@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/memory-adm.iml" filepath="$PROJECT_DIR$/.idea/memory-adm.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../space_memory-recrut-inigo/.idea/space_memory-recrut-inigo.iml" filepath="$PROJECT_DIR$/../space_memory-recrut-inigo/.idea/space_memory-recrut-inigo.iml" />
     </modules>
   </component>
 </project>

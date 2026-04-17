@@ -1962,6 +1962,7 @@
     "groupPicker": {
       "createGroup": "Create new group",
       "for": "Student",
+      "loading": "Loading groups...",
       "noResults": "No groups found. Try changing filters.",
       "noSlots": "Full",
       "searchPlaceholder": "Search by name, teacher, day...",
