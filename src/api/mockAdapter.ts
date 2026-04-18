@@ -428,6 +428,17 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     return ok(config, { projectId, items });
   }
 
+  // Новый endpoint: GET /payments/{student_id}/transactions
+  if (method === "get" && /^payments\/[^/]+\/transactions$/.test(url)) {
+    const queryString = String(config.url || '').split('?')[1] || '';
+    const params = new URLSearchParams(queryString);
+    const projectId = params.get('project_id');
+    const items = projectId
+      ? (mockTransactions[projectId] || [])
+      : Object.values(mockTransactions).flat();
+    return ok(config, { items });
+  }
+
   /**
    * Запрос 4: GET v1/payments/documents/{id}/pdf
    * Mock PDF download
@@ -570,6 +581,12 @@ export const mockAdapter: AxiosAdapter = async (config) => {
     const body = readBody(config);
     if (!body?.programId || !body?.reason) return err(config, 400, "programId/reason required");
     return ok(config, { ok: true });
+  }
+
+  if (method === "post" && url === "payments/recalculate-start-date") {
+    const body = readBody(config);
+    if (!body?.programId || !body?.startDate) return err(config, 400, "programId/startDate required");
+    return ok(config, { ok: true, programId: body.programId, startDate: body.startDate, shiftedChargesCount: 3 });
   }
 
   if (method === "post" && url === "payments/split") {

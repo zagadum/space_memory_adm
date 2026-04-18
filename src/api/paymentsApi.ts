@@ -31,8 +31,16 @@ export interface ProjectCalendarResponse {
 
 /** Транзакции по одному проекту */
 export interface ProjectTransactionsResponse {
-  projectId: string;
+  projectId?: string;
   items: Transaction[];
+}
+
+export interface ArchivePayload {
+  programId: string;
+  reason?: string;
+  endDate?: string;
+  comment?: string;
+  futureAction?: "keep_credit" | "refund" | "transfer";
 }
 
 type MaybeWrapped<T> = T | { data: T };
@@ -145,21 +153,23 @@ export const paymentsApi = {
 
   /**
    * 3. Транзакции — вызывается по клику на раздел "Транзакции".
-   *    GET /students/{student_id}/projects/{project_id}/transactions
+   *    GET /payments/{student_id}/transactions
    */
   async getProjectTransactions(
     studentId: string,
     projectId: string
   ): Promise<ProjectTransactionsResponse> {
     const { data } = await http.get<MaybeWrapped<ProjectTransactionsResponse>>(
-      `payments/${studentId}/projects/${projectId}/transactions`
+      API_ENDPOINTS.PAYMENTS.PROJECT_TRANSACTIONS(studentId),
+      { params: { project_id: projectId } }
     );
     return unwrapApiData(data);
   },
 
   // ── Старые методы (для совместимости) ────────────────────────────────────────
-  async getTransactions(programId: string) {
-    const { data } = await http.get<MaybeWrapped<{ items: Transaction[] }>>("payments/transactions", { params: { programId } });
+  async getTransactions(studentId: number) {
+    // FIX: переименовано параметра с programId на student_id для соответствия бэкенду
+    const { data } = await http.get<MaybeWrapped<{ items: Transaction[] }>>("payments/transactions", { params: { student_id: studentId } });
     return unwrapApiData(data).items;
   },
 
@@ -183,13 +193,13 @@ export const paymentsApi = {
     return unwrapApiData(data);
   },
 
-  async changeTariff(payload: { programId: string; value: number; fromMonthIndex: number }) {
-    const { data } = await http.post<MaybeWrapped<{ ok: boolean; programId: string; value: number }>>("payments/tariff", payload);
+  async changeTariff(payload: { programId: string; value: number; fromMonthIndex: number; effectiveYear?: number }) {
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean; programId: string; value: number }>>(API_ENDPOINTS.PAYMENTS.TARIFF, payload);
     return unwrapApiData(data);
   },
 
   async setPause(payload: { programId: string; from: string; to: string; reason?: string; comment?: string }) {
-    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/pause", payload);
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>(API_ENDPOINTS.PAYMENTS.PAUSE, payload);
     return unwrapApiData(data);
   },
 
@@ -204,12 +214,20 @@ export const paymentsApi = {
   },
 
   async unlock(payload: { programId: string }) {
-    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/unlock", payload);
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>(API_ENDPOINTS.PAYMENTS.UNLOCK, payload);
     return unwrapApiData(data);
   },
 
-  async archive(payload: { programId: string; reason?: string; endDate?: string; comment?: string }) {
-    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/archive", payload);
+  async archive(payload: ArchivePayload) {
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>(API_ENDPOINTS.PAYMENTS.ARCHIVE, payload);
+    return unwrapApiData(data);
+  },
+
+  async recalculateStartDate(payload: { programId: string; startDate: string }) {
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean; programId: string; startDate: string; shiftedChargesCount: number }>>(
+      API_ENDPOINTS.PAYMENTS.RECALCULATE_START_DATE,
+      payload,
+    );
     return unwrapApiData(data);
   },
 
@@ -219,7 +237,7 @@ export const paymentsApi = {
   },
 
   async resume(payload: { programId: string }) {
-    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>("payments/resume", payload);
+    const { data } = await http.post<MaybeWrapped<{ ok: boolean }>>(API_ENDPOINTS.PAYMENTS.RESUME, payload);
     return unwrapApiData(data);
   },
 };

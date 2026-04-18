@@ -86,8 +86,8 @@ export const PAYMENTS = {
   STUDENT_PROJECTS: (id: string) => `payments/${id}/projects`,
   PROJECT_CALENDAR: (studentId: string, projectId: string) =>
     `payments/${studentId}/projects/${projectId}/calendar`,
-  PROJECT_TRANSACTIONS: (studentId: string, projectId: string) =>
-    `payments/${studentId}/projects/${projectId}/transactions`,
+  PROJECT_TRANSACTIONS: (studentId: string) =>
+    `payments/${studentId}/transactions`,
 
   // Старые совместимые
   TRANSACTIONS: 'payments/transactions',
@@ -103,6 +103,7 @@ export const PAYMENTS = {
   EXTRA: 'payments/extra',
   UNLOCK: 'payments/unlock',
   ARCHIVE: 'payments/archive',
+  RECALCULATE_START_DATE: 'payments/recalculate-start-date',
   SPLIT: 'payments/split',
   RESUME: 'payments/resume',
 

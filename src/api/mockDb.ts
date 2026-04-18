@@ -22,6 +22,8 @@ export interface MonthObj {
   s: MonthStatus;               // статус месяца
   payStatus?: PayStatus | null; // статус оплаты
   a: number;                    // сумма (zł)
+  prepaid?: boolean;            // месяц покрыт предоплатой
+  coverage?: number;            // покрытая предоплатой часть суммы
   ksef: KsefStatus;             // статус KSeF
   g1: number;                   // кол-во занятий группа 1
   g2: number;                   // кол-во занятий группа 2
@@ -97,6 +99,7 @@ export interface Transaction {
   amount: number;
   amountFmt?: string;
   status: "paid" | "pending";
+  is_paid?: boolean | number | string;
   type: "month" | "extra";
   ksef?: "ok" | "pending" | "conflict" | "error" | null;
   fvnum?: string | null;
@@ -107,6 +110,7 @@ export interface Program {
   id: string;
   name: string;
   sub: string;
+  lifecycleStatus?: 'active' | 'paused' | 'blocked' | 'archived';
   tariff: number;
   balance: number;
   balanceLabel: string;

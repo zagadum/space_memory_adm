@@ -7,6 +7,7 @@ export type ModalId =
   | "extra"
   | "unlock"
   | "archive"
+  | "recalculate-start-date"
   | "edit-invoice"
   | "korekta"
   | "refund"

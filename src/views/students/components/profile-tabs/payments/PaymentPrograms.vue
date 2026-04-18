@@ -99,6 +99,7 @@
             <div v-if="m.ksef === 'conflict'" class="cbadge cb-conflict">!</div>
             <div v-if="m.ksef === 'error'" class="cbadge cb-error">✕</div>
             <div v-if="m.bonus" class="bonus-strip">⭐ {{ t('payments.detail.bonus').replace('⭐ ','') }}</div>
+            <div v-if="m.prepaid" class="cbadge cb-prepaid">₽</div>
 
             <div class="mc-name">{{ shortMonths[i] }}</div>
             
@@ -627,6 +628,7 @@ function txsFor(p: Program) {
 .cb-split { background: var(--cyan); color: #000; }
 .cb-conflict { background: var(--orange); color: #000; right: 8px; }
 .cb-error { background: var(--red); color: #fff; right: 8px; }
+.cb-prepaid { background: var(--green); color: #fff; left: -3px; right: auto; }
 
 /* bonus strip at bottom of cell */
 .bonus-strip {

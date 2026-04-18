@@ -129,8 +129,22 @@ export const usePaymentsStore = defineStore("payments", () => {
       const res = await paymentsApi.getStudentPayments(studentId);
       student.value = res.student || null;
       programs.value = res.programs || [];
+      projectSummaries.value = programs.value
+        .filter((p) => p.id !== "extras")
+        .map((p) => ({
+          id: p.id,
+          name: p.name,
+          sub: p.sub,
+          tariff: p.tariff,
+          balance: p.balance,
+          balanceLabel: p.balanceLabel,
+          barGradient: p.barGradient,
+        }));
 
       for (const p of programs.value) {
+        if (p.id !== "extras") {
+          calendarByProject.value[p.id] = p.years || {};
+        }
         if (activeYear.value[p.id] == null) {
           const years = Object.keys(p.years || {}).map(Number).sort();
           activeYear.value[p.id] = years.length ? years[years.length - 1] : 2026;
@@ -203,7 +217,7 @@ export const usePaymentsStore = defineStore("payments", () => {
    * Запрос 3 — вызывается по клику на раздел "Транзакции" внутри проекта.
    * Грузит транзакции только для этого проекта.
    * Кэшируется: повторный клик не делает запрос.
-   * Эндпоинт: GET /students/{student_id}/projects/{project_id}/transactions
+   * Эндпоинт: GET /payments/{student_id}/transactions
    */
   async function loadProjectTransactions(projectId: string) {
     // Уже загружены — не делаем повторный запрос
@@ -233,7 +247,13 @@ export const usePaymentsStore = defineStore("payments", () => {
     txLoading.value[programId] = true;
     txError.value[programId] = "";
     try {
-      transactionsByProgram.value[programId] = await paymentsApi.getTransactions(programId);
+      // FIX: передаём student_id вместо prog.id
+      // currentStudentId это "s_1", "s_2", поэтому извлекаем число
+      if (!currentStudentId.value) {
+        throw new Error("Current student ID not set");
+      }
+      const studentId = parseInt(currentStudentId.value.replace('s_', '') || '0', 10);
+      transactionsByProgram.value[programId] = await paymentsApi.getTransactions(studentId);
     } catch (e: unknown) {
       txError.value[programId] = parseApiError(e, "Failed to load transactions");
     } finally {
@@ -306,6 +326,13 @@ export const usePaymentsStore = defineStore("payments", () => {
   // Перезагрузка данных текущего студента (вызывается после мутаций)
   async function reloadCurrent() {
     if (currentStudentId.value) {
+      calendarByProject.value = {};
+      calendarLoading.value = {};
+      calendarError.value = {};
+      newTxByProject.value = {};
+      newTxLoading.value = {};
+      newTxError.value = {};
+      projectSummaries.value = [];
       await loadStudent(currentStudentId.value);
     }
   }

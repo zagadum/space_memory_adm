@@ -419,6 +419,7 @@
       "invoice": "Faktura",
       "korekta": "Korekta",
       "pause": "Pauza",
+      "recalculateStart": "Nowa data startu",
       "refund": "Zwrot",
       "resume": "Wznów",
       "split": "Podziel",
@@ -1305,6 +1306,17 @@
       "commentLabel": "Szczegółowy komentarz",
       "commentPlaceholder": "Napisz bardziej szczegółowo, dlaczego uczeń odchodzi. Ta informacja pomoże nam stać się lepszymi...",
       "endDateLabel": "Data ostatnich zajęć",
+      "futureActionDescriptions": {
+        "keep_credit": "Pozostaw nadpłatę na saldzie ucznia, aby można było ją wykorzystać później przy powrocie lub przeniesieniu.",
+        "refund": "Oznacz pozostałą kwotę do osobnego zwrotu obsługiwanego przez finanse.",
+        "transfer": "Przenieś pozostałą kwotę na inny produkt lub grupę po uzgodnieniu z klientem."
+      },
+      "futureActionLabel": "Co zrobić z pozostałym saldem / nadpłatą",
+      "futureActions": {
+        "keepCredit": "Zostaw jako saldo",
+        "refund": "Przygotuj zwrot",
+        "transfer": "Przenieś na inny program"
+      },
       "reason": "Powód",
       "reasonLabel": "Powód zakończenia",
       "reasons": {
@@ -1318,6 +1330,14 @@
       "title": "Archiwizacja",
       "warning": "To działanie zatrzyma wszystkie przyszłe naliczenia. Miejsce w grupie zostanie zwolnione dla innych uczniów.",
       "warningTitle": "Uwaga:"
+    },
+    "recalculateStartDate": {
+      "description": "Przeliczenie przeniesie przyszłe nieopłacone naliczenia na nową datę startu i ponownie ułoży miesiące w kalendarzu.",
+      "startDateLabel": "Nowa data startu",
+      "submit": "Przelicz kalendarz",
+      "subtitle": "Przesunięcie przyszłego kalendarza od nowej daty startu",
+      "title": "Przeliczenie daty startu",
+      "warning": "Opłacone i częściowo opłacone miesiące nie są przenoszone automatycznie. Jeśli docelowe miesiące są już zajęte przez inne naliczenia, operacja zostanie odrzucona."
     },
     "attendance": {
       "empty": "Brak oceny",

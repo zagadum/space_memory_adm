@@ -150,6 +150,7 @@ async function save() {
       programId,
       value: newTariff.value,
       fromMonthIndex: selectedMonth.value,
+      effectiveYear: activeYear.value,
     });
     await payments.reloadCurrent();
     modal.close();

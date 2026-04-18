@@ -2,33 +2,49 @@
   <div class="action-section">
     <div class="action-label">{{ t("payments.actions") }}</div>
     <div class="action-row">
-      <button class="btn btn-amber btn-sm" @click="modal.open('pause', { programId })">🌙 {{ t("payments.btn.pause") }}</button>
-      <button class="btn btn-ghost btn-sm" @click="modal.open('discount', { programId, year, monthIndex })">🏷️ {{ t("payments.btn.discount") }}</button>
-      <button class="btn btn-ghost btn-sm" @click="modal.open('tariff', { programId, year, monthIndex })">💱 {{ t("payments.btn.tariff") }}</button>
-      <button class="btn btn-pink btn-sm" @click="modal.open('extra', { programId })">➕ {{ t("payments.btn.extra") }}</button>
+      <button v-if="canPause" class="btn btn-amber btn-sm" @click="modal.open('pause', { programId })">🌙 {{ t("payments.btn.pause") }}</button>
+      <button v-if="canDiscount" class="btn btn-ghost btn-sm" @click="modal.open('discount', { programId, year, monthIndex })">🏷️ {{ t("payments.btn.discount") }}</button>
+      <button v-if="canTariff" class="btn btn-ghost btn-sm" @click="modal.open('tariff', { programId, year, monthIndex })">💱 {{ t("payments.btn.tariff") }}</button>
+      <button v-if="canRecalculateStart" class="btn btn-ghost btn-sm" @click="modal.open('recalculate-start-date', { programId })">🗓️ {{ t("payments.btn.recalculateStart") }}</button>
+      <button v-if="canAddExtra" class="btn btn-pink btn-sm" @click="modal.open('extra', { programId })">➕ {{ t("payments.btn.extra") }}</button>
     </div>
-    <div class="action-row">
-      <button class="btn btn-unlock btn-sm" @click="modal.open('unlock', { programId })">🔓 {{ t("payments.btn.unlock") }}</button>
-      <div class="action-divider"></div>
-      <button class="btn btn-ghost btn-sm" @click="modal.open('groupSplit', { programId })">🔄 {{ t("payments.btn.split") }}</button>
-      <button class="btn btn-archive btn-sm" @click="modal.open('archive', { programId })">📦 {{ t("payments.btn.archive") }}</button>
-      <button class="btn btn-green btn-sm" @click="modal.open('resume', { programId })">▶ {{ t("payments.btn.resume") }}</button>
+    <div v-if="canUnlock || canArchive || canResume" class="action-row">
+      <button v-if="canUnlock" class="btn btn-unlock btn-sm" @click="modal.open('unlock', { programId })">🔓 {{ t("payments.btn.unlock") }}</button>
+      <div v-if="(canUnlock && (canArchive || canResume))" class="action-divider"></div>
+      <button v-if="canArchive" class="btn btn-archive btn-sm" @click="modal.open('archive', { programId })">📦 {{ t("payments.btn.archive") }}</button>
+      <button v-if="canResume" class="btn btn-green btn-sm" @click="modal.open('resume', { programId })">▶ {{ t("payments.btn.resume") }}</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { useModalStore } from "../../../../../stores/modal.store";
+import { usePaymentsStore } from "../../../../../stores/payments.store";
 
 const { t } = useI18n();
 const modal = useModalStore();
+const payments = usePaymentsStore();
 
-defineProps<{
+const props = defineProps<{
   programId: string;
   year: string;
   monthIndex: number;
 }>();
+
+const lifecycleStatus = computed(() => {
+  return payments.programs.find((program) => program.id === props.programId)?.lifecycleStatus ?? "active";
+});
+
+const canPause = computed(() => lifecycleStatus.value === "active");
+const canDiscount = computed(() => lifecycleStatus.value === "active");
+const canTariff = computed(() => lifecycleStatus.value === "active");
+const canRecalculateStart = computed(() => lifecycleStatus.value === "active");
+const canAddExtra = computed(() => lifecycleStatus.value === "active");
+const canUnlock = computed(() => lifecycleStatus.value === "blocked");
+const canArchive = computed(() => ["active", "paused", "blocked"].includes(lifecycleStatus.value));
+const canResume = computed(() => ["paused", "archived"].includes(lifecycleStatus.value));
 </script>
 
 <style scoped>

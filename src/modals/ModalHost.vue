@@ -5,6 +5,7 @@
   <ExtraModal v-else-if="openId==='extra'" />
   <UnlockModal v-else-if="openId==='unlock'" />
   <ArchiveModal v-else-if="openId==='archive'" />
+  <RecalculateStartDateModal v-else-if="openId==='recalculate-start-date'" />
   <EditInvoiceModal v-else-if="openId==='edit-invoice'" />
   <KorektaModal v-else-if="openId==='korekta'" />
   <RefundModal v-else-if="openId==='refund'" />
@@ -47,6 +48,7 @@ import TariffModal from "./templates/TariffModal.vue";
 import ExtraModal from "./templates/ExtraModal.vue";
 import UnlockModal from "./templates/UnlockModal.vue";
 import ArchiveModal from "./templates/ArchiveModal.vue";
+import RecalculateStartDateModal from "./templates/RecalculateStartDateModal.vue";
 import EditInvoiceModal from "./templates/EditInvoiceModal.vue";
 import KorektaModal from "./templates/KorektaModal.vue";
 import RefundModal from "./templates/RefundModal.vue";

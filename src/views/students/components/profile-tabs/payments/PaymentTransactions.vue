@@ -30,14 +30,14 @@
 
           <!-- amount + status -->
           <div class="tx-amount-block">
-            <div class="tx-amt" :style="{ color: tx.status === 'paid' ? 'var(--green)' : 'var(--blue)' }">
+            <div class="tx-amt" :style="{ color: isPaidTx(tx) ? 'var(--green)' : 'var(--blue)' }">
               {{ tx.amountFmt || tx.amount + ' zł' }}
             </div>
             <div
               class="tx-status"
-              :style="{ color: tx.status === 'paid' ? 'var(--green)' : 'var(--blue)' }"
+              :style="{ color: isPaidTx(tx) ? 'var(--green)' : 'var(--blue)' }"
             >
-              {{ tx.status === 'paid' ? t('payments.tx.paid') : t('payments.tx.pending') }}
+              {{ isPaidTx(tx) ? t('payments.tx.paid') : '🕐 ' + t('payments.tx.pending') }}
             </div>
           </div>
 
@@ -157,6 +157,15 @@ const txList = computed<Transaction[]>(() => {
 const txIsLoading = computed(() =>
   payments.newTxLoading[props.prog] || payments.txLoading[props.prog] || false
 );
+
+function isPaidTx(tx: Transaction): boolean {
+  const rawFlag = tx.is_paid;
+  const byFlag = rawFlag === true || rawFlag === 1 || rawFlag === "1" || rawFlag === "true";
+  if (byFlag) return true;
+
+  const normalizedStatus = String(tx.status || "").toLowerCase();
+  return ["paid", "completed", "refunded", "partially_refunded"].includes(normalizedStatus);
+}
 
 async function toggle() {
   isOpen.value = !isOpen.value;

@@ -456,6 +456,7 @@
       "invoice": "Invoice",
       "korekta": "Correction",
       "pause": "Pause",
+      "recalculateStart": "New start date",
       "refund": "Refund",
       "resume": "Resume",
       "split": "Split",
@@ -1353,6 +1354,17 @@
       "commentLabel": "Detailed comment",
       "commentPlaceholder": "Write in detail why the student is leaving. This helps us improve...",
       "endDateLabel": "Date of last lesson",
+      "futureActionDescriptions": {
+        "keep_credit": "Keep any overpayment on the student's balance so it can be reused later if the student returns or transfers.",
+        "refund": "Mark the remaining amount for a separate refund flow handled by finance.",
+        "transfer": "Move the remaining amount to another product or group after confirming it with the client."
+      },
+      "futureActionLabel": "What to do with remaining balance / overpayment",
+      "futureActions": {
+        "keepCredit": "Keep as balance",
+        "refund": "Prepare refund",
+        "transfer": "Transfer to another program"
+      },
       "reason": "Reason",
       "reasonLabel": "Reason for completion",
       "reasons": {
@@ -1366,6 +1378,14 @@
       "title": "Archive",
       "warning": "This action will stop all future charges. The place in the group will be freed for other students.",
       "warningTitle": "Warning:"
+    },
+    "recalculateStartDate": {
+      "description": "Recalculation will move future unpaid charges to the new start date and rebuild the calendar months.",
+      "startDateLabel": "New start date",
+      "submit": "Recalculate calendar",
+      "subtitle": "Shift the future calendar from a new start date",
+      "title": "Recalculate start date",
+      "warning": "Paid and partially paid months are not moved automatically. If target months are already occupied by other charges, the operation will be rejected."
     },
     "attendance": {
       "empty": "No grade",

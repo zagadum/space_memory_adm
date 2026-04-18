@@ -33,6 +33,13 @@
         <span class="md-val" :style="{ color: SC[month.s] }">{{ month.a ? month.a + ' zł' : '0 zł' }}</span>
       </div>
 
+      <div v-if="month.prepaid" class="md-row" style="border:1px solid rgba(16,185,129,.25);background:rgba(16,185,129,.06)">
+        <span class="md-lbl">{{ t('payments.balance') }}</span>
+        <span class="md-val" style="color:var(--green)">
+          {{ t('payments.status.paid') }} · {{ Number(month.coverage || 0).toFixed(2) }} zł
+        </span>
+      </div>
+
       <!-- 📊 Занятия -->
       <div v-if="month.lessons != null || month.totalLessons != null" class="md-row">
         <span class="md-lbl">{{ t('payments.detail.lessons') }}</span>
@@ -108,9 +115,9 @@
 
     <!-- ── ACTIONS ── -->
     <div class="md-acts">
-      <button class="md-btn" @click="onDiscount">{{ t('payments.detail.discount') }}</button>
-      <button class="md-btn" @click="onGroupChange">🔄 {{ t('payments.btn.changeGroup') }}</button>
-      <button v-if="month.s === 'pause'" class="md-btn md-btn-green" @click="onResume">▶ {{ t('payments.btn.resume') }}</button>
+      <button v-if="canDiscount" class="md-btn" @click="onDiscount">{{ t('payments.detail.discount') }}</button>
+      <button v-if="canSplitMonth" class="md-btn" @click="onGroupChange">🔄 {{ t('payments.btn.split') }}</button>
+      <button v-if="canResumeMonth" class="md-btn md-btn-green" @click="onResume">▶ {{ t('payments.btn.resume') }}</button>
       <span class="md-hint">{{ t('payments.detail.txHint') }}</span>
     </div>
   </div>
@@ -120,6 +127,7 @@
 import { computed } from "vue";
 import type { MonthObj } from "../../../../../api/mockDb";
 import { useModalStore } from "../../../../../stores/modal.store";
+import { usePaymentsStore } from "../../../../../stores/payments.store";
 import { useI18n } from "vue-i18n";
 
 const { t, tm } = useI18n();
@@ -136,6 +144,16 @@ const emit = defineEmits<{
 }>();
 
 const modal = useModalStore();
+const payments = usePaymentsStore();
+const lifecycleStatus = computed(() => {
+  return payments.programs.find((program) => program.id === props.prog)?.lifecycleStatus ?? 'active';
+});
+const canSplitMonth = computed(() => {
+  if (!props.month) return false;
+  return lifecycleStatus.value === 'active' && (props.month.s === 'partial' || !!props.month.groupSplit?.length);
+});
+const canDiscount = computed(() => lifecycleStatus.value === 'active');
+const canResumeMonth = computed(() => lifecycleStatus.value === 'paused' && props.month?.s === 'pause');
 
 // ── Dictionaries (из HTML-прототипа) ──
 
