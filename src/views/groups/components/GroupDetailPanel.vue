@@ -104,7 +104,7 @@
                 <span class="gp-bar-val" style="color:var(--dim)">—</span>
               </div>
               <div class="gp-bar-row">
-                <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
+                <span class="gp-bar-label">{{ t('newGroups.detail.waitingPayment') }}</span>
                 <div class="gp-bar-track"><div class="gp-bar-fill" style="width:0%"></div></div>
                 <span class="gp-bar-val" style="color:var(--dim)">—</span>
               </div>
@@ -498,6 +498,7 @@ function deriveTeacherShort(fullName: string): string {
   return parts[0].slice(0, 3).toUpperCase()
 }
 
+function buildAutoName(opts: {
   dateStr?: string
   timeStr?: string
   teacher?: NewGroupTeacher | null
