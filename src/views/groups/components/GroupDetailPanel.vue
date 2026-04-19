@@ -13,7 +13,7 @@
             <div class="gp-title">{{ group.name }}</div>
             <div class="gp-subtitle">
               <!-- День (readonly — производное от даты) -->
-              <span>{{ group.day }}</span>
+              <span>{{ normalizeDayToKey(group.day) ? t('newGroups.weekdays.' + normalizeDayToKey(group.day)) : group.day }}</span>
               <span class="sep">·</span>
 
               <!-- Время — кликабельное inline-редактирование -->
@@ -77,7 +77,10 @@
         </div>
         <div class="gp-chips">
           <span :class="['gp-chip', 'blue']">{{ group.type === 'individual' ? t('newGroups.detail.typeIndividualFull') : t('newGroups.detail.typeGroupFull') }}</span>
-          <span v-if="ageInfo" :class="['gp-chip', 'purple']">{{ ageInfo.icon }} {{ ageInfo.label }}</span>
+          <span v-if="ageInfo" :class="['gp-chip', 'purple', 'edit-chip']" @click="agePanelOpen = true">
+            {{ ageInfo.icon }} {{ ageInfo.label }}
+            <span class="edit-icon">✎</span>
+          </span>
           <span class="gp-chip">{{ t('newGroups.detail.createdOn', { date: fmtDate(group.createdDate) }) }}</span>
           <span :class="['gp-chip', daysDiff(group.createdDate) > 14 ? 'amber' : 'green']">{{ t('newGroups.detail.daysWaiting', { n: daysDiff(group.createdDate) }) }}</span>
           <span v-if="group.manager" class="gp-chip">👤 {{ group.manager.name }}</span>
@@ -129,8 +132,8 @@
                 <span class="gp-bar-val" style="color:var(--green)">{{ contractCount }}</span>
               </div>
                <div class="gp-bar-row">
-                 <span class="gp-bar-label">{{ t('newGroups.detail.paid') }}</span>
-                 <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: pct + '%' }"></div></div>
+                 <span class="gp-bar-label">{{ t('newGroups.detail.waitingPayment') }}</span>
+                 <div class="gp-bar-track"><div :class="['gp-bar-fill', pct === 100 ? 'green' : 'amber']" :style="{ width: (100 - pct) + '%' }"></div></div>
                  <span class="gp-bar-val" :style="{ color: pct === 100 ? 'var(--green)' : 'var(--amber)' }">
                    <template v-if="actualPaid === actualTotal && actualTotal > 0">{{ t('newGroups.detail.paidStatus') }}</template>
                    <template v-else>{{ notPaid }}</template>
@@ -365,6 +368,34 @@
         <button class="btn btn-ghost" style="width:100%;justify-content:center" @click="teacherPanelOpen = false">{{ t('newGroups.detail.cancel') }}</button>
       </div>
     </div>
+
+    <!-- AGE CATEGORY SELECTION SUB-PANEL -->
+    <div v-if="agePanelOpen" :class="['asp-panel', 'open']">
+      <div class="asp-header">
+        <div>
+          <div class="asp-title">{{ t('newGroups.detail.selectAgeTitle') }}</div>
+          <div class="asp-sub">{{ t('newGroups.detail.selectAgeSub') }}</div>
+        </div>
+        <div class="gp-close" @click="agePanelOpen = false">✕</div>
+      </div>
+      <div class="asp-list">
+        <div
+          v-for="ag in CANONICAL_AGE_GROUPS"
+          :key="ag.key"
+          :class="['asp-item', group.age === ag.key ? 'selected' : '']"
+          @click="updateAge(ag.key)"
+        >
+          <div class="asp-avatar" :style="{ background: 'var(--app-surface-hi)', color: 'inherit' }">{{ ag.icon }}</div>
+          <div class="asp-info">
+            <div class="asp-name">{{ ag.label }}</div>
+          </div>
+          <span v-if="group.age === ag.key" class="asp-status already">{{ t('newGroups.detail.selected') }}</span>
+        </div>
+      </div>
+      <div class="asp-footer">
+        <button class="btn btn-ghost" style="width:100%;justify-content:center" @click="agePanelOpen = false">{{ t('newGroups.detail.cancel') }}</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -374,7 +405,7 @@ import { useI18n } from 'vue-i18n'
 import type { NewGroup, NewGroupStudent, MasterStudent, NewGroupTeacher } from '../../../api/newGroupsApi'
 import { editGroup } from '../../../api/newGroupsApi'
 import type { RecruitmentBackend } from '../../../api/http'
-import { ageMap, fmtDate, daysDiff } from '../../../utils/newGroupsUtils'
+import { ageMap, fmtDate, daysDiff, normalizeDayToKey, CANONICAL_AGE_GROUPS } from '../../../utils/newGroupsUtils'
 import { useNotificationStore } from '../../../stores/notification.store'
 import { parseApiError } from '../../../api/errorHelper'
 import GroupHistoryPanel from './GroupHistoryPanel.vue'
@@ -422,6 +453,7 @@ const deleteConfirm = ref(false)
 const historyPanelOpen = ref(false)
 const teacherPanelOpen = ref(false)
 const teacherQuery = ref('')
+const agePanelOpen = ref(false)
 
 // ── Inline edit: time ──
 const editingTime = ref(false)
@@ -466,14 +498,15 @@ function deriveTeacherShort(fullName: string): string {
   return parts[0].slice(0, 3).toUpperCase()
 }
 
-function buildAutoName(opts: {
   dateStr?: string
   timeStr?: string
   teacher?: NewGroupTeacher | null
+  age?: string | null
 }): string {
   const dateStr = opts.dateStr ?? props.group.startDate
   const timeStr = opts.timeStr ?? props.group.time
   const teacher = opts.teacher !== undefined ? opts.teacher : props.group.teacher
+  const age = opts.age !== undefined ? opts.age : props.group.age
 
   let res = ''
 
@@ -485,8 +518,8 @@ function buildAutoName(opts: {
   const hour = timeStr ? timeStr.split(':')[0] : ''
   if (hour) res += (res ? ' ' : '') + hour
 
-  if (props.group.age) {
-    res += (res ? ' ' : '') + t(`newGroups.create.ageAdjectives.${props.group.age}`)
+  if (age) {
+    res += (res ? ' ' : '') + t(`newGroups.create.ageAdjectives.${age}`)
   }
 
   if (teacher) {
@@ -600,6 +633,28 @@ function selectTeacher(teacherId: number | null) {
   const newName = buildAutoName({ teacher })
   emit('teacher-assigned', { groupId: props.group.id, teacherId, name: newName || undefined })
   teacherPanelOpen.value = false
+}
+
+async function updateAge(ageKey: string) {
+  try {
+    const newName = buildAutoName({ age: ageKey })
+    const ageLabel = ageMap[ageKey]?.label ?? ageKey
+    await editGroup({
+      group_id: props.group.id,
+      age: ageKey as any,
+      age_name: ageLabel as any,
+      name: newName
+    }, props.backend)
+
+    emit('group-saved', {
+      groupId: props.group.id,
+      updates: { age: ageKey, name: newName }
+    })
+    agePanelOpen.value = false
+    notify.addToast(t('common.success'), 'success')
+  } catch (err: unknown) {
+    notify.addToast(parseApiError(err, t('common.error')), 'error')
+  }
 }
 
 async function confirmAdd() {
@@ -790,6 +845,19 @@ function doDelete() {
 .gp-chip.blue   { background: rgba(79,110,247,0.12);  color: var(--blue);   border-color: rgba(79,110,247,0.3); }
 .gp-chip.amber  { background: rgba(245,158,11,0.12);  color: var(--amber);  border-color: rgba(245,158,11,0.3); }
 .gp-chip.purple { background: rgba(139,92,246,0.12);  color: var(--purple); border-color: rgba(139,92,246,0.3); }
+
+.edit-chip {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.edit-chip:hover {
+  background: rgba(139,92,246,0.22);
+  border-color: var(--purple);
+  box-shadow: 0 0 12px rgba(139,92,246,0.25);
+}
+.edit-chip:hover .edit-icon {
+  opacity: 1;
+}
 
 /* START BAR */
 .gp-start-bar {

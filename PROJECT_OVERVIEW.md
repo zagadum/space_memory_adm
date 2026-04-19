@@ -1,7 +1,7 @@
 # GLS CRM — Project Overview
 
 **Version:** 1.1
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-04-19
 **Status:** Active Development
 
 ---
@@ -476,10 +476,10 @@ GET  /api/v1/auth/me
 #### Students
 ```
 GET  /api/v1/students                      # Paginated list
-GET  /api/v1/payments/student/{id}         # Student profile + programs
-GET  /api/v1/students/{id}/projects        # Program list only
-GET  /api/v1/students/{id}/projects/{id}/calendar  # Payment calendar
-GET  /api/v1/students/{id}/projects/{id}/transactions  # Transactions
+GET  /api/v1/payments/student/{id}         # Student profile + programs (legacy)
+GET  /api/v1/payments/{sid}/projects       # Program list
+GET  /api/v1/payments/{sid}/projects/{pid}/calendar  # Payment calendar
+GET  /api/v1/payments/{sid}/transactions  # Transactions
 GET  /api/v1/student/groups                # Student groups
 GET  /api/v1/student/info                  # Personal info
 GET  /api/v1/student/attendance            # Attendance records
@@ -503,6 +503,7 @@ POST /api/v1/payments/unlock               # Unlock program
 POST /api/v1/payments/split                # Split group (change group)
 POST /api/v1/payments/archive              # Archive program
 POST /api/v1/payments/resume               # Resume from pause
+POST /api/v1/payments/recalculate-start-date # Recalculate start date
 ```
 
 #### Dictionaries
@@ -544,6 +545,8 @@ POST /api/v1/expelled-students/bulk-assign  # Bulk assign manager
 POST /api/v1/expelled-students/bulk-archive # Bulk archive
 
 GET  /api/v1/recruitment/new-students      # Trial students
+GET  /api/v1/recruitment/link-history      # Link Generator history
+POST /api/v1/recruitment/generate-link     # Generate link
 POST /api/v1/recruitment/new-students      # Create trial student
 POST /api/v1/recruitment/new-students/{id}/archive
 
@@ -696,8 +699,9 @@ VITE_USE_MOCK=true npm run dev
 - ✅ Dispute system with reasons
 - ✅ Accountant view (Salary Calculator) with status tracking
 
-#### Recruitment & Re-enrollment
+#### Recruitment
 - ✅ New students (trial) tracking
+- ✅ Link Generator (Personal & Marketing links)
 - ✅ Leads pipeline
 - ✅ Expelled students dashboard
 - ✅ Re-enrollment workflow
@@ -922,4 +926,4 @@ This document provides:
 
 **Maintained by:** GLS Development Team
 **Documentation Version:** 1.1
-**Last Updated:** 2026-04-16
+**Last Updated:** 2026-04-19

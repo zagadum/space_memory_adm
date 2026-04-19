@@ -52,7 +52,7 @@
             <div class="gpp-color-dot" :style="{ background: dotColor(g.age) }" />
             <div class="gpp-item-info">
               <div class="gpp-item-name">{{ g.name }}</div>
-              <div class="gpp-item-meta">{{ g.day }}<template v-if="g.time">, {{ g.time }}</template> · {{ g.teacher?.name ?? '—' }}</div>
+              <div class="gpp-item-meta">{{ normalizeDayToKey(g.day) ? t('newGroups.weekdays.' + normalizeDayToKey(g.day)) : g.day }}<template v-if="g.time">, {{ g.time }}</template> · {{ g.teacher?.name ?? '—' }}</div>
             </div>
           </div>
           <div class="gpp-item-right">
@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ageMap, CANONICAL_AGE_GROUPS } from '../../../utils/newGroupsUtils'
+import { ageMap, CANONICAL_AGE_GROUPS, normalizeDayToKey } from '../../../utils/newGroupsUtils'
 
 interface ApiGroup {
   id: number

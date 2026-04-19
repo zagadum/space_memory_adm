@@ -47,7 +47,7 @@
               <td>
                 <div class="group-name-cell" @click="openPanel(g.id)" style="cursor:pointer">
                   <div class="group-name-link">{{ g.name }}</div>
-                  <div class="group-schedule">{{ g.day }}, {{ g.time }}{{ g.teacher ? ' · ' + g.teacher.name : '' }}</div>
+                  <div class="group-schedule">{{ normalizeDayToKey(g.day) ? t('newGroups.weekdays.' + normalizeDayToKey(g.day)) : g.day }}, {{ g.time }}{{ g.teacher ? ' · ' + g.teacher.name : '' }}</div>
                 </div>
               </td>
               <td>
@@ -196,7 +196,7 @@ import GroupDetailPanel from './components/GroupDetailPanel.vue'
 import GroupPickerPanel from '../recruitment/components/GroupPickerPanel.vue'
 import { useNotificationStore } from '../../stores/notification.store'
 import { parseApiError } from '../../api/errorHelper'
-import { ageMap, fmtDate, daysDiff } from '../../utils/newGroupsUtils'
+import { ageMap, fmtDate, daysDiff, normalizeDayToKey } from '../../utils/newGroupsUtils'
 
 // ── Data ──
 const { t } = useI18n()

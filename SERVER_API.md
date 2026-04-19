@@ -33,7 +33,11 @@ POST       api/v1/payments/refund ..............................................
 POST       api/v1/payments/resume .................................................... v1.payments.resume › pp\Http\Controllers\Api\Payments\PaymentController@resume  
 POST       api/v1/payments/split ....................................................... v1.payments.split › pp\Http\Controllers\Api\Payments\PaymentController@split  
 GET|HEAD   api/v1/payments/student/{id} ................................. v1.payments.student › pp\Http\Controllers\Api\Payments\PaymentController@getStudentPayments  
-POST       api/v1/payments/tariff .............................................. v1.payments.tariff › pp\Http\Controllers\Api\Payments\PaymentController@changeTariff  
+GET|HEAD   api/v1/payments/{sid}/projects ................................. v1.payments.projects › pp\Http\Controllers\Api\Payments\PaymentController@getStudentProjects
+GET|HEAD   api/v1/payments/{sid}/projects/{pid}/calendar ................ v1.payments.calendar › pp\Http\Controllers\Api\Payments\PaymentController@getProjectCalendar
+GET|HEAD   api/v1/payments/{sid}/transactions ......................... v1.payments.transactions › pp\Http\Controllers\Api\Payments\PaymentController@getProjectTransactions
+POST       api/v1/payments/recalculate-start-date ............... v1.payments.recalculate › pp\Http\Controllers\Api\Payments\PaymentController@recalculateStartDate
+POST       api/v1/payments/tariff .............................................. v1.payments.tariff › pp\Http\Controllers\Api\Payments\PaymentController@changeTariff
 GET|HEAD   api/v1/payments/transactions ............................... v1.payments.transactions › pp\Http\Controllers\Api\Payments\PaymentController@getTransactions  
 POST       api/v1/payments/unlock .................................................... v1.payments.unlock › pp\Http\Controllers\Api\Payments\PaymentController@unlock  
 POST       api/v1/payments/update-tariff ................................ v1.payments.update-tariff › pp\Http\Controllers\Api\Payments\PaymentController@changeTariff  
@@ -55,3 +59,10 @@ GET|HEAD   api/v1/students/groups-filter .............................. v1.stude
 GET|HEAD   api/v1/students/list ................................................. v1.students.list-legacy › pp\Http\Controllers\Api\Student\StudentController@getList  
 GET|HEAD   api/v1/students/teacher-filter ........................... v1.students.teacher-filter › pp\Http\Controllers\Api\Student\StudentController@getTeacherFilter  
 GET|HEAD   api/v1/students/{id}/payments ............................... v1.students.payments › pp\Http\Controllers\Api\Payments\PaymentController@getStudentPayments  
+
+GET|HEAD   api/v1/recruitment/new-students ............................ v1.recruitment.students › pp\Http\Controllers\Api\Recruitment\NewStudentsController@index
+GET|HEAD   api/v1/recruitment/link-history ........................... v1.recruitment.link-history › pp\Http\Controllers\Api\Recruitment\LinkGeneratorController@history
+POST       api/v1/recruitment/generate-link ........................ v1.recruitment.generate-link › pp\Http\Controllers\Api\Recruitment\LinkGeneratorController@generate
+GET|HEAD   api/v1/recruitment/leads ...................................... v1.recruitment.leads › pp\Http\Controllers\Api\Recruitment\LeadsController@index
+GET|HEAD   api/v1/recruitment/target-mail .......................... v1.recruitment.target-mail › pp\Http\Controllers\Api\Recruitment\MailController@index
+GET|HEAD   api/v1/recruitment/import-db ............................ v1.recruitment.import-db › pp\Http\Controllers\Api\Recruitment\ImportController@index

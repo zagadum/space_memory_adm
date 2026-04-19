@@ -57,3 +57,34 @@ export function daysDiff(s: string): number {
   const diffTime = today.getTime() - target.getTime()
   return Math.floor(diffTime / 86400000)
 }
+
+/**
+ * Normalizes various day-of-week strings/numbers to a standard key (mon, tue, etc.)
+ */
+export function normalizeDayToKey(day: string | number | null | undefined): string | null {
+  if (day === null || day === undefined) return null
+
+  const raw = String(day).trim()
+  if (!raw) return null
+
+  // If it's a digit 1-7
+  if (/^[1-7]$/.test(raw)) {
+    const keys: Record<string, string> = {
+      '1': 'mon', '2': 'tue', '3': 'wed', '4': 'thu', '5': 'fri', '6': 'sat', '7': 'sun'
+    }
+    return keys[raw] || null
+  }
+
+  const normalized = raw.toLowerCase().replace(/[''ʼ]/g, "'").replace(/[.\s]+/g, '')
+  const map: Record<string, string> = {
+    monday: 'mon', mon: 'mon', 'понедельник': 'mon', 'понеділок': 'mon', 'пн': 'mon', 'poniedziałek': 'mon', 'pn': 'mon',
+    tuesday: 'tue', tue: 'tue', tues: 'tue', 'вторник': 'tue', 'вівторок': 'tue', 'вт': 'tue', 'wtorek': 'tue', 'wt': 'tue',
+    wednesday: 'wed', wed: 'wed', 'среда': 'wed', 'середа': 'wed', 'ср': 'wed', 'środa': 'wed', 'śr': 'wed',
+    thursday: 'thu', thu: 'thu', thur: 'thu', thurs: 'thu', 'четверг': 'thu', 'четвер': 'thu', 'чт': 'thu', 'czwartek': 'thu', 'czw': 'thu',
+    friday: 'fri', fri: 'fri', 'пятница': 'fri', "п'ятниця": 'fri', 'пт': 'fri', 'piątek': 'fri', 'pt': 'fri',
+    saturday: 'sat', sat: 'sat', 'суббота': 'sat', 'субота': 'sat', 'сб': 'sat', 'sobota': 'sat', 'sb': 'sat',
+    sunday: 'sun', sun: 'sun', 'воскресенье': 'sun', 'неділя': 'sun', 'вс': 'sun', 'нд': 'sun', 'niedziela': 'sun', 'nd': 'sun',
+  }
+
+  return map[normalized] ?? null
+}

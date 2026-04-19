@@ -1782,7 +1782,7 @@
       "daysShort": "dn.",
       "daysWaiting": "⏱ {n} dni oczekiwania",
       "deleteBtn": "🗑 Usuń",
-      "deleteConfirm": "Czy na pewno chcesz usunąć grupę",
+      "deleteConfirm": "Czy na pewno chcesz usunąć grupę {name}?",
       "deleteGroup": "🗑 Usuń grupę",
       "deleteTitle": "Usunąć grupę?",
       "deleteWarning": "Tej akcji nie można cofnąć.",
@@ -1795,6 +1795,8 @@
       "removeTeacher": "Usuń nauczyciela",
       "searchStudent": "Szukaj ucznia po imieniu...",
       "searchTeacherPlaceholder": "Szukaj nauczyciela po imieniu...",
+      "selectAgeSub": "Wybierz grupę wiekową",
+      "selectAgeTitle": "Kategoria wiekowa",
       "selectTeacherSub": "Wybierz nauczyciela dla tej grupy",
       "selectTeacherTitle": "Wybierz nauczyciela",
       "selected": "Wybrano",
@@ -1822,6 +1824,7 @@
       "typeIndividualFull": "👤 Indywidualna",
       "willActivate": "{n} się aktywuje",
       "willWait": "{n} oczekuje",
+      "waitingPayment": "Czekamy na opłatę",
       "years": "lat"
     },
     "groupsCount": "{n} grup",
@@ -1858,7 +1861,7 @@
     "status": {
       "recruiting": "Rekrutacja",
       "ready": "Gotowa do startu",
-      "overfilled": "Nadmiar / Optymalizacja",
+      "overfilled": "Przepełnienie / Optymalizacja",
       "unpaidToRemove": "{n} os. nie zapłaciło",
       "allPaid": "Wszystko opłacone"
     },
